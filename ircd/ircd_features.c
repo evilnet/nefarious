@@ -449,6 +449,7 @@ static struct FeatureDesc {
   F_I(HIS_SCRAMBLED_CACHE_TIME, 0, 604800, 0),
   F_B(FLEXABLEKEYS, 0, 0, 0),
   F_B(NOTHROTTLE, 0, 0, 0),
+  F_B(CREATE_CHAN_OPER_ONLY, 0, 0, 0),
 
 #undef F_S
 #undef F_B

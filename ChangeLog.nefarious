@@ -1,10 +1,29 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-27  Reed Loden  <reed@reedloden.com>
+
+	* doc/example.conf: Added FEAT_CREATE_CHAN_OPER_ONLY (restricts 
+	the creation of new channels to oper only) (default: FALSE).
+
+	* include/ircd_features.h: Added FEAT_CREATE_CHAN_OPER_ONLY.
+
+	* ircd/ircd_features.c: Added FEAT_CREATE_CHAN_OPER_ONLY
+	(default: FALSE).
+
+	* ircd/m_ircops.c: Reduced the number of IsAnOper() checks by 
+	checking it one time and setting a variable (int oper).
+
+	* ircd/m_join.c: Implemented FEAT_CREATE_CHAN_OPER_ONLY, 
+	corrected some indenting, and changed MODE_REGONLY to 
+	MODE_ACCONLY in the FEAT_FLEXABLEKEYS check.
+
+	* ircd/s_user.c: /SETHOST now ignores hosts that change nothing.
+
 2004-08-28  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Added new feature FLEXABLEKEYS. When TRUE a user
-	joining a channel with the correct key can get past +rliOMm.
+	* doc/example.conf: Added new feature FLEXABLEKEYS. When TRUE, a
+	user joining a channel with the correct key can get past +rliOMm.
 
 	* include/ircd_features.h: Added new feature FLEXABLEKEYS.
 
@@ -12,8 +31,8 @@
 
 	* ircd/ircd_features.c: Added new feature FLEXABLEKEYS.
 
-	* ircd/m_join.c: Made FLEXABLEKEYS work. If the channel is +m or +M
-	then autovoice the user.
+	* ircd/m_join.c: Made FLEXABLEKEYS work. If the channel is +m
+	or +M, then autovoice the user.
 
 2004-08-27  Reed Loden  <reed@reedloden.com>
 

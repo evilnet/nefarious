@@ -1378,6 +1378,10 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
       *host++ = '\0';
     else /* user can only specifiy host.cc [password] */
       host = hostmask;
+    /* Ignore the assignment if it changes nothing */
+    if (HasSetHost(cptr) &&
+	(ircd_strcmp(cli_user(cptr)->host, host) == 0))
+      return 0;
     /*
      * Oper sethost
      */

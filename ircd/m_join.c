@@ -292,6 +292,9 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       /* Note: check_target_limit will only ever return 0 here */
       sub1_from_channel(chptr); /* created it... */
       continue;
+    } else if (feature_bool(CREATE_CHAN_OPER_ONLY) && !IsAnOper(sptr)) {
+      send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+      continue;
     } else
       joinbuf_join(&create, chptr, flags);
 
@@ -305,11 +308,12 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
     do_names(sptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
 
-    if (((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr)) || (chptr->mode.mode & MODE_MODERATED) &&
-       (flex == 1) && feature_bool(FEAT_FLEXABLEKEYS)) {
-        sendcmdto_one(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr, "%H +v %C",
-          chptr, sptr);
+    if (((chptr->mode.mode & MODE_ACCONLY) && !IsAccount(sptr)) || 
+	(chptr->mode.mode & MODE_MODERATED) &&
+	(flex == 1) && feature_bool(FEAT_FLEXABLEKEYS)) {
+      sendcmdto_one(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
+      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr,
+				       "%H +v %C", chptr, sptr);
     }
   }
 
