@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
+
+	* acinclude.m4: Cleaned up some AC_DEFINE's, dont need acconfig.h now.
+
+	* aclocal.m4: Regenerated (aclocal).
+
+	* config.h.in: Regenerated (autoheader).
+
 2004-09-27  Neil Spierling <vulcan@linux-boxen.org>
 
 	* include/supported.h: Fixed a client parsing issue.
