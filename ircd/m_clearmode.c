@@ -266,8 +266,7 @@ ms_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return send_reply(sptr, ERR_NOPRIVILEGES);
   }
 
-  if (!IsChannelName(parv[1]) || IsLocalChannel(parv[1]) ||
-      !(chptr = FindChannel(parv[1])))
+  if (!IsChannelName(parv[1]) || !(chptr = FindChannel(parv[1])))
     return send_reply(sptr, ERR_NOSUCHCHANNEL, parv[1]);
 
   return do_clearmode(cptr, sptr, chptr, parv[2]);
@@ -318,7 +317,7 @@ mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return send_reply(sptr, ERR_QUARANTINED, chptr->chname, qreason);
 
     for (tmp = chptr->members; tmp; tmp = tmp->next_member)
-      if (IsChannelService(tmp->user)) {
+      if (IsService(tmp->user->server) && IsChannelService(tmp->user)) {
 	/* Impersonate the abuser */
 	sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 				"Failed CLEARMODE for registered channel %s by %s",

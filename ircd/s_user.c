@@ -444,7 +444,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
         && strcmp(cli_passwd(sptr), aconf->passwd))
     {
       ServerStats->is_ref++;
-      IPcheck_connect_fail(cli_ip(sptr));
       send_reply(sptr, ERR_PASSWDMISMATCH);
       return exit_client(cptr, sptr, &me, "Bad Password");
     }
@@ -454,7 +453,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
      */
     if ((killreason=find_kill(sptr))) {
       ServerStats->is_ref++;
-      IPcheck_connect_fail(cli_ip(sptr));
       return exit_client(cptr, sptr, &me,
         killreason == -1 ? "K-lined" : "G-lined");
     }

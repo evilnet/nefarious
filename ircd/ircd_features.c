@@ -260,6 +260,7 @@ static struct FeatureDesc {
   /* features that probably should not be touched */
   F_I(KILLCHASETIMELIMIT, 0, 30, 0),
   F_I(MAXCHANNELSPERUSER, 0, 20, 0),
+  F_I(NICKLEN, 0, 30, 0),
   F_I(AVBANLEN, 0, 40, 0),
   F_I(MAXBANS, 0, 45, 0),
   F_I(MAXSILES, 0, 15, 0),
@@ -272,9 +273,12 @@ static struct FeatureDesc {
   F_I(CONNECTFREQUENCY, 0, 600, init_class),
   F_I(DEFAULTMAXSENDQLENGTH, 0, 40000, init_class),
   F_I(GLINEMAXUSERCOUNT, 0, 20, 0),
-  F_I(SOCKSENDBUF, 0, 61440, 0),
-  F_I(SOCKRECVBUF, 0, 61440, 0),
-  
+  F_I(SOCKSENDBUF, 0, 0, 0),
+  F_I(SOCKRECVBUF, 0, 0, 0),
+  F_I(IPCHECK_CLONE_LIMIT, 0, 4, 0),
+  F_I(IPCHECK_CLONE_PERIOD, 0, 40, 0),
+  F_I(IPCHECK_CLONE_DELAY, 0, 600, 0),  
+
   /* Some misc. default paths */
   F_S(MPATH, FEAT_CASE | FEAT_MYOPER, "ircd.motd", motd_init),
   F_S(RPATH, FEAT_CASE | FEAT_MYOPER, "remote.motd", motd_init),

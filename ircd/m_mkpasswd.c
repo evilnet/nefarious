@@ -105,7 +105,9 @@
 #include "s_debug.h"
 #include "userload.h"
 
+#ifdef HAVE_CRYPT_H
 #include <crypt.h>
+#endif
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,6 +1,24 @@
-2003-11-13 Spike <spike@undernet.org>
-	* ircd/gline.c: Remove the possibility to add a BADCHAN by
-	setting a gline on $R#chan.
+2003-11-23  Reed Loden  <reed@reedloden.com>
+
+	* Sync with u2.10.11.06.(pre2).
+
+	* Fix lots of bugs.
+
+	* Add MODE_STRIP (+S) and MODE_NOAMSG (+T).
+	(credits to NetGamers/SiRVulcaN)
+
+	* Rename MODE_SSLONLY to +z.
+
+	* Add a lot of ASUKA stuff that is disabled by default for
+	various other networks that use evilnet. Most of these required
+	that I redo other things so they would work properly.
+	- Check
+	- XtraOp
+	- HideChans
+	- HideIdle
+
+	* Add FEAT_OPER_LOCAL_CHANNELS so when local channels are
+	disabled, opers can still join.
 
 2003-11-04  Reed Loden  <reed@reedloden.com>
 

@@ -43,11 +43,12 @@
                 " MAXCHANNELS=%i" \
                 " MAXBANS=%i" \
                 " NICKLEN=%i" \
-                " TOPICLEN=%i" \
-                " AWAYLEN=%i" \
-                " KICKLEN=%i"
+                " MAXNICKLEN=%i"
 
-#define FEATURES2 "CHANTYPES=%s" \
+#define FEATURES2 "TOPICLEN=%i" \
+                " AWAYLEN=%i" \
+                " KICKLEN=%i" \
+		" CHANTYPES=%s" \
                 " PREFIX=%s" \
                 " CHANMODES=%s" \
                 " CASEMAPPING=%s" \
@@ -55,10 +56,11 @@
 
 #define FEATURESVALUES1 feature_int(FEAT_MAXSILES), MAXMODEPARAMS, \
 			feature_int(FEAT_MAXCHANNELSPERUSER), \
-			feature_int(FEAT_MAXBANS), NICKLEN, TOPICLEN, \
-			AWAYLEN, TOPICLEN
+			feature_int(FEAT_MAXBANS), feature_int(FEAT_NICKLEN), \
+			NICKLEN
 
-#define FEATURESVALUES2 feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
+#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN,
+			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
 			"(ov)@+", "b,k,l,imnpstrcCMNOQSTz", "rfc1459", \
 			feature_str(FEAT_NETWORK)
 
@@ -67,4 +69,3 @@
 #define infousermodes "dioswkgxhBRXIn"
 
 #endif /* INCLUDED_supported_h */
-
