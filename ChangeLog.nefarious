@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-07-12  Reed Loden  <reed@reedloden.com>
+
+	* include/patchlevel.h: Bumped for release (0.3.0).
+
+	* ircd/version.c.SH: Add '-' to separate lines.
+
 2004-07-11  Reed Loden  <reed@reedloden.com>
 
 	* ChangeLog: Added entry from Vampire- that we forgot.
