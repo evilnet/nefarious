@@ -59,7 +59,7 @@
 			feature_int(FEAT_MAXBANS), feature_int(FEAT_NICKLEN), \
 			NICKLEN
 
-#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN,
+#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, \
 			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
 			"(ov)@+", "b,k,l,imnpstrcCMNOQSTz", "rfc1459", \
 			feature_str(FEAT_NETWORK)
