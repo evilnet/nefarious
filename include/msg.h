@@ -343,6 +343,7 @@ struct Client;
 
 #define MSG_SET			"SET"		/* SET */
 #define TOK_SET			"SET"
+#define CMD_SET			MSG_SET, TOK_SET
 
 #define MSG_RESET		"RESET"		/* RESE */
 #define TOK_RESET		"RESET"

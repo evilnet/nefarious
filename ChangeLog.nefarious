@@ -4,6 +4,10 @@
 	* ircd/m_join.c: Send reason instead of RPL_BANNEDROMCHAN when
 	attempting to join a BADCHAN'd channel + allow wildcards in badchans.
 
+	* ircd/m_set.c: Added remote SET support
+
+	* ircd/parse.c: Addes ms_set reference
+
 	* ircd/table_gen.c: Forbid * in a channel name since this will break
 	 wildcards
 
@@ -17,6 +21,10 @@
 
 	* include/ircd_features.h: Added a new feature: REMOTE_OPER, default
 	   to TRUE
+
+	 * include/msg.h: Added CMD_SET definition
+
+	 * include/handlers.h: Added ms_set prototype
 
 
 2003-01-13  Mathieu Rene <math@rootservices.net>

@@ -419,7 +419,7 @@ feature_set(struct Client* from, const char* const* fields, int count)
   const char *t_str;
   struct FeatureDesc *feat;
 
-  if (from && !HasPriv(from, PRIV_SET))
+  if (from && !HasPriv(from, PRIV_SET) && !IsServer(from))
     return send_reply(from, ERR_NOPRIVILEGES);
 
   if (count < 1) {
