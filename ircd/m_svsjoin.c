@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_sajoin.c
+ * IRC - Internet Relay Chat, ircd/m_svsjoin.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  *
@@ -23,37 +23,92 @@
  * $Id$
  */
 
-#include "channel.h"
+/*
+ * m_functions execute protocol messages on this server:
+ *
+ *    cptr    is always NON-NULL, pointing to a *LOCAL* client
+ *            structure (with an open socket connected!). This
+ *            identifies the physical socket where the message
+ *            originated (or which caused the m_function to be
+ *            executed--some m_functions may call others...).
+ *
+ *    sptr    is the source of the message, defined by the
+ *            prefix part of the message if present. If not
+ *            or prefix not found, then sptr==cptr.
+ *
+ *            (!IsServer(cptr)) => (cptr == sptr), because
+ *            prefixes are taken *only* from servers...
+ *
+ *            (IsServer(cptr))
+ *                    (sptr == cptr) => the message didn't
+ *                    have the prefix.
+ *
+ *                    (sptr != cptr && IsServer(sptr) means
+ *                    the prefix specified servername. (?)
+ *
+ *                    (sptr != cptr && !IsServer(sptr) means
+ *                    that message originated from a remote
+ *                    user (not local).
+ *
+ *            combining
+ *
+ *            (!IsServer(sptr)) means that, sptr can safely
+ *            taken as defining the target structure of the
+ *            message in this server.
+ *
+ *    *Always* true (if 'parse' and others are working correct):
+ *
+ *    1)      sptr->from == cptr  (note: cptr->from == cptr)
+ *
+ *    2)      MyConnect(sptr) <=> sptr == cptr (e.g. sptr
+ *            *cannot* be a local connection, unless it's
+ *            actually cptr!). [MyConnect(x) should probably
+ *            be defined as (x == x->from) --msa ]
+ *
+ *    parc    number of variable parameter strings (if zero,
+ *            parv is allowed to be NULL)
+ *
+ *    parv    a NULL terminated list of parameter pointers,
+ *
+ *                    parv[0], sender (prefix string), if not present
+ *                            this points to an empty string.
+ *                    parv[1]...parv[parc-1]
+ *                            pointers to additional parameters
+ *                    parv[parc] == NULL, *always*
+ *
+ *            note:   it is guaranteed that parv[0]..parv[parc-1] are all
+ *                    non-NULL pointers.
+ */
 #include "config.h"
+
+#include "channel.h"
 #include "client.h"
 #include "handlers.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
-#include "ircd_defs.h"
 #include "ircd_features.h"
-#include "ircd_relay.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
-#include "ircd_snprintf.h"
-#include "ircd_alloc.h"
-#include "list.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
-#include "querycmds.h"
-#include "send.h"
-#include "s_conf.h"
-#include "s_user.h"
 #include "s_debug.h"
-#include "userload.h"
+#include "s_user.h"
+#include "send.h"
 
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 
-
-int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
+/*
+ * ms_svsjoin - server message handler
+ *
+ * parv[0] = sender prefix
+ * parv[1] = numeric of client to act on
+ * parv[2] = channel to force client to join
+ */
+int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
   struct Client *acptr;
   struct Channel *chptr;
   struct JoinBuf join;
@@ -61,13 +116,13 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   unsigned int flags = 0;
   char *name;
 
-  if (parc < 3)
-    return need_more_params(sptr, "SAJOIN");
+  if (parc < 3) {
+    protocol_violation(sptr, "Too few arguments for SVSJOIN");
+    return need_more_params(sptr, "SVSJOIN");
+  }
 
-  if(!(acptr = FindClient(parv[1])))
+  if(!(acptr = findNUser(parv[1])))
     return 0;
-
-  acptr = FindUser(parv[1]);
 
   if (IsChannelService(acptr))
     return 0;
@@ -88,9 +143,8 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   clean_channelname(name);
 
   /* bad channel name */
-  if ((!IsChannelName(name)) || (IsColor(name))) {
+  if ((!IsChannelName(name)) || (IsColor(name)))
     return 0;
-  }
 
   if (chptr->users == 0) {
     flags = CHFL_CHANOP;
@@ -110,8 +164,8 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
 
   if (chptr->topic[0]) {
     send_reply(acptr, RPL_TOPIC, chptr->chname, chptr->topic);
-    send_reply(acptr, RPL_TOPICWHOTIME, chptr->chname, chptr->topic_nick,
-      chptr->topic_time);
+    send_reply(acptr, RPL_TOPICWHOTIME, chptr->chname,
+	       chptr->topic_nick, chptr->topic_time);
   }
 
   do_names(acptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
@@ -120,5 +174,4 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   joinbuf_flush(&create);
 
   return 0;
-
 }

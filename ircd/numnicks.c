@@ -366,5 +366,3 @@ struct Client* find_match_server(char *mask)
   }
   return 0;
 }
-
-

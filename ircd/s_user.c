@@ -1554,15 +1554,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	  ClearAccountOnly(acptr);
 	break;
       case 'B':
-	if (what == MODE_ADD
-	    && feature_int(FEAT_BOT_CLASS) > 0
-	    && get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
-	  SetBot(acptr);
+	if (what == MODE_ADD) {
+	    if ((feature_int(FEAT_BOT_CLASS) > 0
+		&& get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
+		|| force)
+	    SetBot(acptr);
 	else
 	  ClearBot(acptr);
 	break;
       default:
-	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, parv[0]);
+	send_reply(acptr, ERR_UNKNOWNMODE, *m);
         break;
       }
     }

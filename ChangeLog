@@ -1,3 +1,6 @@
+2003-11-01 Isomer <isomer@undernet.org>
+	* include/patchlevel.h: 2.10.11.05 release
+
 2003-10-25 beware <steendijk@xs4all.nl>
         * ircd/m_who.c: Fixed /whois comma separated list with wildcards cpu
         hog bug
@@ -51,6 +54,14 @@
 
 	* ircd/match.c: (match) rewrote function based on existing
 	code from the hybrid ircd -- death to goto
+
+2003-08-05 Diane Bruce  <db@db.net>
+
+	* ircd/parse.c: Fixed the typo the fix of the typo created
+
+2003-08-01 Diane Bruce  <db@db.net>
+
+	* ircd/parse.c: Fixed typo
 
 2003-07-07  Bas Steendijk <steendijk@xs4all.nl>
 
@@ -110,6 +121,10 @@
 
 	* include/patchlevel.h: Bumped to pre3 - hopefuly the last pre
 	before the release.
+
+2003-06-22  Diane Bruce  <db@db.net>
+
+	* ircd/parse.c: Completely rewritten June 2, 2003 - Dianora
 
 2003-06-22  Bas Steendijk  <steendijk@xs4all.nl>
 

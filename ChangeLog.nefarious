@@ -1,3 +1,28 @@
+2003-11-04  Reed Loden  <reed@reedloden.com>
+
+	* Sync with u2.10.11.05 release.
+
+	* include/handlers.h, include/msg.h, ircd/Makefile.in,
+	ircd/parse.c: Rename SAJOIN/SAPART to SVSJOIN/SVSPART.
+
+	* ircd/Makefile.in: Run "make depend".
+
+	* ircd/m_svsjoin.c: Instead of using FindClient and FindUser,
+	use findNUser; also changed other various stuff.
+
+	* ircd/m_svspart.c: Instead of using FindClient and FindUser,
+	use findNUser; also changed other various stuff.
+
+	* ircd/m_wallchops.c: Send a copy of the wallchops back to the
+	sender.
+
+	* ircd/m_wallvoices.c: Send a copy of the wallvoices back to
+	the sender.
+
+	* ircd/numnicks.c: Remove excess lines at EOF.
+
+	* ircd/s_user.c: Redo some various stuff.
+
 2003-11-02  Reed Loden  <reed@reedloden.com>
 
 	* doc/readme.features: Update documentation.
@@ -203,8 +228,8 @@
 	  - +M ACCOUNT Only Channel Mode
 	  - Local/Global LUSERS Counts
 	  - RPL_REDIR Connection Redirection (R:lines)
-	  - SAJOIN Command (services only)
-	  - SAPART Command (services only)
+	  - SVSJOIN Command (services only)
+	  - SVSPART Command (services only)
 
 	* Messed with the REMOTEOPER macros again.
 

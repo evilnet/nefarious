@@ -153,8 +153,6 @@ IRCD_SRC = \
 	m_restart.c \
 	m_rping.c \
 	m_rpong.c \
-	m_sajoin.c \
-	m_sapart.c \
 	m_server.c \
 	m_set.c \
 	m_sethost.c \
@@ -162,6 +160,8 @@ IRCD_SRC = \
 	m_silence.c \
 	m_squit.c \
 	m_stats.c \
+	m_svsjoin.c \
+	m_svspart.c \
 	m_time.c \
 	m_topic.c \
 	m_trace.c \
@@ -903,28 +903,6 @@ m_rpong.o: m_rpong.c ../config.h ../include/client.h \
  ../include/ircd_string.h ../include/ircd_chattr.h ../include/msg.h \
  ../include/numeric.h ../include/numnicks.h ../include/opercmds.h \
  ../include/send.h
-m_sajoin.o: m_sajoin.c ../include/channel.h ../include/ircd_defs.h \
- ../config.h ../include/client.h ../include/dbuf.h ../include/msgq.h \
- ../include/ircd_events.h ../include/ircd_handler.h \
- ../include/handlers.h ../include/hash.h ../include/ircd.h \
- ../include/struct.h ../include/ircd_chattr.h \
- ../include/ircd_features.h ../include/ircd_relay.h \
- ../include/ircd_reply.h ../include/ircd_string.h \
- ../include/ircd_snprintf.h ../include/ircd_alloc.h ../include/list.h \
- ../include/msg.h ../include/numeric.h ../include/numnicks.h \
- ../include/querycmds.h ../include/send.h ../include/s_conf.h \
- ../include/s_user.h ../include/s_debug.h ../include/userload.h
-m_sapart.o: m_sapart.c ../include/channel.h ../include/ircd_defs.h \
- ../config.h ../include/client.h ../include/dbuf.h ../include/msgq.h \
- ../include/ircd_events.h ../include/ircd_handler.h \
- ../include/handlers.h ../include/hash.h ../include/ircd.h \
- ../include/struct.h ../include/ircd_chattr.h \
- ../include/ircd_features.h ../include/ircd_relay.h \
- ../include/ircd_reply.h ../include/ircd_string.h \
- ../include/ircd_snprintf.h ../include/ircd_alloc.h ../include/list.h \
- ../include/msg.h ../include/numeric.h ../include/numnicks.h \
- ../include/querycmds.h ../include/send.h ../include/s_conf.h \
- ../include/s_user.h ../include/s_debug.h ../include/userload.h
 m_server.o: m_server.c ../config.h ../include/client.h \
  ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
  ../include/ircd_events.h ../include/ircd_handler.h ../include/hash.h \
@@ -980,6 +958,22 @@ m_stats.o: m_stats.c ../config.h ../include/s_stats.h \
  ../include/ircd_reply.h ../include/ircd_string.h \
  ../include/ircd_chattr.h ../include/msg.h ../include/numeric.h \
  ../include/s_user.h ../include/send.h
+m_svsjoin.o: m_svsjoin.c ../config.h ../include/channel.h \
+ ../include/ircd_defs.h ../include/client.h ../include/dbuf.h \
+ ../include/msgq.h ../include/ircd_events.h ../include/ircd_handler.h \
+ ../include/handlers.h ../include/hash.h ../include/ircd.h \
+ ../include/struct.h ../include/ircd_chattr.h \
+ ../include/ircd_features.h ../include/ircd_reply.h \
+ ../include/ircd_string.h ../include/msg.h ../include/numeric.h \
+ ../include/numnicks.h ../include/s_debug.h ../include/s_user.h \
+ ../include/send.h
+m_svspart.o: m_svspart.c ../config.h ../include/channel.h \
+ ../include/ircd_defs.h ../include/client.h ../include/dbuf.h \
+ ../include/msgq.h ../include/ircd_events.h ../include/ircd_handler.h \
+ ../include/handlers.h ../include/hash.h ../include/ircd.h \
+ ../include/struct.h ../include/ircd_reply.h ../include/ircd_string.h \
+ ../include/ircd_chattr.h ../include/msg.h ../include/numeric.h \
+ ../include/numnicks.h ../include/s_user.h ../include/send.h
 m_time.o: m_time.c ../config.h ../include/client.h \
  ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
  ../include/ircd_events.h ../include/ircd_handler.h ../include/ircd.h \

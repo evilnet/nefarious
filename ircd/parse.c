@@ -155,11 +155,11 @@ struct Message msgtab[] = {
     { m_unregistered, m_join, ms_join, m_join, m_ignore }
   },
   {
-    MSG_SAJOIN,
-    TOK_SAJOIN,
+    MSG_SVSJOIN,
+    TOK_SVSJOIN,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_unregistered, m_ignore, ms_sajoin, m_ignore, m_ignore }
+    { m_unregistered, m_ignore, ms_svsjoin, m_ignore, m_ignore }
   },
   {
     MSG_MODE,
@@ -204,11 +204,11 @@ struct Message msgtab[] = {
     { m_unregistered, m_part, ms_part, m_part, m_ignore }
   },
   {
-    MSG_SAPART,
-    TOK_SAPART,
+    MSG_SVSPART,
+    TOK_SVSPART,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_unregistered, m_ignore, ms_sapart, m_ignore, m_ignore }
+    { m_unregistered, m_ignore, ms_svspart, m_ignore, m_ignore }
   },
   {
     MSG_TOPIC,
