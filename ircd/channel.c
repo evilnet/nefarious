@@ -1744,6 +1744,8 @@ modebuf_init(struct ModeBuf *mbuf, struct Client *source,
   assert(0 != chan);
   assert(0 != dest);
 
+  if (IsLocalChannel(chan->chname)) dest &= ~MODEBUF_DEST_SERVER;
+
   mbuf->mb_add = 0;
   mbuf->mb_rem = 0;
   mbuf->mb_source = source;
@@ -2915,3 +2917,14 @@ int IsInvited(struct Client* cptr, struct Channel* chptr)
 
   return 0;
 }
+
+int IsColorChannel(char *name)
+{
+	int j, found = 0;
+
+	for (j = 0; name[j]; j++) if (IsCntrl(name[j])) found++;
+
+	if (found) return 1;
+	return 0;
+}
+

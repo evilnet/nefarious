@@ -1393,7 +1393,7 @@ int rehash(struct Client *cptr, int sig)
 
   if (1 == sig)
     sendto_opmask_butone(0, SNO_OLDSNO,
-                         "Got signal SIGHUP, reloading ircd conf. file");
+                         "Got signal SIGHUP, reloading ircd.conf file");
 
   while ((tmp2 = *tmp)) {
     if (tmp2->clients) {

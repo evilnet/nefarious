@@ -1,3 +1,44 @@
+2003-08-28 hikari <shadow@undernet.org>
+	* ircd/Makefile.in: Adding CFLAGS in a couple of places so building
+	with flags that effect linking works properly (-m64 for example).
+
+2003-08-28 hikari <shadow@undernet.org>
+	* ircd/gline.c: Throw a protocol_violation if we get sent an
+	invalid GLINE with $ in it (suspected cause of recent core where
+	a GLINE was missing the R after $ to denote relanme.
+
+2003-08-12 Timothy Vogelsang <net@astrolink.org>
+
+	* ircd/match.c: (match) rewrote function based on existing
+	code from the hybrid ircd -- death to goto
+
+2003-07-07  Bas Steendijk <steendijk@xs4all.nl>
+
+	* ircd/s_user.c: invalidate ban cache for user on host
+	hiding/account
+
+2003-07-04  Bas Steendijk <steendijk@xs4all.nl>
+
+	* include/client.h, ircd/m_userhost.c, ircd/m_userip.c,
+	ircd/m_who.c, ircd/m_whois.c, ircd/whocmds.c: the same code,
+	for "can user A see user B is an oper", appeared in a lot of
+	places. made it a define SeeOper.
+
+2003-07-01  Bas Steendijk  <steendijk@xs4all.nl>
+
+	* ircd/m_names.c: length counter being incremented one too many
+	for each nick, resulting names reply messages are about 50
+	chars shorter than possible. fixed.
+
+2003-06-29  Bas Steendijk  <steendijk@xs4all.nl>
+
+        * ircd/channel.c: don't ever send mode changes for local
+	channels to servers.
+
+2003-06-25  Bas Steendijk  <steendijk@xs4all.nl>
+
+	* ircd/m_burst.c: Clear topic set by netrider on burst.
+
 2003-07-13 hikari <shadow@undernet.org>
 	* ircd/IPcheck.c: Fixed (another) overflow problem in
 	ip_registry_check_local()

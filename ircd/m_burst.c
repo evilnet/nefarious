@@ -212,7 +212,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     for (lp = chptr->banlist; lp; lp = lp->next)
       lp->flags |= CHFL_BURST_BAN_WIPEOUT;
 
-    /* clear topic set by netrider (if set) -beware */
+    /* clear topic set by netrider (if set) */
     if (*chptr->topic) {
       *chptr->topic = '\0';
       *chptr->topic_nick = '\0';

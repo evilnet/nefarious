@@ -111,6 +111,9 @@
 /* Specify whether or not to use poll() */
 #undef USE_POLL
 
+/* Define if you are using OpenSSL */
+#undef USE_SSL
+
 /* Enable debugging code */
 #undef DEBUGMODE
 

@@ -486,7 +486,7 @@ static Numeric replyTable[] = {
 /* 226 */
   { 0 },
 /* 227 */
-  { RPL_STATSqLINE, "q %s %s [%s]", "227" },
+  { RPL_STATSqLINE, "R %s %s [%s]", "227" },
 /* 228 */
   { RPL_STATSQLINE, "Q %s :%s", "228" },
 /* 229 */

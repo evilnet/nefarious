@@ -1,4 +1,3 @@
-#ifdef USE_SSL
 /*
  * IRC - Internet Relay Chat (SSL), ircd/ssl.c
  * Copyright (C) 2002 Alex Badea <vampire@go.ro>
@@ -23,14 +22,6 @@
  * $Id$
  */
  
-#define _XOPEN_SOURCE
-#include <limits.h>
-#include <sys/uio.h>
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>  
-
 #include "config.h" 
 #include "ircd.h"  
 #include "ircd_defs.h"
@@ -44,6 +35,14 @@
 #include "send.h"
 #include "ssl.h"
 
+#ifdef USE_SSL
+#define _XOPEN_SOURCE
+#include <limits.h>
+#include <sys/uio.h>
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 SSL_CTX *ctx;
 static int ssl_inuse = 0;

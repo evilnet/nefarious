@@ -521,7 +521,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     samelastnick=1; 
 
   if (differ) {
-    sendcmdto_serv_butone(&me, CMD_KILL, acptr, "%C :%s (older nick "
+    sendcmdto_serv_butone(&me, CMD_KILL, NULL, "%C :%s (older nick "
 			  "overruled)", acptr, cli_name(&me));
     if (MyConnect(acptr)) {
       sendcmdto_one(acptr, CMD_QUIT, cptr, ":Killed (%s (older "
@@ -534,7 +534,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		    "overruled))", feature_str(FEAT_HIS_SERVERNAME));
   }
   else {
-    sendcmdto_serv_butone(&me, CMD_KILL, acptr, "%C :%s (nick collision from "
+    sendcmdto_serv_butone(&me, CMD_KILL, NULL, "%C :%s (nick collision from "
 			  "same user@host)", acptr, cli_name(&me));
     if (MyConnect(acptr)) {
       sendcmdto_one(acptr, CMD_QUIT, cptr, ":Killed (%s (nick "

@@ -423,7 +423,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ircd_strncpy(user->realhost, cli_sockhost(sptr), HOSTLEN);
     aconf = cli_confs(sptr)->value.aconf;
 
-    if ((0 == find_csline(sptr, cli_sockhost(sptr)))) {
+    if ((find_csline(sptr, cli_sockhost(sptr)) != NULL)) {
       return exit_client(cptr, sptr, &me, "No Authorization - use another server");
     }
 
@@ -1125,6 +1125,11 @@ int hide_hostmask(struct Client *cptr, unsigned int flag)
   if (MyConnect(cptr) && !feature_bool(FEAT_HOST_HIDING) && (flag == FLAG_HIDDENHOST))
     return 0;
 
+  /* Invalidate all bans against the user so we check them again */
+  for (chan = (cli_user(cptr))->channel; chan;
+       chan = chan->next_channel)
+     ClearBanValid(chan);
+
   /* If the user is +h, we don't hide the hostmask.  Set the flag to keep sync though */
   if (HasSetHost(cptr)) {
     SetFlag(cptr, flag);
@@ -1154,6 +1159,8 @@ int hide_hostmask(struct Client *cptr, unsigned int flag)
    * and set the modes, if any
    */
   for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
+    if (IsZombie(chan))
+      continue;
     sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr,
       "%H", chan->channel);
     if (IsChanOp(chan) && HasVoice(chan)) {
@@ -1528,20 +1535,21 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         }
         break;
       case 'R':
-        if (what == MODE_ADD)
-          SetAccountOnly(acptr);
-        else
-          ClearAccountOnly(acptr);
-        break;
+	if (what == MODE_ADD)
+	  SetAccountOnly(acptr);
+	else
+	  ClearAccountOnly(acptr);
+	break;
       case 'B':
-       if (what == MODE_ADD
-           && feature_int(FEAT_BOT_CLASS) > 0
-           && get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
-         SetBot(acptr);
-       else
-         ClearBot(acptr);
-       break;
+	if (what == MODE_ADD
+	    && feature_int(FEAT_BOT_CLASS) > 0
+	    && get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
+	  SetBot(acptr);
+	else
+	  ClearBot(acptr);
+	break;
       default:
+	send_reply(sptr, ERR_UMODEUNKNOWNFLAG, parv[0]);
         break;
       }
     }

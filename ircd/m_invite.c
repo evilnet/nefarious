@@ -145,6 +145,12 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!IsChannelPrefix(*parv[2]))
     return 0;
 
+  /* bad channel name */
+  if ((!IsChannelName(parv[2])) || (IsColorChannel(parv[2]))) {
+    send_reply(sptr, ERR_NOSUCHCHANNEL, parv[2]);
+    return 0;
+  }
+
   if (!(chptr = FindChannel(parv[2]))) {
     if (IsLocalChannel(parv[2])) {
       send_reply(sptr, ERR_NOTONCHANNEL, parv[2]);

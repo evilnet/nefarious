@@ -1,3 +1,34 @@
+2003-09-05  Reed Loden  <reed@reedloden.com>
+
+	* Added a lot and fixed a ton. I'll finish this ChangeLog entry
+	later when I have more time.
+
+2003-08-25  Martijn Smit  <wasted@whatnet.org>
+
+	* include/channel.h, ircd/channel.c, ircd/m_invite.c,
+	ircd/m_join.c: Don't allow users to use color codes with
+	/invite and move color dection to a function for further use.
+
+2003-08-20  David Mansell  <splidge@quakenet.org>
+
+	* ircd/s_user.c (hide_hostmask): When rejoining a user to
+	channels, don't send joins to channels where the user is a
+	zombie.
+
+2003-08-20  David Mansell  <splidge@quakenet.org>
+
+	* ircd/m_nick.c: Fix problem where collide kills are not sent
+	to all servers.
+
+2003-07-18  Patrick N.  <smash@web.de>
+
+	* ircd/s_user.c: added sending of ERR_UMODEUNKNOWNFLAG
+
+2003-07-16  Thomas Sader  <thommey@laxin.de>
+
+	* ircd/m_kick.c: We need to check if the user being kicked is
+	actually on the channel before saying you can't kick he/she/it.
+
 2003-07-15  Mathieu Rene  <math@rootservices.net>
 
 	* include/s_user.h, ircd/s_user.c: Fixed a warning by removing
@@ -41,6 +72,8 @@
 	"Redirection lines".
 
 	* Stomped out several compiler warnings.
+
+	* Oops, forgot doc/readme.features.
 
 2003-07-05  Reed Loden  <reed@reedloden.com>
 

@@ -60,8 +60,6 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   struct JoinBuf join;
   struct JoinBuf create;
   unsigned int flags = 0;
-  int j;
-  int k = 0;
   char *name;
 
   if (parc < 3)
@@ -90,15 +88,8 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   name = chptr->chname;
   clean_channelname(name);
 
-  if (!IsChannelName(name)) { /* bad channel name */
-    return 0;
-  }
-
-  for (k = 0, j = 0; name[j]; j++)
-    if (IsCntrl(name[j]))
-      k++;
-
-  if ( k > 0 ) {
+  /* bad channel name */
+  if ((!IsChannelName(name)) || (IsColorChannel(name))) {
     return 0;
   }
 

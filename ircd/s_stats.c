@@ -296,7 +296,7 @@ stats_cslines(struct Client* to, struct StatDesc* sd, int stat, char* param)
   struct csline *csline;
 
   for (csline = GlobalConnStopList; csline; csline = csline->next)
-    send_reply(to, RPL_STATSqLINE, csline->mask, csline->server, csline->port);
+    send_reply(to, RPL_STATSRLINE, csline->mask, csline->server, csline->port);
 }
 
 static void

@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, include/common.c
+ * IRC - Internet Relay Chat, ircd/table_gen.c
  * Copyright (C) 1998 Andrea Cocito
  *
  * This program is free software; you can redistribute it and/or modify

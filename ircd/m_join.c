@@ -171,8 +171,6 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct Gline *gline;
   unsigned int flags = 0;
   int i;
-  int j;
-  int k = 0;
   char *p = 0;
   char *chanlist;
   char *name;
@@ -195,7 +193,8 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     if (join0(&join, cptr, sptr, name)) /* did client do a JOIN 0? */
       continue;
 
-    if (!IsChannelName(name)) { /* bad channel name */
+    /* bad channel name */
+    if ((!IsChannelName(name)) || (IsColorChannel(name))) {
       send_reply(sptr, ERR_NOSUCHCHANNEL, name);
       continue;
     }
