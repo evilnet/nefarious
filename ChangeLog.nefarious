@@ -1,7 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-25  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* ircd/ssl.c: Generate an error message when a client connects to
+	a SSL port on a normal connection (non SSL).
+
+2004-08-24  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/s_bsd.c: SSL bug fix, was causing cores.
 

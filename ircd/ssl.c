@@ -71,6 +71,10 @@ static void accept_ssl(struct ssl_data *data)
     if (err) {
       ERR_error_string(err, string);
       Debug((DEBUG_ERROR, "SSL_accept: %s", string));
+
+      const char* const error_ssl = "ERROR :SSL Connection Error\r\n";
+      write(data->fd, error_ssl, strlen(error_ssl));
+
       abort_ssl(data);
     }
     return;   
