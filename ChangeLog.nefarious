@@ -3,6 +3,12 @@
 
 2005-01-28  Neil Spierling <sirvulcan@gmail.com>
 
+	* include/check.h: Quakenet updates, flags added.
+
+	* ircd/gline.c: Quakenet updates, few nick gline changes.
+
+2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+
 	* doc/example.conf: Changed RECORD to REPLY for X:Lines.
 
 	* include/ircd_features.h: Added an undocumented F:Line for testing

@@ -85,6 +85,9 @@ canon_userhost(char *userhost, char **user_p, char **host_p, char *def_user)
   if (*userhost == '$') {
     *user_p = userhost;
     *host_p = NULL;
+#ifdef NICKGLINES
+    *nick_p = NULL;
+#endif
     return;
   }
 
@@ -882,17 +885,19 @@ gline_find(char *userhost, unsigned int flags)
 #ifdef NICKGLINES
       if ((gline->gl_nick == NULL) && (gline->gl_host == NULL)) {
          if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0) ||
-                 (!gline->gl_host && !host)) &&
-                 ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-                 (user && ircd_strcmp(gline->gl_user, user) == 0)))
+            (!gline->gl_host && !host)) &&
+            ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
+            (user && ircd_strcmp(gline->gl_user, user) == 0)) &&
+            ((!nick && gline->gl_nick && ircd_strcmp(gline->gl_nick, "*") == 0) ||
+            (nick && gline->gl_nick && ircd_strcmp(gline->gl_nick, nick) == 0) || (!gline->gl_nick && !nick)))
            break;
      } else {
          if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0) ||
-                 (!gline->gl_host && !host)) &&
-		 ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-		 (user && ircd_strcmp(gline->gl_user, user) == 0)) &&
-		 ((!nick && ircd_strcmp(gline->gl_nick, "*") == 0) ||
-		 (nick && ircd_strcmp(gline->gl_nick, nick) == 0)))
+            (!gline->gl_host && !host)) &&
+            ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
+            (user && match(gline->gl_user, user) == 0)) &&
+            ((!nick && gline->gl_nick && ircd_strcmp(gline->gl_nick, "*") == 0) ||
+            (nick && gline->gl_nick && (match(gline->gl_nick, nick) == 0)) || (!gline->gl_nick && !nick)))
   	   break;
       }
 #else
@@ -1229,6 +1234,9 @@ IsNickGlined(struct Client *cptr, char *nick)
       continue;
     }
     
+    if (GlineIsRealName(gline)) /* skip realname glines */
+      continue;
+
     if (!ircd_strcmp(gline->gl_nick, "*"))	/* skip glines w. wildcarded nick */
       continue;
 

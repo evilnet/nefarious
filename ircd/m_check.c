@@ -43,8 +43,15 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "s_user.h"
+#include "support.h"
 
 #include <string.h>
+
+#define CHECK_CHECKCHAN 0x01 /* -c */
+#define CHECK_SHOWUSERS 0x02 /* ! -u */
+#define CHECK_OPSONLY   0x04 /* -o */
+#define CHECK_SHOWIPS   0x08 /* -i */
+#define CHECK_CIDRMASK  0x10 /* automatically detected when performing a hostmask /CHECK */
 
 /*
  * - ASUKA ---------------------------------------------------------------------
@@ -56,29 +63,58 @@
  * -----------------------------------------------------------------------------
  */
 
+/*
+ * Syntax: CHECK <channel|nick|server|hostmask> [-flags]
+ * 
+ * Where valid flags are:
+ * -c: Show channels when checking a hostmask.
+ * -i: Show IPs instead of hostnames when displaying results.
+ * -o: Only show channel operators when checking a channel.
+ * -u: Hide users when checking a channel.
+ * 
+ * <hostmask> can be of the form host, user@host, nick!user@host, 
+ * with host being host.domain.cc, 127.0.0.1 or 127.0.0.0/24.
+ * Wildcards are supported.
+ */
 int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
    struct Channel *chptr;
    struct Client *acptr;
-   int showchan = 0, showusers = 1, i;
+   char *param;
+   int flags = CHECK_SHOWUSERS, i;
+
 
    if (!feature_bool(FEAT_CHECK))
      return send_reply(sptr, ERR_DISABLED, "CHECK");
 
-   if (parc < 2)
-   {
+   if (parc < 2) {
       send_reply(sptr, ERR_NEEDMOREPARAMS, "CHECK");
       return 0;
    }
 
-   /* This checks to see if -c has been supplied for hostmask checking */
-   if (parc >= 3)
-   {
-      for (i = 2; i < parc; ++i)
-      {
-         if (strncmp(parv[i], "-c", 2) == 0) showchan = 1;
-         if (strncmp(parv[i], "-u", 2) == 0) showusers = 0;
-      }
+   /* This checks to see if any flags have been supplied */
+   if ((parc >= 3) && (parv[2][0] == '-')) {
+    for (i = 0; parv[2][i]; i++) {
+        switch (parv[2][i]) {
+       case 'c':
+         flags |= CHECK_CHECKCHAN;
+         break;
+        
+       case 'o':
+         flags |= CHECK_OPSONLY; /* fall through */
+       case 'u':
+         flags &= ~(CHECK_SHOWUSERS);
+         break;
+        
+       case 'i':
+         flags |= CHECK_SHOWIPS;
+         break;
+        
+       default:
+         /* might want to raise some sort of error here? */
+         break;
+       }
+     }
    }
 
    if (IsChannelName(parv[1]))  /* channel */
@@ -86,7 +122,7 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       if ((chptr = FindChannel(parv[1])))
       {
          checkChannel(sptr, chptr);
-         checkUsers(sptr, chptr, showusers);
+         checkUsers(sptr, chptr, flags);
       }
       else
       {
@@ -103,52 +139,43 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
     checkClient(sptr, acptr);
    }
-   else if ((acptr = FindServer(parv[1])))  /* server */
-   {
-      checkServer(sptr, acptr);
+   else if ((acptr = FindServer(parv[1]))) { /* server */
+     checkServer(sptr, acptr);
    }
-   else if (checkHostmask(sptr, parv[1], showchan) > 0)  /* hostmask */
-   {
-      return 1;
-   }
-   else  /* no match */
-   {
-      send_reply(sptr, ERR_SEARCHNOMATCH, "CHECK", parv[1]);
-   }
+   else if (checkHostmask(sptr, parv[1], flags) > 0) /* hostmask */
+     return 1;
+   else /* no match */
+     send_reply(sptr, ERR_SEARCHNOMATCH, "CHECK", parv[1]);
+
  
   return 1;
-
 }
 
-static int checkClones(struct Channel *chptr, char *nick, char *host)
-{
-   int clones = 0;
-   struct Membership *lp;
-   struct Client *acptr;
+static int checkClones(struct Channel *chptr, char *nick, char *host) {
+  int clones = 0;
+  struct Membership *lp;
+  struct Client *acptr;
 
-   for (lp = chptr->members; lp; lp = lp->next_member) 
-   {
-      acptr = lp->user;
-      if (!strcmp(acptr->cli_user->realhost, host) && strcmp(acptr->cli_name, nick))
-      {
-         /* this is a clone */
-         clones++;
-      }
-   }
+  for (lp = chptr->members; lp; lp = lp->next_member) {
+    acptr = lp->user;
+    if (!strcmp(acptr->cli_user->realhost, host) && strcmp(acptr->cli_name, nick)) {
+      /* this is a clone */
+      clones++;
+    }
+  }
 
-   return ((clones) ? clones + 1 : 0);
+  return ((clones) ? clones + 1 : 0);
 }
 
-void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
-{
-   struct Membership *lp;
-   struct SLink *slp;
-   struct Client *acptr;
+void checkUsers(struct Client *sptr, struct Channel *chptr, int flags) {
+  struct Membership *lp;
+  struct SLink *slp;
+  struct Client *acptr;
 
    char outbuf[BUFSIZE], ustat[64];
    int cntr = 0, opcntr = 0, hopcntr = 0, vcntr = 0, clones = 0, bans = 0, excepts = 0, c = 0, authed = 0;
 
-   if (showusers) {
+   if (flags & CHECK_SHOWUSERS) {
      if (feature_bool(FEAT_HALFOPS))
        send_reply(sptr, RPL_DATASTR, "Users (@ = op, % = halfop, + = voice, * = clone)");
      else
@@ -157,6 +184,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
 
    for (lp = chptr->members; lp; lp = lp->next_member)
    {
+      int opped = 0;
 
       acptr = lp->user;
 
@@ -174,6 +202,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
       {
          strcat(ustat, "@");
          opcntr++;
+         opped = 1;
       }
 
       else if (chptr && IsHalfOp(lp))
@@ -188,16 +217,15 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
          vcntr++;
       }
       else
-      {
          strcat(ustat, " ");
-      }
 
       if ((c = IsAccount(acptr)) != 0) ++authed;
 
-      if (showusers) {
-         ircd_snprintf(0, outbuf, sizeof(outbuf), "%s%c", acptr->cli_info, COLOR_OFF);
-         send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->realusername,
-              acptr->cli_user->realhost, outbuf, (c ? acptr->cli_user->account : ""));
+      if ((flags & CHECK_SHOWUSERS) || ((flags & CHECK_OPSONLY) && opped)) {
+        ircd_snprintf(0, outbuf, sizeof(outbuf), "%s%c", acptr->cli_info, COLOR_OFF);
+        send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->realusername,
+            (flags & CHECK_SHOWIPS) ? ircd_ntoa((const char*)&(cli_ip(acptr))) : acptr->cli_user->realhost, outbuf, 
+            (c ? acptr->cli_user->account : ""));
       }
 
       cntr++;
@@ -218,8 +246,8 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
 
    send_reply(sptr, RPL_DATASTR, " ");
 
-   /* Do not display bans if ! showusers */
-   if (!showusers) {
+   /* Do not display bans if ! flags & CHECK_SHOWUSERS */
+   if (!(flags & CHECK_SHOWUSERS)) {
      send_reply(sptr, RPL_ENDOFCHECK, " ");
      return;
    }
@@ -235,9 +263,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
    }
 
    if (bans == 0)
-   {
-      send_reply(sptr, RPL_DATASTR, "<none>");
-   }
+     send_reply(sptr, RPL_DATASTR, "<none>");
 
    /* Excepts */
    if (feature_bool(FEAT_EXCEPTS)) {
@@ -251,9 +277,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
      }
 
      if (excepts == 0)
-     {
        send_reply(sptr, RPL_DATASTR, "<none>");
-     }
    }
 
    send_reply(sptr, RPL_ENDOFCHECK, " ");
@@ -274,11 +298,8 @@ void checkChannel(struct Client *sptr, struct Channel *chptr)
 
    /* Topic */
    if (strlen(chptr->topic) <= 0)
-   {
       send_reply(sptr, RPL_DATASTR, "          Topic:: <none>");
-   }
-   else 
-   {
+   else {
       ircd_snprintf(sptr, outbuf, sizeof(outbuf), "          Topic:: %s", chptr->topic);
       send_reply(sptr, RPL_DATASTR, outbuf);
 
@@ -297,19 +318,13 @@ void checkChannel(struct Client *sptr, struct Channel *chptr)
    channel_modes(sptr, modebuf, parabuf, sizeof(modebuf), chptr);
 
    if(modebuf[1] == '\0')
-   {
       strcat(outbuf, "<none>");
-   }
-   else if(*parabuf)
-   {
+   else if(*parabuf) {
       strcat(outbuf, modebuf);
       strcat(outbuf, " ");
       strcat(outbuf, parabuf);
-   }
-   else
-   {
+   } else
       strcat(outbuf, modebuf);
-   }
 
    send_reply(sptr, RPL_DATASTR, outbuf);
 
@@ -354,13 +369,9 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    send_reply(sptr, RPL_DATASTR, outbuf);
 
    if (IsService(acptr) == -1)
-   {
       send_reply(sptr, RPL_DATASTR, "         Status:: Network Service");
-   }
    else if (IsAnOper(acptr))
-   {
       send_reply(sptr, RPL_DATASTR, "         Status:: IRC Operator");
-   }
 
    ircd_snprintf(0, outbuf, sizeof(outbuf), "   Connected to:: %s", cli_name(acptr->cli_user->server));
    send_reply(sptr, RPL_DATASTR, outbuf);
@@ -375,7 +386,8 @@ void checkClient(struct Client *sptr, struct Client *acptr)
       strcpy(outbuf, "       Umode(s):: <none>");
    else
       ircd_snprintf(0, outbuf, sizeof(outbuf), "       Umode(s):: +%s", umode_str(acptr));
-      send_reply(sptr, RPL_DATASTR, outbuf);
+
+   send_reply(sptr, RPL_DATASTR, outbuf);
 
    if (acptr->cli_user->joined == 0)
       send_reply(sptr, RPL_DATASTR, "     Channel(s):: <none>");
@@ -400,11 +412,9 @@ void checkClient(struct Client *sptr, struct Client *acptr)
       *chntext = '\0';
 
       strcpy(chntext, "     Channel(s):: ");
-      for (lp = acptr->cli_user->channel; lp; lp = lp->next_channel)
-      {
+      for (lp = acptr->cli_user->channel; lp; lp = lp->next_channel) {
          chptr = lp->channel;
-         if (len + strlen(chptr->chname) + mlen > BUFSIZE - 5) 
-         {
+         if (len + strlen(chptr->chname) + mlen > BUFSIZE - 5) {
             send_reply(sptr, RPL_DATASTR, chntext);
             *chntext = '\0';
             strcpy(chntext, "     Channel(s):: ");
@@ -412,21 +422,14 @@ void checkClient(struct Client *sptr, struct Client *acptr)
          }
          if (IsDeaf(acptr))
             *(chntext + len++) = '-';
+         if (is_chan_op(acptr, chptr))
+            *(chntext + len++) = '@';
+         if (is_half_op(acptr, chptr))
+            *(chntext + len++) = '%';
          if (IsOper(sptr) && !ShowChannel(sptr,chptr))
             *(chntext + len++) = '*';
          if (IsZombie(lp))
-         {
             *(chntext + len++) = '!';
-         }
-         else
-         {
-            if (IsChanOp(lp))
-               *(chntext + len++) = '@';
-           else if (IsHalfOp(lp))
-               *(chntext + len++) = '%';
-            else if (HasVoice(lp))
-               *(chntext + len++) = '+';
-         }
          if (len)
             *(chntext + len) = '\0';
 
@@ -437,15 +440,14 @@ void checkClient(struct Client *sptr, struct Client *acptr)
       }
 
       if (chntext[0] != '\0')
-      send_reply(sptr, RPL_DATASTR, chntext);
+        send_reply(sptr, RPL_DATASTR, chntext);
    }
 
    /* If client processing command ISN'T target (or a registered
     * Network Service), show idle time since the last time we
     * parsed something.
     */
-   if (MyUser(acptr) && !(IsService(acptr) == -1) && !(strCasediff(acptr->cli_name, sptr->cli_name) == 0)) 
-   {
+   if (MyUser(acptr) && !(IsService(acptr) == -1) && !(strCasediff(acptr->cli_name, sptr->cli_name) == 0)) {
       nowr = CurrentTime - acptr->cli_user->last;
       ircd_snprintf(0, outbuf, sizeof(outbuf), "       Idle for:: %d days, %02ld:%02ld:%02ld",
          nowr / 86400, (nowr / 3600) % 24, (nowr / 60) % 60, nowr % 60);
@@ -453,8 +455,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    }
 
    /* Away message (if applicable) */
-   if (acptr->cli_user->away) 
-   {
+   if (acptr->cli_user->away) {
       ircd_snprintf(0, outbuf, sizeof(outbuf), "   Away message:: %s", acptr->cli_user->away);
       send_reply(sptr, RPL_DATASTR, outbuf);
    }
@@ -505,187 +506,215 @@ void checkServer(struct Client *sptr, struct Client *acptr)
    ircd_snprintf(0, outbuf, sizeof(outbuf), "        Numeric:: %s --> %d", NumServ(acptr), base64toint(acptr->cli_yxx));
    send_reply(sptr, RPL_DATASTR, outbuf);
 
+   ircd_snprintf(0, outbuf, sizeof(outbuf), "          Users:: %d / %d", cli_serv(acptr)->clients, 
+                 base64toint(cli_serv(acptr)->nn_capacity));
+   send_reply(sptr, RPL_DATASTR, outbuf);
+
+   if (IsBurst(acptr))
+     send_reply(sptr, RPL_DATASTR, "         Status:: Bursting");
+   else if (IsBurstAck(acptr))
+     send_reply(sptr, RPL_DATASTR, "         Status:: Awaiting EOB Ack");
+   else if (IsService(acptr))
+     send_reply(sptr, RPL_DATASTR, "         Status:: Network Service");
+   else if (IsHub(acptr))
+     send_reply(sptr, RPL_DATASTR, "         Status:: Network Hub");
+
+   if (feature_bool(FEAT_CHECK_EXTENDED)) {
+     int dlinkc = 0;
+     struct DLink* slink = NULL;
+    
+     send_reply(sptr, RPL_DATASTR, " ");
+     send_reply(sptr, RPL_DATASTR, "Downlinks::");
+     for (slink = cli_serv(acptr)->down; slink; slink = slink->next) {
+       ircd_snprintf(0, outbuf, sizeof(outbuf), "[%d] - %s%s", ++dlinkc, 
+             IsBurst(slink->value.cptr) ? "*" : IsBurstAck(slink->value.cptr) ? "!" : IsService(slink->value.cptr) ? "=" : IsHub(slink->value.cptr) ? "+" : " ", 
+             cli_name(slink->value.cptr));
+       send_reply(sptr, RPL_DATASTR, outbuf);
+     }
+
+     if (!dlinkc)
+       send_reply(sptr, RPL_DATASTR, "<none>");
+   }
+
    /* Send 'END OF CHECK' message */
    send_reply(sptr, RPL_ENDOFCHECK, " ");
 }
 
-signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan)
-{
-   struct Client *acptr;
-   struct Channel *chptr;
-   struct Membership *lp;
-   int count = 0, found = 0;
-   char outbuf[BUFSIZE];
-   char targhost[NICKLEN + USERLEN + HOSTLEN + 3], curhost[NICKLEN + USERLEN + HOSTLEN + 3];
-   char nickm[NICKLEN + 1], userm[USERLEN + 1], hostm[HOSTLEN + 1];
-   char *p = NULL;
+signed int checkHostmask(struct Client *sptr, char *hoststr, int flags) {
+  struct Client *acptr;
+  struct Channel *chptr;
+  struct Membership *lp;
+  int count = 0, found = 0;
+  char outbuf[BUFSIZE];
+  char targhost[NICKLEN + USERLEN + HOSTLEN + 3], curhost[NICKLEN + USERLEN + HOSTLEN + 3];
+  char nickm[NICKLEN + 1], userm[USERLEN + 1], hostm[HOSTLEN + 1];
+  char *p = NULL;
+  struct in_addr cidr_check;
+  int cidr_check_bits;
 
-   strcpy(nickm,"*");
-   strcpy(userm,"*");
-   strcpy(hostm,"*");
+  strcpy(nickm,"*");
+  strcpy(userm,"*");
+  strcpy(hostm,"*");
 
-   if (!strchr(hoststr, '!') && !strchr(hoststr, '@'))
-   {
-      ircd_strncpy(hostm,hoststr,HOSTLEN);
-   }
-   else
-   {
-      if ((p = strchr(hoststr, '@')))
-      {
-         *p++ = '\0';
-         if (*p) ircd_strncpy(hostm,p, HOSTLEN);
+  if (!strchr(hoststr, '!') && !strchr(hoststr, '@'))
+    ircd_strncpy(hostm,hoststr,HOSTLEN);
+  else {
+    if (p = strchr(hoststr, '@')) {
+      *p++ = '\0';
+      if (*p) ircd_strncpy(hostm,p, HOSTLEN);
+    }
+
+    /* Get the nick!user mask */
+    if (p = strchr(hoststr, '!')) {
+      *p++ = '\0';
+      if (*p) ircd_strncpy(userm,p,USERLEN);
+      if (*hoststr) ircd_strncpy(nickm,hoststr,NICKLEN);
+    }
+    else if (*hoststr) {
+      /* Durz: We should only do the following *IF* the hoststr has not already been
+       * copied into hostm (ie. neither ! or @ specified).. otherwise, when we do
+       * /quote check *.barrysworld.com - we end up with targhost as: *!*.barryswo@*.barrysworld.com
+       */
+      ircd_strncpy(userm,hoststr,USERLEN);
+    }
+  }
+  
+  if ((p = strchr(hostm, '/')) || inet_aton(hostm, &cidr_check)) {
+    if (p)
+      *p = '\0';
+    if (inet_aton(hostm, &cidr_check)) {
+      cidr_check_bits = p ? atoi(p + 1) : 32;
+      if ((cidr_check_bits >= 0) && (cidr_check_bits <= 32)) {
+        flags |= CHECK_CIDRMASK;
+        cidr_check.s_addr &= NETMASK(cidr_check_bits);
       }
+    }
+    if (p)
+      *p = '/';
+  }
 
-      /* Get the nick!user mask */
-      if ((p = strchr(hoststr, '!')))
-      {
-         *p++ = '\0';
-         if (*p) ircd_strncpy(userm,p,USERLEN);
-         if (*hoststr) ircd_strncpy(nickm,hoststr,NICKLEN);
-      }
-      else if (*hoststr)
-      {
-         /* Durz: We should only do the following *IF* the hoststr has not already been
-          * copied into hostm (ie. neither ! or @ specified).. otherwise, when we do
-          * /quote check *.barrysworld.com - we end up with targhost as: *!*.barryswo@*.barrysworld.com
-          */
-         ircd_strncpy(userm,hoststr,USERLEN);
-      }
-   }
+  /* Copy formatted string into "targhost" buffer */
+  ircd_snprintf(0, targhost, sizeof(targhost),  "%s!%s@%s", nickm, userm, hostm);
 
-   /* Copy formatted string into "targhost" buffer */
-   ircd_snprintf(0, targhost, sizeof(targhost),  "%s!%s@%s", nickm, userm, hostm);
+  targhost[sizeof(targhost) - 1] = '\0';
 
-   targhost[sizeof(targhost) - 1] = '\0';
+  /* Note: we have to exclude the last client struct as it is not a real client
+   * structure, and therefore any attempt to access elements in it would cause
+   * a segfault.
+   */
 
-   /* Note: we have to exclude the last client struct as it is not a real client
-    * structure, and therefore any attempt to access elements in it would cause
-    * a segfault.
-    */
+  for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr)) {
+    /* Dont process if acptr is a unregistered client, a server or a ping */
+    if (!IsRegistered(acptr) || IsServer(acptr))
+      continue;
 
-   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr)) 
-   {
-      /* Dont process if acptr is a unregistered client, a server or a ping */
-      if (!IsRegistered(acptr) || IsServer(acptr))
-         continue;
+    if (IsMe(acptr))   /* Always the last acptr record */
+      break;
 
-      if (IsMe(acptr))   /* Always the last acptr record */
-         break;
+    if(count > feature_int(FEAT_MAX_CHECK_OUTPUT)) { /* sanity stuff */
+      send_reply(sptr, RPL_ENDOFCHECK, " ");
+      break;
+    }
 
-      if(count > feature_int(FEAT_MAX_CHECK_OUTPUT))   /* sanity stuff */
-      {
-         send_reply(sptr, RPL_ENDOFCHECK, " ");
-         break;
-      }
+    /* Copy host info into buffer */
+    curhost[0] = '\0';
+    ircd_snprintf(0, curhost, sizeof(curhost), "%s!%s@%s", acptr->cli_name, acptr->cli_user->realusername, acptr->cli_user->realhost);
 
-      /* Copy host info into buffer */
-      curhost[0] = '\0';
-      ircd_snprintf(0, curhost, sizeof(curhost), "%s!%s@%s", acptr->cli_name, acptr->cli_user->realusername, acptr->cli_user->realhost);
-
+    if (flags & CHECK_CIDRMASK) {
+      if (((cli_ip(acptr).s_addr & NETMASK(cidr_check_bits)) == cidr_check.s_addr) && !match(nickm, acptr->cli_name) 
+            && (!match(userm, acptr->cli_user->realusername) || !match(userm, acptr->cli_user->username)))
+        found = 1;
+    }
+    else {
       if(match((const char*)targhost,(const char*)curhost) == 0)
-      {
-         found = 1;
+        found = 1;
+      else {
+        curhost[0] = '\0';
+        ircd_snprintf(0, curhost, sizeof(curhost), "%s!%s@%s", acptr->cli_name, acptr->cli_user->username, acptr->cli_user->host);
+
+        if(match((const char*)targhost,(const char*)curhost) == 0)
+          found = 1;
       }
-      else
-      {
-         curhost[0] = '\0';
-         ircd_snprintf(0, curhost, sizeof(curhost), "%s!%s@%s", acptr->cli_name, acptr->cli_user->username, acptr->cli_user->host);
+    }
 
-         if(match((const char*)targhost,(const char*)curhost) == 0)
-         {
-            found = 1;
-         }
+    if (found == 1) {
+      found = 0;  /* reset that so it doesn't get crazy go nuts */
+
+      /* Show header if we've found at least 1 record */
+      if (count == 0) {
+        /* Output header */ 
+        send_reply(sptr, RPL_DATASTR, " ");
+        send_reply(sptr, RPL_CHKHEAD, "host", targhost);
+
+        send_reply(sptr, RPL_DATASTR, " ");
+        ircd_snprintf(0, outbuf, sizeof(outbuf),  "%s   %-*s%-*s%s", "No.", (NICKLEN + 2 ), "Nick",
+                (USERLEN + 2), "User", "Host");
+        send_reply(sptr, RPL_DATASTR, outbuf);
       }
 
-      if (found == 1)
-      {
-         found = 0;  /* reset that so it doesn't get crazy go nuts */
-
-         /* Show header if we've found at least 1 record */
-         if (count == 0) 
-         {
-            /* Output header */ 
-            send_reply(sptr, RPL_DATASTR, " ");
-            send_reply(sptr, RPL_CHKHEAD, "host", targhost);
-
-            send_reply(sptr, RPL_DATASTR, " ");
-            ircd_snprintf(0, outbuf, sizeof(outbuf),  "%s   %-*s%-*s%s", "No.", (NICKLEN + 2 ), "Nick",
-				(USERLEN + 2), "User", "Host");
-            send_reply(sptr, RPL_DATASTR, outbuf);
-         }
-
-         ircd_snprintf(0, outbuf, sizeof(outbuf), "%-4d  %-*s%-*s%s", (count+1), (NICKLEN + 2),
-            acptr->cli_name, (USERLEN + 2), acptr->cli_user->realusername, acptr->cli_user->realhost);
-         send_reply(sptr, RPL_DATASTR, outbuf);
-
-         /* Show channel output (if applicable) - the 50 channel limit sanity check
-          * is specifically to prevent coredumping when someone lamely tries to /check
-          * Q or some other channel service...
-          */
-         if (showchan == 1) 
-         {
-            if (acptr->cli_user->joined > 0 && acptr->cli_user->joined <= 50) 
-            {
-               char chntext[BUFSIZE];
-               int len = strlen("      on channels: ");
-               int mlen = strlen(me.cli_name) + len + strlen(sptr->cli_name);
-               *chntext = '\0';
-
-               strcpy(chntext, "      on channels: ");
-               for (lp = acptr->cli_user->channel; lp; lp = lp->next_channel)
-               {
-                  chptr = lp->channel;
-                  if (len + strlen(chptr->chname) + mlen > BUFSIZE - 5) 
-                  {
-                     send_reply(sptr, RPL_DATASTR, chntext);
-                     *chntext = '\0';
-                     strcpy(chntext, "      on channels: ");
-                     len = strlen(chntext);
-                  }
-                  if (IsDeaf(acptr))
-                     *(chntext + len++) = '-';
-                  if (IsOper(sptr) && !ShowChannel(sptr,chptr))
-                     *(chntext + len++) = '*';
-                  if (IsZombie(lp))
-                  {
-                     *(chntext + len++) = '!';
-                  }
-                  else
-                  {
-                  if (IsChanOp(lp))
-                     *(chntext + len++) = '@';
-                  else if (IsHalfOp(lp))
-                     *(chntext + len++) = '%';
-                  else if (HasVoice(lp))
-                     *(chntext + len++) = '+';
-                  }
-                  if (len)
-                     *(chntext + len) = '\0';
-
-                  strcpy(chntext + len, chptr->chname);
-                  len += strlen(chptr->chname);
-                  strcat(chntext + len, " ");
-                  len++;
-               }
-               if (chntext[0] != '\0')
-                  send_reply(sptr, RPL_DATASTR, chntext);
-
-               send_reply(sptr, RPL_DATASTR, " ");
-            }
-         }
-         count++;
-      }
-   }
-
-   if (count > 0)
-   {
-      send_reply(sptr, RPL_DATASTR, " ");
-
-      ircd_snprintf(0, outbuf, sizeof(outbuf), "Matching records found:: %d", count);
+      ircd_snprintf(0, outbuf, sizeof(outbuf), "%-4d  %-*s%-*s%s", (count+1), (NICKLEN + 2),
+            acptr->cli_name, (USERLEN + 2), acptr->cli_user->realusername, 
+            (flags & CHECK_SHOWIPS) ? ircd_ntoa((const char*)&(cli_ip(acptr))) : acptr->cli_user->realhost);
       send_reply(sptr, RPL_DATASTR, outbuf);
 
-      send_reply(sptr, RPL_ENDOFCHECK, " ");
-   }
+      /* Show channel output (if applicable) - the 50 channel limit sanity check
+       * is specifically to prevent coredumping when someone lamely tries to /check
+       * Q or some other channel service...
+       */
+      if (flags & CHECK_CHECKCHAN) {
+        if (acptr->cli_user->joined > 0 && acptr->cli_user->joined <= 50) {
+          char chntext[BUFSIZE];
+          int len = strlen("      on channels: ");
+          int mlen = strlen(me.cli_name) + len + strlen(sptr->cli_name);
+          *chntext = '\0';
 
-   return count;
+          strcpy(chntext, "      on channels: ");
+          for (lp = acptr->cli_user->channel; lp; lp = lp->next_channel) {
+            chptr = lp->channel;
+            if (len + strlen(chptr->chname) + mlen > BUFSIZE - 5) {
+              send_reply(sptr, RPL_DATASTR, chntext);
+              *chntext = '\0';
+              strcpy(chntext, "      on channels: ");
+              len = strlen(chntext);
+            }
+            if (IsDeaf(acptr))
+              *(chntext + len++) = '-';
+            if (is_chan_op(acptr, chptr))
+              *(chntext + len++) = '@';
+            if (is_half_op(acptr, chptr))
+              *(chntext + len++) = '%';
+            if (IsOper(sptr) && !ShowChannel(sptr,chptr))
+              *(chntext + len++) = '*';
+            else if (has_voice(acptr, chptr))
+              *(chntext + len++) = '+';
+            else if (IsZombie(lp))
+              *(chntext + len++) = '!';
+            if (len)
+              *(chntext + len) = '\0';
+
+            strcpy(chntext + len, chptr->chname);
+            len += strlen(chptr->chname);
+            strcat(chntext + len, " ");
+            len++;
+          }
+          if (chntext[0] != '\0')
+            send_reply(sptr, RPL_DATASTR, chntext);
+
+          send_reply(sptr, RPL_DATASTR, " ");
+        }
+      }
+      count++;
+    }
+  }
+
+  if (count > 0) {
+    send_reply(sptr, RPL_DATASTR, " ");
+
+    ircd_snprintf(0, outbuf, sizeof(outbuf), "Matching records found:: %d", count);
+    send_reply(sptr, RPL_DATASTR, outbuf);
+
+    send_reply(sptr, RPL_ENDOFCHECK, " ");
+  }
+
+  return count;
 }
