@@ -82,7 +82,7 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
      that there are no common channels, thus use PubChannel and not
      SeeChannel */
   if (!chptr && (!fields || (fields & (WHO_FIELD_CHA | WHO_FIELD_FLA))) &&
-      !IsChannelService(acptr))
+      !IsChannelService(acptr) && !IsNoChan(acptr))
   {
     struct Membership* chan;
     for (chan = cli_user(acptr)->channel; chan && !chptr; chan = chan->next_channel)

@@ -176,7 +176,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
       }
 
       ircd_snprintf(0, outbuf, sizeof(outbuf), "%s%c", acptr->cli_info, COLOR_OFF);
-      send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->username,
+      send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->realusername,
            acptr->cli_user->realhost, outbuf, (IsAccount(acptr) ? acptr->cli_user->account : ""));
 
       cntr++;
@@ -513,7 +513,7 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan)
 
       /* Copy host info into buffer */
       curhost[0] = '\0';
-      ircd_snprintf(0, curhost, sizeof(curhost), "%s!%s@%s", acptr->cli_name, acptr->cli_user->username, acptr->cli_user->realhost);
+      ircd_snprintf(0, curhost, sizeof(curhost), "%s!%s@%s", acptr->cli_name, acptr->cli_user->realusername, acptr->cli_user->realhost);
 
       if(match((const char*)targhost,(const char*)curhost) == 0)
       {
@@ -548,7 +548,7 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan)
          }
 
          ircd_snprintf(0, outbuf, sizeof(outbuf), "%-4d  %-*s%-*s%s", (count+1), (NICKLEN + 2),
-            acptr->cli_name, (USERLEN + 2), acptr->cli_user->username, acptr->cli_user->realhost);
+            acptr->cli_name, (USERLEN + 2), acptr->cli_user->realusername, acptr->cli_user->realhost);
          send_reply(sptr, RPL_DATASTR, outbuf);
 
          /* Show channel output (if applicable) - the 50 channel limit sanity check

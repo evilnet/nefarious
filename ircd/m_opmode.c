@@ -194,4 +194,3 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   return 0;
 }
-

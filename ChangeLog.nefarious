@@ -1,3 +1,39 @@
+2003-12-06  Reed Loden  <reed@reedloden.com>
+
+	* ircd/ircd_features.c: Send notice to "from", also.
+
+	* ircd/ircd_relay.c: Remove redundancy in
+	client_can_send_to_channel() checks.
+
+	* ircd/m_check.c: Send real host to opers.
+
+	* ircd/m_ircops.c: Ignore services.
+
+	* ircd/m_join.c: Fix local channel if statement.
+
+	* ircd/m_nick.c: Remove unneeded asuka text.
+
+	* ircd/m_opmode.c: Remove excess line at EOF.
+
+	* ircd/m_svspart.c: Call m_part() and have it do the job
+	instead of actually parting the user.
+
+	* ircd/m_wallchops.c: Don't see WALLCHOPS to sender.
+
+	* ircd/m_whois.c: Don't send NETWORK with RPL_WHOISSERVICE.
+
+	* ircd/s_err.c: Don't send NETWORK with RPL_WHOISSERVICE and
+	reformat RPL_WHOISACCOUNTONLY.
+
+	* ircd/s_user.c: Send 004 in the correct order (thanks cnix),
+	fix checks on new asuka commands, and other miscellaneous
+	stuff.
+
+	* ircd/whocmds.c: Fixed bug where a channel of +n user is
+	leaked via WHO (synced from QuakeNet repository).
+
+	* Sync with u2.10.11.06.(pre3).
+
 2003-11-24  Reed Loden  <reed@reedloden.com>
 
 	* include/ircd_features.h: Add FEAT_REMOTE_MOTD.

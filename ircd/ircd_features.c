@@ -595,23 +595,23 @@ feature_set(struct Client* from, const char* const* fields, int count)
 
       switch (feat->flags & FEAT_MASK) {
         case FEAT_NONE:
-          sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s",
+          sendto_opmask_butone(0, SNO_OLDSNO, "%C changed %s",
                                from, feat->type);
           break;
         case FEAT_INT:
-          sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s to %d",
+          sendto_opmask_butone(0, SNO_OLDSNO, "%C changed %s to %d",
                                from, feat->type, feat->v_int);
           break;
         case FEAT_BOOL:
-          sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s to %s", from,
+          sendto_opmask_butone(0, SNO_OLDSNO, "%C changed %s to %s", from,
                                feat->type, (feat->v_int ? "TRUE" : "FALSE"));
           break;
         case FEAT_STR:
           if(feat->v_str)
-            sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s to: %s",
+            sendto_opmask_butone(0, SNO_OLDSNO, "%C changed %s to: %s",
                                  from, feat->type, feat->v_str);
           else
-            sendto_opmask_butone(from, SNO_OLDSNO, "%C unset %s",
+            sendto_opmask_butone(0, SNO_OLDSNO, "%C unset %s",
                                  from, feat->type);
           break;
       } /* switch */
@@ -680,7 +680,7 @@ feature_reset(struct Client* from, const char* const* fields, int count)
                  "default", feat->type);
       
     if(change)
-      sendto_opmask_butone(from, SNO_OLDSNO, "%C reset %s to its default",
+      sendto_opmask_butone(0, SNO_OLDSNO, "%C reset %s to its default",
                            from, feat->type);
   }
 

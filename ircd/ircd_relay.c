@@ -174,9 +174,8 @@ void server_relay_channel_message(struct Client* sptr, const char* name, const c
   }
   /*
    * This first: Almost never a server/service
-   * Servers may have channel services, need to check for it here
    */
-  if (client_can_send_to_channel(sptr, chptr) || IsChannelService(sptr)) {
+  if (client_can_send_to_channel(sptr, chptr)) {
     sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
   }
@@ -195,9 +194,8 @@ void server_relay_channel_notice(struct Client* sptr, const char* name, const ch
     return;
   /*
    * This first: Almost never a server/service
-   * Servers may have channel services, need to check for it here
    */
-  if (client_can_send_to_channel(sptr, chptr) || IsChannelService(sptr)) {
+  if (client_can_send_to_channel(sptr, chptr)) {
     sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
 			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
   }

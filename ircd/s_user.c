@@ -593,8 +593,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
      */
     send_reply(sptr, RPL_YOURHOST, cli_name(&me), version);
     send_reply(sptr, RPL_CREATED, creation);
-    send_reply(sptr, RPL_MYINFO, cli_name(&me), infousermodes, infochanmodes,
-	       infochanmodeswithparams, version);
+    send_reply(sptr, RPL_MYINFO, cli_name(&me), version, infousermodes,
+	       infochanmodes, infochanmodeswithparams);
     send_supported(sptr);
     m_lusers(sptr, sptr, 1, parv);
     update_load();
@@ -842,10 +842,12 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
      */
     if (MyUser(sptr) && feature_bool(FEAT_CONNEXIT_NOTICES))
       sendto_opmask_butone(0, SNO_CONNEXIT,
-			   "Nick change: From %s to %s [%s@%s]",
+			   "Nick change: From %s to %s [%s@%s] <%s%s>",
 			   cli_name(sptr), nick,
 			   cli_user(sptr)->username,
-			   cli_user(sptr)->host);
+			   cli_user(sptr)->host,
+			   NumNick(sptr) /* Two %'s */
+			   );
 
     if ((cli_name(sptr))[0])
       hRemClient(sptr);
@@ -1581,12 +1583,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	  ClearAccountOnly(acptr);
 	break;
       case 'B':
-	if (what == MODE_ADD) {
-	    if ((feature_int(FEAT_BOT_CLASS) > 0
-		&& get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
-		|| force)
-	    SetBot(acptr);
-	}
+	if (what == MODE_ADD)
+	  SetBot(acptr);
 	else
 	  ClearBot(acptr);
 	break;
@@ -1612,13 +1610,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      * ASUKA: Allow opers to set +k.  Also, restrict +XnI to
      * opers only also.
      */
-    if (!FlagHas(&setflags, FLAG_CHSERV) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_XTRAOP)))
+    if (!FlagHas(&setflags, FLAG_CHSERV) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_XTRAOP))
       ClearChannelService(acptr);
-    if (!FlagHas(&setflags, FLAG_XTRAOP) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_XTRAOP)))
+    if (!FlagHas(&setflags, FLAG_XTRAOP) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_XTRAOP))
       ClearXtraOp(acptr);
-    if (!FlagHas(&setflags, FLAG_NOCHAN) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_HIDECHANS)))
+    if (!FlagHas(&setflags, FLAG_NOCHAN) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_HIDECHANS))
       ClearNoChan(acptr);
-    if (!FlagHas(&setflags, FLAG_NOIDLE) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_HIDEIDLE)))
+    if (!FlagHas(&setflags, FLAG_NOIDLE) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_HIDEIDLE))
       ClearNoIdle(acptr);
     
     /*
@@ -1638,6 +1636,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     if (feature_bool(FEAT_HIS_DEBUG_OPER_ONLY) && !IsAnOper(acptr) && 
 	!FlagHas(&setflags, FLAG_DEBUG))
       ClearDebug(acptr);
+
+    if (!FlagHas(&setflags, FLAG_BOT) && (feature_int(FEAT_BOT_CLASS) > 0)
+	&& (get_client_class(acptr) == feature_int(FEAT_BOT_CLASS)))
+      ClearBot(acptr);
   }
 
   if (MyConnect(acptr)) {

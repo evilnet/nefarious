@@ -226,7 +226,7 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
      *       probably a good place to add them :)
      */
     if (IsChannelService(acptr))
-      send_reply(sptr, RPL_WHOISSERVICE, name, feature_str(FEAT_NETWORK));
+      send_reply(sptr, RPL_WHOISSERVICE, name);
 
     if (MyConnect(acptr) && IsSSL(acptr) && ((parc >= 3) ||
 	(acptr == sptr) || IsAnOper(sptr)))

@@ -652,7 +652,7 @@ static Numeric replyTable[] = {
 /* 309 */
   { 0 },
 /* 310 */
-  { RPL_WHOISSERVICE, "%s :is an %s Network Service", "310" },
+  { RPL_WHOISSERVICE, "%s :is a Network Service", "310" },
 /* 311 */
   { RPL_WHOISUSER, "%s %s %s * :%s", "311" },
 /* 312 */
@@ -702,7 +702,7 @@ static Numeric replyTable[] = {
 /* 334 */
   { RPL_LISTUSAGE, ":%s", "334" },
 /* 335 */
-  { RPL_WHOISACCOUNTONLY, "%s :Only accepts messages from registered users.", "335" },
+  { RPL_WHOISACCOUNTONLY, "%s :only accepts messages from registered users", "335" },
 /* 336 */
   { RPL_WHOISBOT, "%s :is a bot", "336" },
 /* 337 */
