@@ -4,7 +4,7 @@
 2005-03-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/ircd_relay.c: If a stripped message (+S) is 0 in length
-	then dont send it. Found by Compy.
+	then dont send it. Found by pLaYa.
 
 2005-03-02  Neil Spierling  <sirvulcan@gmail.com>
 
