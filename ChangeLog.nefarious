@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-25  Alex Schumann   <rubin@afternet.org>
+	* ircd/s_auth.c: Add check for IsDNSPending(auth) in addition
+	to IsDoingAuth(auth) before freeing auth.
+
 2005-02-25  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Couple of debug statements so the if statements
