@@ -7,6 +7,8 @@
 	* ircd/s_user.c: Forgot to change a FEAT_BOTSERVICE_CLASS to
 	FEAT_BOT_CLASS.
 
+	* Removed MODE_REGISTERED.
+
 2003-01-15  Reed Loden  <reed@reedloden.com>
 
 	* Added several ASUKA patches: delayedjoin, cC, accountonly,

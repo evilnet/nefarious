@@ -202,8 +202,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     modebuf_mode(mbuf, MODE_DEL | chptr->mode.mode); /* wipeout modes */
     chptr->mode.mode &= ~(MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET |
 			  MODE_MODERATED | MODE_TOPICLIMIT | MODE_INVITEONLY |
-			  MODE_NOPRIVMSGS | MODE_REGONLY | MODE_REGISTERED |
-			  MODE_NOCTCP | MODE_NOCOLOUR | MODE_DELJOINS );
+			  MODE_NOPRIVMSGS | MODE_REGONLY | MODE_NOCTCP |
+			  MODE_NOCOLOUR | MODE_DELJOINS);
 
     parse_flags |= (MODE_PARSE_SET | MODE_PARSE_WIPEOUT); /* wipeout keys */
 

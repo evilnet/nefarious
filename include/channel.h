@@ -86,10 +86,9 @@ struct Client;
 #define MODE_BAN        0x0200
 #define MODE_LIMIT      0x0400
 #define MODE_REGONLY    0x0800  /* Only +r users may join */
-#define MODE_REGISTERED 0x1000
-#define MODE_NOCOLOUR   0x2000
-#define MODE_NOCTCP     0x4000
-#define MODE_DELJOINS   0x8000
+#define MODE_NOCOLOUR   0x1000
+#define MODE_NOCTCP     0x2000
+#define MODE_DELJOINS   0x4000
 #define MODE_LISTED     0x10000
 #define MODE_SAVE	0x20000	/* save this mode-with-arg 'til later */
 #define MODE_FREE	0x40000 /* string needs to be passed to MyFree() */
