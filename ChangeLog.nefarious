@@ -1,3 +1,7 @@
+2003-10-23  Reed Loden  <reed@reedloden.com>
+
+	* ircd/gline.c: Add IK's fixes.
+
 2003-10-19  Reed Loden  <reed@reedloden.com>
 
 	* ircd/gline.c: Incorporate IK's complete rewrite of the gline

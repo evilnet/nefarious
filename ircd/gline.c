@@ -213,31 +213,30 @@ static int
 do_mangle_gline(struct Client* cptr, struct Client* acptr,
 		struct Client* sptr, const char* orig_reason)
 {
-  int tval = 0;
-  int len = strlen(orig_reason);
-  char* reason = (char*) MyMalloc(len + 1);
-  char* endanglebracket = strchr(orig_reason, '>');
-  char* space = strchr(orig_reason, ' ');
-
-  assert(0 != reason);
+  char reason[BUFSIZE];
+  char* endanglebracket;
+  char* space;
 
   if (!feature_bool(FEAT_HIS_GLINE))
     return exit_client_msg(cptr, acptr, &me, orig_reason);
 
-  if (IsService(sptr) && (orig_reason[0] == '<') && endanglebracket
-      && endanglebracket < space)
+  endanglebracket = strchr(orig_reason, '>');
+  space = strchr(orig_reason, ' ');
+
+  if (IsService(sptr))
   {
-    strcpy(reason, "G-lined by ");
-    strncpy(reason, orig_reason+1, endanglebracket - orig_reason + 1);
-  } else if (IsService(sptr)) {
-    strcpy(reason, orig_reason);
+    if (orig_reason[0] == '<' && endanglebracket && endanglebracket < space)
+    {
+      strcpy(reason, "G-lined by ");
+      strncat(reason, orig_reason + 1, endanglebracket - orig_reason - 1);
+    } else {
+      strcpy(reason, orig_reason);
+    }
   } else {
-    ircd_snprintf(0, reason, len, "G-lined (<%s> %s)", sptr->cli_name,
+    ircd_snprintf(0, reason, BUFSIZE, "G-lined (<%s> %s)", sptr->cli_name,
 		  orig_reason);
   }
-  tval = exit_client_msg(cptr, acptr, &me, reason);
-  MyFree(reason);
-  return tval;
+  return exit_client_msg(cptr, acptr, &me, reason);
 }
 
 static int
