@@ -18,7 +18,7 @@
  * $Id$
  *
  */
-#define PATCHLEVEL "07+Nefarious(0.2.2)"
+#define PATCHLEVEL "07+Nefarious(0.2.3)"
 
 #define RELEASE ".11."
 
