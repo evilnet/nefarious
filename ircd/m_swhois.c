@@ -166,8 +166,8 @@ int ms_swhois(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   if (user_set_swhois(cli_user(acptr), swhois))
-    sendcmdto_serv_butone(acptr, CMD_SWHOIS, acptr, ":%s", swhois);
+    sendcmdto_serv_butone(sptr, CMD_SWHOIS, cptr, "%C :%s", acptr, swhois);
   else
-    sendcmdto_serv_butone(acptr, CMD_SWHOIS, acptr, "");
+    sendcmdto_serv_butone(sptr, CMD_SWHOIS, cptr, "%C", acptr);
   return 0;
 }

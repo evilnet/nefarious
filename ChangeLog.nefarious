@@ -3,11 +3,18 @@
 
 2005-01-28  Reed Loden  <reed@reedloden.com>
 
+	* include/supported.h: Reordered modes (specifically admin [A]).
+
 	* ircd/channel.c: Removed broken code and replaced it with
 	boring, but working!, code. Cleaned up whitespacing.
 
+	* ircd/m_oper.c: Changed default snomask for admin back to
+	normal oper default.
+
 	* ircd/m_swhois.c: Removed parameter checking as it is
-	unnecessary.
+	unnecessary. Correctly forward swhois messages.
+
+	* ircd/s_serv.c: Burst swhois messages.
 
 2005-01-28  Reed Loden  <reed@reedloden.com>
 

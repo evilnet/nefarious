@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, common/send.c
+ * IRC - Internet Relay Chat, ircd/send.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  *
