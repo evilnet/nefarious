@@ -891,6 +891,10 @@ int check_target_limit(struct Client *sptr, void *target, const char *name,
   /* If user is invited to channel, give him/her a free target */
   if (IsChannelName(name) && IsInvited(sptr, target))
     return 0;
+  /* If feature evilnet is true and user is an oper, he/she always has a
+     free target -reed */
+  if (feature_bool(FEAT_EVILNET) && IsOper(sptr))
+    return 0;
   /*
    * Same target as last time?
    */

@@ -38,14 +38,14 @@
  * it.  Thanks for helping debug guys.
  */
 #ifndef NICKLEN
-#define NICKLEN         9
+#define NICKLEN		15
 #endif
 /*
  * USERLEN is the maximum length allowed of a user name including an optional
  * leading '~' if the user name has not been authenticated by an auth (RFC 931)
  * server query.
  */
-#define USERLEN         10
+#define USERLEN		10
 /*
  * HOSTLEN is exactly long enough to hold one (1) segment of FQDN or hostname.
  * This is due to an historical misinterpretation of RFC 1034.
@@ -65,24 +65,24 @@
  * of greater than 63 characters are rejected by the server, and most FQDN's
  * are shorter. It is possible to have a valid FQDN longer than 63 characters.
  */
-#define HOSTLEN         63
+#define HOSTLEN		63
 /*
  * ACCOUNTLEN is the maximum length for the account name, which can be set
  * with the ACCOUNT (AC) command.  This is used for keeping track of who's
  * logged into which account, for the benefit of irc services.
  */
-#define ACCOUNTLEN      12
+#define ACCOUNTLEN	12
 /*
  * REALLEN is the maximum length for user supplied information about a client
  * connection (gcos). This information is set at client/server registration
  * time.
  */
-#define REALLEN         50
+#define REALLEN		50
 /*
  * PASSWDLEN is the maximum length for a password used for connecting servers
  * and clients.
  */
-#define PASSWDLEN       20
+#define PASSWDLEN	20
 /*
  * SOCKIPLEN is the length of a dotted quad ip address "XXX.XXX.XXX.XXX"
  */
@@ -90,7 +90,7 @@
 /*
  * TOPICLEN is the maximum length for channel topics and kill comments
  */
-#define TOPICLEN        250
+#define TOPICLEN	250
 /*
  * AWAYLEN is the maximum length for away messages
  */
@@ -99,11 +99,10 @@
  * BUFSIZE is exactly long enough to hold one protocol message (RFC 1459)
  * including the line termination (\r\n).
  */
-#define BUFSIZE         512     /* WARNING: *DONT* CHANGE THIS!!!! */
+#define BUFSIZE		512     /* WARNING: *DONT* CHANGE THIS!!!! */
 
-#define MAXTARGETS      20
-#define STARTTARGETS    10
-#define RESERVEDTARGETS 12
+#define MAXTARGETS	20
+#define STARTTARGETS	10
+#define RESERVEDTARGETS	12
 
 #endif /* INCLUDED_ircd_defs_h */
-
