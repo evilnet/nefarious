@@ -115,6 +115,9 @@ int m_userip(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   assert(0 != cptr);
   assert(cptr == sptr);
 
+  if (feature_bool(FEAT_HIS_USERIP) && !IsAnOper(sptr))
+    return send_reply(sptr, ERR_DISABLED, "USERIP");
+
   if (parc < 2)
     return need_more_params(sptr, "USERIP");
   send_user_info(sptr, parv[1], RPL_USERIP, userip_formatter); 

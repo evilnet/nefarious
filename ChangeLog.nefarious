@@ -1,6 +1,24 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-28  Reed Loden  <reed@reedloden.com>
+
+	* include/ircd_features.h: Added FEAT_HIS_USERIP.
+
+	* ircd/channel.c: Commented out broken code (I'll fix it
+	sometime; sorry y'all).
+
+	* ircd/ircd_features.c: Added FEAT_HIS_USERIP (default: FALSE).
+
+	* ircd/m_check.c: Fixed several warnings in new QuakeNet code.
+
+	* ircd/m_invite.c: Added invite timestamps (from u2.10.12).
+	Removed duplicate code.
+
+	* ircd/m_userip.c: Added HIS_USERIP from QuakeNet.
+
+	* ircd/s_err.c: Added RPL_WHOISSPECIAL (320).
+
 2005-01-28  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/m_oper.c: Switched a couple of things.

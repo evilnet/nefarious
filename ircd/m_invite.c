@@ -96,6 +96,8 @@
 #include "send.h"
 #include "ircd_struct.h"
 
+#include <stdlib.h>
+
 /*
  * m_invite - generic message handler
  *
@@ -185,14 +187,19 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (!IsLocalChannel(chptr->chname) || MyConnect(acptr)) {
     if (feature_bool(FEAT_ANNOUNCE_INVITES)) {
+      /* Announce to channel operators. */
       sendcmdto_channel_butserv_butone(&me, get_error_numeric(RPL_ISSUEDINVITE)->str,
                                        NULL, chptr, sptr, SKIP_NONOPS, 
                                        "%H %C %C :%C has been invited by %C",
                                        chptr, acptr, sptr, acptr, sptr);
+      /* Announce to servers with channel operators, but skip acptr,
+       * since they will be notified below. */
       sendcmdto_channel_servers_butone(sptr, NULL, TOK_INVITE, chptr, acptr, SKIP_NONOPS,
-                                       "%s :%H", cli_name(acptr), chptr);
+                                       "%s %H %Tu", cli_name(acptr),
+                                       chptr, chptr->creationtime);
     }
-    sendcmdto_one(sptr, CMD_INVITE, acptr, "%s :%H", cli_name(acptr), chptr);
+    sendcmdto_one(sptr, CMD_INVITE, acptr, "%s %H %Tu", cli_name(acptr),
+                  chptr, chptr->creationtime);
   }
 
   return 0;
@@ -204,6 +211,7 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
  *   parv[0] - sender prefix
  *   parv[1] - user to invite
  *   parv[2] - channel name
+ *   parv[3] - (optional) channel timestamp
  *
  * - INVITE now is accepted only if who does it is chanop (this of course
  *   implies that channel must exist and he must be on it).
@@ -213,11 +221,15 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
  *
  * - Invite with no parameters now lists the channels you are invited to.
  *                                                         - Isomer 23 Oct 99
+ *
+ * - Invite with too-late timestamp, or with no timestamp from a bursting
+ *   server, is silently discarded.                   - Entrope 19 Jan 05
  */
 int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client *acptr;
   struct Channel *chptr;
+  time_t invite_ts;
   
   if (IsServer(sptr)) {
     /*
@@ -253,14 +265,14 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
   }
 
-  /* Allow remote +k users who aren't on the channel to invite people -
-   * needed for off-channel services to work properly */
-  if (!IsChannelService(sptr) && !find_channel_member(sptr, chptr)) {
-    send_reply(sptr, ERR_NOTONCHANNEL, chptr->chname);
+  if (parc > 3) {
+    invite_ts = atoi(parv[3]);
+    if (invite_ts > chptr->creationtime)
+      return 0;
+  } else if (IsBurstOrBurstAck(cptr))
     return 0;
-  }
 
-  if (!find_channel_member(sptr, chptr) && !IsChannelService(sptr)) {
+  if (!IsChannelService(sptr) && !find_channel_member(sptr, chptr)) {
     send_reply(sptr, ERR_NOTONCHANNEL, chptr->chname);
     return 0;
   }
@@ -277,15 +289,21 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     add_invite(acptr, chptr);
 
   if (feature_bool(FEAT_ANNOUNCE_INVITES)) {
+    /* Announce to channel operators. */
     sendcmdto_channel_butserv_butone(&me, get_error_numeric(RPL_ISSUEDINVITE)->str,
-                                     NULL, chptr, sptr, SKIP_NONOPS, 
+                                     NULL, chptr, sptr, SKIP_NONOPS,
                                      "%H %C %C :%C has been invited by %C",
                                      chptr, acptr, sptr, acptr, sptr);
+    /* Announce to servers with channel operators, but skip acptr,
+     * since they will be notified below. */
     sendcmdto_channel_servers_butone(sptr, NULL, TOK_INVITE, chptr, acptr, SKIP_NONOPS,
-                                     "%s :%H", cli_name(acptr), chptr);
+                                     "%s %H %Tu", cli_name(acptr), chptr,
+                                     chptr->creationtime);
   }
-  sendcmdto_one(sptr, CMD_INVITE, acptr, "%s :%H", cli_name(acptr), chptr);
 
+  sendcmdto_one(sptr, CMD_INVITE, acptr,
+		"%s %H %Tu",
+		cli_name(acptr), chptr, chptr->creationtime);
 
   return 0;
 }

@@ -45,6 +45,7 @@
 #include "s_user.h"
 #include "support.h"
 
+#include <arpa/inet.h>
 #include <string.h>
 
 #define CHECK_CHECKCHAN 0x01 /* -c */
@@ -80,7 +81,6 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
    struct Channel *chptr;
    struct Client *acptr;
-   char *param;
    int flags = CHECK_SHOWUSERS, i;
 
 
@@ -544,13 +544,12 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int flags) {
   struct Client *acptr;
   struct Channel *chptr;
   struct Membership *lp;
-  int count = 0, found = 0;
+  int count = 0, found = 0, cidr_check_bits = 0;
   char outbuf[BUFSIZE];
   char targhost[NICKLEN + USERLEN + HOSTLEN + 3], curhost[NICKLEN + USERLEN + HOSTLEN + 3];
   char nickm[NICKLEN + 1], userm[USERLEN + 1], hostm[HOSTLEN + 1];
   char *p = NULL;
   struct in_addr cidr_check;
-  int cidr_check_bits;
 
   strcpy(nickm,"*");
   strcpy(userm,"*");
@@ -559,13 +558,13 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int flags) {
   if (!strchr(hoststr, '!') && !strchr(hoststr, '@'))
     ircd_strncpy(hostm,hoststr,HOSTLEN);
   else {
-    if (p = strchr(hoststr, '@')) {
+    if ((p = strchr(hoststr, '@'))) {
       *p++ = '\0';
       if (*p) ircd_strncpy(hostm,p, HOSTLEN);
     }
 
     /* Get the nick!user mask */
-    if (p = strchr(hoststr, '!')) {
+    if ((p = strchr(hoststr, '!'))) {
       *p++ = '\0';
       if (*p) ircd_strncpy(userm,p,USERLEN);
       if (*hoststr) ircd_strncpy(nickm,hoststr,NICKLEN);

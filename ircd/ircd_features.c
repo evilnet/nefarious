@@ -422,6 +422,7 @@ static struct FeatureDesc {
   F_B(HIS_STATS_s, 0, 1, 0),
   F_B(HIS_GLINE, 0, 1, 0),
   F_B(HIS_USERGLINE, 0, 1, 0),
+  F_B(HIS_USERIP, 0, 0, 0),
   F_B(AUTOJOIN, 0, 0, 0),
   F_B(AUTOJOIN_NOTICE, 0, 1, 0),
   F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #Nefarious", 0),
