@@ -3,6 +3,10 @@
 
 2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
 
+	* More bug fixes, see ChangeLog.
+
+2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/gline.c: Bug fix (see ChangeLog).
 
 2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
