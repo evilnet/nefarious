@@ -257,6 +257,10 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	     "timestamp %Tu", parv[3], cli_user(acptr)->acc_create));
     }
 
+    Debug((DEBUG_DEBUG, "ACC TEST: hf: %s fh %s dh %s id %s dmf %s", HasFakeHost(acptr) ? "1" : "0",
+                       cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost, IsDNSBLMarked(acptr) ? "1" : "0",
+                       feature_bool(FEAT_DNSBL_MARK_FAKEHOST) ? "1" : "0"));
+
     if (HasFakeHost(acptr) && !ircd_strcmp(cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost) &&
         IsDNSBLMarked(acptr) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST))
       ClearFakeHost(acptr);

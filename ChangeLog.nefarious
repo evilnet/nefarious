@@ -3,6 +3,14 @@
 
 2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_account.c: Temp debugging stuff.
+
+	* ircd/m_mark.c: Temp debugging stuff.
+
+	* ircd/s_user.c: Adjusted CMD_MARK some wierdness going on here.
+
+2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_mark.c: Handle new parm plus send out MARK to any other servers.
 
 	* ircd/s_user.c: Send the dnsblhost along to other servers.

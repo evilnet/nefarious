@@ -663,9 +663,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
       strcat(flagbuf, "a");
 
-      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%C %s %s %s :%s",
-                            sptr, MARK_DNSBL, cli_dnsbl(sptr), flagbuf, cli_user(sptr)->dnsblhost,
-                            cli_dnsblformat(sptr));
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s :%s", sptr, MARK_DNSBL, cli_dnsbl(sptr),
+                            flagbuf, cli_user(sptr)->dnsblhost, cli_dnsblformat(sptr));
 
       Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
           cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",

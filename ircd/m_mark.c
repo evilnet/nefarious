@@ -115,6 +115,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     unsigned int x_flag = 0;
     struct Client* acptr;
 
+    Debug((DEBUG_DEBUG, "Recieving Mark"));
     if ((acptr = findNUser(parv[1]))) {
       Debug((DEBUG_DEBUG, "Marking: %s d: %s f: %s r: %s", cli_name(acptr), parv[3],
              parv[4], parv[parc-1]));
@@ -138,7 +139,8 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
 
       sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s :%s", acptr, MARK_DNSBL,
                             cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
-    }
+    } else
+      Debug((DEBUG_DEBUG, "Mark Cant Find %s", parv[1]));
 
     return 0;
   } else
