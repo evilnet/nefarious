@@ -235,7 +235,8 @@ do_mangle_gline(struct Client* cptr, struct Client* acptr,
       strcpy(reason, "G-lined by ");
       strncat(reason, orig_reason + 1, endanglebracket - orig_reason - 1);
     } else {
-      strcpy(reason, "G-lined (%s)", orig_reason);
+      ircd_snprintf(0, reason, sizeof(reason), "G-lined (%s)",
+		    orig_reason);
     }
   } else {
     ircd_snprintf(0, reason, sizeof(reason), "G-lined (<%s> %s)",

@@ -915,7 +915,7 @@ HIS_STATS_s
  * Type: boolean
  * Default: TRUE
 
-As per S:line patch, this removes /STATS s from users.
+As per SETHOST patch, this removes /STATS s from users.
 
 HIS_STATS_d
  * Type: boolean

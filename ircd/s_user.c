@@ -835,7 +835,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
      * Send out a connexit notice for the nick change before
      * cli_name(sptr) is overwritten with the new nick. -reed
      */
-    if (feature_bool(FEAT_CONNEXIT_NOTICES))
+    if (MyUser(sptr) && feature_bool(FEAT_CONNEXIT_NOTICES))
       sendto_opmask_butone(0, SNO_CONNEXIT,
 			   "Nick change: From %s to %s [%s@%s]",
 			   cli_name(sptr), nick,

@@ -1,3 +1,16 @@
+2003-11-02  Reed Loden  <reed@reedloden.com>
+
+	* doc/readme.features: Update documentation.
+
+	* ircd/gline.c: Use ircd_snprintf instead of strcpy.
+
+	* ircd/ircd_features.c: Add missing comma (found by Kingpin).
+
+	* ircd/s_user.c: Only show nick change notices if the user is
+	on that specific server.
+
+	* ircd/version.c.SH: Add missing comma (found by Amy).
+
 2003-10-31  Reed Loden  <reed@reedloden.com>
 
 	* doc/readme.features: Update documentation.
