@@ -217,7 +217,7 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
      */
     if (IsChannelService(acptr))
 	send_reply(sptr, RPL_WHOISSERVICE, name,
-		   feature_str(FEAT_NETWORK);
+		   feature_str(FEAT_NETWORK));
     if (MyConnect(acptr) && (!feature_bool(FEAT_HIS_WHOIS_IDLETIME) ||
 			     sptr == acptr || IsAnOper(sptr) || parc >= 3))
       send_reply(sptr, RPL_WHOISIDLE, name, CurrentTime - user->last, 
