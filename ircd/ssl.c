@@ -238,7 +238,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
       Debug((DEBUG_DEBUG, "ERR_get_error() returned %d: %s", openssl_err, 
                                  ERR_error_string(openssl_err, err_buff)));
       
-      return (res < 0 && errno_sv == EINTR) ? retval : IO_FAILURE;
+      return (res < 0 && (errno_sv == EINTR || errno_sv == EBUSY || errno_sv == EAGAIN)) ? retval : IO_FAILURE;
     case SSL_ERROR_ZERO_RETURN:
       SSL_shutdown(socket->ssl);
       return IO_FAILURE;

@@ -16,6 +16,8 @@
 	when the lookup is for an rbl. This appears to solve
 	the false positives with sorbs.
 
+	* ircd/ssl.c: added EBUSY and EAGAIN to errno's not to die on.
+
 2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Woops changed the wrong one.
