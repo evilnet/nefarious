@@ -109,6 +109,8 @@ static struct Client *decode_auth_id(const char *id)
   unsigned int fd, cookie;
   struct Client *cptr;
 
+  if (!id)
+    return NULL;
   if (id[0] != '.')
     return NULL;
   if (!(cookiestr = strchr(id + 1, '.')))

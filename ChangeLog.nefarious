@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-31  Alex Schumann <rubin@afternet.org>
+
+	* ircd/m_account.c: check for null in decode_auth_id (crash on playa's
+	net)
+
 2005-03-31  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Fixed a bug with style 2 and banning sethost
