@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-31  Neil Spierling  <sirvulcan@gmail.com>
+
+	* channel.c: Trash excepts when destroying channels (+z).
+
 2005-01-29  Reed Loden  <reed@reedloden.com>
 
 	* include/channel.h: Added a comment for MODE_PERSIST.

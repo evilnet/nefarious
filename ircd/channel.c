@@ -237,6 +237,15 @@ int destroy_unregistered_channel(struct Channel* chptr)
     MyFree(obtmp->value.ban.who);
     free_link(obtmp);
   }
+  tmp = chptr->exceptlist;
+  while (tmp)
+  {
+    obtmp = tmp;
+    tmp = tmp->next;
+    MyFree(obtmp->value.except.exceptstr);
+    MyFree(obtmp->value.except.who);
+    free_link(obtmp);
+  }
   if (chptr->prev)
     chptr->prev->next = chptr->next;
   else
@@ -272,7 +281,7 @@ int sub1_from_channel(struct Channel* chptr)
     return 1;
   }
 
-  if ((chptr->mode.mode & MODE_PERSIST)) // channel is registered
+  if ((chptr->mode.mode & MODE_PERSIST)) /* channel is registered */
   {
     --chptr->users;
     return 0;
