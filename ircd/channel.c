@@ -868,9 +868,9 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
   }                             /* Continue when there was something
                                  that didn't fit (full==1) */
 
-  if (*chptr->topic)
-    sendcmdto_one(&me, CMD_TOPIC, cptr, "%H %Tu :%s", chptr,
-                 chptr->topic_time, chptr->topic);
+  if (feature_bool(FEAT_TOPIC_BURST) && *chptr->topic)
+    sendcmdto_one(&me, CMD_TOPIC, cptr, "%H %Tu %Tu :%s", chptr,
+                 chptr->creationtime, chptr->topic_time, chptr->topic);
 }
 
 /*

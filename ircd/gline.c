@@ -24,6 +24,7 @@
 #include "gline.h"
 #include "channel.h"
 #include "client.h"
+#include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_features.h"
@@ -137,18 +138,40 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
       char ipname[16];
       int ad[4] = { 0 };
       int bits2 = 0;
-       
-      class = sscanf(host,"%d.%d.%d.%d/%d",
-                     &ad[0],&ad[1],&ad[2],&ad[3], &bits2);
-      if (class!=5) {
-        gline->bits=class*8;
+      char *ch;
+      int seenwild;
+      int badmask = 0;
+      
+      /* Sanity check for dodgy IP masks 
+       * Any mask featuring a digit after a wildcard will 
+       * not behave as expected. */
+      for (seenwild=0,ch=host;*ch;ch++) {
+        if (*ch=='*' || *ch=='?') 
+          seenwild=1;
+        if (IsDigit(*ch) && seenwild) {
+          badmask=1;
+          break;
+        }
       }
-      else {
-        gline->bits=bits2;
-      }
-      ircd_snprintf(0, ipname, sizeof(ipname), "%d.%d.%d.%d", ad[0], ad[1],
-		    ad[2], ad[3]);
-      gline->ipnum.s_addr = inet_addr(ipname);
+      
+      if (badmask) {
+        /* It's bad - let's make it match 0.0.0.0/32 */
+        gline->bits=32;
+        gline->ipnum.s_addr=0;
+      } else {
+
+        class = sscanf(host,"%d.%d.%d.%d/%d",
+                       &ad[0],&ad[1],&ad[2],&ad[3], &bits2);
+        if (class!=5) {
+          gline->bits=class*8;
+        }
+        else {
+          gline->bits=bits2;
+        }
+        ircd_snprintf(0, ipname, sizeof(ipname), "%d.%d.%d.%d", ad[0], ad[1],
+                      ad[2], ad[3]);
+        gline->ipnum.s_addr = inet_addr(ipname);
+      } 
       Debug((DEBUG_DEBUG,"IP gline: %08x/%i",gline->ipnum.s_addr,gline->bits));
       gline->gl_flags |= GLINE_IPMASK;
     }
@@ -199,21 +222,34 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       } else if (gline->gl_flags & GLINE_BADCHAN) { /* Badchan Gline */
         struct Channel *chptr,*nchptr;
         struct Membership *member,*nmember;
-
-        for(chptr=GlobalChannelList;chptr;chptr=nchptr) {
-	  nchptr=chptr->next;
-	  if (match(gline->gl_user, chptr->chname))
-	    continue;
-	  for (member=chptr->members;member;member=nmember) {
-	    nmember=member->next_member;
-	    if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
+	if (string_has_wildcards(gline->gl_user)) {
+	  for(chptr=GlobalChannelList;chptr;chptr=nchptr) {
+	    nchptr=chptr->next;
+	    if (match(gline->gl_user, chptr->chname))
 	      continue;
-	    sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	    sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	    make_zombie(member, member->user, &me, &me, chptr);
-	    retval=1;
+	    for (member=chptr->members;member;member=nmember) {
+	      nmember=member->next_member;
+	      if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
+		continue;
+	      sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+	      sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+	      make_zombie(member, member->user, &me, &me, chptr);
+	      retval=1;
+	    }
 	  }
-	}
+	} else { 
+	  if (chptr=FindChannel(gline->gl_user)) { 
+	    for (member=chptr->members;member;member=nmember) { 
+	      nmember=member->next_member;
+	      if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user)) 
+	        continue; 
+	      sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+	      sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+	      make_zombie(member, member->user, &me, &me, chptr); 
+	      retval=1;
+	    } 
+	  }
+        } 
       } else { /* Host/IP gline */
 	      if (cli_user(acptr)->username && 
 			      match (gline->gl_user, (cli_user(acptr))->realusername) != 0)
@@ -797,10 +833,10 @@ gline_memory_count(size_t *gl_size)
 
   for (gline = GlobalGlineList; gline; gline = gline->gl_next) {
     gl++;
-    gl_size += sizeof(struct Gline);
-    gl_size += gline->gl_user ? (strlen(gline->gl_user) + 1) : 0;
-    gl_size += gline->gl_host ? (strlen(gline->gl_host) + 1) : 0;
-    gl_size += gline->gl_reason ? (strlen(gline->gl_reason) + 1) : 0;
+    *gl_size += sizeof(struct Gline);
+    *gl_size += gline->gl_user ? (strlen(gline->gl_user) + 1) : 0;
+    *gl_size += gline->gl_host ? (strlen(gline->gl_host) + 1) : 0;
+    *gl_size += gline->gl_reason ? (strlen(gline->gl_reason) + 1) : 0;
   }
   return gl;
 }

@@ -205,6 +205,14 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      return 0;
    }
 
+   /* Don't let users use X<numerics here> so they can't fake X2 -reed */
+   if(!IsAnOper(sptr) && nick[0] == 'X' && IsDigit(nick[1])
+      && !IsAlpha(*nick))
+   {
+     send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+     return 0;
+   }
+
   if (!(acptr = FindClient(nick))) {
     /*
      * No collisions, all clear...
@@ -303,6 +311,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char           nick[NICKLEN + 2];
   time_t         lastnick = 0;
   int            differ = 1;
+  int            samelastnick = 0;
 
   assert(0 != cptr);
   assert(0 != sptr);
@@ -505,6 +514,9 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   /*
    * This exits the client we had before getting the NICK message
    */
+  if (lastnick == cli_lastnick(acptr)) 
+    samelastnick=1; 
+
   if (differ) {
     sendcmdto_serv_butone(&me, CMD_KILL, acptr, "%C :%s (older nick "
 			  "overruled)", acptr, cli_name(&me));
@@ -531,7 +543,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     exit_client_msg(cptr, acptr, &me, "Killed (%s (nick collision from "
 		    "same user@host))", feature_str(FEAT_HIS_SERVERNAME));
   }
-  if (lastnick == cli_lastnick(acptr))
+  if (samelastnick)
     return 0;
 
   assert(0 != sptr);

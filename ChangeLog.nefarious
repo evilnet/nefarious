@@ -1,3 +1,31 @@
+2003-06-08  Reed Loden  <reed@reedloden.com>
+
+	* Added two patches from ULtimaTe_.
+
+	* Added some IRCu fixes from asuka.
+
+	* Added topicburst from asuka.
+
+2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
+
+	* ircd/gline.c: fixed the counting bug in gline_memory_count
+
+	* ircd/jupe.c: fixed the counting bug in jupe_memory_count
+
+2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
+
+	* include/ircd_features.h: new feature FEAT_HIS_WHOIS_LOCALCHAN
+
+	* ircd/ircd_features.c: new feature FEAT_HIS_WHOIS_LOCALCHAN
+
+	* ircd/m_whois.c: hide local channels in local WHOIS, this
+	breaks HEAD_IN_SAND.
+
+	* doc/readme.features: documented FEAT_HIS_WHOIS_LOCALCHAN
+
+	* doc/ircd.conf.sample: default value for
+	FEAT_HIS_WHOIS_LOCALCHAN
+
 2003-05-10  Reed Loden  <reed@reedloden.com>
 
 	* Synced to current u2_10_11_05.

@@ -257,6 +257,7 @@ static struct FeatureDesc {
   F_S(HIDDEN_IP, 0, "127.0.0.1", 0),
   F_B(AUTOHIDE, 0, 0, 0),
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
+  F_B(TOPIC_BURST, 0, 1, 0),
   F_B(REMOTE_OPER, 0, 1, 0),
   F_B(EVILNET, FEAT_NODISP, 0, 0),
 
@@ -375,6 +376,7 @@ static struct FeatureDesc {
   F_B(HIS_STATS_z, 0, 1, 0),
   F_B(HIS_WHOIS_SERVERNAME, 0, 1, 0),
   F_B(HIS_WHOIS_IDLETIME, 0, 1, 0),
+  F_B(HIS_WHOIS_LOCALCHAN, 0, 1, 0),
   F_B(HIS_WHO_SERVERNAME, 0, 1, 0),
   F_B(HIS_WHO_HOPCOUNT, 0, 1, 0),
   F_B(HIS_BANWHO, 0, 1, 0),
