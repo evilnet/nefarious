@@ -1,5 +1,9 @@
 2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
 
+	* configure: Regenerated configure.
+
+2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+
 	* configure.in: Added a macro to for kerberos includes. Should fix SSL errors.
 	configure will be regenerated and committed in 5 mins on another box.
 
