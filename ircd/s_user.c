@@ -601,8 +601,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     release_dnsbl_reply(sptr);
 
-    ircd_snprintf(0, chkhosti, USERLEN+SOCKIPLEN+3, "%s!%s@%s", cli_name(sptr), user->username, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
-    ircd_snprintf(0, chkhosth, USERLEN+HOSTLEN+3, "%s!%s@%s", cli_name(sptr), user->username, cli_sockhost(sptr));
+    ircd_snprintf(0, chkhosti, NICKLEN+USERLEN+SOCKIPLEN+3, "%s!%s@%s", cli_name(sptr), user->username, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
+    ircd_snprintf(0, chkhosth, NICKLEN+USERLEN+HOSTLEN+3, "%s!%s@%s", cli_name(sptr), user->username, cli_sockhost(sptr));
 
     if (IsDNSBL(sptr) && ((dhost = find_dnsblexempt(chkhosti)) || (dhost = find_dnsblexempt(chkhosth)))) {
       SetDNSBLAllowed(sptr);
