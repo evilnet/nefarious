@@ -35,77 +35,103 @@
 #include <iostream>
 
 #include "zlib.h"
+#include "Bounce.h"
 #include "Connection.h"
 #include "main.h"
 #include "Socket.h"
 
-using std::string ;
-using std::cerr ;
-using std::endl ;
-using std::ifstream ;
+using std::string;
+using std::cerr;
+using std::endl;
+using std::ifstream;
 
-int Connection::compressBuffer( Bytef* from, int fromSize, Bytef* to,
-	Socket* sendto )
-{
-/*
- * Compresses from buffer "from" to buffer "to".
- * Returns size of "to" buffer.
- */
+/*****************************
+ * Constructor / Destructor **
+ *****************************/
+
+Connection::Connection() {
+    // initialize variables
+    decompStream.zalloc = (alloc_func) 0;
+    decompStream.zfree = (free_func) 0;
+    decompStream.opaque = (voidpf) 0;
+
+    compStream.zalloc = (alloc_func) 0;
+    compStream.zfree = (free_func) 0;
+    compStream.opaque = (voidpf) 0;
+    pCount = 0;
+
+    inflateInit(&decompStream);
+    deflateInit2(&compStream, COMP_TYPE, Z_DEFLATED, 15, 9, Z_DEFAULT_STRATEGY);
+} // Connection::Connection
+
+Connection::~Connection() {
+  /*
+   * 06/12/2003: We need to free the zlib buffers to prevent memory
+   *             leaks.  Since this will be called when we destroy
+   *             the object, this should work nicely. -GCARTER
+   */
+  inflateEnd(&decompStream);
+  deflateEnd(&compStream);
+} // Connection::~Connection
+
+int Connection::compressBuffer( Bytef* from, int fromSize, Bytef* to, Socket* sendto) {
+  /*
+   * Compresses from buffer "from" to buffer "to".
+   * Returns size of "to" buffer.
+   */
 
   compStream.next_in = from;
   compStream.avail_in = fromSize;
   pCount++;
 
-  do {
-       compStream.next_out = to;
-       compStream.avail_out = MTU;
-       int zlibCode = deflate(&compStream, Z_SYNC_FLUSH);
-       if (zlibCode == Z_STREAM_ERROR || zlibCode == Z_DATA_ERROR) {
-         logEntry("[  COMP]: Zlib has reported a data stream error, aborting process.");
-         ::exit( 0 );
-       }
-       if (compStream.avail_out < MTU) {
-         sendto->write((const char *)to, (MTU - compStream.avail_out));
-       }
-     } while ((compStream.avail_in > 0) || (compStream.avail_out < MTU));
+  while((compStream.avail_in > 0) || (compStream.avail_out < MTU)) {
+    compStream.next_out = to;
+    compStream.avail_out = MTU;
+    int zlibCode = deflate(&compStream, Z_SYNC_FLUSH);
+    if (zlibCode == Z_STREAM_ERROR || zlibCode == Z_DATA_ERROR) {
+      aBounce->logEntry("Connection::compressBuffer> Zlib has reported a data stream error, closing connection.");
+      return -1;
+    } // if
 
-#ifdef DEBUG
-  if (pCount > STAT_FREQ) {
-    logEntry("[  COMP]: Total Input Bytes: %li, Total Output Bytes: %li", compStream.total_in, compStream.total_out);
-    pCount = 0;
-  }
-#endif
+    if (compStream.avail_out < MTU)
+      sendto->write((const char *) to, (MTU - compStream.avail_out));
+  } // while
 
-  return(compStream.total_out);
+  if (aBounce->getDebug() == true) {
+    if (pCount > STAT_FREQ) {
+      aBounce->logEntry("Connection::compressBuffer> Total Input Bytes: %li, Total Output Bytes: %li", compStream.total_in, compStream.total_out);
+      pCount = 0;
+    } // if
+  } // if
+
+  return compStream.total_out;
 }
 
-int Connection::deCompressBuffer(Bytef* from, int fromSize, Bytef* to,
-	Socket* sendto)
-{
+int Connection::deCompressBuffer(Bytef* from, int fromSize, Bytef* to, Socket* sendto) {
   decompStream.next_in = from;
   decompStream.avail_in = fromSize;
   pCount++;
 
-  do {
-       decompStream.next_out = to;
-       decompStream.avail_out = MTU;
-       int zlibCode = inflate(&decompStream, Z_SYNC_FLUSH);
-       if (zlibCode == Z_STREAM_ERROR || zlibCode == Z_DATA_ERROR) {
-         logEntry("[DECOMP]: Zlib has reported a data stream error, aborting process.");
-         ::exit( 0 );
-       }
-       if(decompStream.avail_out < MTU) {
-         sendto->write((const char *)to, (MTU - decompStream.avail_out));
-       }
-     } while((decompStream.avail_in) > 0 || (decompStream.avail_out < MTU));
+  while((decompStream.avail_in) > 0 || (decompStream.avail_out < MTU)) {
+    decompStream.next_out = to;
+    decompStream.avail_out = MTU;
+    int zlibCode = inflate(&decompStream, Z_SYNC_FLUSH);
+    if (zlibCode == Z_STREAM_ERROR || zlibCode == Z_DATA_ERROR) {
+      aBounce->logEntry("Connection::deCompressBuffer> Zlib has reported a data stream error, closing connection.");
+      return -1;
+    } // if
 
-#ifdef DEBUG
-  if (pCount > STAT_FREQ) {
-    logEntry("[DECOMP]: Total Input Bytes: %li, Total Output Bytes: %li", decompStream.total_in, decompStream.total_out);
-    pCount = 0;
-  }
-#endif
+    if(decompStream.avail_out < MTU)
+      sendto->write((const char *) to, (MTU - decompStream.avail_out));
+  } // while
 
-  return(decompStream.total_out);
+  if (aBounce->getDebug() == true) {
+    if (pCount > STAT_FREQ) {
+      aBounce->logEntry("Connection::deCompressBuffer> Total Input Bytes: %li, Total Output Bytes: %li", decompStream.total_in, decompStream.total_out);
+      pCount = 0;
+    } // if
+  } // if
+
+  return decompStream.total_out;
 }
 

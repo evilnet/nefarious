@@ -1,0 +1,48 @@
+#####################
+## zBounce Example ##
+#####################
+
+# zBounce Config lines
+# --------------------
+#
+# IP ONLY NO HOSTMASKS!!!
+
+# P:<Local vhost>:<Uncompressed Local Port>:<Remote Address>:<Compressed Remote Port>
+# p:<Local vhost>:<Compressed Local Port>:<Remote Address>:<Uncompressed Remote Port>
+# A:<IP to allow>
+
+# Using a P means: Accept plain input, and send a compressed stream.
+# Using a p means: Accept compressed input, and send a plain stream.
+
+# Assumptions
+# -----------
+
+# Server1 IP				:	10.0.0.50
+# Server1 Server Connections Port	:	4400
+# Server1 zBounce Uncompressed Port	:	8400
+# Server1 zBounce Compressed Port	:	8500
+# Server1 C:line			:	C:10.0.0.50:<password>:Server2:8400:90
+
+# Server2 IP				:	192.168.0.50
+# Server2 Server Connections Port	:	4400
+# Server2 zBounce Uncompressed Port	:	8400
+# Server2 zBounce Compressed Port	:	8500
+# Server2 C:line			:	C:192.168.0.50:<password>:Server1:8400:90
+
+##############################
+## zBounce Config - Server1 ##
+##############################
+
+P:10.0.0.50:8400:192.168.0.50:8500
+p:10.0.0.50:8500:10.0.0.50:4400
+A:10.0.0.50
+A:192.168.0.50
+
+##############################
+## zBounce Config - Server2 ##
+##############################
+
+P:192.168.0.50:8400:10.0.0.50:8500
+p:192.168.0.50:8500:192.168.0.50:4400
+A:192.168.0.50
+A:10.0.0.50

@@ -16,69 +16,88 @@
 #include <fcntl.h>
 #include <netdb.h>
 
+#include <string>
+
 #include "config.h"
+
+using std::string;
 
 /**
  * This class is used to encapsulate a socket connection.
  */
-class Socket
-{
-public:
+class Socket {
+  public:
+    /**
+     * This constructor will initialize all variables needed for
+     * for this class.
+     */
+    Socket();
 
-  /**
-   * This constructor will initialize all variables needed for
-   * for this class.
-   */
-  Socket();
+    /**
+     * Connects the socket to the remote host on the given port.
+     */
+    int connectTo(const string&, unsigned short);
 
-  /**
-   * The file descriptor for this connection.
-   */
-  int fd;
+    /**
+     * Writes numBytes bytes from the array "buf" to the socket.
+     */
+    int write(const char* buf, size_t numBytes);
 
-  /**
-   * The size of the last read buffer.
-   */
-  int lastReadSize;
-
-  /**
-   * This variable is true if the data can be written to the socket,
-   * false otherwise.
-   */
-  bool canWrite;
-
-  /**
-   * Input buffer.
-   */
-  char buffer[MTU];
-
-  /**
-   * Socket address structure for the connection.
-   */
-  struct sockaddr_in address;
-
-  /**
-   * Pointer to sendq buffer.
-   */
-  char* sendq;
+    /**
+     * Writes strlen(buf) bytes to the socket.
+     */
+    int write(const char*);
   
-  /**
-   * Connects the socket to the remote host on the given port.
-   */
-  int connectTo(const string&, unsigned short);
+    // Reads as much as possible into a 4k buffer.
+    char *read();
 
-  /**
-   * Writes numBytes bytes from the array "buf" to the socket.
-   */
-  int write(const char* buf, size_t numBytes);
+    /*********************
+     ** Address Members **
+     *********************/
 
-  /**
-   * Writes strlen(buf) bytes to the socket.
-   */
-  int write(const char*);
-  
-  // Reads as much as possible into a 4k buffer.
-  char* read();
+    struct sockaddr_in *getAddress()
+      { return &myAddress; }
+
+    /****************
+     ** FD Members **
+     ****************/
+
+    void setFD(const int setMe)
+      { myFD = setMe; }
+
+    const int getFD() const
+      { return myFD; }
+
+    /****************************
+     ** Last Read Size Members **
+     ****************************/
+
+    void setLastReadSize(const int setMe)
+      { myLastReadSize = setMe; }
+
+    const int getLastReadSize() const
+      { return myLastReadSize; }
+
+    /***********************
+     ** Writeable Members **
+     ***********************/
+
+    void setWriteable(const bool setMe)
+      { myWriteable = setMe; }
+
+    const bool getWriteable() const
+      { return myWriteable; }
+
+  private:
+    /***************
+     ** Variables **
+     ***************/
+
+    bool myWriteable;			// can we write to the socket?
+    char myReadBuffer[MTU];		// input buffer
+    int myFD;				// file descriptor for this connection
+    int myLastReadSize;			// The size of the last read buffer.
+    struct sockaddr_in myAddress;	// socket address structure
 };
 
 #endif // __SOCKET_H

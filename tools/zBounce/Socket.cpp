@@ -29,14 +29,24 @@
  *
  */
 
-#include	<string>
-#include	<cstring>
-#include	<cerrno>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/nameser.h>
+#include <resolv.h>
+#include <netdb.h>
 
-#include	"Socket.h"
-#include	"main.h"
+#include <string>
 
-using std::string ;
+#include <cstring>
+#include <cerrno>
+#include <cassert>
+#include <cstdio>
+
+#include "Bounce.h"
+#include "Socket.h"
+#include "main.h"
+
+using std::string;
 
 /**
  *  Socket Constructor.
@@ -46,14 +56,13 @@ using std::string ;
  *
  */
 Socket::Socket() {
-
-  fd = -1;
-  lastReadSize = 0;
-  canWrite = true;
-  ::memset( buffer, 0, MTU ) ;
-  ::memset( &address, 0, sizeof( struct sockaddr_in ) ) ;
-  sendq = 0 ;
-}
+  // initialize variables
+  myFD = -1;
+  setLastReadSize(0);
+  setWriteable(true);
+  ::memset(myReadBuffer, 0, MTU);
+  ::memset(&myAddress, 0, sizeof(struct sockaddr_in));
+} // Socket::Socket
 
 /**
  *  Write.
@@ -66,65 +75,56 @@ Socket::Socket() {
  *   number of bytes written (0 is a valid value)
  *
  */
-int Socket::write(const char *message, size_t len)
-{
-
+int Socket::write(const char *message, size_t len) {
   #ifndef NDEBUG
-   assert( message != 0 ) ;
+   assert(message != 0);
   #endif
 
-   // Is our descriptor valid?
-   if( -1 == fd )
-	{
-	// Nope, return error
-	return -1 ;
-	}
+  // Is our descriptor valid?
+  if (-1 == myFD)
+    // Nope, return error
+    return -1;
 
-   // amount will hold the number of bytes read
-   int amount = 0 ;
+  // amount will hold the number of bytes read
+  int amount = 0;
 
-   // loopCnt is the number of times send() is called and is used
-   // to limit the number of loops executed here
-   unsigned short int loopCnt = 0 ;
+  // loopCnt is the number of times send() is called and is used
+  // to limit the number of loops executed here
+  unsigned short int loopCnt = 0;
 
-   do
-	{
-	// Since we're using errno as a loop guard, make sure
-	// to reset it each iteration
-	errno = 0 ;
+  // Continue looping while all three of the following are true:
+  // 1) A bad read occured
+  // 2) The reason for a bad read was due to an interrupted system
+  //    call
+  // 3) We have not reached the max loop count
+  do {
+    // Since we're using errno as a loop guard, make sure
+    // to reset it each iteration
+    errno = 0;
 
-	// Request a send opertion via the OS
-	amount = ::send(fd, message, len, 0) ;
-	}
-	// Continue looping while all three of the following are true:
-	// 1) A bad read occured
-	// 2) The reason for a bad read was due to an interrupted system
-	//    call
-	// 3) We have not reached the max loop count
-	while( (amount < 0) && (EINTR == errno) && (++loopCnt <= 10) ) ;
+    // Request a send opertion via the OS
+    amount = ::send(myFD, message, len, 0);
+  } while((amount < 0) && (EINTR == errno) && (++loopCnt <= 10));
 
-#ifdef DEBUG
-//   logEntry("[%i]: Requested to send: %i, Wrote %i.", fd, len, amount);
-#endif
+  // if (aBounce->getDebug() == true)
+  //   aBounce->logEntry("[%i]: Requested to send: %i, Wrote %i.", myFD, len, amount);
 
-   // Was the send successful?
-   if (-1 == amount)
-	{
-	// Nope, log it
-     logEntry("[%s]: Write Error: %i (%s)", inet_ntoa(address.sin_addr),
-	errno, ::strerror( errno ) ) ;
-	::close(fd);
-#ifdef DEBUG
-	logEntry("Closing FD: %i", fd);
-#endif
+  // Was the send successful?
+  if (-1 == amount) {
+    // Nope, log it
+    aBounce->logEntry("Socket::write> [%s]: Write Error: %i (%s)", inet_ntoa(myAddress.sin_addr), errno, ::strerror(errno));
+    ::close(myFD);
 
-	// The socket is now invalidated
-	fd = -1 ;
-	}
+    if (aBounce->getDebug() == true)
+      aBounce->logEntry("Socket::write> Closing FD: %i", myFD);
 
-   // Return the amount read
-   return amount;
-}
+    // The socket is now invalidated
+    myFD = -1 ;
+  } // if
+
+  // Return the amount read
+  return amount;
+} // Socket::write
 
 /**
  *  Write(2).
@@ -133,33 +133,27 @@ int Socket::write(const char *message, size_t len)
  *  Process: Writes out the whole of 'message'.
  *
  */
-int Socket::write(const char *message)
-{
-
+int Socket::write(const char *message) {
   #ifndef NDEBUG
-   assert( message != 0 ) ;
+    assert(message != 0);
   #endif
 
-   if( -1 == fd )
-	{
-	return -1 ;
-	}
+  if (-1 == myFD)
+    return -1;
 
-   int amount = 0 ;
-   unsigned short int loopCnt = 0 ;
+  int amount = -1;
+  unsigned short int loopCnt = 0;
 
-   do
-	{
-	errno = 0 ;
-	amount = ::write(fd, message, strlen( message )) ;
-	}
-	while( (amount < 0) && (EINTR == errno) && (++loopCnt <= 10) ) ;
+  do {
+    errno = 0;
+    amount = ::write(myFD, message, strlen(message));
+  } while((amount < 0) && (EINTR == errno) && (++loopCnt <= 10));
 
-#ifdef DEBUG
-//   logEntry("[%i]: Wrote %i Bytes.", fd, amount);
-#endif
-   return amount;
-}
+  // if (aBounce->getDebug() == true)
+  //  aBounce->logEntry("[%i]: Wrote %i Bytes.", myFD, amount);
+
+  return amount;
+} // Socket::write
 
 /**
  *  connectTo.
@@ -169,77 +163,89 @@ int Socket::write(const char *message)
  *              port 'portnum'.
  *
  */
-int Socket::connectTo(const string& hostname, unsigned short portnum)
-{
+int Socket::connectTo(const string& hostname, unsigned short portnum) {
+  struct hostent *hp = ::gethostbyname(hostname.c_str());
 
-  struct hostent *hp = ::gethostbyname( hostname.c_str() ) ;
-  if( NULL == hp )
-	{
-	return 0 ;
-	}
+  if (NULL == hp)
+    return 0;
 
-  ::memset(&address,0,sizeof(address));
-  ::memcpy(&address.sin_addr,hp->h_addr,hp->h_length);
-  address.sin_family= hp->h_addrtype;
-  address.sin_port= htons((u_short)portnum);
+  ::memset(&myAddress, 0, sizeof(myAddress));
+  ::memcpy(&myAddress.sin_addr, hp->h_addr, hp->h_length);
+  myAddress.sin_family= hp->h_addrtype;
+  myAddress.sin_port= htons((u_short) portnum);
 
-  fd = ::socket( hp->h_addrtype, SOCK_STREAM, 0 ) ;
-  if( fd < 0 )
-	{
-	return -1 ;
-	}
+  myFD = ::socket(hp->h_addrtype, SOCK_STREAM, 0);
 
-if (::connect(fd, (struct sockaddr*)&address, sizeof(address)) < 0)
-	{
-	::close(fd);
-#ifdef DEBUG
-	logEntry("Closing FD: %i", fd);
-#endif
-	fd = -1;
-	return 0;
-	}
+  if (myFD < 0)
+    return -1;
 
-  return(1);
-}
+  /*
+   * This section really isn't needed in most cases. However if the user
+   * wishes to bind to another interface they have the freedom to before the
+   * socket is connected.
+   */
+  if (aBounce->getVHost().length() > 0) {
+    struct sockaddr_in la;
+    struct hostent *vh;  
+
+    if ((vh = gethostbyname(aBounce->getVHost().c_str())) == NULL) {
+      aBounce->logEntry("Socket::connectTo> VHost[gethostbyname]: errno(%d) errmsg(%s)\n", h_errno, hstrerror(h_errno));
+      return 0;
+    } // if
+
+    memset(&la, 0, sizeof(la));
+    memcpy((char *) &la.sin_addr, vh->h_addr, vh->h_length);
+
+    la.sin_family = vh->h_addrtype;
+    la.sin_port = 0;
+    
+    if (bind(myFD, (struct sockaddr *) & la, sizeof(la)) == -1) {  
+      close(myFD);
+      aBounce->logEntry("Socket::connectTo> VHost[bind]: errno(%d) errmsg(%s)\n", errno, strerror(errno));
+      return 0;
+    } // if
+  } // if
+
+  if (::connect(myFD, (struct sockaddr*) &myAddress, sizeof(myAddress)) < 0) {
+    ::close(myFD);
+
+    if (aBounce->getDebug() == true)
+      aBounce->logEntry("Socket::connectTo> Closing FD: %i", myFD);
+
+    myFD = -1;
+    return 0;
+  } // if
+
+  return 1;
+} // Socket::connectTo
 
 /**
  *  read.
  *  Inputs: Nothing.
- *  Outputs: char* to static buffer containing data.
+ *  Outputs: pointer to static buffer containing data.
  *  Process: 1. Reads as much as possible from this socket, up to
  *              "MTU" bytes.
  *
  */
-char* Socket::read()
-{
+char *Socket::read() {
 
-  if( -1 == fd )
-	{
-	return 0 ;
-	}
+  if (-1 == myFD)
+    return 0;
 
-   int amount = 0 ;
-   unsigned short int loopCnt = 0 ;
+  int amount = 0;
+  unsigned short int loopCnt = 0;
 
-   do
-	{
-	errno = 0 ;
-	amount = ::read( fd, buffer, MTU ) ;
-	}
-	while( (amount < 0) && (EINTR == errno) && (++loopCnt <= 10) ) ;
+  do {
+    errno = 0;
+    amount = ::read(myFD, myReadBuffer, MTU);
+  } while((amount < 0) && (EINTR == errno) && (++loopCnt <= 10));
 
-  if( -1 == amount )
-	{
-    logEntry("[%s]: Read Error: %i (%s)",
-	::inet_ntoa(address.sin_addr), errno, ::strerror( errno ) ) ;
+  if(-1 == amount) {
+    aBounce->logEntry("[%s]: Read Error: %i (%s)", ::inet_ntoa(myAddress.sin_addr), errno, ::strerror(errno));
     amount = 0;
-	}
+  } // if
 
+  setLastReadSize(amount);
 
-#ifdef DEBUG
-//  printf("[%i]: Read %i Bytes.\n", fd, amount);
-#endif
-
-  lastReadSize = amount;
-  return buffer;
-}
+  return myReadBuffer;
+} // Socket::read

@@ -1,0 +1,21 @@
+#####################################
+## zBounce Command Line Parameters ##
+#####################################
+
+Usage: zBounce -d [-e config_file_path] [-l log_file_path] [-p pid_file_path] [-b vhost]
+
+	Switch				Description
+	------				-----------
+	-d				Turn debug mode on.  Debug is off by
+					default.
+	-e <config_file_path>		Specify alternative path to confiuration
+					file.  Default path is "bounce.conf" in the
+					current running directory.
+	-l <log_file_path>		Specify alternative path to debug log file.
+					Default path is "bounce.log" in the current
+					running directory.
+	-p <pid_file_path>		Specify alternative path to PID file.
+					Default path is "bounce.pid" in the current
+					running directory.
+	-b <vhost>			Specify IP or HOSTNAME to make outbound
+					connections from.

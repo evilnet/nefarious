@@ -5,5 +5,5 @@ zBounce_SOURCES = Bounce.cpp \
 	Connection.cpp \
 	Listener.cpp \
 	Socket.cpp \
-	StringTokenizer.cpp \
+	StringTokenizer.cc \
 	main.cpp

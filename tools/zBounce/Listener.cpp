@@ -29,6 +29,7 @@
  *
  */
 
+#include <new>
 #include <list>
 #include <string>
 #include <fstream>
@@ -36,40 +37,38 @@
 
 #include <cerrno>
 
+#include "Bounce.h"
 #include "Listener.h"
 #include "Socket.h"
 #include "main.h"
 
-using std::string ;
-using std::cerr ;
-using std::endl ;
-using std::ifstream ;
+using std::string;
+using std::cerr;
+using std::endl;
+using std::ifstream;
+using std::cout;
 
-Socket* Listener::handleAccept()
-{
+Socket *Listener::handleAccept() {
+  /*
+   *  handleAccept.
+   *  Inputs: Nothing.
+   *  Outputs: A Socket Object.
+   *  Process: 1. Accept's an incomming connection,
+   *              and returns a new socket object. 
+   */
 
-/*
- *  handleAccept.
- *  Inputs: Nothing.
- *  Outputs: A Socket Object.
- *  Process: 1. Accept's an incomming connection,
- *              and returns a new socket object. 
- */
+  socklen_t sin_size = static_cast<socklen_t>(sizeof(struct sockaddr_in));
 
-  socklen_t sin_size = static_cast< socklen_t >(
-		sizeof(struct sockaddr_in) );
+  Socket *newSocket = new (std::nothrow) Socket();
 
-  Socket* newSocket = new (nothrow) Socket();
-  if( NULL == newSocket )
-	{
-	cerr	<< "Listener::handleAccept> Memory allocation failure\n" ;
-	::exit( 0 ) ;
-	}
-	
-  int new_fd = ::accept(fd,
-		reinterpret_cast< struct sockaddr* >( &newSocket->address ),
-		&sin_size);
-  newSocket->fd = new_fd; 
+  if (NULL == newSocket) {
+    cerr << "Listener::handleAccept> Memory allocation failure\n";
+    ::exit(0);
+  } // if
+
+  int new_fd = ::accept(myFD, reinterpret_cast<struct sockaddr *>(newSocket->getAddress()), &sin_size);
+
+  newSocket->setFD(new_fd);
 
   // TOOD: Where did this number come from? -dan
   unsigned int opt = 61440;
@@ -78,48 +77,46 @@ Socket* Listener::handleAccept()
   ::setsockopt(new_fd, SOL_SOCKET, SO_SNDBUF, &opt, sizeof(opt));
 
   return newSocket;
-}
+} // Listener::handleAccept
  
 void Listener::beginListening() {
-/*
- *  beginListening.
- *  Inputs: Nothing.
- *  Outputs: Nothing.
- *  Process: 1. Binds the local ports for all the
- *              Listener objects.
- *
- */
+  /*
+   *  beginListening.
+   *  Inputs: Nothing.
+   *  Outputs: Nothing.
+   *  Process: 1. Binds the local ports for all the
+   *              Listener objects.
+   *
+   */
 
-  fd = ::socket(AF_INET, SOCK_STREAM, 0);
-  if( fd < 0 )
-	{
-	cerr	<< "Listener::beginListening> Unable to allocate socket: "
-		<< ::strerror( errno ) << endl ;
-	return ;
-	}
+  myFD = ::socket(AF_INET, SOCK_STREAM, 0);
+  if (myFD < 0) {
+	cerr << "Listener::beginListening> Unable to allocate socket: "
+             << ::strerror( errno ) << endl;
+
+    return;
+  } // if
 
   struct sockaddr_in my_addr;
   int optval = 1;
 
   my_addr.sin_family = AF_INET;
-  my_addr.sin_port = htons(localPort);
-  my_addr.sin_addr.s_addr = ::inet_addr(myVhost.c_str());
+  my_addr.sin_port = htons(getLocalPort());
+  my_addr.sin_addr.s_addr = ::inet_addr(getVHost().c_str());
   ::memset( &(my_addr.sin_zero), 0, 8);
 
-  ::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+  ::setsockopt(myFD, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
-  int bindRes = ::bind(fd,
-	reinterpret_cast< struct sockaddr * >( &my_addr ),
-	sizeof(struct sockaddr));
-  if( bindRes < 0 )
-	{
-     /*
-      *  If we can't bind a listening port, we might aswell drop out.
-      */
-     logEntry("Unable to bind to %s:%i!", myVhost.c_str(), localPort);
-     ::exit(0);
-	}
+  int bindRes = ::bind(myFD, reinterpret_cast< struct sockaddr *>(&my_addr), sizeof(struct sockaddr));
 
-    ::listen(fd, 10);
-}
+  if (bindRes < 0) {
+    /*
+     *  If we can't bind a listening port, we might aswell drop out.
+     */
+    aBounce->logEntry("Listener::beginListening> Unable to bind to %s:%i!", getVHost().c_str(), getLocalPort());
 
+    ::exit(0);
+  } // if
+
+  ::listen(myFD, 10);
+} // Listener::beginListening

@@ -1,5 +1,9 @@
 2004-06-17  Neil Spierling <vulcan@linux-boxen.org>
 
+	* tools/zBounce/*: Major synch of zBounce off the main zBounce project cvs.
+
+2004-06-17  Neil Spierling <vulcan@linux-boxen.org>
+
 	* README: Updated my email address + bumped date.
 
 	* doc/example.conf: Added feature SPAMBOT_CHECKS, defaults to TRUE.

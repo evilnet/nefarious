@@ -1,15 +1,16 @@
-zBounce - Basic configuration.
+Bounce - Basic configuration.
 -----------------------------
 
 Example 1: Compressing the S<>S data between a hub and a leaf.
 
-* Hub : hubserver.nefarious.irc (192.168.1.1)
-* Leaf: leafy.nefarious.irc (10.1.1.1)
+* Hub : hubserver.undernet.org (192.168.1.1)
+* Leaf: leafy.undernet.org (10.1.1.1)
 
 Install bounce on both irc machines and set the configs as below.
 This configuration allows for the initialisation of a compressed connection
 from both sides.
- 
+
+For further examples see: docs/zbounce_ircd.example
  
 Hub Bounce Config
 -----------------
@@ -17,18 +18,18 @@ Hub Bounce Config
 P:192.168.1.1:8400:10.1.1.1:8500
  
 * This sets bounce to listen on the local interface 192.168.1.1 on port 8400 for 
-* uncompressed input (from IRCu) and to forward any connections recieved on this
+* uncompressed input (from ircu) and to forward any connections recieved on this
 * to 10.1.1.1 on port 8500 in a compressed form.
 
 p:192.168.1.1:8500:192.168.1.1:4400
  
 * This sets bounce to listen on the local interface 192.168.1.1 on port 8500 for 
 * compressed input and to forward any connections recieved on this to 192.168.1.1
-* on port 4400 (to IRCu) in a uncompressed form.
+* on port 4400 (to ircu) in a uncompressed form.
 
-Hub IRCu:
+Hub ircu:
 
-Add/Change a C: line for leafserver.linux-boxen.org with IP 192.168.1.1. Make this is
+Add/Change a C: line for leafserver.undernet.org with IP 192.168.1.1. Make this is
 the last C line in the config for the leaf, so that this IP will be used to connect to
 the bounce.
 
@@ -43,18 +44,18 @@ Leaf Bounce Config
 P:10.1.1.1:8400:192.168.1.1:8500
  
 * This sets bounce to listen on the local interface 10.1.1.1 on port 8400 for
-* uncompressed input (from IRCu) and to forward any connections recieved on this
+* uncompressed input (from ircu) and to forward any connections recieved on this
 * to 192.168.1.1 on port 8500 in a compressed form.
 
 p:10.1.1.1:8500:10.1.1.1:4400
 
 * This sets bounce to listen on the local interface 10.1.1.1 on port 8500 for
 * compressed input and to forward any connections recieved on this to 10.1.1.1
-* on port 8400 (to IRCu) in a uncompressed form.
+* on port 8400 (to ircu) in a uncompressed form.
  
-Leaf IRCu:
+Leaf ircu:
 
-Add/Change a C: line for hubserver.linux-boxen.org with IP 10.1.1.1. Make this is the
+Add/Change a C: line for hubserver.undernet.org with IP 10.1.1.1. Make this is the
 last C line in the config for the hub, so that this IP will be used to connect to
 the bounce.
 

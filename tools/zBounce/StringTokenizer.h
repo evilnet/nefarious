@@ -1,5 +1,24 @@
-/* StringTokenizer.h
+/**
+ * StringTokenizer.h
  * Author: Daniel Karrels dan@karrels.com
+ * Copyright (C) 2002 Daniel Karrels <dan@karrels.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
+ * USA.
+ *
+ * $Id$
  */
 
 #ifndef __STRINGTOKENIZER_H
@@ -23,6 +42,13 @@ using std::vector ;
 class StringTokenizer
 {
 
+private:
+	/**
+	 * This is the type that will be used to store
+	 * the tokens in the StringTokenizer object.
+	 */
+	typedef vector< string > vectorType ;
+
 public:
 
 	/**
@@ -30,19 +56,13 @@ public:
 	 * tokenized, and the delimiter by which
 	 * tokens will be generated.
 	 */
-	StringTokenizer( const string& = string( "" ), char = ' ' ) ;
+	StringTokenizer( const string& = string(), char = ' ' ) ;
 
 	/**
 	 * The destructor is a NOOP because no streams have been
 	 * opened, and no memory dynamically explicitly allocated.
 	 */
 	virtual ~StringTokenizer() ;
-
-	/**
-	 * This is the type that will be used to store
-	 * the tokens in the StringTokenizer object.
-	 */
-	typedef vector< string > vectorType ;
 
 	/**
 	 * This is the type of the variable used for
@@ -58,7 +78,7 @@ public:
 	 * compiled at a later time to throw an exception while
 	 * in a production environment.
 	 */
-	inline const string&	getToken( const size_type& ) const ;
+	const string&		getToken( const size_type& ) const ;
 
 	/**
 	 * This method allows StringTokenizer objects to be used like
@@ -71,16 +91,13 @@ public:
 	/**
 	 * Return a const reference to the original C++ string before
 	 * tokenization.
+	 * A copy of the original string is *not* kept because, in
+	 * the setting in which this class was designed, getOriginal()
+	 * is never called.  This will free up some processing time
+	 * spent copying the original string.
 	 */
-	inline const string&	getOriginal() const
-		{ return original ; }
-
-	/**
-	 * Return a const reference to the original C++ string before
-	 * tokenization.
-	 */
-	inline const string&	toString() const
-		{ return original ; }
+	inline const string	getOriginal() const
+		{ return assemble() ; }
 
 	/**
 	 * Return the number of tokens in this StringTokenizer object.
@@ -109,14 +126,16 @@ public:
 	 * This method builds and returns a C++ string starting at the given
 	 * index, and continuing until the last token, placing the
 	 * appropriate delimiter between each token.
+	 * With no argument supplied, assemble() will return the entire
+	 * original string, delimiters included.
 	 */
-	string			assemble( const size_type& ) const ;
+	string			assemble( const size_type& = 0 ) const ;
 
 	/**
 	 * The immutable iterator type to use for walking through
 	 * this object's tokens.
 	 */
-	typedef vector< string >::const_iterator const_iterator ;
+	typedef vectorType::const_iterator const_iterator ;
 
 	/**
 	 * Retrieve an immutable iterator to the beginning of this
@@ -133,11 +152,18 @@ public:
 		{ return array.end() ; }
 
 	/**
+	 * Return the total number of characters for all tokens,
+	 * including the delimiters.
+	 */
+	inline size_type	totalChars() const ;
+
+	/**
 	 * Convenience method for debugging purposes.
 	 */
-	friend std::ostream& operator<<( std::ostream& out, const StringTokenizer& rhs )
+	friend std::ostream& operator<<( std::ostream& out,
+		const StringTokenizer& rhs )
 		{
-		for( register size_type i = 0, end = rhs.size() ; i < end ; ++i )
+		for( size_type i = 0, end = rhs.size() ; i < end ; ++i )
 			{
 			out << rhs.array[ i ] ;
 			if( i < (rhs.size() - 1) )
@@ -161,11 +187,6 @@ protected:
 	 * at object instantiation to tokenize the given C++ string.
 	 */
 	virtual void		Tokenize( const string& ) ;
-
-	/**
-	 * The non-tokenized string.
-	 */
-	const string		original ;
 
 	/**
 	 * The delimiter by which the (original) string is tokenized.

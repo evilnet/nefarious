@@ -29,132 +29,168 @@
  *
  */
 
+#include <string>
 #include <iostream>
 
 #include "Bounce.h"
 #include "main.h"
 
-using std::cout ;
-using std::endl ;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::string;
 
-FILE* logFile = 0;
-Bounce* application;
+FILE *pidFile;
+Bounce *aBounce;
 
 /**
- *  Global routine for debug logging.
+ * Display usage for command line parameters.
  */
-void logEntry( const char* format, ... )
-{
+void usage(const string &usagePrompt) {
+  cerr << "Usage: " << usagePrompt << " -d [-e config_file_path] [-l log_file_path] [-p pid_file_path] [-b vhost]" << endl;
+  cerr << "See docs/zbounce_cmdline.readme for additional help." << endl;
+  exit(1);
+} // usage
 
-// Note that the log file is only opened (in main()) if DEBUG
-// is defined.  Therefore, it only makes sense to log attempt to
-// log to the logFile if DEBUG is defined
-#ifdef DEBUG
-	char buf[ 4096 ] = { 0 } ;
-	va_list msg;
+void hup_handler(int sig) {
+  aBounce->logEntry("::hup_handler> Got SIGHUP -- Reloading configuration.");
+  aBounce->bindListeners();
+} // hup_handler
 
-	time_t utime = ::time(NULL);
-	struct tm* now = localtime(&utime);
+void usr_handler(int sig) {
+  aBounce->dumpConfig();
+} // usr_handler
 
-	va_start(msg, format);
-	vsprintf(buf, format, msg);
+int main(int argc, char **argv) {
+  int ch;				// for getopt
+  char *prompt;				// pointer to my prompt
 
-	strcat(buf, "\0");
-	va_end(msg);
+  // initialize variables
+  aBounce = new Bounce();
 
-	fprintf( logFile, "[%02d/%02d/%02d %02d:%02d]: %s\n",
-		now->tm_mday, now->tm_mon,
-		1900+now->tm_year, now->tm_hour,
-		now->tm_min, buf ) ;
+  /*
+   *  Ignore SIGPIPE.
+   */
+  struct sigaction act;
+  struct sigaction act2;
+  struct sigaction act3;
 
-	// Commented out fflush() here because it will thrash the
-	// HD if there is a lot of logging()...the system will flush
-	// on its own.
-	// Yep - but I need it for now because I'm impatient ;) --Gte
-	 fflush( logFile );
-#endif // DEBUG
-}
+  act.sa_handler = SIG_IGN;
+  act.sa_flags = 0;
+  sigemptyset(&act.sa_mask);
+  sigaction(SIGPIPE, &act, 0);
 
-void hup_handler(int sig)
-{
-	logEntry("Got SIGHUP -- Reloading configuration.");
-	application->bindListeners();
-}
-void usr_handler(int sig)
-{
-	application->dumpConfig();
-}
+  act2.sa_handler = hup_handler;
+  act2.sa_flags = 0;
+  sigemptyset(&act2.sa_mask);
+  sigaction(SIGHUP, &act2, 0);
 
-int main()
-{
-application = new Bounce();
+  act3.sa_handler = usr_handler;
+  act3.sa_flags = 0;
+  sigemptyset(&act3.sa_mask);
+  sigaction(SIGUSR1, &act3, 0);
 
-/*
- *  Ignore SIGPIPE.
- */
-struct sigaction act;
-struct sigaction act2;
-struct sigaction act3;
+  // remember prompt
+  if ((prompt = strrchr(argv[0], '/')))
+    prompt++;
+  else
+    prompt = argv[0];
 
-act.sa_handler = SIG_IGN;
-act.sa_flags = 0;
-sigemptyset(&act.sa_mask);
-sigaction(SIGPIPE, &act, 0);
+  aBounce->setPrompt(prompt);
 
-act2.sa_handler = hup_handler;
-act2.sa_flags = 0;
-sigemptyset(&act2.sa_mask);
-sigaction(SIGHUP, &act2, 0);
+  /* parse command line options */
+  while ((ch = getopt(argc, argv, "de:l:b:p:")) != -1) {
+    switch (ch) {
+      case 'd':
+        aBounce->setDebug(true);
+        break;
+      case 'p':
+        aBounce->setPIDPath(optarg);
+        break;
+      case 'e':
+        aBounce->setConfigPath(optarg);
+        break;
+      case 'l':
+        aBounce->setLogPath(optarg);
+        break;
+      case 'b':
+        aBounce->setVHost(optarg);
+        break;
+      default:
+        usage(aBounce->getPrompt());
+        break;
+    } // switch
+  } // while
 
-act3.sa_handler = usr_handler;
-act3.sa_flags = 0;
-sigemptyset(&act3.sa_mask);
-sigaction(SIGUSR1, &act3, 0);
+  if (aBounce->getDebug() == true) {        
+    /*
+     * TODO: The name of this file should be specified
+     * on command line or in a conf file
+     *
+     * 06/12/2003: Done. -GCARTER
+     * 06/13/2003: Moved fopen functions to Bounce class. -GCARTER
+     */
+    if (aBounce->openLog(aBounce->getLogPath()) == false) {
+      cout << "ERROR: Unable to open log file: " << ::strerror(errno) << endl;
 
-#ifdef DEBUG
-	// TODO: The name of this file should be specified
-	// on command line or in a conf file
-	logFile = fopen("bounce.log", "a");
-	if( NULL == logFile )
-		{
-		cout	<< "Unable to open log file: "
-			<< ::strerror( errno ) << endl ;
-		return 0 ;
-		}
-#endif // DEBUG
+      return 0;
+    } // if
+  } // if
 
-/*
- * Detach from console.
- */
-pid_t forkResult = ::fork() ;
-if(forkResult < 0)
-	{
-	cout	<< "Unable to fork new process." << endl ;
-	return -1 ;
-	}
-else if( forkResult != 0 )
-	{
-	cout	<< "Successfully forked, new process ID: "
-		<< forkResult << endl ;
-	return 0;
-	}
+  /*
+   * Create new aBounce object, bind listeners and begin
+   * polling them.
+   *
+   * 06/12/2003 Do this before the fork in case of errors. -GCARTER
+   */
+  aBounce->bindListeners();
 
-/*
- *  Create new application object, bind listeners and begin
- *  polling them.
- */
-application->bindListeners();
+  /*
+   * Detach from console.
+   *
+   * 06/12/2003: If we read in the configuration correctly NOW we can fork. -GCARTER
+   */
+  pid_t forkResult = ::fork();
+  if(forkResult < 0) {
+    cerr << "ERROR: Unable to fork new process." << endl;
+    return -1;
+  } // if
+  else if (forkResult != 0) {
+    if (aBounce->getDebug() == true)
+      aBounce->logEntry("::main> zBounce started, process %d", forkResult);
 
-while( true )
-	{
-	application->checkSockets();
-	}
+  /*
+   * 06/12/2003: Write out pid to either the default file or the path
+   *             specified from the command line. -GCARTER
+   */
+  pidFile = fopen(aBounce->getPIDPath().c_str(), "w");
 
-#ifdef DEBUG
-	fclose( logFile ) ;
-	logFile = 0 ;
-#endif
+    if (NULL == pidFile) {
+      cout << "ERROR: Unable to open log file: "
+           << ::strerror(errno) << endl ;
 
-return 0 ;
+      return 0;
+    } // if
 
-} // main()
+    fprintf(pidFile, "%d\n", forkResult);
+    fflush(pidFile);
+    fclose(pidFile);
+
+    close(0);
+    close(1);
+
+    return 1;
+  } // else
+
+  while(true) {
+    aBounce->checkSockets();
+  } // while
+
+  if (aBounce->getDebug() == true)
+    aBounce->closeLog();
+
+  // cleanup
+  delete aBounce;
+
+  return 0;
+} // main

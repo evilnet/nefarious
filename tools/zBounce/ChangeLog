@@ -1,14 +1,51 @@
-zBounce Changelog; Newest entries at the top.
---
-
-04/11/2000: Greg Sikorski:
-	*	Added 'A' Lines to config format, to only allow specified IP's to
-		initiate a connection.
-	*	Cleaned up formatting, stupid editor messed with tabs. :)
-
-03/11/2000: Dan Karrels:
-	*	Cleanups, STL'ing old C from original version.
-	*	Added configure script and Makefile.
-
-< 01/11/2000: Greg Sikorski:
-	*	Initial version.
+06/13/2003 omni@dynmc.net:
+	-Renamed application pointer to aBounce instead to be more
+	 descriptive of what it points to.
+	-Moved logEntry to Bounce class and added openLog()/closeLog() to class.
+	-Bounce::logEntry now returns number of bytes written.
+06/12/2003 omni@dynmc.net:
+	-Added close() for stdout and stderr once the process has fork()ed.
+	-Began to encapsulate all class variables and create member functions
+	 respectively.  Most class variables are now held privately and are not
+	 externally available.
+	-Moved zlib initializers to Connection class constructor and added
+	 buffer deallocation to the destructor for inflate/deflate.
+	-Created command line options for conf file path, log file path
+	 pid file path, debug mode and outgoing vhost support.
+	-Cleaned up most C/C++ syntax to conform to a single style, pre this
+	 change there were a combination of styles and none of them meshed.
+	-Replaced inflate/deflate error exit() calls to return calls instead,
+	 allowing the process to disconnect the current socket on compression
+	 error instead of crashing the process and giving up on all active
+	 sockets.  This should prevent malicious intent as well, you could
+	 telnet to the compress port and send erroneous data causing the program
+	 to exit.
+	-Made application variable global to allow global program options to be
+	 available to all code.  Now storing things like outbound vhost, log file
+	 pid file and conf file paths in Bounce class.
+	-Removed #define DEBUG support and replaced with application->getDebug()
+	 instead to allow inline debug state changes as well as command line
+	 enabling.
+	-On successful run, process no longer spits output to stdout or stderr
+	 rather it will write it's pid to bounce.pid in the current directory or
+	 the path specified on the command line.  Should make crontab jobs much
+	 easier to execute.  Should consider distrubuting the botchk code as well
+	 along with the package just to be nice.
+	-Added seconds to date displaed in debug output.  Corrected off by one error
+	 affecting the month display.
+	TODO: Attack Bounce.cpp socket code to clean it up, shouldn't have to rebuild
+	      the FD_SET each time as you know when connections are made.  Should be
+	      a static FD_SET that is modified when connections or made or removed
+	      then copied to a temp set and used to check states with select().  Should
+	      help CPU a bit.
+	TODO: Move log writing facility and pid writing facility to part of Bounce
+	      class to remove the two global FILE variables that currently exist.
+	      Should be easy, probably tackle tomorrow.
+	TODO: Create more statistics to show how well the compression is enhancing
+	      the link and what impact it is having on the processor.  It was suggested
+	      that an administrative port be opened to make queries of such a nature.
+	TODO: Look into possible poll() support or kqueue() support to further increase
+	      the performance of the state queries.
+	TODO: Possibly move source files to a src/ directory and cause the binary
+	      to be installed in the root director by make install.  Currently
+	      make install errors out.

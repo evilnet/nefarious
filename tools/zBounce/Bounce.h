@@ -47,7 +47,7 @@
 #include "config.h"
 
 using std::list;
-using std::string ;
+using std::string;
 
 class Socket;
 class Listener;
@@ -56,25 +56,116 @@ class Connection;
 /**
  *  "Bounce" Class.
  */
-class Bounce
-{
+class Bounce {
 public:
-  typedef list<Listener*> listenerListType;
-  listenerListType listenerList;      // List of 'Listeners'.
+  Bounce();				// constructor
+  virtual ~Bounce();			// deconstructor
+
+  /**********************
+   ** Type Definitions **
+   **********************/
 
   typedef list<Connection*> connectionsListType;
-  connectionsListType connectionsList; // List of 'Connections'.
-
-  char cBuffer[MTU+1024];     // Compression scratch buffer.
-
+  typedef list<Listener*> listenerListType;
   typedef list<unsigned long> allowListType;
-  allowListType allowList;     // List of IP's allowed to connect.
+
   size_t savedBytes;
+
+  char cBuffer[MTU + 1024];		// compression scratch buffer.
 
   void bindListeners(); // Binds Listening Ports.
   void checkSockets();  // Polls all sockets.
   void receiveNewConnection(Listener*); // Accepts connections.
   void dumpConfig(); // Accepts connections.
+
+  /*************************
+   ** Config Path Members **
+   *************************/
+
+  void setConfigPath(const string &setMe)
+    { myConfigPath = setMe; }
+
+  const string getConfigPath() const
+    { return myConfigPath; }
+
+  /*******************
+   ** Debug Members **
+   *******************/
+
+  void setDebug(const bool setMe)
+    { myDebug = setMe; }
+
+  const bool getDebug() const
+    { return myDebug; }
+
+  /***********************
+   ** Log Entry Members **
+   ***********************/
+
+  const bool openLog(const string &);
+  const bool closeLog();
+  const int logEntry(const char *, ...);
+
+  /**********************
+   ** Log Path Members **
+   **********************/
+
+  void setLogPath(const string &setMe)
+    { myLogPath = setMe; }
+
+  const string getLogPath() const
+    { return myLogPath; }
+
+  /*****************
+   ** PID Members **
+   *****************/
+
+  void setPIDPath(const string &setMe)
+    { myPIDPath = setMe; }
+
+  const string getPIDPath() const
+    { return myPIDPath; }
+
+  /********************
+   ** Prompt Members **
+   ********************/
+
+  void setPrompt(const string &setMe)
+    { myPrompt = setMe; }
+
+  const string getPrompt() const
+    { return myPrompt; }
+
+  /*******************
+   ** VHost Members **
+   *******************/
+
+  void setVHost(const string &setMe)
+    { myVHost = setMe; }
+
+  const string getVHost() const
+    { return myVHost; }
+
+private:
+  /***************
+   ** Variables **
+   ***************/
+
+  // TODO: all variables should technically go in here
+  // and be encapsed by members.
+  allowListType allowList;			// List of IP's allowed to connect.
+  bool myDebug;					// debug mode default: false
+  connectionsListType connectionsList;		// List of 'Connections'.
+  FILE *myLogFile;				// pointer to log file
+  FILE *myPIDFile;				// pointer to pid file
+  listenerListType listenerList;		// List of 'Listeners'.
+  string myConfigPath;				// path to config file
+  string myLogPath;				// path to log file
+  string myPIDPath;				// path to pid file
+  string myPrompt;				// command originally used to start me
+  string myVHost;				// virtual host to bind to if any
 };
+
+extern Bounce *aBounce;
 
 #endif // __BOUNCE_H

@@ -3,6 +3,7 @@
 #ifndef __MAIN_H
 #define __MAIN_H "$Id:"
 
-void logEntry( const char*, ... ) ;
-
+/*
+ * 06/13/2003: logEntry declaration removed, logEntry is now in Bounce class. -GCARTER
+ */
 #endif // __MAIN_H
