@@ -1,6 +1,6 @@
 /*
  * IRC - Internet Relay Chat, ircd/m_svsnick.c
- * Copyright (C) 2002 Mathieu Rene <math@rootservices.net>
+ * Copyright (C) 2003 Mathieu Rene <math@rootservices.net>
  *                  
  *
  * See file AUTHORS in IRC package for additional names of

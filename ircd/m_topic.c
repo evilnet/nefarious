@@ -184,14 +184,14 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       if ((chptr->mode.mode & MODE_TOPICLIMIT) != 0 && !is_chan_op(sptr, chptr))
       {
         send_reply(sptr, ERR_CHANOPRIVSNEEDED, chptr->chname);
-        return;
+        continue;
       }
       /* if chan +m and user not service/+v/+o, return error and ignore */
       if (!client_can_send_to_channel(sptr, chptr)
           && !IsChannelService(sptr) && !IsVoicedOrOpped(chptr->members))
       {
         send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
-        return;
+        continue;
       }
       if (chptr->mode.mode & MODE_NOCOLOUR) {
 	if (hascolour == -1) hascolour = HasColour(topic);

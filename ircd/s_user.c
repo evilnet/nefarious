@@ -1763,9 +1763,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
   if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))
     ++UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding) {
-    if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
       if (do_host_hiding)
 	hide_hostmask(acptr);
+    }
     else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
       make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(acptr))), cli_user(acptr)->host, cli_user(acptr)->host, cli_user(acptr)->virthost);
       SetFlag(acptr, FLAG_HIDDENHOST);

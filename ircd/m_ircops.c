@@ -116,7 +116,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
   struct Client *acptr;
   struct Client *server = 0;
-  char buf[BUFSIZE] = NULL;
+  char buf[BUFSIZE];
   int ircops = 0;
 
   if (!MyUser(sptr))

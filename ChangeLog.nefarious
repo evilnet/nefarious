@@ -5,7 +5,12 @@
 	FEAT_HOST_HIDING_STYLE code and various other code clean-ups.
 
 	* ircd/m_ircops.c: Quick fix for weird behavior due to 
-	uninitialized variable; disable use of ms_ircops() for now.
+	uninitialized variable; disable use of ms_ircops() for now; 
+	fixed it again.
+
+	* ircd/m_topic.c, ircd/s_user.c: Fix warnings.
+
+	* ircd/m_svsnick.c: Update copyright.
 
 	* tools/linesync/linesync.conf: Add 'F' to ALLOWED_LINES.
 
