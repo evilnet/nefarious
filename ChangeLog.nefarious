@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-25  Alex Schumann  <rubin@afternet.org>
+
+        * ircd/ssl.c: Added some Debug() info to try and track down
+	the Write error: 0 during netsplit bug for ssl users.
+
 2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Dont display RPL_HOSTHIDDEN if we are setting the

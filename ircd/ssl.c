@@ -226,6 +226,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
       Debug((DEBUG_DEBUG, "SSL_write returned WANT_ - retrying"));
       return retval;
     case SSL_ERROR_SYSCALL:
+      Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SYSCALL res=%d errno=%d retval=%d", res, errno, retval));
       return (res < 0 && errno == EINTR) ? retval : IO_FAILURE;
     case SSL_ERROR_ZERO_RETURN:
       SSL_shutdown(socket->ssl);
