@@ -3,6 +3,10 @@
 
 2005-03-14  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_exempt.c: Small fix.
+
+2005-03-14  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/s_user.c: Added NICKLEN to the inital length of host and ip
 	check for dnsbl exempts. Changed HOSTLEN to SOCKIPLEN for the ip
 	mask.
