@@ -3,6 +3,10 @@
 
 2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_svsnick.c: Bug fix: NICK was being sent twice to users.
+
+2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/s_auth.c: Turned a static char into a normal char.
 
 	* ircd/s_conf.c: Bug fix with S:Lines.
