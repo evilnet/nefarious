@@ -749,7 +749,10 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       ircd_strncpy(cli_user(new_client)->account, account, ACCOUNTLEN);
     if (HasHiddenHost(new_client))
       ircd_snprintf(0, cli_user(new_client)->host, HOSTLEN, "%s.%s",
-        account, feature_str(FEAT_HIDDEN_HOST));
+        account, (IsAnOper(new_client) &&
+	feature_bool(FEAT_OPERHOST_HIDING)) ?
+	feature_str(FEAT_HIDDEN_OPERHOST) :
+	feature_str(FEAT_HIDDEN_HOST));
     if (HasSetHost(new_client)) {
       if ((host = strrchr(hostmask, '@')) != NULL) {
         *host++ = '\0';
@@ -1121,7 +1124,9 @@ int hide_hostmask(struct Client *cptr, unsigned int flag)
 
   sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":Registered");
   ircd_snprintf(0, cli_user(cptr)->host, HOSTLEN, "%s.%s",
-    cli_user(cptr)->account, feature_str(FEAT_HIDDEN_HOST));
+    cli_user(cptr)->account, (IsAnOper(cptr) &&
+    feature_bool(FEAT_OPERHOST_HIDING)) ?
+    feature_str(FEAT_HIDDEN_OPERHOST) : feature_str(FEAT_HIDDEN_HOST));
   SetFlag(cptr, flag);
 
   /* ok, the client is now fully hidden, so let them know -- hikari */

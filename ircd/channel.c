@@ -446,7 +446,10 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
                                 cli_user(cptr)->realhost);
      else {
         ircd_snprintf(0, tmphost, HOSTLEN, "%s.%s",
-                      cli_user(cptr)->account, feature_str(FEAT_HIDDEN_HOST));
+		      cli_user(cptr)->account, (IsAnOper(cptr) &&
+		      feature_bool(FEAT_OPERHOST_HIDING)) ?
+		      feature_str(FEAT_HIDDEN_OPERHOST) :
+		      feature_str(FEAT_HIDDEN_HOST));
         sa = make_nick_user_host(nu_accthost, cli_name(cptr),
                                  cli_user(cptr)->username,
                                  tmphost);
@@ -2836,7 +2839,6 @@ joinbuf_flush(struct JoinBuf *jbuf)
 }
 
 /* Returns TRUE (1) if client is invited, FALSE (0) if not */
-
 int IsInvited(struct Client* cptr, struct Channel* chptr)
 {
   struct SLink *lp;

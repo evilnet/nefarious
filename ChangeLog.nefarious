@@ -1,4 +1,16 @@
+2003-07-01  Martijn Smit  <detsaw@users.sourceforge.net>
+
+	* Added OPERHOST_HIDING and HIDDEN_OPERHOST.
+
 2003-07-03  Reed Loden  <reed@reedloden.com>
+
+	* Modified operhost patch to use "? :" construct rather than if
+	and else.
+
+	* Changed default server port and hidden host.
+
+	* Backported some patches from u2.10.12.
+	(FEAT_LOCAL_CHANNELS and brand new parse.c)
 
 	* Added some fixes from asuka.
 

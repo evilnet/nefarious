@@ -23,6 +23,16 @@
 	* include/patchlevel.h: Bumped to pre3 - hopefuly the last pre
 	before the release.
 
+2003-06-22  Diane Bruce  <db@db.net>
+
+	* ircd/parse.c: Completely rewritten June 2, 2003 - Dianora
+
+2003-06-22  Bas Steendijk  <steendijk@xs4all.nl>
+
+	* include/ircd_features.h, include/supported.h, ircd/ircd_features.c,
+	ircd/ircd_features.c, ircu2.10/ircd/m_join.c, doc/example.conf: 
+	Make ability to create local channels a feature which can be disabled.
+
 2003-06-13  Kevin L Mitchell  <klmitch@mit.edu>
 
 	* ircd/m_settime.c: it's supposed to be %ld, not %l
