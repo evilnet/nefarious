@@ -639,7 +639,6 @@ struct ConfItem* find_conf_cidr(const char* name, const char* user,
                                  struct in_addr cli_addr, int statmask)
 {
   struct ConfItem *tmp;
-  char userhost[USERLEN + HOSTLEN + 3];
   char *ip_start;
   char *cidr_start;
   struct in_addr conf_addr;

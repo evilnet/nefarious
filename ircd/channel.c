@@ -1526,6 +1526,60 @@ void clean_channelname(char *cn)
   }
 }
 
+int SetAutoChanModes(struct Channel *chptr)
+{
+  static int chan_flags[] = {
+    MODE_PRIVATE,	'p',
+    MODE_SECRET,	's',
+    MODE_MODERATED,	'm',
+    MODE_TOPICLIMIT,	't',
+    MODE_INVITEONLY,	'i',
+    MODE_NOPRIVMSGS,	'n',
+    MODE_REGONLY,	'r',
+    MODE_NOCOLOUR,	'c',
+    MODE_STRIP,		'S',
+    MODE_NOCTCP,	'C',
+    MODE_ACCONLY,	'M',
+    MODE_NONOTICE,	'N',
+    MODE_OPERONLY,	'O',
+    MODE_ADMINONLY,     'A',
+    MODE_NOQUITPARTS,	'Q',
+    MODE_SSLONLY,	'z',
+    MODE_NOAMSG,	'T',
+    MODE_NOLISTMODES,	'L'
+  };
+  unsigned int *flag_p;
+  unsigned int t_mode;
+  const char *modestr;
+
+  t_mode = 0;
+
+  assert(0 != chptr);
+
+  if (!feature_bool(FEAT_AUTOCHANMODES) || !feature_str(FEAT_AUTOCHANMODES_LIST) || 
+       strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) <= 1)
+    return 0;
+
+  modestr = feature_str(FEAT_AUTOCHANMODES_LIST);
+
+  for (; *modestr; modestr++) {
+    for (flag_p = chan_flags; flag_p[0]; flag_p += 2) /* look up flag */
+      if (flag_p[1] == *modestr)
+        break;
+
+    if (!flag_p[0]) /* didn't find it */
+      continue;
+
+    t_mode |= flag_p[0]; 
+
+  } /* for (; *modestr; modestr++) { */
+
+  if (t_mode != 0)
+    chptr->mode.mode = t_mode;
+
+  return 0;
+}
+
 /*
  *  Get Channel block for i (and allocate a new channel
  *  block, if it didn't exists before).
@@ -1565,59 +1619,6 @@ struct Channel *get_channel(struct Client *cptr, char *chname, ChannelGetType fl
     hAddChannel(chptr);
   }
   return chptr;
-}
-
-int SetAutoChanModes(struct Channel *chptr)
-{
-  static int chan_flags[] = {
-    MODE_PRIVATE,	'p',
-    MODE_SECRET,	's',
-    MODE_MODERATED,	'm',
-    MODE_TOPICLIMIT,	't',
-    MODE_INVITEONLY,	'i',
-    MODE_NOPRIVMSGS,	'n',
-    MODE_REGONLY,	'r',
-    MODE_NOCOLOUR,	'c',
-    MODE_STRIP,		'S',
-    MODE_NOCTCP,	'C',
-    MODE_ACCONLY,	'M',
-    MODE_NONOTICE,	'N',
-    MODE_OPERONLY,	'O',
-    MODE_ADMINONLY,     'A',
-    MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'z',
-    MODE_NOAMSG,	'T',
-    MODE_NOLISTMODES,	'L'
-  };
-  unsigned int *flag_p;
-  unsigned int t_mode;
-  const char *modestr;
-
-  t_mode = 0;
-
-  assert(0 != chptr);
-
-  if (!feature_bool(FEAT_AUTOCHANMODES) || !feature_str(FEAT_AUTOCHANMODES_LIST) || 
-       strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) <= 1)
-    return;
-
-  modestr = feature_str(FEAT_AUTOCHANMODES_LIST);
-
-  for (; *modestr; modestr++) {
-    for (flag_p = chan_flags; flag_p[0]; flag_p += 2) /* look up flag */
-      if (flag_p[1] == *modestr)
-        break;
-
-    if (!flag_p[0]) /* didn't find it */
-      continue;
-
-    t_mode |= flag_p[0]; 
-
-  } /* for (; *modestr; modestr++) { */
-
-  if (t_mode != 0)
-    chptr->mode.mode = t_mode;
-
 }
 
 void add_invite(struct Client *cptr, struct Channel *chptr)

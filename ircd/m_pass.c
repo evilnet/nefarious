@@ -126,7 +126,6 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      *     PASS ::I-line-pass X username :pass phrase
      */
      char* s = &parv[1][1];
-     int k;
      
      parc = 1;
      for (;;) {

@@ -1,7 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2004-10-18 Alex Schumann <rubinlinux@gmail.com>
+2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Warning cleanup.
+
+	* ircd/m_pass.c: Warning cleanup.
+
+	* ircd/s_auth.c: Only send "Checking your IP against DNS ban lists"
+			 done this as a way to get around the multiple
+			 notice issue with more than one DNSBL.
+
+	* ircd/s_conf.c: Warning cleanup.
+
+2004-10-18  Alex Schumann  <rubinlinux@gmail.com>
 
 	* ircd/m_account.c: modded LOC code to resolve some bugs with it.
 

@@ -89,10 +89,6 @@ static struct {
   { "NOTICE AUTH :*** Invalid hostname\r\n",               35 },
   { "NOTICE AUTH :*** Checking your IP against DNS ban " \
     "lists\r\n",                                           58 },
-  { "NOTICE AUTH :*** IP passed DNS ban list check\r\n",   47 },
-  { "NOTICE AUTH :*** IP passed DNS ban list check (cached)\r\n", 56 },
-  { "NOTICE AUTH :*** IP found on DNS ban list\r\n",       43 },
-  { "NOTICE AUTH :*** IP found on DNS ban list (cached)\r\n", 52 }
 };
 
 typedef enum {
@@ -105,11 +101,7 @@ typedef enum {
   REPORT_FAIL_ID,
   REPORT_IP_MISMATCH,
   REPORT_INVAL_DNS,
-  REPORT_DO_DNSBL,
-  REPORT_FIN_DNSBL,
-  REPORT_FIN_DNSBLC,
-  REPORT_FAIL_DNSBL,
-  REPORT_FAIL_DNSBLC
+  REPORT_DO_DNSBL
 } ReportType;
 
 #ifdef USE_SSL
@@ -156,15 +148,7 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
       }
     }
 
-    if (IsUserPort(auth->client)) {
-      if (!pass)
-        sendheader(auth->client, REPORT_FAIL_DNSBL);
-      else
-        sendheader(auth->client, REPORT_FIN_DNSBL);
-    }
-  } else
-    if (IsUserPort(auth->client))
-      sendheader(auth->client, REPORT_FIN_DNSBL);
+  }
 
   return;
 }
@@ -208,12 +192,6 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
 	}
       }
 
-      if (IsUserPort(auth->client)) {
-	if (pass == 1)
-          sendheader(client, REPORT_FIN_DNSBLC);
-        else
-          sendheader(client, REPORT_FAIL_DNSBLC);
-      }
     } else
       SetDNSBLPending(auth);
   }
@@ -319,11 +297,8 @@ void destroy_auth_request(struct AuthRequest* auth, int send_reports)
       sendheader(auth->client, REPORT_FAIL_DNS);
   }
 
-  if (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)) {
+  if (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS))
     delete_resolver_queries(auth);
-    if (send_reports && IsUserPort(auth->client))
-      sendheader(auth->client, REPORT_FIN_DNSBL);
-  }
 
   if (send_reports) {
     log_write(LS_RESOLVER, L_INFO, 0, "DNS/AUTH timeout %s",
