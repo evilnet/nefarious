@@ -32,6 +32,7 @@
 #include "s_debug.h"
 #include "send.h"
 #include "struct.h"
+#include "ircd_string.h"
 
 #include <assert.h>
 #include <string.h>
@@ -268,4 +269,20 @@ client_report_privs(struct Client *to, struct Client *client)
   msgq_clean(mb);
 
   return 0;
+}
+
+int client_modify_priv_by_name(struct Client *who, char *priv, int what) {
+ int i = 0;
+ assert(0 != priv);
+ assert(0 != who);
+
+ for (i = 0; privtab[i].name; i++)
+  if (0 == ircd_strcmp(privtab[i].name, priv)) {
+   if (what == PRIV_ADD)
+    GrantPriv(who, privtab[i].priv);
+   else if (what == PRIV_DEL) {
+    RevokePriv(who, privtab[i].priv);
+   }
+  }
+ return 0;
 }

@@ -205,5 +205,5 @@ extern int find_kill(struct Client *cptr);
 extern int find_restrict(struct Client *cptr);
 extern struct MotdItem* read_motd(const char* motdfile);
 extern char* find_quarantine(const char* chname);
-
+extern int conf_check_slines(struct Client *cptr);
 #endif /* INCLUDED_s_conf_h */

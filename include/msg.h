@@ -352,6 +352,7 @@ struct Client;
 
 #define MSG_PRIVS		"PRIVS"		/* PRIV */
 #define TOK_PRIVS		"PRIVS"
+#define CMD_PRIVS		MSG_PRIVS, TOK_PRIVS
 
 /*
  * Constants

@@ -524,6 +524,9 @@ struct Client {
 #define PrivHas(pset, priv)	((pset)->priv_mask[_PRIV_IDX(priv)] & \
 				 _PRIV_BIT(priv))
 
+#define PRIV_ADD 1
+#define PRIV_DEL 0
+
 #define GrantPriv(cli, priv)	(PrivSet(&(cli_privs(cli)), priv))
 #define RevokePriv(cli, priv)	(PrivClr(&(cli_privs(cli)), priv))
 #define HasPriv(cli, priv)	(PrivHas(&(cli_privs(cli)), priv))
@@ -541,6 +544,7 @@ extern void client_add_sendq(struct Connection* con,
 			     struct Connection** con_p);
 extern void client_set_privs(struct Client* client);
 extern int client_report_privs(struct Client* to, struct Client* client);
+extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
 
 #endif /* INCLUDED_client_h */
 

@@ -213,6 +213,15 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     ++UserStats.opers;
     SetFlag(sptr, FLAG_OPER);
     sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s :+o", parv[0]);
+  } else if (IsServer(cptr)) {
+     struct Client *acptr;
+     if (parc < 4) {
+       send_reply(sptr, ERR_NOOPERHOST);
+       return 0;
+     }
+     if(!(acptr = find_match_server(parv[1]))) {
+      return send_reply(sptr, ERR_NOOPERHOST);
+     }
   }
   return 0;
 }

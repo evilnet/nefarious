@@ -8,7 +8,7 @@
 #ifndef INCLUDED_ircd_chattr_h
 #include "ircd_chattr.h"
 #endif
-
+#include <string.h>
 /*
  * Macros
  */

@@ -89,6 +89,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "send.h"
+#include "msg.h"
 
 #include <assert.h>
 
@@ -114,4 +115,39 @@ int mo_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   }
 
   return 0;
+}
+
+int ms_privs(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
+ struct Client *acptr = parc > 1 ? findNUser(parv[1]) : NULL;
+ char buf[512] = "";
+ int what = PRIV_ADD;
+ int modified = 0;
+ char *p = 0;
+ char *tmp;
+ int i;
+
+ if (parc < 3)
+  return need_more_params(sptr, "PRIVS");
+
+ if (!acptr)
+  return 0;
+
+ for (i=1; i<parc; i++) {
+   strcat(buf, parv[i]);
+   strcat(buf, " ");
+ }
+
+ for (i = 2; i < parc; i++) {
+  if (*parv[i] == '+') { what = PRIV_ADD; parv[i]++; }
+  if (*parv[i] == '-') { what = PRIV_DEL; parv[i]++; }
+  for (tmp = ircd_strtok(&p, parv[i], ","); tmp; tmp = ircd_strtok(&p, NULL, ",")) {
+   client_modify_priv_by_name(acptr, tmp, what);
+   if (!modified) modified = 1;
+  }
+ }
+ if (MyConnect(acptr) && modified)
+  sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Your privileges were modified", acptr);
+
+ sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%s", buf);
+ return 0;
 }
