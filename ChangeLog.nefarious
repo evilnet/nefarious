@@ -1,3 +1,8 @@
+2003-01-13  Mathieu Rene <math@rootservices.net>
+	* ircd/m_oper.c: Isolated OPER Authentication procedure
+	* ircd/m_svsnick.c: Fixed stuff that didnt compile
+	* ircd/s_conf.c: Fixed stuff that didnt compile
+
 2003-01-11  Reed Loden  <reed@reedloden.com>
 
 	* Add SVSNICK (several files modified).

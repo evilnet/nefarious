@@ -123,7 +123,7 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 if((acptr2 = FindClient(parv[2]))) {
   /* Nick collision occured, kill user with specific reason */
   ++ServerStats->is_kill;
-  cli_flags(sptr) |= FLAG_KILLED;
+  FlagSet(&cli_flags(sptr), FLAG_KILLED);
   exit_client(cptr, acptr2, &me, "Killed (This nickname is registered)");
  }
 

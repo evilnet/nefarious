@@ -120,6 +120,29 @@ int oper_password_match(const char* to_match, const char* passwd)
   return (0 == strcmp(to_match, passwd));
 }
 
+int can_oper(struct Client *cptr, struct Client *sptr, char *name, char *password, struct ConfItem **_aconf) {
+  struct ConfItem *aconf;
+
+  aconf = find_conf_exact(name, cli_username(sptr), cli_sockhost(sptr), CONF_OPS);
+  if (!aconf) 
+    aconf = find_conf_exact(name, cli_username(sptr),
+                            ircd_ntoa((const char*) &(cli_ip(cptr))), CONF_OPS);
+  if (!aconf || IsIllegal(aconf))
+    return ERR_NOOPERHOST;
+   assert(0 != (aconf->status & CONF_OPS));
+
+  if (oper_password_match(password, aconf->passwd)) {
+    if (ACR_OK != attach_conf(sptr, aconf)) {
+      return ERR_NOOPERHOST;
+    } 
+  } else {
+    *_aconf = aconf;
+    return ERR_PASSWDMISMATCH;
+  }
+   *_aconf = aconf;
+   return 0;
+}
+
 /*
  * m_oper - generic message handler
  */
@@ -128,6 +151,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   struct ConfItem* aconf;
   char*            name;
   char*            password;
+ struct Flags old_mode = cli_flags(sptr);
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -138,29 +162,21 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (EmptyString(name) || EmptyString(password))
     return need_more_params(sptr, "OPER");
 
-  aconf = find_conf_exact(name, cli_username(sptr), cli_sockhost(sptr), CONF_OPS);
-  if (!aconf) 
-    aconf = find_conf_exact(name, cli_username(sptr),
-                            ircd_ntoa((const char*) &(cli_ip(cptr))), CONF_OPS);
-
-  if (!aconf || IsIllegal(aconf)) {
-    send_reply(sptr, ERR_NOOPERHOST);
-    sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s)",
+    switch (can_oper(cptr, sptr, name, password, &aconf)) {
+    case ERR_NOOPERHOST:
+     sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O: Lines)",
 			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
-    return 0;
-  }
-  assert(0 != (aconf->status & CONF_OPS));
-
-  if (oper_password_match(password, aconf->passwd)) {
-    struct Flags old_mode = cli_flags(sptr);
-
-    if (ACR_OK != attach_conf(sptr, aconf)) {
-      send_reply(sptr, ERR_NOOPERHOST);
-      sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s "
-			   "(%s@%s)", parv[0], cli_user(sptr)->username,
-			   cli_sockhost(sptr));
-      return 0;
+     send_reply(sptr, ERR_NOOPERHOST);
+     return 0;
+     break;
+    case ERR_PASSWDMISMATCH:
+     sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
+			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+     send_reply(sptr, ERR_PASSWDMISMATCH);
+     return 0;
+     break;
     }
+ 
     if (CONF_LOCOP == aconf->status) {
       ClearOper(sptr);
       SetLocOp(sptr);
@@ -190,12 +206,6 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			 IsOper(sptr) ? 'O' : 'o');
 
     log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#C)", name, sptr);
-  }
-  else {
-    send_reply(sptr, ERR_PASSWDMISMATCH);
-    sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s)",
-			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
-  }
   return 0;
 }
 
