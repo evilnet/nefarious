@@ -238,18 +238,6 @@
 /* Define to 1 if `vfork' works. */
 #undef HAVE_WORKING_VFORK
 
-/* First key used for crypting hostnames under host hiding style 2 (random if
-   not given). */
-#undef KEY
-
-/* Second key used for crypting hostnames under host hiding style 2 (random if
-   not given). */
-#undef KEY2
-
-/* Third key used for crypting hostnames under host hiding style 2 (random if
-   not given). */
-#undef KEY3
-
 /* Path to debugging log file */
 #undef LPATH
 

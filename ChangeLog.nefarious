@@ -3,6 +3,19 @@
 
 2005-02-21  Neil Spierling  <sirvulcan@gmail.com>
 
+	* config.h.in: Removed KEY defines.
+
+	* configure: Regenerated.
+
+	* configure.in: Removed cloak key stuff.
+
+	* include/ircd_defs.h: Define the cloak keys here now.
+
+	* ircd/hosthiding.c: Removed some defines. Keeping the random
+	number function for now.
+
+2005-02-21  Neil Spierling  <sirvulcan@gmail.com>
+
 	* doc/example.conf: Updated X:Lines with new flags/name bits.
 
 	* include/client.h: Added 2 new flags for dnsbl's for marking

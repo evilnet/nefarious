@@ -33,22 +33,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-/* Technically they will always be defined via config.h
- * but i left it in, cloakrand might become primary use
- * sometime */
-
-#ifndef KEY
-#define KEY cloakrand()
-#endif
-
-#ifndef KEY2
-#define KEY2 cloakrand()
-#endif
-
-#ifndef KEY3
-#define KEY3 cloakrand()
-#endif
-
  /* This coded was ported from Ultimate IRCd (http://www.shadow-realm.org),
   * modifications made by SiRVulcaN <sirvulcan@gmail.com> to work on 
   * IRCu.
