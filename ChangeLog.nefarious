@@ -1,6 +1,23 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-03  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added feature TPATH (default "ircd.tune").
+
+	* include/ircd_features.h: Added FEAT_TPATH.
+
+	* include/s_misc.h: Function declerations.
+
+	* ircd/ircd.c: Load tune file upon ircd launch.
+
+	* ircd/ircd_features.c: Added TPATH.
+
+	* ircd/s_serv.c: savetune and loadtune functions.
+
+	* ircd/s_user.c: Update the tune file when user counts go up
+	above the highest known count.
+
 2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/m_wallhops.c: Couple of fixes with displaying "%".

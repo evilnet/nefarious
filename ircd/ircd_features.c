@@ -393,6 +393,7 @@ static struct FeatureDesc {
   F_S(OMPATH, FEAT_CASE | FEAT_MYOPER, "ircd.opermotd", 0),
   F_S(QPATH, FEAT_CASE | FEAT_MYOPER, "ircd.quotes", 0),
   F_S(EPATH, FEAT_CASE | FEAT_MYOPER, "ircd.rules", 0),
+  F_S(TPATH, FEAT_CASE | FEAT_MYOPER, "ircd.tune", 0),
   F_I(HOST_HIDING_STYLE, 0, 1, 0),
   F_B(OPERHOST_HIDING, 0, 1, 0),
   F_S(HIDDEN_OPERHOST, FEAT_CASE, "Staff.Nefarious", 0),

@@ -571,6 +571,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (UserStats.globalclients < UserStats.clients && IsUser(sptr)) {
     if (UserStats.globalclients >= 0) {
       ++UserStats.globalclients;
+      save_tunefile();
     }
   }
 
@@ -578,6 +579,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (UserStats.localclients < UserStats.local_clients && IsUser(sptr)) {
     if (UserStats.localclients >= 0) {
       ++UserStats.localclients;
+      save_tunefile();
     }
   }
 

@@ -399,3 +399,41 @@ int opermotd_send(struct Client* cptr) {
 
   return 0;
 }
+
+
+void save_tunefile(void)
+{
+        FILE *tunefile;
+        char tfile[1024];
+
+        ircd_snprintf(0, tfile, sizeof(tfile), "%s/%s", DPATH, feature_str(FEAT_TPATH));
+        tunefile = fopen(tfile, "w");
+        if (!tunefile)
+        {
+                sendto_opmask_butone(0, SNO_OLDSNO, "Unable to write tunefile..");
+                return;
+        }
+        fprintf(tunefile, "%d\n", UserStats.localclients);
+        fprintf(tunefile, "%d\n", UserStats.globalclients);
+        fclose(tunefile);
+}
+
+void load_tunefile(void)
+{
+        FILE *tunefile;
+        char buf[1024];
+
+        char tfile[1024];
+        ircd_snprintf(0, tfile, sizeof(tfile), "%s/%s", DPATH, feature_str(FEAT_TPATH));
+        tunefile = fopen(tfile, "r");
+        if (!tunefile)
+                return;
+        Debug((DEBUG_DEBUG, "Reading tune file"));
+
+        fgets(buf, 1023, tunefile);
+        UserStats.globalclients = atol(buf);
+        fgets(buf, 1023, tunefile);
+        UserStats.localclients = atol(buf);
+        fclose(tunefile);
+}
+
