@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-14  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_exempt.c: Needed changes for our web exempt module. Send notices
+	if the exemption is already there when adding or isnt there when trying to
+	remove move it. Also fixed a bug with syncing exempts when removing them.
+
+	* ircd/s_user.c: Check both nick!user@host and nick!user@ip for
+	exemptions as apache doesnt usually resolve hosts so it will be giving
+	us ips in the exemption module on the website.
+
 2005-03-11  Reed Loden  <reed@reedloden.com>
 
 	* include/patchlevel.h: Changed 0.3.0 to 0.4.0-dev so as not to
@@ -28,7 +38,7 @@
 
 2005-03-01  Alex Schumann  <rubin@afternet.org>
 
-        * ircd/ssl.c: Added some Debug() info to try and track down
+	* ircd/ssl.c: Added some Debug() info to try and track down
 	the Write error: 0 during netsplit bug for ssl users.
 
 2005-03-01  Neil Spierling  <sirvulcan@gmail.com>

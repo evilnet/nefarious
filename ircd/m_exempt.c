@@ -71,8 +71,12 @@ int add_exempt(struct Client* sptr, char* host, char* netburst)
   struct dnsblexempts *dnsblexempts;
   char *dhost;
 
-  if ((dhost = find_dnsblexempt(host)))
+  if ((dhost = find_dnsblexempt(host))) {
+    if ((0 != ircd_strcmp(netburst, "nb")) && MyConnect(sptr))
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :DNSBL Exemption %s already exists", sptr, host);
+
     return 0;
+  }
 
   if (!IsServer(sptr) && (0 != ircd_strcmp(netburst, "nb")))
     sendto_opmask_butone(0, SNO_GLINE, "%C Adding DNSBL Exemption on %s", sptr, host);
@@ -87,12 +91,20 @@ int add_exempt(struct Client* sptr, char* host, char* netburst)
     DNSBLExemptList->prev = &dnsblexempts->next;
   DNSBLExemptList = dnsblexempts;
 
-  return 0;
+  return 1;
 }
 
 int del_exempt(struct Client* sptr, char* host)
 {
   struct dnsblexempts *dnsblexempts;
+  char *dhost;
+
+  if (!(dhost = find_dnsblexempt(host))) {
+    if (MyConnect(sptr))
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :DNSBL Exemption %s does not exist", sptr, host);
+
+    return 0;
+  }
 
   for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next) {
     if (!match(dnsblexempts->host, host)) {
@@ -143,7 +155,7 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   cp = pretty_mask(cp);
 
-  if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp, "nm")))
+  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, "nm")))
     sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %c%s", sptr, c, cp);
 
   return 0;
