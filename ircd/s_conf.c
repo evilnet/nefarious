@@ -1135,48 +1135,52 @@ const struct DenyConf* conf_get_deny_list(void)
 }
 
 /*
- * read_configuration_file
+ * read_actual_config 
  *
- * Read configuration file.
+ * cfile - name of configuration file
  *
- * returns 0, if file cannot be opened
- *         1, if file read
+
+ * returns 1 if read, 0 if unable to open
  */
 
 #define MAXCONFLINKS 150
 
-int read_configuration_file(void)
+int
+read_actual_config(const char *cfile) 
 {
   enum { MAX_FIELDS = 15 };
-
-  char* src;
-  char* dest;
-  int quoted;
-  FBFILE *file;
-  char line[512];
-  int ccount = 0;
-  struct ConfItem *aconf = 0;
-  
-  int   field_count = 0;
   const char* field_vector[MAX_FIELDS + 1];
+  int quoted, ccount = 0, field_count = 0;
+  char *src, *asrc, *dest, line[512];
 
-  Debug((DEBUG_DEBUG, "read_configuration_file: ircd.conf = %s", configfile));
-  if (0 == (file = fbopen(configfile, "r"))) {
+  struct ConfItem *aconf = 0;
+  FBFILE *file;
+
+  Debug((DEBUG_DEBUG, "read_actual_config: ircd.conf = %s", cfile));
+  sendto_opmask_butone(0, SNO_OLDSNO, "Reading configuration file: %s", cfile);
+
+  if (0 == (file = fbopen(cfile, "r"))) {
+    sendto_opmask_butone(0, SNO_OLDSNO, "Unable to open configuration file: %s", cfile);
     return 0;
   }
-
   feature_unmark(); /* unmark all features for resetting later */
 
-  while (fbgets(line, sizeof(line) - 1, file)) {
+  while (fbgets(line, sizeof(line) - 1, file))
+  {
+    int is_include = 0;
+    /* Skip comments and whitespaces */
     if ('#' == *line || IsSpace(*line))
       continue;
 
     if ((src = strchr(line, '\n')))
       *src = '\0';
     
-    if (':' != line[1]) {
+    if((asrc = strstr(line, "include")))
+      is_include = 1; 
+
+    if (':' != line[1] && !is_include) {
       Debug((DEBUG_ERROR, "Bad config line: %s", line));
-      sendto_opmask_butone(0, SNO_OLDSNO,"Bad Config line");
+      sendto_opmask_butone(0, SNO_OLDSNO, "Bad Config line: %s", line);
       continue;
     }
 
@@ -1194,74 +1198,76 @@ int read_configuration_file(void)
     field_count = 1;
     quoted = 0;
 
-    for (src = line, dest = line; *src; ) {
-      switch (*src) {
-      case '\\':
-        ++src;
-        switch (*src) {
-        case 'b':
-          *dest++ = '\b';
-          ++src;
-          break;
-        case 'f':
-          *dest++ = '\f';
-          ++src;
-          break;
-        case 'n':
-          *dest++ = '\n';
-          ++src;
-          break;
-        case 'r':
-          *dest++ = '\r';      
-          ++src;
-          break;
-        case 't':
-          *dest++ = '\t';
-          ++src;
-          break;
-        case 'v':
-          *dest++ = '\v';
-          ++src;
-          break;
+    for (src = line, dest = line; *src; )
+    {
+      switch (*src)
+      {
         case '\\':
-          *dest++ = '\\';
+          ++src;
+          switch (*src) {
+            case 'b':
+              *dest++ = '\b';
+              ++src;
+              break;
+            case 'f':
+              *dest++ = '\f';
+              ++src;
+              break;
+            case 'n':
+              *dest++ = '\n';
+              ++src;
+              break;
+            case 'r':
+              *dest++ = '\r';
+              ++src;
+              break;
+            case 't':
+              *dest++ = '\t';
+              ++src;
+              break;
+            case 'v':
+              *dest++ = '\v';
+              ++src;
+              break;
+           case '\\':
+              *dest++ = '\\';
+              ++src;
+              break;
+           case '\0':
+              break;
+           default:
+             *dest++ = *src++;
+             break;
+          }
+          break;
+        case '"':
+          if (quoted)
+            quoted = 0;
+          else
+            quoted = 1;
+          /*
+           * strip quotes
+           */
           ++src;
           break;
-        case '\0':
+        case ':':
+          if (quoted)
+            *dest++ = *src++;
+          else {
+            *dest++ = '\0';
+            field_vector[field_count++] = dest;
+            if (field_count > MAX_FIELDS)
+              *src = '\0';
+            else
+               ++src;
+          }
+          break;
+        case '#':
+          *src = '\0';
           break;
         default:
           *dest++ = *src++;
-          break;
-        }
-        break;
-      case '"':
-        if (quoted)
-          quoted = 0;
-        else
-          quoted = 1;
-        /*
-         * strip quotes
-         */
-        ++src;
-        break;
-      case ':':
-        if (quoted)
-          *dest++ = *src++;
-        else {
-          *dest++ = '\0';
-          field_vector[field_count++] = dest;
-          if (field_count > MAX_FIELDS)
-            *src = '\0';
-          else  
-            ++src;
-        }
-        break;
-      case '#':
-        *src = '\0';
-        break;
-      default:
-        *dest++ = *src++;
-        break;
+           break;
       }
     }
     *dest = '\0';
@@ -1272,6 +1278,10 @@ int read_configuration_file(void)
     if (aconf)
       free_conf(aconf);
 
+    if(0 == ircd_strcmp(field_vector[0], "include")) {
+      read_actual_config(field_vector[1]);
+    }
+
     aconf = make_conf();
 
     switch (*field_vector[0]) {
@@ -1280,8 +1290,8 @@ int read_configuration_file(void)
       conf_add_admin(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'B':		     /* 'services' lines (aka 'bot lines'). */
-    case 'b':		     /* I honestly couldn't think of a better letter. -akl */
+    case 'B':                /* 'services' lines (aka 'bot lines'). */
+    case 'b':                /* I honestly couldn't think of a better letter. -akl */
       conf_add_svcline(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
@@ -1383,10 +1393,11 @@ int read_configuration_file(void)
     default:
       Debug((DEBUG_ERROR, "Error in config file: %s", line));
       sendto_opmask_butone(0, SNO_OLDSNO, "Unknown prefix in config file: %c",
-			   *field_vector[0]);
+                           *field_vector[0]);
       aconf->status = CONF_ILLEGAL;
       break;
     }
+
     if (IsIllegal(aconf))
       continue;
 
@@ -1397,7 +1408,7 @@ int read_configuration_file(void)
       DupString(aconf->passwd, field_vector[2]);
 
     if (field_count > 3 && !EmptyString(field_vector[3]))
-        DupString(aconf->name, field_vector[3]);
+      DupString(aconf->name, field_vector[3]);
 
     if (field_count > 4 && !EmptyString(field_vector[4])) {
       if (aconf->status & CONF_OPERATOR) {
@@ -1407,10 +1418,10 @@ int read_configuration_file(void)
         if(*field_vector[4]) DupString(m, field_vector[4]);
         for (; *m; m++) {
           for (i = oper_access; (flag = *i); i += 2)
-           if (*m == (char)(*(i + 1))) {
-             aconf->port |= flag;
-             break;
-           }
+            if (*m == (char)(*(i + 1))) {
+              aconf->port |= flag;
+              break;
+            }
         }
       } else
         aconf->port = atoi(field_vector[4]);
@@ -1423,11 +1434,13 @@ int read_configuration_file(void)
      * Associate each conf line with a class by using a pointer
      * to the correct class record. -avalon
      */
-    if (aconf->status & CONF_CLIENT_MASK) {
+    if (aconf->status & CONF_CLIENT_MASK)
+    {
       if (aconf->conn_class == 0)
         aconf->conn_class = find_class(0);
     }
-    if (aconf->status & CONF_CLIENT) {
+     if (aconf->status & CONF_CLIENT)
+    {
       struct ConfItem *bconf;
 
       if ((bconf = find_conf_entry(aconf, aconf->status))) {
@@ -1450,12 +1463,18 @@ int read_configuration_file(void)
         aconf = bconf;
       }
     }
-    if (aconf->status & CONF_SERVER) {
+       
+    if (aconf->status & CONF_SERVER)
+    {
       if (ccount > MAXCONFLINKS || !aconf->host || strchr(aconf->host, '*') ||
           strchr(aconf->host, '?') || !aconf->name)
+      {
         continue;
+      }
     }
-    if (aconf->status & (CONF_LOCOP | CONF_OPERATOR)) {
+
+    if (aconf->status & (CONF_LOCOP | CONF_OPERATOR))
+    {
       if (!strchr(aconf->host, '@')) {
         char* newhost;
         int len = 3;                /* *@\0 = 3 */
@@ -1468,11 +1487,15 @@ int read_configuration_file(void)
         aconf->host = newhost;
       }
     }
-    if (aconf->status & CONF_SERVER) {
+
+    if (aconf->status & CONF_SERVER)
+    {
       if (EmptyString(aconf->passwd))
         continue;
+
       lookup_confhost(aconf);
     }
+
     /*
      * Juped nicks are listed in the 'password' field of U:lines,
      * the list is comma separated and might be empty and/or contain
@@ -1484,19 +1507,47 @@ int read_configuration_file(void)
 
     collapse(aconf->host);
     collapse(aconf->name);
-    Debug((DEBUG_NOTICE,
-        "Read Init: (%d) (%s) (%s) (%s) (%u) (%p)",
-        aconf->status, aconf->host, aconf->passwd,
-        aconf->name, aconf->port, aconf->conn_class));
+       
+    Debug((DEBUG_NOTICE, "Read Init: (%d) (%s) (%s) (%s) (%u) (%p)",
+          aconf->status, aconf->host, aconf->passwd,
+          aconf->name, aconf->port, aconf->conn_class));
+ 
     aconf->next = GlobalConfList;
     GlobalConfList = aconf;
     aconf = NULL;
   }
+
   if (aconf)
-    free_conf(aconf);
+    free_conf(aconf); 
+
   fbclose(file);
-/*    nextping = nextconnect = CurrentTime; */
-  feature_mark(); /* reset unmarked features */
+
+  return 1;
+}
+
+
+/*
+ * read_configuration_file
+ *
+ * Read configuration file.
+ *
+ * returns 0, if file cannot be opened
+ *         1, if file read
+ */
+int
+read_configuration_file(void)
+{
+  /* unmark all features for resetting later */
+  feature_unmark();
+
+  if(!read_actual_config(configfile))
+  {
+    return 0;
+  }
+
+
+  /* reset unmarked features */
+  feature_mark();
 
   /*
    * Set our local FLAG_HUB if necessary.

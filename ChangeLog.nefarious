@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-16  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added includes section.
+
+	* ircd/s_user.c: Modified read configuration file functions
+	to handle includes.
+
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
 	* Undernet sync.
