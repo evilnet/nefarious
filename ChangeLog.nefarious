@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-15  Neil Spierling <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added features AUTOCHANMODES and
+	AUTOCHANMODES_LIST, (Quakenet)
+
+	* include/ircd_features.h: Same as example.conf entry above. (Quakenet)
+
+	* include/s_conf.h: Declare find_conf_cidr. (Quakenet)
+
+	* ircd/channel.c: Don't hide QUIT messages from channel services. (Quakenet)
+			  Added SetAutoChanModes function plus call it if the 
+			    nessecary lines are enabled on a first time JOIN. (Quakenet)
+			  Added support for CIDR channel bans and exempts. (Quakenet)
+
+	* ircd/m_create.c: Dont allow a client to rejoin if its already
+	in the channel.
+
+	* ircd/m_account.c: Added needed %s.
+
+	* ircd/m_oper.c: Call find_conf_cidr if the other methods to
+	check the conf fail etc. (Quakenet).
+
+	* ircd/s_conf.c: find_conf_cidr Function etc. (Quakenet).
+
 2004-10-03  Neil Spierling <sirvulcan@gmail.com>
 
 	* ChangeLog.nefarious: Updated my email address.

@@ -173,7 +173,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     hide_hostmask(acptr);
 
   sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
-            cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s %s",
+            cli_user(acptr)->acc_create ? "%C %s %Tu %s" : "%C %s %s",
             acptr, cli_user(acptr)->account,
             cli_user(acptr)->acc_create,
             feature_bool(FEAT_VERIFIED_ACCOUNTS) ? parv[4] : "");

@@ -158,6 +158,9 @@ int ms_create(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if ((chptr = FindChannel(name))) {
       name = chptr->chname;
 
+      if (find_member_link(chptr, sptr))
+        continue;
+
       /* Check if we need to bounce a mode */
       if (TStime() - chanTS > TS_LAG_TIME ||
 	  (chptr->creationtime && chanTS > chptr->creationtime &&

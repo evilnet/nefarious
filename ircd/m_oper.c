@@ -131,6 +131,11 @@ int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **
   if (!aconf)
     aconf = find_conf_exact(name, cli_username(sptr),
                             ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
+
+  if (!aconf)
+    aconf = find_conf_cidr(name, cli_username(sptr), 
+                            cli_ip(sptr), CONF_OPS);
+
   if (!aconf || IsIllegal(aconf))
     return ERR_NOOPERHOST;
    assert(0 != (aconf->status & CONF_OPS));

@@ -465,6 +465,8 @@ static struct FeatureDesc {
   F_S(WHOIS_OPER, 0, "is an IRC Operator", 0),
   F_S(WHOIS_ADMIN, 0, "is an IRC Administrator", 0),
   F_S(WHOIS_SERVICE, 0, "is a Network Service", 0),
+  F_B(AUTOCHANMODES, 0, 0, 0),
+  F_S(AUTOCHANMODES_LIST, FEAT_CASE | FEAT_NULL, 0, 0),
 
 #undef F_S
 #undef F_B

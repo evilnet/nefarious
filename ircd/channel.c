@@ -552,6 +552,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   char*         sre = NULL;
   char*         sfe = NULL;
   char*         ip_se = NULL;
+  in_addr_t     cli_addr = 0;
 
   if (!IsUser(cptr))
     return 0;
@@ -606,11 +607,37 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
 
   for (tmpe = chptr->exceptlist; tmpe; tmpe = tmpe->next) {
     if ((tmpe->flags & CHFL_EXCEPT_IPMASK)) {
-      if (!ip_se)
+      char* ipe_start;
+      char* cidre_start;
+      
+      if (!ip_se) {
         ip_se = make_nick_user_ip(nu_ipe, cli_name(cptr),
                                  (cli_user(cptr))->username, cli_ip(cptr));
+        if ((ipe_start = strrchr(ip_se, '@')))
+          cli_addr = inet_addr(ipe_start + 1);
+      }
       if (match(tmpe->value.except.exceptstr, ip_se) == 0)
         break;
+      if ((ipe_start = strrchr(tmpe->value.except.exceptstr, '@')) && (cidre_start = strchr(ipe_start + 1, '/'))) {
+        int bitse = atoi(cidre_start + 1);
+        char* pe = strchr(ip_se, '@');
+        
+        if (pe) {
+          *pe = *ipe_start = 0;
+          if (match(tmpe->value.except.exceptstr, ip_se) == 0) {
+            if ((bitse > 0) && (bitse < 33)) {
+              *cidre_start = 0;
+              in_addr_t except_addr=inet_addr(ipe_start + 1);
+              *cidre_start = '/';
+              if ((NETMASK(bitse) & cli_addr) == except_addr) {
+                *pe = *ipe_start = '@';
+                break;
+              }
+            }
+          }
+          *pe = *ipe_start = '@';
+        }
+      }
     }
     if (match(tmpe->value.except.exceptstr, se) == 0)
       break;
@@ -656,6 +683,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char*         sr = NULL;
   char*         sf = NULL;
   char*         ip_s = NULL;
+  in_addr_t     cli_addr = 0;
 
   if (!IsUser(cptr))
     return 0;
@@ -710,11 +738,37 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
   for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
     if ((tmp->flags & CHFL_BAN_IPMASK)) {
-      if (!ip_s)
+      char* ip_start;
+      char* cidr_start;
+      
+      if (!ip_s) {
         ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
 				 (cli_user(cptr))->username, cli_ip(cptr));
+        if ((ip_start = strrchr(ip_s, '@')))
+          cli_addr = inet_addr(ip_start + 1);
+      }
       if (match(tmp->value.ban.banstr, ip_s) == 0)
         break;
+      if ((ip_start = strrchr(tmp->value.ban.banstr, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+        int bits = atoi(cidr_start + 1);
+        char* p = strchr(ip_s, '@');
+        
+        if (p) {
+          *p = *ip_start = 0;
+          if (match(tmp->value.ban.banstr, ip_s) == 0) {
+            if ((bits > 0) && (bits < 33)) {
+              *cidr_start = 0;
+              in_addr_t ban_addr=inet_addr(ip_start + 1);
+              *cidr_start = '/';
+              if ((NETMASK(bits) & cli_addr) == ban_addr) {
+                *p = *ip_start = '@';
+                break;
+              }
+            }
+          }
+          *p = *ip_start = '@';
+        }
+      }
     }
     if (match(tmp->value.ban.banstr, s) == 0)
       break;
@@ -1501,10 +1555,66 @@ struct Channel *get_channel(struct Client *cptr, char *chname, ChannelGetType fl
     chptr->prev = NULL;
     chptr->next = GlobalChannelList;
     chptr->creationtime = MyUser(cptr) ? TStime() : (time_t) 0;
+    if (feature_bool(FEAT_AUTOCHANMODES) && feature_str(FEAT_AUTOCHANMODES_LIST) && 
+        strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+      SetAutoChanModes(chptr);
     GlobalChannelList = chptr;
     hAddChannel(chptr);
   }
   return chptr;
+}
+
+int SetAutoChanModes(struct Channel *chptr)
+{
+  static int chan_flags[] = {
+    MODE_PRIVATE,	'p',
+    MODE_SECRET,	's',
+    MODE_MODERATED,	'm',
+    MODE_TOPICLIMIT,	't',
+    MODE_INVITEONLY,	'i',
+    MODE_NOPRIVMSGS,	'n',
+    MODE_REGONLY,	'r',
+    MODE_NOCOLOUR,	'c',
+    MODE_STRIP,		'S',
+    MODE_NOCTCP,	'C',
+    MODE_ACCONLY,	'M',
+    MODE_NONOTICE,	'N',
+    MODE_OPERONLY,	'O',
+    MODE_ADMINONLY,     'A',
+    MODE_NOQUITPARTS,	'Q',
+    MODE_SSLONLY,	'z',
+    MODE_NOAMSG,	'T',
+    MODE_NOLISTMODES,	'L'
+  };
+  unsigned int *flag_p;
+  unsigned int t_mode;
+  const char *modestr;
+
+  t_mode = 0;
+
+  assert(0 != chptr);
+
+  if (!feature_bool(FEAT_AUTOCHANMODES) || !feature_str(FEAT_AUTOCHANMODES_LIST) || 
+       strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) <= 1)
+    return;
+
+  modestr = feature_str(FEAT_AUTOCHANMODES_LIST);
+
+  for (; *modestr; modestr++) {
+    for (flag_p = chan_flags; flag_p[0]; flag_p += 2) /* look up flag */
+      if (flag_p[1] == *modestr)
+        break;
+
+    if (!flag_p[0]) /* didn't find it */
+      continue;
+
+    t_mode |= flag_p[0]; 
+
+  } /* for (; *modestr; modestr++) { */
+
+  if (t_mode != 0)
+    chptr->mode.mode = t_mode;
+
 }
 
 void add_invite(struct Client *cptr, struct Channel *chptr)
@@ -3523,8 +3633,8 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
     /* Send notification to channel */
     if (!(flags & CHFL_ZOMBIE))
       sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL, 0,
-				       ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
-					|| !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && HasColour(jbuf->jb_comment))) ?
+				       ((flags & CHFL_BANNED) || ((chan->mode.mode & MODE_NOQUITPARTS)
+					&& !IsChannelService(member->user)) || !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && HasColour(jbuf->jb_comment))) ?
 				       "%H" : "%H :%s", chan, jbuf->jb_comment);
     else if (MyUser(jbuf->jb_source))
       sendcmdto_one(jbuf->jb_source, CMD_PART, jbuf->jb_source,

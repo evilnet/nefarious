@@ -455,8 +455,38 @@ enum AuthorizationCheckResult attach_iline(struct Client*  cptr)
       *uhost = '\0';
     strncat(uhost, cli_sock_ip(cptr), sizeof(uhost) - 1 - strlen(uhost));
     uhost[sizeof(uhost) - 1] = 0;
-    if (match(aconf->host, uhost))
-      continue;
+    if (match(aconf->host, uhost)) {
+      char* ip_start;
+      char* cidr_start;
+      struct in_addr conf_addr;
+      int bits;
+      
+      ip_start = strrchr(aconf->host, '@');
+      if (ip_start == NULL)
+        ip_start = aconf->host;
+      else {
+        *ip_start = 0;
+        if (match(aconf->host, cli_username(cptr))) {
+          *ip_start = '@';
+          continue;
+        }
+        *ip_start++ = '@';
+      }
+      cidr_start = strchr(ip_start, '/');
+      if (!cidr_start)
+        continue;
+      *cidr_start = 0;
+      if (inet_aton(ip_start, &conf_addr) == 0) {
+        *cidr_start = '/';
+        continue;
+      }
+      bits = atoi(cidr_start + 1);
+      *cidr_start = '/';
+      if ((bits < 1) || (bits > 32))
+        continue;
+      if ((cli_ip(cptr).s_addr & NETMASK(bits)) != conf_addr.s_addr)
+        continue;
+    }
     if (strchr(uhost, '@'))
       SetFlag(cptr, FLAG_DOID);
 
@@ -590,6 +620,65 @@ struct ConfItem* find_conf_exact(const char* name, const char* user,
      */
     if (match(tmp->host, userhost))
       continue;
+    if (tmp->status & (CONF_OPERATOR | CONF_LOCOP)) {
+      if (tmp->clients < MaxLinks(tmp->conn_class))
+        return tmp;
+      else
+        continue;
+    }
+    else
+      return tmp;
+  }
+  return 0;
+}
+
+/*
+ * find a conf entry by CIDR host entry which has the same name.
+ */
+struct ConfItem* find_conf_cidr(const char* name, const char* user,
+                                 struct in_addr cli_addr, int statmask)
+{
+  struct ConfItem *tmp;
+  char userhost[USERLEN + HOSTLEN + 3];
+  char *ip_start;
+  char *cidr_start;
+  struct in_addr conf_addr;
+  int bits;
+
+  for (tmp = GlobalConfList; tmp; tmp = tmp->next) {
+    if (!(tmp->status & statmask) || !tmp->name || !tmp->host ||
+        0 != ircd_strcmp(tmp->name, name))
+      continue;
+    
+    ip_start = strrchr(tmp->host, '@');
+    if (ip_start == NULL)
+      ip_start = tmp->host;
+    else {
+      *ip_start = 0;
+      if (match(tmp->host, user)) {
+        *ip_start = '@';
+        continue;
+      }
+      *ip_start = '@';
+      ip_start++;
+    }
+    cidr_start = strchr(ip_start, '/');
+    if (!cidr_start)
+      continue;
+    
+    *cidr_start = 0;
+    if (inet_aton(ip_start, &conf_addr) == 0) {
+      *cidr_start = '/';
+      continue;
+    }
+    bits = atoi(cidr_start + 1);
+    *cidr_start = '/';
+    if ((bits < 1) || (bits > 32))
+      continue;
+    
+    if ((cli_addr.s_addr & NETMASK(bits)) != conf_addr.s_addr)
+      continue;
+    
     if (tmp->status & (CONF_OPERATOR | CONF_LOCOP)) {
       if (tmp->clients < MaxLinks(tmp->conn_class))
         return tmp;

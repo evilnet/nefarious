@@ -241,6 +241,8 @@ extern void det_confs_butmask(struct Client *cptr, int mask);
 extern enum AuthorizationCheckResult attach_conf(struct Client *cptr, struct ConfItem *aconf);
 extern struct ConfItem* find_conf_exact(const char* name, const char* user,
                                         const char* host, int statmask);
+extern struct ConfItem* find_conf_cidr(const char* name, const char* user,
+                                       struct in_addr cli_addr, int statmask);
 extern enum AuthorizationCheckResult conf_check_client(struct Client *cptr);
 extern int  conf_check_server(struct Client *cptr);
 extern struct ConfItem* find_conf_name(const char* name, int statmask);
