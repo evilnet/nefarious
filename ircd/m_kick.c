@@ -120,7 +120,7 @@ int m_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   if (!(chptr = get_channel(sptr, name, CGT_NO_CREATE)))
     return send_reply(sptr, ERR_NOSUCHCHANNEL, name);
 
-  if (!is_chan_op(sptr, chptr))
+  if (!is_chan_op(sptr, chptr)  && !is_half_op(sptr, chptr))
     return send_reply(sptr, ERR_CHANOPRIVSNEEDED, name);
 
   if (!(who = find_chasing(sptr, parv[2], 0)))
@@ -137,6 +137,10 @@ int m_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   if (IsChannelService(who) && !IsXtraOp(sptr) && (who!=sptr))
     return send_reply(sptr, ERR_ISCHANSERVICE, cli_name(who), chptr->chname);
+
+  /* Don't allow halfops to kick chanops */
+  if (is_chan_op(who, chptr) && is_half_op(sptr, chptr) && !is_chan_op(sptr, chptr))
+     return send_reply(sptr, ERR_HALFCANTKICKOP, name);
 
   /* Prevent kicking opers from local channels -DM- */
   if (IsLocalChannel(chptr->chname) && HasPriv(who, PRIV_DEOP_LCHAN))
@@ -211,7 +215,7 @@ int ms_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    * of channel membership.  -- aaronc
    */
   if (!IsServer(sptr) && member && cli_from(who) != cptr &&
-      ((!(sptr_link = find_member_link(chptr, sptr)) || !IsChanOp(sptr_link)) &&
+      ((!(sptr_link = find_member_link(chptr, sptr)) || (!IsChanOp(sptr_link) && !IsHalfOp(sptr_link))) &&
 	!IsChannelService(sptr))) {
     sendto_opmask_butone(0, SNO_HACK2, "HACK: %C KICK %H %C %s", sptr, chptr,
 			 who, comment);
@@ -219,7 +223,7 @@ int ms_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     sendcmdto_one(who, CMD_JOIN, cptr, "%H", chptr);
 
     /* Reop/revoice member */
-    if (IsChanOp(member) || HasVoice(member)) {
+    if (IsChanOp(member)  || IsHalfOp(member) || HasVoice(member)) {
       struct ModeBuf mbuf;
 
       modebuf_init(&mbuf, sptr, cptr, chptr,
@@ -229,6 +233,8 @@ int ms_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
       if (IsChanOp(member))
 	modebuf_mode_client(&mbuf, MODE_DEL | MODE_CHANOP, who);
+      if (IsHalfOp(member))
+        modebuf_mode_client(&mbuf, MODE_DEL | MODE_HALFOP, who);
       if (HasVoice(member))
 	modebuf_mode_client(&mbuf, MODE_DEL | MODE_VOICE, who);
 

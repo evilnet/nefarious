@@ -435,6 +435,12 @@ static struct FeatureDesc {
   F_S(UNVERIFIED, 0, "You account is unverified, please verify it, reconnect and login again.", 0),
   F_B(HOST_IN_TOPIC, 0, 1, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
+  F_B(HALFOPS, 0, 1, 0),
+  F_B(EXCEPTS, 0, 0, 0),
+  F_B(BREAK_P10, 0, 0, 0),
+  F_I(AVEXCEPTLEN, 0, 40, 0),
+  F_I(MAXEXCEPTS, 0, 30, 0),
+  F_B(HIS_EXCEPTWHO, 0, 0, 0),
 
 #undef F_S
 #undef F_B

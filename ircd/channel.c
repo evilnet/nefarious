@@ -73,6 +73,10 @@ static struct SLink* next_ban;
 static struct SLink* prev_ban;
 static struct SLink* removed_bans_list;
 
+static struct SLink* next_except;
+static struct SLink* prev_except;
+static struct SLink* removed_excepts_list;
+
 /*
  * Use a global variable to remember if an oper set a mode on a local channel. Ugly,
  * but the only way to do it without changing set_mode intensively.
@@ -232,6 +236,15 @@ int sub1_from_channel(struct Channel* chptr)
     MyFree(obtmp->value.ban.who);
     free_link(obtmp);
   }
+  tmp = chptr->exceptlist;
+  while (tmp)
+  {
+    obtmp = tmp;
+    tmp = tmp->next;
+    MyFree(obtmp->value.except.exceptstr);
+    MyFree(obtmp->value.except.who);
+    free_link(obtmp);
+  }
   if (chptr->prev)
     chptr->prev->next = chptr->next;
   else
@@ -245,6 +258,109 @@ int sub1_from_channel(struct Channel* chptr)
    */
   assert(chptr->hnext == chptr);
   MyFree(chptr);
+  return 0;
+}
+
+int add_exceptid(struct Client *cptr, struct Channel *chptr, char *exceptid,
+                     int change, int firsttime)
+{
+  struct SLink*  except;
+  struct SLink** exceptp;
+  int            cnt = 0;
+  int            removed_excepts = 0;
+  int            len = strlen(exceptid);
+
+  if (firsttime)
+  {
+    next_except = NULL;
+    assert(0 == prev_except);
+    assert(0 == removed_excepts_list);
+  }
+  if (MyUser(cptr))
+    collapse(exceptid);
+  for (exceptp = &chptr->exceptlist; *exceptp;)
+  {
+    len += strlen((*exceptp)->value.except.exceptstr);
+    ++cnt;
+    if (((*exceptp)->flags & CHFL_BURST_EXCEPT_WIPEOUT))
+    {
+      if (!strcmp((*exceptp)->value.except.exceptstr, exceptid))
+      {
+        (*exceptp)->flags &= ~CHFL_BURST_EXCEPT_WIPEOUT;
+        return -2;
+      }
+    }
+    else if (!mmatch((*exceptp)->value.except.exceptstr, exceptid))
+      return -1;
+    if (!mmatch(exceptid, (*exceptp)->value.except.exceptstr))
+    {
+      struct SLink *tmp = *exceptp;
+      if (change)
+      {
+        if (MyUser(cptr))
+        {
+          cnt--;
+          len -= strlen(tmp->value.except.exceptstr);
+        }
+        *exceptp = tmp->next;
+        /* These will be sent to the user later as -b */
+        tmp->next = removed_excepts_list;
+        removed_excepts_list = tmp;
+        removed_excepts = 1;
+      }
+      else if (!(tmp->flags & CHFL_BURST_EXCEPT_WIPEOUT))
+      {
+        tmp->flags |= CHFL_EXCEPT_OVERLAPPED;
+        if (!next_except)
+          next_except = tmp;
+        exceptp = &tmp->next;
+      }
+      else
+        exceptp = &tmp->next;
+    }
+    else
+    {
+      if (firsttime)
+        (*exceptp)->flags &= ~CHFL_EXCEPT_OVERLAPPED;
+      exceptp = &(*exceptp)->next;
+    }
+  }
+  if (MyUser(cptr) && !removed_excepts &&
+      (len > (feature_int(FEAT_AVEXCEPTLEN) * feature_int(FEAT_MAXEXCEPTS)) ||
+       (cnt >= feature_int(FEAT_MAXEXCEPTS))))
+  {
+    send_reply(cptr, ERR_EXCEPTLISTFULL, chptr->chname, exceptid);
+    return -1;
+  }
+  if (change)
+  {
+    char*              ip_start;
+    struct Membership* member;
+    except = make_link();
+    except->next = chptr->exceptlist;
+
+    except->value.except.exceptstr = (char*) MyMalloc(strlen(exceptid) + 1);
+    assert(0 != except->value.except.exceptstr);
+    strcpy(except->value.except.exceptstr, exceptid);
+
+    if (feature_bool(FEAT_HIS_EXCEPTWHO) && IsServer(cptr))
+      DupString(except->value.except.who, cli_name(&me));
+    else
+      DupString(except->value.except.who, cli_name(cptr));
+    assert(0 != except->value.except.who);
+
+    except->value.except.when = TStime();
+    except->flags = CHFL_EXCEPT;      /* This bit is never used I think... */
+    if ((ip_start = strrchr(exceptid, '@')) && check_if_ipmask(ip_start + 1))
+      except->flags |= CHFL_EXCEPT_IPMASK;
+    chptr->exceptlist = except;
+
+    /*
+     * Erase except-valid-bit
+     */
+    for (member = chptr->members; member; member = member->next_member)
+      ClearExceptValid(member);     /* `except' == channel member ! */
+  }
   return 0;
 }
 
@@ -372,6 +488,23 @@ int add_banid(struct Client *cptr, struct Channel *chptr, char *banid,
   return 0;
 }
 
+struct SLink *next_removed_overlapped_except(void)
+{
+  struct SLink *tmp = removed_excepts_list;
+  if (prev_except)
+  {
+    if (prev_except->value.except.exceptstr)     /* Can be set to NULL in set_mode() */
+      MyFree(prev_except->value.except.exceptstr);
+    MyFree(prev_except->value.except.who);
+    free_link(prev_except);
+    prev_except = 0;
+  }
+  if (tmp)
+    removed_excepts_list = removed_excepts_list->next;
+  prev_except = tmp;
+  return tmp;
+}
+
 struct SLink *next_removed_overlapped_ban(void)
 {
   struct SLink *tmp = removed_bans_list;
@@ -400,6 +533,110 @@ struct Membership* find_channel_member(struct Client* cptr, struct Channel* chpt
   member = find_member_link(chptr, cptr);
   return (member && !IsZombie(member)) ? member : 0;
 }
+
+/*
+ * is_excepted - a non-zero value if except else 0.
+ */
+static int is_excepted(struct Client *cptr, struct Channel *chptr,
+                     struct Membership* member)
+{
+  struct SLink* tmpe;
+  char          tmphoste[HOSTLEN + 1];
+  char          nu_hoste[NUH_BUFSIZE];
+  char          nu_accthoste[NUH_BUFSIZE];
+  char          nu_realhoste[NUH_BUFSIZE];
+  char          nu_fakehoste[NUH_BUFSIZE];
+  char          nu_ipe[NUI_BUFSIZE];
+  char*         se;
+  char*         sae = NULL;
+  char*         sre = NULL;
+  char*         sfe = NULL;
+  char*         ip_se = NULL;
+
+  if (!IsUser(cptr))
+    return 0;
+
+  if (member && IsExceptValid(member))
+    return IsExcepted(member);
+
+  /* This is horrible code.  s is always set to the apparent host */
+  /* If the user is sethosted, sr is set to the real host */
+  /* If the user is fakehosted, sf is set to the real host */
+  /* If the user is authed and +x (and not +h), then sa is set to the real host */
+  /* If the user is authed and -x (or +h), then sa is set to the "account" host */
+
+  se = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->username,
+                          (cli_user(cptr))->host);
+
+  if (HasSetHost(cptr))
+    sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
+                             cli_user(cptr)->realusername,
+                             cli_user(cptr)->realhost);
+
+  if (HasFakeHost(cptr))
+    sfe = make_nick_user_host(nu_fakehoste, cli_name(cptr),
+                             cli_user(cptr)->username,
+                             cli_user(cptr)->fakehost);
+
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    if (IsAccount(cptr)) {
+       if (HasHiddenHost(cptr) && !HasSetHost(cptr))
+          sae = make_nick_user_host(nu_accthoste, cli_name(cptr),
+                                  cli_user(cptr)->realusername,
+                                  cli_user(cptr)->realhost);
+       else {
+          make_hidden_hostmask(tmphoste, cptr);
+          sae = make_nick_user_host(nu_accthoste, cli_name(cptr),
+                                   cli_user(cptr)->username,
+                                   tmphoste);
+       }
+    }
+  } else {
+     if (IsHiddenHost(cptr) && !HasSetHost(cptr))
+       sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               cli_user(cptr)->realhost);
+     else {
+       ircd_snprintf(0, tmphoste, HOSTLEN, "%s", cli_user(cptr)->virthost);
+       sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
+                                cli_user(cptr)->username,
+                                tmphoste);
+     }
+  }
+
+  for (tmpe = chptr->exceptlist; tmpe; tmpe = tmpe->next) {
+    if ((tmpe->flags & CHFL_EXCEPT_IPMASK)) {
+      if (!ip_se)
+        ip_se = make_nick_user_ip(nu_ipe, cli_name(cptr),
+                                 (cli_user(cptr))->username, cli_ip(cptr));
+      if (match(tmpe->value.except.exceptstr, ip_se) == 0)
+        break;
+    }
+    if (match(tmpe->value.except.exceptstr, se) == 0)
+      break;
+    else if (sre && match(tmpe->value.except.exceptstr, sre) == 0)
+      break;
+    else if (sfe && match(tmpe->value.except.exceptstr, sfe) == 0)
+      break;
+    else if (sae && match(tmpe->value.except.exceptstr, sae) == 0)
+      break;
+  }
+
+  if (member) {
+    SetExceptValid(member);
+    if (tmpe) {
+      SetExcepted(member);
+      return 1;
+    }
+    else {
+      ClearExcepted(member);
+      return 0;
+    }
+  }
+
+  return (tmpe != NULL);
+}
+
 
 /*
  * is_banned - a non-zero value if banned else 0.
@@ -653,6 +890,17 @@ int has_voice(struct Client* cptr, struct Channel* chptr)
   return 0;
 }
 
+int is_half_op(struct Client* cptr, struct Channel* chptr)
+{
+  struct Membership* member;
+
+  assert(0 != chptr);
+  if ((member = find_member_link(chptr, cptr)))
+    return (!IsZombie(member) && IsHalfOp(member));
+
+  return 0;
+}
+
 int member_can_send_to_channel(struct Membership* member)
 {
   assert(0 != member);
@@ -680,7 +928,7 @@ int member_can_send_to_channel(struct Membership* member)
    * but because of the amount of CPU time that is_banned chews
    * we only check it for our clients.
    */
-  if (MyUser(member->user) && is_banned(member->user, member->channel, member))
+  if (MyUser(member->user) && is_banned(member->user, member->channel, member) && !is_excepted(member->user, member->channel, member))
     return 0;
   
   return 1;
@@ -722,7 +970,7 @@ const char* find_no_nickchange_channel(struct Client* cptr)
     struct Membership* member;
     for (member = (cli_user(cptr))->channel; member;
 	 member = member->next_channel) {
-      if (!IsVoicedOrOpped(member) && is_banned(cptr, member->channel, member))
+      if (!IsVoicedOrOpped(member) && is_banned(cptr, member->channel, member) && !is_excepted(cptr, member->channel, member))
         return member->channel->chname;
     }
   }
@@ -798,8 +1046,17 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
  */
 void send_channel_modes(struct Client *cptr, struct Channel *chptr)
 {
-  static unsigned int current_flags[4] =
-      { 0, CHFL_CHANOP | CHFL_VOICE, CHFL_VOICE, CHFL_CHANOP };
+  static unsigned int current_flags[8] =
+      {
+        0,
+        CHFL_VOICE,
+	CHFL_HALFOP,
+	CHFL_CHANOP,
+	CHFL_CHANOP | CHFL_VOICE,
+	CHFL_CHANOP | CHFL_HALFOP,
+	CHFL_VOICE  | CHFL_HALFOP,
+	CHFL_CHANOP | CHFL_HALFOP | CHFL_VOICE
+      };
   int                first = 1;
   int                full  = 1;
   int                flag_cnt = 0;
@@ -807,6 +1064,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
   size_t             len;
   struct Membership* member;
   struct SLink*      lp2;
+  struct SLink*      lp3;
   char modebuf[MODEBUFLEN];
   char parabuf[MODEBUFLEN];
   struct MsgBuf *mb;
@@ -819,6 +1077,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
 
   member = chptr->members;
   lp2 = chptr->banlist;
+  lp3 = chptr->exceptlist;
 
   *modebuf = *parabuf = '\0';
   channel_modes(cptr, modebuf, parabuf, sizeof(parabuf), chptr);
@@ -849,7 +1108,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
      * Run 4 times over all members, to group the members with the
      * same mode together
      */
-    for (first = 1; flag_cnt < 4;
+    for (first = 1; flag_cnt < 8;
          member = chptr->members, new_mode = 1, flag_cnt++)
     {
       for (; member; member = member->next_member)
@@ -857,7 +1116,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
         if ((member->status & CHFL_VOICED_OR_OPPED) !=
             current_flags[flag_cnt])
           continue;             /* Skip members with different flags */
-	if (msgq_bufleft(mb) < NUMNICKLEN + 4)
+	if (msgq_bufleft(mb) < NUMNICKLEN + 5)
           /* The 4 is a possible ",:ov" */
         {
           full = 1;           /* Make sure we continue after
@@ -882,7 +1141,11 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
 
             if (IsChanOp(member))
 	      tbuf[loc++] = 'o';
-            if (HasVoice(member))
+
+	    if (IsHalfOp(member))
+	      tbuf[loc++] = 'h';
+
+           if (HasVoice(member))
 	      tbuf[loc++] = 'v';
 	    tbuf[loc] = '\0';
 	    msgq_append(&me, mb, tbuf);
@@ -910,6 +1173,25 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
 	msgq_append(&me, mb, " %s%s", first ? ":%" : "",
 		    lp2->value.ban.banstr);
 	first = 0;
+      }
+
+      if (feature_bool(FEAT_EXCEPTS)) {
+        /* Attach all excepts, space seperated " :%except except ..." */
+        for (first = 2; lp3; lp3 = lp3->next)
+        {
+          len = strlen(lp3->value.except.exceptstr);
+  	  if (msgq_bufleft(mb) < len + 1 + first)
+            /* The +1 stands for the added ' '.
+            * The +first stands for the added "~".
+             */
+          {
+            full = 1;
+            break;
+          }
+  	  msgq_append(&me, mb, " %s%s", first ? "~ " : "",
+		      lp3->value.except.exceptstr);
+	  first = 0;
+        }
       }
     }
 
@@ -1021,6 +1303,20 @@ char *pretty_mask(char *mask)
   return make_nick_user_host(retmask, nick, user, host);
 }
 
+static void send_except_list(struct Client* cptr, struct Channel* chptr)
+{
+  struct SLink* lp;
+
+  assert(0 != cptr);
+  assert(0 != chptr);
+
+  for (lp = chptr->exceptlist; lp; lp = lp->next)
+    send_reply(cptr, RPL_EXCEPTLIST, chptr->chname, lp->value.except.exceptstr,
+	       lp->value.except.who, lp->value.except.when);
+
+  send_reply(cptr, RPL_ENDOFEXCEPTLIST, chptr->chname);
+}
+
 static void send_ban_list(struct Client* cptr, struct Channel* chptr)
 {
   struct SLink* lp;
@@ -1114,7 +1410,7 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
 	return overrideJoin + ERR_SSLONLYCHAN;
 
-  if (is_banned(sptr, chptr, NULL))
+  if (is_banned(sptr, chptr, NULL) && !is_excepted(sptr, chptr, NULL))
   	return overrideJoin + ERR_BANNEDFROMCHAN;
   
   /*
@@ -1439,6 +1735,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
   /* we only need the flags that don't take args right now */
   static int flags[] = {
 /*  MODE_CHANOP,	'o', */
+/*  MODE_HALFOP,	'h', */
 /*  MODE_VOICE,		'v', */
     MODE_PRIVATE,	'p',
     MODE_SECRET,	's',
@@ -1449,6 +1746,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_REGONLY,	'r',
 /*  MODE_KEY,		'k', */
 /*  MODE_BAN,		'b', */
+/*  MODE_EXCEPT         'e', */
 /*  MODE_LIMIT,		'l', */
     MODE_NOCOLOUR,	'c',
     MODE_STRIP,		'S',
@@ -1525,14 +1823,19 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
       bufptr_i = &rembuf_i;
     }
 
-    if (MB_TYPE(mbuf, i) & (MODE_CHANOP | MODE_VOICE)) {
+    if (MB_TYPE(mbuf, i) & (MODE_CHANOP | MODE_HALFOP | MODE_VOICE)) {
       tmp = strlen(cli_name(MB_CLIENT(mbuf, i)));
 
       if ((totalbuflen - IRCD_MAX(5, tmp)) <= 0) /* don't overflow buffer */
 	MB_TYPE(mbuf, i) |= MODE_SAVE; /* save for later */
       else {
-	bufptr[(*bufptr_i)++] = MB_TYPE(mbuf, i) & MODE_CHANOP ? 'o' : 'v';
-	totalbuflen -= IRCD_MAX(5, tmp) + 1;
+                if(MB_TYPE(mbuf, i) & MODE_CHANOP)
+          bufptr[(*bufptr_i)++] = 'o';
+                if(MB_TYPE(mbuf, i) & MODE_HALFOP)
+                  bufptr[(*bufptr_i)++] = 'h';
+        if(MB_TYPE(mbuf, i) & MODE_VOICE)
+          bufptr[(*bufptr_i)++] = 'v';
+        totalbuflen -= IRCD_MAX(5, tmp) + 1;
       }
     } else if (MB_TYPE(mbuf, i) & MODE_BAN) {
       tmp = strlen(MB_STRING(mbuf, i));
@@ -1541,6 +1844,15 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 	MB_TYPE(mbuf, i) |= MODE_SAVE; /* save for later */
       else {
 	bufptr[(*bufptr_i)++] = 'b';
+	totalbuflen -= tmp + 1;
+      }
+    } else if (MB_TYPE(mbuf, i) & MODE_EXCEPT) {
+      tmp = strlen(MB_STRING(mbuf, i));
+
+      if ((totalbuflen - tmp) <= 0) /* don't overflow buffer */
+	MB_TYPE(mbuf, i) |= MODE_SAVE; /* save for later */
+      else {
+	bufptr[(*bufptr_i)++] = 'e';
 	totalbuflen -= tmp + 1;
       }
     } else if (MB_TYPE(mbuf, i) & MODE_KEY) {
@@ -1595,12 +1907,16 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
       }
 
       /* deal with clients... */
-      if (MB_TYPE(mbuf, i) & (MODE_CHANOP | MODE_VOICE))
+      if (MB_TYPE(mbuf, i) & (MODE_CHANOP | MODE_HALFOP | MODE_VOICE))
 	build_string(strptr, strptr_i, cli_name(MB_CLIENT(mbuf, i)), 0, ' ');
 
       /* deal with bans... */
       else if (MB_TYPE(mbuf, i) & MODE_BAN)
 	build_string(strptr, strptr_i, MB_STRING(mbuf, i), 0, ' ');
+
+      /* deal with excepts... */
+      else if (MB_TYPE(mbuf, i) & MODE_EXCEPT)
+        build_string(strptr, strptr_i, MB_STRING(mbuf, i), 0, ' ');
 
       /* deal with keys... */
       else if (MB_TYPE(mbuf, i) & MODE_KEY)
@@ -1686,11 +2002,11 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
       }
 
       /* deal with modes that take clients */
-      if (MB_TYPE(mbuf, i) & (MODE_CHANOP | MODE_VOICE))
+      if (MB_TYPE(mbuf, i) & (MODE_CHANOP | MODE_HALFOP | MODE_VOICE))
 	build_string(strptr, strptr_i, NumNick(MB_CLIENT(mbuf, i)), ' ');
 
       /* deal with modes that take strings */
-      else if (MB_TYPE(mbuf, i) & (MODE_KEY | MODE_BAN))
+      else if (MB_TYPE(mbuf, i) & (MODE_KEY | MODE_BAN | MODE_EXCEPT))
 	build_string(strptr, strptr_i, MB_STRING(mbuf, i), 0, ' ');
 
       /*
@@ -1915,6 +2231,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
 {
   static int flags[] = {
 /*  MODE_CHANOP,	'o', */
+/*  MODE_HALFOPS,	'h', */
 /*  MODE_VOICE,		'v', */
     MODE_PRIVATE,	'p',
     MODE_SECRET,	's',
@@ -1924,6 +2241,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_NOPRIVMSGS,	'n',
     MODE_KEY,		'k',
 /*  MODE_BAN,		'b', */
+/*  MODE_EXCEPT,        'e', */
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
@@ -1983,6 +2301,19 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
 }
 
 /*
+ * Simple function to invalidate excepts
+ */
+void
+mode_except_invalidate(struct Channel *chan)
+{
+  struct Membership *member;
+
+  for (member = chan->members; member; member = member->next_member)
+    ClearExceptValid(member);
+}
+
+
+/*
  * Simple function to invalidate bans
  */
 void
@@ -2010,6 +2341,8 @@ mode_invite_clear(struct Channel *chan)
 #define DONE_BANLIST	0x04	/* We've sent the ban list */
 #define DONE_NOTOPER	0x08	/* We've sent a "Not oper" error */
 #define DONE_BANCLEAN	0x10	/* We've cleaned bans... */
+#define DONE_EXCEPTLIST  0x20
+#define DONE_EXCEPTCLEAN 0x40
 
 struct ParseState {
   struct ModeBuf *mbuf;
@@ -2026,7 +2359,9 @@ struct ParseState {
   int args_used;
   int max_args;
   int numbans;
+  int numexcepts;
   struct SLink banlist[MAXPARA];
+  struct SLink exceptlist[MAXPARA];
   struct {
     unsigned int flag;
     struct Client *client;
@@ -2204,6 +2539,121 @@ mode_parse_key(struct ParseState *state, int *flag_p)
   }
 }
 
+
+static void
+mode_parse_except(struct ParseState *state, int *flag_p)
+{
+  char *t_str, *s;
+  struct SLink *except, *newexcept = 0;
+
+  if (state->parc <= 0) { /* Not enough args, send except list */
+    if (MyUser(state->sptr) && !(state->done & DONE_EXCEPTLIST)) {
+      send_except_list(state->sptr, state->chptr);
+      state->done |= DONE_EXCEPTLIST;
+    }
+
+    return;
+  }
+
+  if (MyUser(state->sptr) && state->max_args <= 0) /* drop if too many args */
+    return;
+
+  t_str = state->parv[state->args_used++]; /* grab arg */
+  state->parc--;
+  state->max_args--;
+
+  /* If they're not an oper, they can't change modes */
+  if (state->flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) {
+    send_notoper(state);
+    return;
+  }
+
+  if ((s = strchr(t_str, ' ')))
+    *s = '\0';
+
+  if (!*t_str || *t_str == ':') { /* warn if empty */
+    if (MyUser(state->sptr))
+      need_more_params(state->sptr, state->dir == MODE_ADD ? "MODE +e" :
+		       "MODE -e");
+    return;
+  }
+
+  t_str = collapse(pretty_mask(t_str));
+
+  /* remember the except for the moment... */
+  if (state->dir == MODE_ADD) {
+    newexcept = state->exceptlist + (state->numexcepts++);
+    newexcept->next = 0;
+
+    DupString(newexcept->value.except.exceptstr, t_str);
+    newexcept->value.except.who = cli_name(state->sptr);
+    newexcept->value.except.when = TStime();
+
+    newexcept->flags = CHFL_EXCEPT | MODE_ADD;
+
+    if ((s = strrchr(t_str, '@')) && check_if_ipmask(s + 1))
+      newexcept->flags |= CHFL_EXCEPT_IPMASK;
+  }
+
+  if (!state->chptr->exceptlist) {
+    state->chptr->exceptlist = newexcept; /* add our except with its flags */
+    state->done |= DONE_EXCEPTCLEAN;
+    return;
+  }
+
+  /* Go through all excepts */
+  for (except = state->chptr->exceptlist; except; except = except->next) {
+    /* first, clean the except flags up a bit */
+    if (!(state->done & DONE_EXCEPTCLEAN))
+      /* Note: We're overloading *lots* of bits here; be careful! */
+      except->flags &= ~(MODE_ADD | MODE_DEL | CHFL_EXCEPT_OVERLAPPED);
+
+    /* Bit meanings:
+     *
+     * MODE_ADD		   - Except was added; if we're bouncing modes,
+     *			     then we'll remove it below; otherwise,
+     *			     we'll have to allocate a real except
+     *
+     * MODE_DEL		   - Except was marked for deletion; if we're
+     *			     bouncing modes, we'll have to re-add it,
+     *			     otherwise, we'll have to remove it
+     *
+     * CHFL_EXCEPT_OVERLAPPED - The except we added turns out to overlap
+     *			     with a except already set; if we're
+     *			     bouncing modes, we'll have to bounce
+     *			     this one; otherwise, we'll just ignore
+     *			     it when we process added excepts
+     */
+
+    if (state->dir == MODE_DEL && !ircd_strcmp(except->value.except.exceptstr, t_str)) {
+      except->flags |= MODE_DEL; /* delete one except */
+
+      if (state->done & DONE_EXCEPTCLEAN) /* If we're cleaning, finish */
+	break;
+    } else if (state->dir == MODE_ADD) {
+      /* if the except already exists, don't worry about it */
+      if (!ircd_strcmp(except->value.except.exceptstr, t_str)) {
+	newexcept->flags &= ~MODE_ADD; /* don't add except at all */
+	MyFree(newexcept->value.except.exceptstr); /* stopper a leak */
+	state->numexcepts--; /* deallocate last except */
+	if (state->done & DONE_EXCEPTCLEAN) /* If we're cleaning, finish */
+	  break;
+      } else if (!mmatch(except->value.except.exceptstr, t_str)) {
+	if (!(except->flags & MODE_DEL))
+	  newexcept->flags |= CHFL_EXCEPT_OVERLAPPED; /* our except overlaps */
+      } else if (!mmatch(t_str, except->value.except.exceptstr))
+	except->flags |= MODE_DEL; /* mark except for deletion: overlapping */
+
+      if (!except->next && (newexcept->flags & MODE_ADD)) {
+	except->next = newexcept; /* add our except with its flags */
+	break; /* get out of loop */
+      }
+    }
+  }
+  state->done |= DONE_EXCEPTCLEAN;
+}
+
+
 /*
  * Helper function to convert bans
  */
@@ -2319,6 +2769,110 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   }
   state->done |= DONE_BANCLEAN;
 }
+
+ /*
+ * This is the bottom half of the except processor
+ */
+static void
+mode_process_excepts(struct ParseState *state)
+{
+  struct SLink *except, *newexcept, *prevexcept, *nextexcept;
+  int count = 0;
+  int len = 0;
+  int exceptlen;
+  int changed = 0;
+
+  for (prevexcept = 0, except = state->chptr->exceptlist; except; except = nextexcept) {
+    count++;
+    exceptlen = strlen(except->value.except.exceptstr);
+    len += exceptlen;
+    nextexcept = except->next;
+
+    if ((except->flags & (MODE_DEL | MODE_ADD)) == (MODE_DEL | MODE_ADD)) {
+      if (prevexcept)
+	prevexcept->next = 0; /* Break the list; except isn't a real except */
+      else
+	state->chptr->exceptlist = 0;
+
+      count--;
+      len -= exceptlen;
+
+      MyFree(except->value.except.exceptstr);
+
+      continue;
+    } else if (except->flags & MODE_DEL) { /* Deleted a except? */
+      modebuf_mode_string(state->mbuf, MODE_DEL | MODE_EXCEPT,
+			  except->value.except.exceptstr,
+			  state->flags & MODE_PARSE_SET);
+
+      if (state->flags & MODE_PARSE_SET) { /* Ok, make it take effect */
+	if (prevexcept) /* clip it out of the list... */
+	  prevexcept->next = except->next;
+	else
+	  state->chptr->exceptlist = except->next;
+
+	count--;
+	len -= exceptlen;
+
+	MyFree(except->value.except.who);
+	free_link(except);
+
+	changed++;
+	continue; /* next except; keep prevexcept like it is */
+      } else
+	except->flags &= (CHFL_EXCEPT | CHFL_EXCEPT_IPMASK); /* unset other flags */
+    } else if (except->flags & MODE_ADD) { /* adding a except? */
+      if (prevexcept)
+	prevexcept->next = 0; /* Break the list; except isn't a real except */
+      else
+	state->chptr->exceptlist = 0;
+
+      /* If we're supposed to ignore it, do so. */
+      if (except->flags & CHFL_EXCEPT_OVERLAPPED &&
+	  !(state->flags & MODE_PARSE_BOUNCE)) {
+	count--;
+	len -= exceptlen;
+
+	MyFree(except->value.except.exceptstr);
+      } else {
+	if (state->flags & MODE_PARSE_SET && MyUser(state->sptr) &&
+	    (len > (feature_int(FEAT_AVEXCEPTLEN) * feature_int(FEAT_MAXEXCEPTS)) ||
+	     count > feature_int(FEAT_MAXEXCEPTS))) {
+	  send_reply(state->sptr, ERR_EXCEPTLISTFULL, state->chptr->chname,
+		     except->value.except.exceptstr);
+	  count--;
+	  len -= exceptlen;
+
+	  MyFree(except->value.except.exceptstr);
+	} else {
+	  /* add the except to the buffer */
+	  modebuf_mode_string(state->mbuf, MODE_ADD | MODE_EXCEPT,
+			      except->value.except.exceptstr,
+			      !(state->flags & MODE_PARSE_SET));
+
+	  if (state->flags & MODE_PARSE_SET) { /* create a new except */
+	    newexcept = make_link();
+	    newexcept->value.except.exceptstr = except->value.except.exceptstr;
+	    DupString(newexcept->value.except.who, except->value.except.who);
+	    newexcept->value.except.when = except->value.except.when;
+	    newexcept->flags = except->flags & (CHFL_EXCEPT | CHFL_EXCEPT_IPMASK);
+
+	    newexcept->next = state->chptr->exceptlist; /* and link it in */
+	    state->chptr->exceptlist = newexcept;
+
+	    changed++;
+	  }
+	}
+      }
+    }
+
+    prevexcept = except;
+  } /* for (prevexcept = 0, except = state->chptr->exceptlist; except; except = nextexcept) { */
+
+  if (changed) /* if we changed the except list, we must invalidate the excepts */
+    mode_except_invalidate(state->chptr);
+}
+
 
 /*
  * This is the bottom half of the ban processor
@@ -2467,6 +3021,41 @@ mode_parse_client(struct ParseState *state, int *flag_p)
   state->cli_change[i].client = acptr;
 }
 
+static void
+mode_parse_client_voice(struct ParseState *state, int *flag_p)
+{
+  char *t_str;
+  struct Client *acptr;
+  int i;
+
+  if (MyUser(state->sptr) && state->max_args <= 0) /* drop if too many args */
+    return;
+
+  if (state->parc <= 0) /* return if not enough args */
+    return;
+
+  t_str = state->parv[state->args_used++]; /* grab arg */
+  state->parc--;
+  state->max_args--;
+
+  if (MyUser(state->sptr)) /* find client we're manipulating */
+    acptr = find_chasing(state->sptr, t_str, NULL);
+  else
+    acptr = findNUser(t_str);
+
+  if (!acptr)
+    return; /* find_chasing() already reported an error to the user */
+
+  for (i = 0; i < MAXPARA; i++) /* find an element to stick them in */
+    if (!state->cli_change[i].flag || (state->cli_change[i].client == acptr &&
+                                       state->cli_change[i].flag & flag_p[0]))
+      break; /* found a slot */
+
+  /* Store what we're doing to them */
+  state->cli_change[i].flag = state->dir | flag_p[0];
+  state->cli_change[i].client = acptr;
+}
+
 /*
  * Helper function to process the changed client list
  */
@@ -2545,12 +3134,12 @@ mode_process_clients(struct ParseState *state)
     if (state->flags & MODE_PARSE_SET) {
       if (state->cli_change[i].flag & MODE_ADD) {
 	member->status |= (state->cli_change[i].flag &
-			   (MODE_CHANOP | MODE_VOICE));
+			   (MODE_CHANOP | MODE_HALFOP | MODE_VOICE));
 	if (state->cli_change[i].flag & MODE_CHANOP)
 	  ClearDeopped(member);
       } else
 	member->status &= ~(state->cli_change[i].flag &
-			    (MODE_CHANOP | MODE_VOICE));
+			    (MODE_CHANOP | MODE_HALFOP | MODE_VOICE));
     }
   } /* for (i = 0; state->cli_change[i].flags; i++) { */
 }
@@ -2605,10 +3194,12 @@ mode_parse_mode(struct ParseState *state, int *flag_p)
  */
 int
 mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
-	   struct Channel *chptr, int parc, char *parv[], unsigned int flags)
+	   struct Channel *chptr, int parc, char *parv[], unsigned int flags,
+	   struct Membership* member)
 {
   static int chan_flags[] = {
     MODE_CHANOP,	'o',
+    MODE_HALFOP,	'h',
     MODE_VOICE,		'v',
     MODE_PRIVATE,	'p',
     MODE_SECRET,	's',
@@ -2618,6 +3209,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_NOPRIVMSGS,	'n',
     MODE_KEY,		'k',
     MODE_BAN,		'b',
+    MODE_EXCEPT,        'e',
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
@@ -2660,6 +3252,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   state.args_used = 0;
   state.max_args = MAXMODEPARAMS;
   state.numbans = 0;
+  state.numexcepts = 0;
 
   for (i = 0; i < MAXPARA; i++) { /* initialize ops/voices arrays */
     state.banlist[i].next = 0;
@@ -2667,6 +3260,11 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     state.banlist[i].value.ban.who = 0;
     state.banlist[i].value.ban.when = 0;
     state.banlist[i].flags = 0;
+    state.exceptlist[i].next = 0;
+    state.exceptlist[i].value.except.exceptstr = 0;
+    state.exceptlist[i].value.except.who = 0;
+    state.exceptlist[i].value.except.when = 0;
+    state.exceptlist[i].flags = 0;
     state.cli_change[i].flag = 0;
     state.cli_change[i].client = 0;
   }
@@ -2704,10 +3302,29 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	mode_parse_ban(&state, flag_p);
 	break;
 
-      case 'o': /* deal with ops/voice */
+      case 'e': /* deal with excepts */
+        if (feature_bool(FEAT_EXCEPTS) && feature_bool(FEAT_BREAK_P10))
+          mode_parse_except(&state, flag_p);
+        break;
+
       case 'v':
-	mode_parse_client(&state, flag_p);
+                if(member && IsHalfOp(member) && !IsChanOp(member))
+                {
+                        mode_parse_client_voice(&state, flag_p);
+                }
+                else {
+                        mode_parse_client(&state, flag_p);
+                }
 	break;
+
+      case 'o': /* deal with ops/voice */
+       mode_parse_client(&state, flag_p);
+       break;
+
+      case 'h':
+        if (feature_bool(FEAT_HALFOPS))
+          mode_parse_client(&state, flag_p);
+       break;
 
       case 'O': /* deal with operonly */
 	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
@@ -2764,7 +3381,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
    * the rest of the function finishes building resultant MODEs; if the
    * origin isn't a member or an oper, skip it.
    */
-  if (!state.mbuf || state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER))
+  if (!state.mbuf || ((state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) && !(state.flags & MODE_PARSE_ISHALFOP)))
     return state.args_used; /* tell our parent how many args we gobbled */
 
   t_mode = state.chptr->mode.mode;
@@ -2799,6 +3416,9 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
   if (state.done & DONE_BANCLEAN) /* process bans */
     mode_process_bans(&state);
+
+  if (state.done & DONE_EXCEPTCLEAN) /* process excepts */
+    mode_process_excepts(&state);
 
   /* process client changes */
   if (state.cli_change[0].flag)

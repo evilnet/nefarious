@@ -170,6 +170,8 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
        */
       if (chptr && is_chan_op(acptr, chptr))
         *(p1++) = '@';
+      if (chptr && is_half_op(acptr, chptr))
+        *(p1++) = '%';
       if (chptr && has_voice(acptr, chptr))
         *(p1++) = '+';
       if (chptr && is_zombie(acptr, chptr))
@@ -178,6 +180,8 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
     else {
       if (chptr && is_chan_op(acptr, chptr))
         *(p1++) = '@';
+      else if (chptr && is_half_op(acptr, chptr))
+       *(p1++) = '%';
       else if (chptr && has_voice(acptr, chptr))
         *(p1++) = '+';
       else if (chptr && is_zombie(acptr, chptr))

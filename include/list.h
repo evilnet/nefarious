@@ -31,6 +31,11 @@ struct SLink {
       char *who;
       time_t when;
     } ban;
+    struct {
+      char *exceptstr;
+      char *who;
+      time_t when;
+    } except;
   } value;
   unsigned int flags;
 };

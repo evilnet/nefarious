@@ -124,7 +124,7 @@ int ms_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2,
 	     (MODE_PARSE_SET    | /* Set the modes on the channel */
 	      MODE_PARSE_STRICT | /* Be strict about it */
-	      MODE_PARSE_FORCE)); /* And force them to be accepted */
+	      MODE_PARSE_FORCE), NULL); /* And force them to be accepted */
 
   modebuf_flush(&mbuf); /* flush the modes */
 
@@ -188,7 +188,7 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2,
 	     (MODE_PARSE_SET |    /* set the modes on the channel */
-	      MODE_PARSE_FORCE)); /* And force them to be accepted */
+	      MODE_PARSE_FORCE), NULL); /* And force them to be accepted */
 
   modebuf_flush(&mbuf); /* flush the modes */
 

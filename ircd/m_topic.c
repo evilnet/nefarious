@@ -151,6 +151,7 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   struct Channel *chptr;
   char *topic = 0, *name, *p = 0, *topicnocolour = 0;
   int hascolour = -1;
+  struct Membership *member;
 
   if (parc < 2)
     return need_more_params(sptr, "TOPIC");
@@ -167,8 +168,9 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     	send_reply(sptr,ERR_NOSUCHCHANNEL,name);
     	continue;
     }
+    member=find_channel_member(sptr, chptr);
     /* Trying to check a topic outside a secret channel */
-    if ((topic || SecretChannel(chptr)) && !find_channel_member(sptr, chptr))
+    if ((topic || SecretChannel(chptr)) && !member)
     {
       send_reply(sptr, ERR_NOTONCHANNEL, chptr->chname);
       continue;
@@ -187,7 +189,7 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     }
     else {
       /* if +t and not @'d, return an error and ignore the topic */
-      if ((chptr->mode.mode & MODE_TOPICLIMIT) != 0 && !is_chan_op(sptr, chptr))
+      if ((chptr->mode.mode & MODE_TOPICLIMIT) != 0 && !is_chan_op(sptr, chptr) && !IsHalfOp(member))
       {
         send_reply(sptr, ERR_CHANOPRIVSNEEDED, chptr->chname);
         continue;

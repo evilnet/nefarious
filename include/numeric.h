@@ -272,8 +272,8 @@ extern const struct Numeric* get_error_numeric(int err);
 
 #define RPL_INVITELIST       346        /* IRCnet, Undernet extension */
 #define RPL_ENDOFINVITELIST  347        /* IRCnet, Undernet extension */
-/*      RPL_EXCEPTLIST       348           IRCnet extension */
-/*      RPL_ENDOFEXCEPTLIST  349           IRCnet extension */
+#define RPL_EXCEPTLIST       348	/* IRCnet/Nefarious extension */
+#define RPL_ENDOFEXCEPTLIST  349	/* IRCnet/Nefarious extension */
 
 #define RPL_VERSION          351
 #define RPL_WHOREPLY         352        /* See also RPL_ENDOFWHO */
@@ -436,6 +436,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_ACCOUNTONLY      486	/* ASUKA/Nefarious extension */
 /*      ERR_CHANTOORECENT    487           IRCnet extension (?) */
 /*      ERR_TSLESSCHAN       488           IRCnet extension (?) */
+#define ERR_EXCEPTLISTFULL   488	/* Nefarious extension */
 #define ERR_VOICENEEDED      489        /* Undernet extension */
 
 #define ERR_NOOPERHOST       491
@@ -486,8 +487,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_OMOTD            536
 #define RPL_ENDOFOMOTD       537
 #define ERR_NOTVERIFIED      538
+#define ERR_HALFCANTKICKOP   539	/* Nefarious extension */
 
-#define ERR_LASTERROR        539
+#define ERR_LASTERROR        540
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

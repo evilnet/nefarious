@@ -736,9 +736,9 @@ static Numeric replyTable[] = {
 /* 347 */
   { RPL_ENDOFINVITELIST, ":End of Invite List", "347" },
 /* 348 */
-  { 0 },
+  { RPL_EXCEPTLIST, "%s %s %s %Tu", "348" },
 /* 349 */
-  { 0 },
+  { RPL_ENDOFEXCEPTLIST, "%s :End of channel exception list", "349" },
 /* 350 */
   { 0 },
 /* 351 */
@@ -1016,7 +1016,7 @@ static Numeric replyTable[] = {
 /* 487 */
   { 0 },
 /* 488 */
-  { 0 },
+  { ERR_EXCEPTLISTFULL, "%s :Channel exception list is full", "488" },
 /* 489 */
   { ERR_VOICENEEDED, "%s :You're neither voiced nor channel operator", "489" },
 /* 490 */
@@ -1118,7 +1118,7 @@ static Numeric replyTable[] = {
 /* 538 */
   { ERR_NOTVERIFIED, ":%s", "538" },
 /* 539 */
-  { 0 },
+  { ERR_HALFCANTKICKOP, "%s :Halfops cannot kick channel operators", "539" },
 /* 540 */
   { 0 },
 /* 541 */

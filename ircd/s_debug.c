@@ -240,6 +240,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       us = 0,                   /* user structs */
       chi = 0,                  /* channel invites */
       chb = 0,                  /* channel bans */
+      che = 0,                  /* channel excepts */
       wwu = 0,                  /* whowas users */
       cl = 0,                   /* classes */
       co = 0,                   /* conf lines */
@@ -253,6 +254,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
 
   size_t chm = 0,               /* memory used by channels */
       chbm = 0,                 /* memory used by channel bans */
+      chem = 0,                 /* memory used by channel excepts */
       cm = 0,                   /* memory used by clients */
       cnm = 0,                  /* memory used by connections */
       awm = 0,                  /* memory used by aways */
@@ -311,6 +313,11 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       chb++;
       chbm += (strlen(link->value.cp) + 1 + sizeof(struct SLink));
     }
+    for (link = chptr->exceptlist; link; link = link->next)
+    {
+      che++;
+      chem += (strlen(link->value.cp) + 1 + sizeof(struct SLink));
+    }
   }
 
   for (aconf = GlobalConfList; aconf; aconf = aconf->next)
@@ -352,7 +359,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
 	     cl * sizeof(struct ConnectionClass));
 
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
-	     ":Channels %d(%zu) Bans %d(%zu)", ch, chm, chb, chbm);
+	     ":Channels %d(%zu) Bans %d(%zu) Excepts %d(%zu)", ch, chm, chb, chbm, che, chem);
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
 	     ":Channel membrs %d(%zu) invite %d(%zu)", memberships,
 	     memberships * sizeof(struct Membership), chi,

@@ -113,6 +113,7 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
 {
   static int flags[] = {
     MODE_CHANOP,	'o',
+    MODE_HALFOP,	'h',
     MODE_VOICE,		'v',
     MODE_PRIVATE,	'p',
     MODE_SECRET,	's',
@@ -122,6 +123,7 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
     MODE_NOPRIVMSGS,	'n',
     MODE_KEY,		'k',
     MODE_BAN,		'b',
+    MODE_EXCEPT,        'e',
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
@@ -199,8 +201,26 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
     chptr->banlist = 0;
   }
 
+  /*
+   * Go through and mark the except for deletion; note that we can't
+   * free them until after modebuf_* are done with them
+   */
+  if (del_mode & MODE_EXCEPT) {
+    for (link = chptr->exceptlist; link; link = next) {
+      next = link->next;
+
+      modebuf_mode_string(&mbuf, MODE_DEL | MODE_EXCEPT, /* delete except */
+                          link->value.except.exceptstr, 1);
+
+      MyFree(link->value.except.who); /* free up who string */
+      free_link(link); /* and of course the link itself */
+    }
+
+    chptr->exceptlist = 0;
+  }
+
   /* Deal with users on the channel */
-  if (del_mode & (MODE_BAN | MODE_CHANOP | MODE_VOICE))
+  if (del_mode & (MODE_BAN | MODE_EXCEPT | MODE_HALFOP | MODE_CHANOP | MODE_VOICE))
     for (member = chptr->members; member; member = member->next_member) {
       if (IsZombie(member)) /* we ignore zombies */
 	continue;
@@ -208,10 +228,19 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
       if (del_mode & MODE_BAN) /* If we cleared bans, clear the valid flags */
 	ClearBanValid(member);
 
+      if (del_mode & MODE_EXCEPT) /* If we cleared excepts, clear the valid flags */
+        ClearExceptValid(member);
+
       /* Drop channel operator status */
       if (IsChanOp(member) && del_mode & MODE_CHANOP) {
 	modebuf_mode_client(&mbuf, MODE_DEL | MODE_CHANOP, member->user);
 	member->status &= ~CHFL_CHANOP;
+      }
+
+          /* Drop halfop */
+      if (IsHalfOp(member) && del_mode & MODE_HALFOP) {
+                modebuf_mode_client(&mbuf, MODE_DEL | MODE_HALFOP, member->user);
+                member->status &= ~CHFL_HALFOP;
       }
 
       /* Drop voice */

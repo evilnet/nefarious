@@ -67,15 +67,25 @@ struct Client;
 #define CHFL_BANNED             0x1000  /* Channel member is banned */
 #define CHFL_SILENCE_IPMASK     0x2000  /* silence mask is an IP-number mask */
 #define CHFL_USER_PARTING       0x4000  /* User is already parting that channel */
+#define CHFL_HALFOP		0x8000
+#define CHFL_EXCEPT             0x10000  /* ban channel flag */
+#define CHFL_EXCEPT_IPMASK      0x20000  /* ban mask is an IP-number mask */
+#define CHFL_EXCEPT_OVERLAPPED     0x40000  /* ban overlapped, need bounce */
+#define CHFL_BURST_EXCEPT          0x80000  /* Ban part of last BURST */
+#define CHFL_BURST_EXCEPT_WIPEOUT  0x100000  /* Ban will be wiped at end of BURST */
+#define CHFL_EXCEPTVALID           0x200000  /* CHFL_BANNED bit is valid */
+#define CHFL_EXCEPTED              0x400000  /* Channel member is banned */
 
-#define CHFL_OVERLAP         (CHFL_CHANOP | CHFL_VOICE)
+#define CHFL_OVERLAP         (CHFL_CHANOP | CHFL_VOICE | CHFL_HALFOP)
 #define CHFL_BANVALIDMASK    (CHFL_BANVALID | CHFL_BANNED)
-#define CHFL_VOICED_OR_OPPED (CHFL_CHANOP | CHFL_VOICE)
+#define CHFL_EXCEPTVALIDMASK (CHFL_EXCEPTVALID | CHFL_EXCEPT)
+#define CHFL_VOICED_OR_OPPED (CHFL_CHANOP | CHFL_HALFOP | CHFL_VOICE)
 
 /* Channel Visibility macros */
 
 #define MODE_CHANOP		CHFL_CHANOP
 #define MODE_VOICE		CHFL_VOICE
+#define MODE_HALFOP		CHFL_HALFOP
 #define MODE_PRIVATE		0x0004 /* don't show channel in list */
 #define MODE_SECRET		0x0008 /* don't show channel in whois/list */
 #define MODE_MODERATED		0x0010 /* only +v/+o may speak */
@@ -100,11 +110,12 @@ struct Client;
 #define MODE_SAVE		0x800000 /* save this mode-with-arg 'til later */
 #define MODE_FREE		0x1000000 /* string needs to be passed to MyFree() */
 #define MODE_BURSTADDED		0x2000000 /* channel was created by a BURST */
+#define MODE_EXCEPT		0x4000000
 
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
-#define MODE_WPARAS     (MODE_CHANOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT)
+#define MODE_WPARAS     (MODE_CHANOP|MODE_HALFOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT|MODE_EXCEPT)
 
 #define HoldChannel(x)          (!(x))
 /* name invisible */
@@ -195,8 +206,11 @@ struct Membership {
 #define IsDeopped(x)        ((x)->status & CHFL_DEOPPED)
 #define IsBanned(x)         ((x)->status & CHFL_BANNED)
 #define IsBanValid(x)       ((x)->status & CHFL_BANVALID)
+#define IsExcepted(x)       ((x)->status & CHFL_EXCEPT)
+#define IsExceptValid(x)    ((x)->status & CHFL_EXCEPTVALID)
 #define IsChanOp(x)         ((x)->status & CHFL_CHANOP)
 #define HasVoice(x)         ((x)->status & CHFL_VOICE)
+#define IsHalfOp(x)         ((x)->status & CHFL_HALFOP)
 #define IsServOpOk(x)       ((x)->status & CHFL_SERVOPOK)
 #define IsBurstJoined(x)    ((x)->status & CHFL_BURST_JOINED)
 #define IsVoicedOrOpped(x)  ((x)->status & CHFL_VOICED_OR_OPPED)
@@ -204,6 +218,8 @@ struct Membership {
 
 #define SetBanned(x)        ((x)->status |= CHFL_BANNED)
 #define SetBanValid(x)      ((x)->status |= CHFL_BANVALID)
+#define SetExcepted(x)      ((x)->status |= CHFL_EXCEPT)
+#define SetExceptValid(x)   ((x)->status |= CHFL_EXCEPTVALID)
 #define SetDeopped(x)       ((x)->status |= CHFL_DEOPPED)
 #define SetServOpOk(x)      ((x)->status |= CHFL_SERVOPOK)
 #define SetBurstJoined(x)   ((x)->status |= CHFL_BURST_JOINED)
@@ -212,6 +228,8 @@ struct Membership {
 
 #define ClearBanned(x)      ((x)->status &= ~CHFL_BANNED)
 #define ClearBanValid(x)    ((x)->status &= ~CHFL_BANVALID)
+#define ClearExcepted(x)    ((x)->status &= ~CHFL_EXCEPT)
+#define ClearExceptValid(x) ((x)->status &= ~CHFL_EXCEPTVALID)
 #define ClearDeopped(x)     ((x)->status &= ~CHFL_DEOPPED)
 #define ClearServOpOk(x)    ((x)->status &= ~CHFL_SERVOPOK)
 #define ClearBurstJoined(x) ((x)->status &= ~CHFL_BURST_JOINED)
@@ -233,6 +251,7 @@ struct Channel {
   struct Membership* members;
   struct SLink*      invites;
   struct SLink*      banlist;
+  struct SLink*      exceptlist;
   struct Mode        mode;
   char               topic[TOPICLEN + 1];
   char               topic_nick[NICKLEN + USERLEN + HOSTLEN + 3];
@@ -334,10 +353,13 @@ extern void add_user_to_channel(struct Channel* chptr, struct Client* who,
 extern void cancel_mode(struct Client *sptr, struct Channel *chptr, char m,
                         const char *param, int *count);
 extern void add_token_to_sendbuf(char *token, size_t *sblenp, int *firstp,
-                                 int *send_itp, char is_a_ban, int mode);
+                                 int *send_itp, char is_a_ban, char is_a_except, int mode);
 extern int add_banid(struct Client *cptr, struct Channel *chptr, char *banid,
                      int change, int firsttime);
 extern struct SLink *next_removed_overlapped_ban(void);
+extern int add_exceptid(struct Client *cptr, struct Channel *chptr, char *exceptid,
+                     int change, int firsttime);
+extern struct SLink *next_removed_overlapped_except(void);
 extern void cancel_mode(struct Client *sptr, struct Channel *chptr, char m,
                         const char *param, int *count);
 extern void make_zombie(struct Membership* member, struct Client* who,
@@ -360,6 +382,7 @@ extern int is_chan_op(struct Client *cptr, struct Channel *chptr);
 extern int is_zombie(struct Client *cptr, struct Channel *chptr);
 extern int has_voice(struct Client *cptr, struct Channel *chptr);
 extern int IsInvited(struct Client* cptr, struct Channel* chptr);
+extern int is_half_op(struct Client *cptr, struct Channel *chptr);
 extern void send_channel_modes(struct Client *cptr, struct Channel *chptr);
 extern char *pretty_mask(char *mask);
 extern void del_invite(struct Client *cptr, struct Channel *chptr);
@@ -380,11 +403,13 @@ extern int modebuf_flush(struct ModeBuf *mbuf);
 extern void modebuf_extract(struct ModeBuf *mbuf, char *buf);
 
 extern void mode_ban_invalidate(struct Channel *chan);
+extern void mode_except_invalidate(struct Channel *chan);
 extern void mode_invite_clear(struct Channel *chan);
 
 extern int mode_parse(struct ModeBuf *mbuf, struct Client *cptr,
 		      struct Client *sptr, struct Channel *chptr,
-		      int parc, char *parv[], unsigned int flags);
+		      int parc, char *parv[], unsigned int flags,
+		      struct Membership* member);
 
 #define MODE_PARSE_SET		0x01	/* actually set channel modes */
 #define MODE_PARSE_STRICT	0x02	/* +m +n +t style not supported */
@@ -394,6 +419,7 @@ extern int mode_parse(struct ModeBuf *mbuf, struct Client *cptr,
 #define MODE_PARSE_NOTMEMBER	0x20	/* send "not member" to user */
 #define MODE_PARSE_WIPEOUT	0x40	/* wipe out +k and +l during burst */
 #define MODE_PARSE_BURST	0x80	/* be even more strict w/extra args */
+#define MODE_PARSE_ISHALFOP	0x100
 
 extern void joinbuf_init(struct JoinBuf *jbuf, struct Client *source,
 			 struct Client *connect, unsigned int type,

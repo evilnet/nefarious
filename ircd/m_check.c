@@ -141,9 +141,12 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
    struct Client *acptr;
 
    char outbuf[BUFSIZE], ustat[64];
-   int cntr = 0, opcntr = 0, vcntr = 0, clones = 0, bans = 0, c = 0;
+   int cntr = 0, opcntr = 0, hopcntr = 0, vcntr = 0, clones = 0, bans = 0, excepts = 0, c = 0;
 
-   send_reply(sptr, RPL_DATASTR, "Users (@ = op, + = voice, * = clone)");
+   if (feature_bool(FEAT_HALFOPS))
+     send_reply(sptr, RPL_DATASTR, "Users (@ = op, % = half op, + = voice, * = clone)");
+   else
+     send_reply(sptr, RPL_DATASTR, "Users (@ = op, + = voice, * = clone)");
 
    for (lp = chptr->members; lp; lp = lp->next_member)
    {
@@ -165,6 +168,13 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
          strcat(ustat, "@");
          opcntr++;
       }
+
+      if (chptr && IsHalfOp(lp))
+      {
+         strcat(ustat, "%");
+         hopcntr++;
+      }
+
       else if (chptr && HasVoice(lp))
       {
          strcat(ustat, "+");
@@ -184,9 +194,15 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
 
    send_reply(sptr, RPL_DATASTR, " ");
 
-   ircd_snprintf(0, outbuf, sizeof(outbuf),
-      "Total users:: %d (%d ops, %d voiced, %d clones)",
-      cntr, opcntr, vcntr, clones);
+   if (feature_bool(FEAT_HALFOPS))
+     ircd_snprintf(0, outbuf, sizeof(outbuf),
+        "Total users:: %d (%d ops, %d half ops, %d voiced, %d clones)",
+        cntr, opcntr, hopcntr, vcntr, clones);
+   else
+     ircd_snprintf(0, outbuf, sizeof(outbuf),
+        "Total users:: %d (%d ops, %d voiced, %d clones)",
+        cntr, opcntr, vcntr, clones);
+
    send_reply(sptr, RPL_DATASTR, outbuf);
 
    send_reply(sptr, RPL_DATASTR, " ");
@@ -204,6 +220,23 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
    if (bans == 0)
    {
       send_reply(sptr, RPL_DATASTR, "<none>");
+   }
+
+   /* Excepts */
+   if (feature_bool(FEAT_HALFOPS)) {
+     send_reply(sptr, RPL_DATASTR, "Excepts on channel::");
+
+     for (slp = chptr->exceptlist; slp; slp = slp->next)
+     {
+        ircd_snprintf(0, outbuf, sizeof(outbuf),  "[%d] - %s - Set by %s, on %s",
+           ++excepts, slp->value.except.exceptstr, slp->value.except.who, myctime(slp->value.except.when));
+        send_reply(sptr, RPL_DATASTR, outbuf);
+     }
+
+     if (excepts == 0)
+     {
+       send_reply(sptr, RPL_DATASTR, "<none>");
+     }
    }
 
    send_reply(sptr, RPL_ENDOFCHECK, " ");
@@ -372,6 +405,8 @@ void checkClient(struct Client *sptr, struct Client *acptr)
          {
             if (IsChanOp(lp))
                *(chntext + len++) = '@';
+           else if (is_half_op(acptr, chptr))
+               *(chntext + len++) = '%';
             else if (HasVoice(lp))
                *(chntext + len++) = '+';
          }

@@ -95,6 +95,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "s_conf.h"
+#include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
 #include "struct.h"
@@ -152,8 +153,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct Membership *member, *nmember;
   struct SLink *lp, **lp_p;
   unsigned int parse_flags = (MODE_PARSE_FORCE | MODE_PARSE_BURST);
-  int param, nickpos = 0, banpos = 0;
-  char modestr[BUFSIZE], nickstr[BUFSIZE], banstr[BUFSIZE];
+  int param, nickpos = 0, banpos = 0, exceptpos = 0, type = 0, ecount = 0;
+  char modestr[BUFSIZE], nickstr[BUFSIZE], banstr[BUFSIZE], exceptstr[BUFSIZE];
 
   if (parc < 3)
     return protocol_violation(sptr,"Too few parameters for BURST");
@@ -226,6 +227,10 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     for (lp = chptr->banlist; lp; lp = lp->next)
       lp->flags |= CHFL_BURST_BAN_WIPEOUT;
 
+    /* mark excepts for wipeout */
+    for (lp = chptr->banlist; lp; lp = lp->next)
+      lp->flags |= CHFL_BURST_EXCEPT_WIPEOUT;
+
     /* clear topic set by netrider (if set) */
     if (*chptr->topic) {
       *chptr->topic = '\0';
@@ -246,7 +251,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     switch (*parv[param]) {
     case '+': /* parameter introduces a mode string */
       param += mode_parse(mbuf, cptr, sptr, chptr, parc - param,
-			  parv + param, parse_flags);
+			  parv + param, parse_flags, NULL);
       break;
 
     case '%': /* parameter contains bans */
@@ -256,7 +261,10 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
 	for (ban = ircd_strtok(&p, banlist, " "); ban;
 	     ban = ircd_strtok(&p, 0, " ")) {
-	  ban = collapse(pretty_mask(ban));
+          if ((0 == ircd_strcmp("~", ban)) && (type == 0))
+            type = 1;
+          if (type == 0) {
+  	    ban = collapse(pretty_mask(ban));
 
 	    /*
 	     * Yeah, we should probably do this elsewhere, and make it better
@@ -266,54 +274,109 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	     * I wish there were a better algo. for this than the n^2 one
 	     * shown below *sigh*
 	     */
-	  for (lp = chptr->banlist; lp; lp = lp->next) {
-	    if (!ircd_strcmp(lp->value.ban.banstr, ban)) {
-	      ban = 0; /* don't add ban */
-	      lp->flags &= ~CHFL_BURST_BAN_WIPEOUT; /* not wiping out */
-	      break; /* new ban already existed; don't even repropagate */
-	    } else if (!(lp->flags & CHFL_BURST_BAN_WIPEOUT) &&
-		       !mmatch(lp->value.ban.banstr, ban)) {
-	      ban = 0; /* don't add ban unless wiping out bans */
-	      break; /* new ban is encompassed by an existing one; drop */
-	    } else if (!mmatch(ban, lp->value.ban.banstr))
-	      lp->flags |= CHFL_BAN_OVERLAPPED; /* remove overlapping ban */
+	    for (lp = chptr->banlist; lp; lp = lp->next) {
+	      if (!ircd_strcmp(lp->value.ban.banstr, ban)) {
+	        ban = 0; /* don't add ban */
+	        lp->flags &= ~CHFL_BURST_BAN_WIPEOUT; /* not wiping out */
+	        break; /* new ban already existed; don't even repropagate */
+	      } else if (!(lp->flags & CHFL_BURST_BAN_WIPEOUT) &&
+		         !mmatch(lp->value.ban.banstr, ban)) {
+	        ban = 0; /* don't add ban unless wiping out bans */
+	        break; /* new ban is encompassed by an existing one; drop */
+	      } else if (!mmatch(ban, lp->value.ban.banstr))
+	        lp->flags |= CHFL_BAN_OVERLAPPED; /* remove overlapping ban */
 
-	    if (!lp->next)
-	      break;
-	  }
+	      if (!lp->next)
+	        break;
+  	    }
 
-	  if (ban) { /* add the new ban to the end of the list */
-	    /* Build ban buffer */
-	    if (!banpos) {
-	      banstr[banpos++] = ' ';
-	      banstr[banpos++] = ':';
-	      banstr[banpos++] = '%';
-	    } else
-	      banstr[banpos++] = ' ';
-	    for (ptr = ban; *ptr; ptr++) /* add ban to buffer */
-	      banstr[banpos++] = *ptr;
+	    if (ban) { /* add the new ban to the end of the list */
+	      /* Build ban buffer */
+	      if (!banpos) {
+	        banstr[banpos++] = ' ';
+	        banstr[banpos++] = ':';
+	        banstr[banpos++] = '%';
+	      } else
+	        banstr[banpos++] = ' ';
+	      for (ptr = ban; *ptr; ptr++) /* add ban to buffer */
+	        banstr[banpos++] = *ptr;
 
-	    newban = make_link(); /* create new ban */
+	      newban = make_link(); /* create new ban */
 
-	    DupString(newban->value.ban.banstr, ban);
+	      DupString(newban->value.ban.banstr, ban);
 
-	    DupString(newban->value.ban.who, 
-		      cli_name(feature_bool(FEAT_HIS_BANWHO) ? &me : sptr));
+	      DupString(newban->value.ban.who, 
+		        cli_name(feature_bool(FEAT_HIS_BANWHO) ? &me : sptr));
 
-	    newban->value.ban.when = TStime();
+	      newban->value.ban.when = TStime();
 
-	    newban->flags = CHFL_BAN | CHFL_BURST_BAN; /* set flags */
-	    if ((ptr = strrchr(ban, '@')) && check_if_ipmask(ptr + 1))
-	      newban->flags |= CHFL_BAN_IPMASK;
+	      newban->flags = CHFL_BAN | CHFL_BURST_BAN; /* set flags */
+	      if ((ptr = strrchr(ban, '@')) && check_if_ipmask(ptr + 1))
+	        newban->flags |= CHFL_BAN_IPMASK;
 
-	    newban->next = 0;
-	    if (lp)
-	      lp->next = newban; /* link it in */
-	    else
-	      chptr->banlist = newban;
-	  }
-	}
-      } 
+	      newban->next = 0;
+	      if (lp)
+	        lp->next = newban; /* link it in */
+	      else
+	        chptr->banlist = newban;
+	    }
+          } else if (type == 1) {
+            char *exceptlist = parv[param] + 1, *p = 0, *except, *ptr;
+            struct SLink *newexcept;
+            ecount++;
+            if (ecount > 1) { /* miss the first one as its just the ~ seperator */
+              except = collapse(pretty_mask(ban));
+
+              for (lp = chptr->exceptlist; lp; lp = lp->next) {
+                if (!ircd_strcmp(lp->value.except.exceptstr, except)) {
+                  except = 0; /* don't add except */
+                  lp->flags &= ~CHFL_BURST_EXCEPT_WIPEOUT; /* not wiping out */
+                  break; /* new except already existed; don't even repropagate */
+                } else if (!(lp->flags & CHFL_BURST_EXCEPT_WIPEOUT) &&
+                             !mmatch(lp->value.except.exceptstr, except)) {
+                  except = 0; /* don't add except unless wiping out excepts */
+                  break; /* new except is encompassed by an existing one; drop */
+                } else if (!mmatch(except, lp->value.except.exceptstr))
+                  lp->flags |= CHFL_EXCEPT_OVERLAPPED; /* remove overlapping except */
+
+                if (!lp->next)
+                  break;
+              }
+
+              if (except) { /* add the new except to the end of the list */
+                /* Build except buffer */
+                if (!exceptpos) {
+                  exceptstr[exceptpos++] = ' ';
+                  exceptstr[exceptpos++] = '~';
+                  exceptstr[exceptpos++] = ' ';
+                } else
+                  exceptstr[exceptpos++] = ' ';
+                for (ptr = except; *ptr; ptr++) /* add except to buffer */
+                  exceptstr[exceptpos++] = *ptr;
+
+                newexcept = make_link(); /* create new except */
+
+                DupString(newexcept->value.except.exceptstr, except);
+
+                DupString(newexcept->value.except.who,
+                            cli_name(feature_bool(FEAT_HIS_EXCEPTWHO) ? &me : sptr));
+
+                newexcept->value.except.when = TStime();
+
+                newexcept->flags = CHFL_EXCEPT | CHFL_BURST_EXCEPT; /* set flags */
+                if ((ptr = strrchr(except, '@')) && check_if_ipmask(ptr + 1))
+                  newexcept->flags |= CHFL_EXCEPT_IPMASK;
+
+                newexcept->next = 0;
+                if (lp)
+                  lp->next = newexcept; /* link it in */
+                else
+                  chptr->exceptlist = newexcept;
+              }
+            }
+          }
+        }
+      }
       param++; /* look at next param */
       break;
 
@@ -335,6 +398,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		   ptr++) {
 		if (*ptr == 'o') /* has oper status */
 		  default_mode = (default_mode & ~CHFL_DEOPPED) | CHFL_CHANOP;
+               else if (*ptr == 'h') /* halfop status */
+                 default_mode |= CHFL_HALFOP;
 		else if (*ptr == 'v') /* has voice status */
 		  default_mode |= CHFL_VOICE;
 		else /* I don't recognize that flag */
@@ -359,6 +424,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    nickstr[nickpos++] = ':'; /* add a specifier */
 	    if (default_mode & CHFL_CHANOP)
 	      nickstr[nickpos++] = 'o';
+            if (default_mode & CHFL_HALFOP)
+              nickstr[nickpos++] = 'h';
 	    if (default_mode & CHFL_VOICE)
 	      nickstr[nickpos++] = 'v';
 	  }
@@ -374,6 +441,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   nickstr[nickpos] = '\0';
   banstr[banpos] = '\0';
+  exceptstr[exceptpos] = '\0';
 
   if (parse_flags & MODE_PARSE_SET) {
     modebuf_extract(mbuf, modestr + 1); /* for sending BURST onward */
@@ -381,11 +449,15 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   } else
     modestr[0] = '\0';
 
-  sendcmdto_serv_butone(sptr, CMD_BURST, cptr, "%H %Tu%s%s%s", chptr,
-			chptr->creationtime, modestr, nickstr, banstr);
+  sendcmdto_serv_butone(sptr, CMD_BURST, cptr, "%H %Tu%s%s%s%s", chptr,
+			chptr->creationtime, modestr, nickstr, banstr,
+			feature_bool(FEAT_EXCEPTS) ? exceptstr : "");
 
   if (parse_flags & MODE_PARSE_WIPEOUT || banpos)
     mode_ban_invalidate(chptr);
+
+  if (parse_flags & MODE_PARSE_WIPEOUT || exceptpos)
+    mode_except_invalidate(chptr);
 
   if (parse_flags & MODE_PARSE_SET) { /* any modes changed? */
     /* first deal with channel members */
@@ -393,14 +465,18 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       if (member->status & CHFL_BURST_JOINED) { /* joined during burst */
 	if (member->status & CHFL_CHANOP)
 	  modebuf_mode_client(mbuf, MODE_ADD | CHFL_CHANOP, member->user);
+        if (member->status & CHFL_HALFOP)
+          modebuf_mode_client(mbuf, MODE_ADD | CHFL_HALFOP, member->user);
 	if (member->status & CHFL_VOICE)
 	  modebuf_mode_client(mbuf, MODE_ADD | CHFL_VOICE, member->user);
       } else if (parse_flags & MODE_PARSE_WIPEOUT) { /* wipeout old ops */
 	if (member->status & CHFL_CHANOP)
 	  modebuf_mode_client(mbuf, MODE_DEL | CHFL_CHANOP, member->user);
+        if (member->status & CHFL_HALFOP)
+          modebuf_mode_client(mbuf, MODE_DEL | CHFL_HALFOP, member->user);
 	if (member->status & CHFL_VOICE)
 	  modebuf_mode_client(mbuf, MODE_DEL | CHFL_VOICE, member->user);
-	member->status = ((member->status & ~(CHFL_CHANOP | CHFL_VOICE)) |
+	member->status = ((member->status & ~(CHFL_CHANOP | CHFL_HALFOP | CHFL_VOICE)) |
 			  CHFL_DEOPPED);
       }
     }
@@ -425,6 +501,30 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
       lp->flags &= (CHFL_BAN | CHFL_BAN_IPMASK); /* reset the flag */
       lp_p = &(*lp_p)->next;
+    }
+
+    if (feature_bool(FEAT_EXCEPTS)) {
+      /* Now deal with channel excepts */
+      lp_p = &chptr->exceptlist;
+      while (*lp_p) {
+        lp = *lp_p;
+
+        /* remove except from channel */
+        if (lp->flags & (CHFL_EXCEPT_OVERLAPPED | CHFL_BURST_EXCEPT_WIPEOUT)) {
+          modebuf_mode_string(mbuf, MODE_DEL | MODE_EXCEPT,
+                              lp->value.except.exceptstr, 1); /* let it free exceptstr */
+
+          *lp_p = lp->next; /* clip out of list */
+          MyFree(lp->value.except.who); /* free who */
+          free_link(lp); /* free except */
+          continue;
+        } else if (lp->flags & CHFL_BURST_EXCEPT) /* add except to channel */
+          modebuf_mode_string(mbuf, MODE_ADD | MODE_EXCEPT,
+                              lp->value.except.exceptstr, 0); /* don't free exceptstr */
+
+        lp->flags &= (CHFL_EXCEPT | CHFL_EXCEPT_IPMASK); /* reset the flag */
+        lp_p = &(*lp_p)->next;
+      }
     }
   }
 

@@ -895,6 +895,11 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       for (member = (cli_user(cptr))->channel; member;
 	   member = member->next_channel)
 	ClearBanValid(member);
+
+      /* Invalidate all excepts against the user so we check them again */
+      for (member = (cli_user(cptr))->channel; member;
+           member = member->next_channel)
+        ClearExceptValid(member);
     }
     /*
      * Also set 'lastnick' to current time, if changed.
@@ -1257,6 +1262,10 @@ int hide_hostmask(struct Client *cptr)
        chan = chan->next_channel)
      ClearBanValid(chan);
 
+  /* Invalidate all excepts against the user so we check them again */
+  for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
+    ClearExceptValid(chan);
+
   /* If user is +h, don't hide the host. Set flag to keep sync though. */
   if (HasSetHost(cptr)) {
     SetHiddenHost(cptr);
@@ -1279,12 +1288,34 @@ int hide_hostmask(struct Client *cptr)
       continue;
     sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr,
       "%H", chan->channel);
-    if (IsChanOp(chan) && HasVoice(chan)) {
+    if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
       sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
-        "%H +ov %C %C", chan->channel, cptr, cptr);
-    } else if (IsChanOp(chan) || HasVoice(chan)) {
-      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
-        "%H +%c %C", chan->channel, IsChanOp(chan) ? 'o' : 'v', cptr);
+        "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
+    } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
+      if(IsChanOp(chan) && IsHalfOp(chan)) {
+      	sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+	                  	         "%H +oh %C %C", chan->channel, cptr, cptr);
+      }
+      else if(IsChanOp(chan) && HasVoice(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                        "%H +ov %C %C", chan->channel, cptr, cptr);
+      }
+      else if(IsHalfOp(chan) && HasVoice(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +hv %C %C", chan->channel, cptr, cptr);
+      }
+      else if(IsChanOp(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +o %C", chan->channel, cptr);
+      }
+      else if(IsHalfOp(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +h %C", chan->channel, cptr);
+      }
+      else if(HasVoice(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +v %C", chan->channel, cptr);
+      }
     }
   }
   return 0;
@@ -1422,6 +1453,10 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
        chan = chan->next_channel)
      ClearBanValid(chan);
 
+  /* Invalidate all excepts against the user so we check them again */
+  for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
+    ClearExceptValid(chan);
+
   if (MyConnect(cptr)) {
     ircd_snprintf(0, hiddenhost, HOSTLEN + USERLEN + 2, "%s@%s",
       cli_user(cptr)->username, cli_user(cptr)->host);
@@ -1439,12 +1474,35 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
       continue;
     sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr,
       "%H", chan->channel);
-    if (IsChanOp(chan) && HasVoice(chan)) {
+
+    if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
       sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
-        "%H +ov %C %C", chan->channel, cptr, cptr);
-    } else if (IsChanOp(chan) || HasVoice(chan)) {
-      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
-        "%H +%c %C", chan->channel, IsChanOp(chan) ? 'o' : 'v', cptr);
+        "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
+    } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
+      if(IsChanOp(chan) && IsHalfOp(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +oh %C %C", chan->channel, cptr, cptr);
+      }
+      else if(IsChanOp(chan) && HasVoice(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                        "%H +ov %C %C", chan->channel, cptr, cptr);
+      }
+      else if(IsHalfOp(chan) && HasVoice(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +hv %C %C", chan->channel, cptr, cptr);
+      }
+      else if(IsChanOp(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +o %C", chan->channel, cptr);
+      }
+      else if(IsHalfOp(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +h %C", chan->channel, cptr);
+      }
+      else if(HasVoice(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
+                                         "%H +v %C", chan->channel, cptr);
+      }
     }
   }
   return 1;

@@ -104,6 +104,7 @@ int
 m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
   struct Channel *chptr = 0;
+  unsigned int hoflags  = 0;
   struct ModeBuf mbuf;
   struct Membership *member;
 
@@ -129,25 +130,29 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     return 0;
   }
 
-  if (!(member = find_member_link(chptr, sptr)) || !IsChanOp(member)) {
+  if (!(member = find_member_link(chptr, sptr)) || (!IsChanOp(member) && !IsHalfOp(member))) {
     if (IsLocalChannel(chptr->chname) && HasPriv(sptr, PRIV_MODE_LCHAN)) {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_CHANNEL | /* Send mode to channel */
 		    MODEBUF_DEST_HACK4));  /* Send HACK(4) notice */
       mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2,
 		 (MODE_PARSE_SET |    /* Set the mode */
-		  MODE_PARSE_FORCE)); /* Force it to take */
+		  MODE_PARSE_FORCE), NULL); /* Force it to take */
       return modebuf_flush(&mbuf);
     } else
       mode_parse(0, cptr, sptr, chptr, parc - 2, parv + 2,
-		 (member ? MODE_PARSE_NOTOPER : MODE_PARSE_NOTMEMBER));
+		 (member ? MODE_PARSE_NOTOPER : MODE_PARSE_NOTMEMBER), NULL);
     return 0;
   }
 
   modebuf_init(&mbuf, sptr, cptr, chptr,
 	       (MODEBUF_DEST_CHANNEL | /* Send mode to channel */
 		MODEBUF_DEST_SERVER)); /* Send mode to servers */
-  mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2, MODE_PARSE_SET);
+
+  if(IsChanOp(member)) hoflags = MODE_PARSE_SET; /* set unconditionally */
+   else if(IsHalfOp(member)) hoflags = MODE_PARSE_ISHALFOP|MODE_PARSE_SET|MODE_PARSE_NOTOPER; /* allowed to +v */
+  else hoflags = MODE_PARSE_NOTOPER;
+  mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2, hoflags, member);
   return modebuf_flush(&mbuf);
 }
 
@@ -184,9 +189,9 @@ ms_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2,
 	       (MODE_PARSE_SET    | /* Set the mode */
 		MODE_PARSE_STRICT | /* Interpret it strictly */
-		MODE_PARSE_FORCE)); /* And force it to be accepted */
+		MODE_PARSE_FORCE), NULL); /* And force it to be accepted */
   } else {
-    if (!(member = find_member_link(chptr, sptr)) || !IsChanOp(member)) {
+    if (!(member = find_member_link(chptr, sptr)) || (!IsChanOp(member) && !IsHalfOp(member))) {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_SERVER |  /* Send mode to server */
 		    MODEBUF_DEST_HACK2  |  /* Send a HACK(2) message */
@@ -194,7 +199,7 @@ ms_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		    MODEBUF_DEST_BOUNCE)); /* And bounce the MODE */
       mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2,
 		 (MODE_PARSE_STRICT |  /* Interpret it strictly */
-		  MODE_PARSE_BOUNCE)); /* And bounce the MODE */
+		  MODE_PARSE_BOUNCE), member); /* And bounce the MODE */
     } else {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_CHANNEL | /* Send mode to clients */
@@ -202,7 +207,7 @@ ms_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       mode_parse(&mbuf, cptr, sptr, chptr, parc - 2, parv + 2,
 		 (MODE_PARSE_SET    | /* Set the mode */
 		  MODE_PARSE_STRICT | /* Interpret it strictly */
-		  MODE_PARSE_FORCE)); /* And force it to be accepted */
+		  MODE_PARSE_FORCE), member); /* And force it to be accepted */
     }
   }
 

@@ -118,7 +118,7 @@ int m_wallchops(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
       if ((chptr->mode.mode & MODE_NOPRIVMSGS) &&
           check_target_limit(sptr, chptr, chptr->chname, 0))
         return 0;
-      sendcmdto_channel_butone(sptr, CMD_WALLCHOPS, chptr, cptr,
+      sendcmdto_channel_butone(sptr, CMD_WALLCHOPS, chptr, NULL,
 			       SKIP_DEAF | SKIP_BURST | SKIP_NONOPS,
 			       "%H :@ %s", chptr, parv[parc - 1]);
     }
@@ -145,7 +145,7 @@ int ms_wallchops(struct Client* cptr, struct Client* sptr, int parc, char* parv[
 
   if ((chptr = FindChannel(parv[1]))) {
     if (client_can_send_to_channel(sptr, chptr)) {
-      sendcmdto_channel_butone(sptr, CMD_WALLCHOPS, chptr, cptr,
+      sendcmdto_channel_butone(sptr, CMD_WALLCHOPS, chptr, NULL,
 			       SKIP_DEAF | SKIP_BURST | SKIP_NONOPS,
 			       "%H :%s", chptr, parv[parc - 1]);
     } else

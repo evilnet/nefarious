@@ -74,6 +74,7 @@ extern void sendcmdto_channel_butone(struct Client *from, const char *cmd,
 #define SKIP_NONOPS	0x04	/* skip users that aren't chanops */
 #define SKIP_NONVOICES  0x08    /* skip users that aren't voiced (includes
                                    chanops) */
+#define SKIP_NONHOPS	0x10
 
 /* Send command to all users having a particular flag set */
 extern void sendwallto_group_butone(struct Client *from, int type, 

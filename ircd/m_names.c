@@ -170,6 +170,11 @@ void do_names(struct Client* sptr, struct Channel* chptr, int filter)
       strcat(buf, "@");
       idx++;
     }
+    else if (IsHalfOp(member))
+    {
+      strcat(buf, "%");
+      idx++;
+    }
     else if (HasVoice(member))
     {
       strcat(buf, "+");
