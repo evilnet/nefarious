@@ -1,3 +1,12 @@
+2003-10-18  Reed Loden  <reed@reedloden.com>
+
+	* ircd/gline.c: Tidy up clsk's fix.
+
+2003-10-18  Alan Alvarez  <nirvana_alan@hotmail.com>
+
+	* ircd/gline.c: Fix memory going out of bounds by allocating
+	memory on the heap.
+
 2003-10-12  Jochen Meesters  <spike@undernet.org>
 
 	* ircd/m_rehash.c: Small fix.

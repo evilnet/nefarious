@@ -277,11 +277,12 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       sendto_opmask_butone(0, SNO_GLINE, "G-line active for %s",
       		     get_client_name(acptr, TRUE));
 
+      /* decide about the gline reason */
       tmp = (char *)MyMalloc(sizeof(gline->gl_reason));
       reason = (char *)MyMalloc(sizeof(gline->gl_reason));
-      assert(tmp != 0);
-      assert(reason != 0);
-      /* decide about the gline reason */
+      assert(0 != tmp);
+      assert(0 != reason);
+
       if (feature_bool(FEAT_HIS_GLINE)) {
 	if (IsService(sptr) && strchr(gline->gl_reason, ' ') &&
 	    (gline->gl_reason[0] == '<') &&
@@ -307,6 +308,7 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       /* and get rid of him */
       if ((tval = exit_client_msg(cptr, acptr, &me, reason)))
         retval = tval; /* retain killed status */
+
       MyFree(tmp);
       MyFree(reason);
     }
