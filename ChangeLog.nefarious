@@ -3,6 +3,12 @@
 
 2004-08-13  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/s_user.c: Bug fix for DEFAULT_UMODE, dont know why i added the
+	clearhiddenhsot part in the first place. When +x was auto set and a user
+	logged in their hidden host wasnt being set. This fixes that.
+
+2004-08-13  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* patches/halfops.srvx2.diff: Removed a couple of uneeded debugging bits
 	i added while creating the patch. Small code fix also.
 
