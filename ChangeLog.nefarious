@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-11  Reed Loden  <reed@reedloden.com>
+
+	* include/patchlevel.h: Changed 0.3.0 to 0.4.0-dev so as not to
+	confuse people that can't see why the tarball is different from
+	CVS.
+
+	* ircd/Makefile.in: Ran "make depend".
+
+	* ircd/m_account.c: Added UserStats.authed incrementer
+	(moved from s_user.c).
+
+	* ircd/s_auth.c: Cleaned-up some whitespacing.
+
+	* ircd/s_user.c: Corrected a spelling typo and removed broken
+	UserStats.authed incrementer.
+
 2005-03-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/ircd_relay.c: If a stripped message (+S) is 0 in length

@@ -100,7 +100,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
 
   if (chptr->mode.mode & MODE_STRIP) {
     text = StripColour(text);
-    if (strlen(text) < 1) {
+    if (EmptyString(text)) {
       send_reply(sptr, ERR_NOTEXTTOSEND);
       return;
     }
@@ -158,7 +158,7 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
 
   if (chptr->mode.mode & MODE_STRIP) {
     text = StripColour(text);
-    if (strlen(text) < 1) {
+    if (EmptyString(text)) {
       send_reply(sptr, ERR_NOTEXTTOSEND);
       return;
     }

@@ -148,15 +148,18 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
     }
   }
 
-  /* If were using DNSBL, and we've processed the last reply, mark stuff done & cleanup */
-  if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)))
-  {
-    if(!IsDoingAuth(auth) && !IsDNSPending(auth)) {
+  /*
+   * If we're using DNSBL and we've processed the last reply,
+   * mark stuff as done and clean-up.
+   */
+  if (feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) {
+    if (!IsDoingAuth(auth) && !IsDNSPending(auth)) {
       ClearDNSBLPending(auth);
       if (IsUserPort(auth->client))
         sendheader(auth->client, REPORT_FIN_DNSBL);
-      Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]", cli_username(auth->client),
-           cli_sockhost(auth->client), cli_sock_ip(auth->client)));
+      Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]",
+	     cli_username(auth->client), cli_sockhost(auth->client),
+	     cli_sock_ip(auth->client)));
       release_auth_client(auth->client);
       unlink_auth_request(auth, &AuthIncompleteList);
       free_auth_request(auth);

@@ -88,6 +88,7 @@
 #include "ircd_string.h"
 #include "msg.h"
 #include "numnicks.h"
+#include "querycmds.h"
 #include "s_debug.h"
 #include "s_bsd.h"
 #include "s_user.h"
@@ -207,6 +208,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
       unhide_hostmask(acptr);
 
     ClearAccount(acptr);
+    --UserStats.authed;
 
     sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C U", acptr);
     return 0;
@@ -268,6 +270,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     hidden = HasHiddenHost(acptr);
     SetAccount(acptr);
     ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
+    ++UserStats.authed;
 
     /* Fake hosts have precedence over account-based hidden hosts,
        so, if the user was already hidden, don't do it again */

@@ -1584,7 +1584,7 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
     /* chop up ident and host.cc */
     if ((host = (strrchr(hostmask, '@')))) /* oper can specify ident@host.cc */
       *host++ = '\0';
-    else /* user can only specifiy host.cc [password] */
+    else /* user can only specify host.cc [password] */
       host = hostmask;
     /* Ignore the assignment if it changes nothing */
     if (HasSetHost(cptr) &&
@@ -2083,10 +2083,6 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     --UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))
     ++UserStats.inv_clients;
-  if (FlagHas(&setflags, FLAG_ACCOUNT) && !IsAccount(acptr))
-    --UserStats.authed;
-  if (!FlagHas(&setflags, FLAG_ACCOUNT) && IsAccount(acptr))
-    ++UserStats.authed;
   if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding) {
     if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
       if (do_host_hiding)
