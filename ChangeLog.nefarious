@@ -3,6 +3,19 @@
 
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Renamed OPLEVELS to OPERLEVELS.
+
+	* include/ircd_features.h: See above.
+
+	* ircd/client.c: See above + let global opers set wide glines
+	if enabled.
+
+	* ircd/m_oper.c: See above.
+
+	* ircd/s_user.c: See above.
+
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
 	* doc/example.conf: New F:lines added OPLEVELS, WHOIS_OPER,
 	WHOIS_ADMIN, and WHOIS_SERVICE.
 

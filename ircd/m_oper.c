@@ -211,7 +211,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
        * prevent someone from being both oper and local oper
        */
       ClearLocOp(sptr);
-      if (!feature_bool(FEAT_OPLEVELS) || !(aconf->port & OFLAG_ADMIN))
+      if (!feature_bool(FEAT_OPERLEVELS) || !(aconf->port & OFLAG_ADMIN))
       {        /* Global Oper  */
            SetOper(sptr);
            ClearAdmin(sptr);

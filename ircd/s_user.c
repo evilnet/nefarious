@@ -1803,7 +1803,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * Stop users making themselves operators too easily:
    */
   if (!IsServer(cptr)) {
-    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAnAdmin(sptr)) || !feature_bool(FEAT_OPLEVELS))
+    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAnAdmin(sptr)) || !feature_bool(FEAT_OPERLEVELS))
       ClearAdmin(sptr);
     if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
       ClearOper(acptr);

@@ -461,10 +461,10 @@ static struct FeatureDesc {
   F_I(DNSBL_EXEMPT_CLASS, 0, 0, 0),
   F_B(HIS_STATS_X, 0, 1, 0),
   F_B(ANNOUNCE_INVITES, 0, 1, 0),
-  F_B(OPLEVELS, 0, 0, 0),
+  F_B(OPERLEVELS, 0, 0, 0),
   F_S(WHOIS_OPER, 0, "is an IRC Operator", 0),
   F_S(WHOIS_ADMIN, 0, "is an IRC Administrator", 0),
-  F_S(WHOIS_SERVICE, 0, "is an Network Service", 0),
+  F_S(WHOIS_SERVICE, 0, "is a Network Service", 0),
 
 #undef F_S
 #undef F_B

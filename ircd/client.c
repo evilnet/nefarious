@@ -133,14 +133,13 @@ static struct {
   { PRIV_BADCHAN, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
 
   /* 
-   * if OPLEVELS is disabled then any priv below will be given to global
+   * if OPERLEVELS is disabled then any priv below will be given to global
    * opers (assuming the feature for the priv is enabled)
    */
   { PRIV_RESTART, FEAT_OPER_RESTART, FEATFLAG_ADMIN_OPERS },
   { PRIV_JUPE, FEAT_OPER_JUPE, FEATFLAG_ADMIN_OPERS },
   { PRIV_DIE, FEAT_OPER_DIE, FEATFLAG_ADMIN_OPERS },
   { PRIV_SET, FEAT_OPER_SET, FEATFLAG_ADMIN_OPERS },
-  { PRIV_WIDE_GLINE, FEAT_OPER_WIDE_GLINE, FEATFLAG_ADMIN_OPERS },
 
   { PRIV_PROPAGATE, FEAT_LAST_F, FEATFLAG_GLOBAL_OPERS },
   { PRIV_SEE_OPERS, FEAT_LAST_F, FEATFLAG_GLOBAL_OPERS },
@@ -157,6 +156,7 @@ static struct {
   { PRIV_BADCHAN, FEAT_OPER_BADCHAN, FEATFLAG_GLOBAL_OPERS },
   { PRIV_LOCAL_BADCHAN, FEAT_OPER_LBADCHAN, FEATFLAG_GLOBAL_OPERS },
   { PRIV_SEE_CHAN, FEAT_OPERS_SEE_IN_SECRET_CHANNELS, FEATFLAG_GLOBAL_OPERS },
+  { PRIV_WIDE_GLINE, FEAT_OPER_WIDE_GLINE, FEATFLAG_GLOBAL_OPERS },
 
   { PRIV_LOCAL_KILL, FEAT_LOCOP_KILL, FEATFLAG_LOCAL_OPERS },
   { PRIV_REHASH, FEAT_LOCOP_REHASH, FEATFLAG_LOCAL_OPERS },
@@ -230,7 +230,7 @@ client_set_privs(struct Client* client)
 	if (IsOper(client))
 	  PrivSet(&privs, feattab[i].priv);
       } else if (feattab[i].flag == FEATFLAG_ADMIN_OPERS) {
-        if (feature_bool(FEAT_OPLEVELS)) {
+        if (feature_bool(FEAT_OPERLEVELS)) {
           if (IsAnAdmin(client))
             PrivSet(&privs, feattab[i].priv);
         } else {
