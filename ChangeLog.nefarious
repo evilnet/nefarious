@@ -2,6 +2,9 @@
 
 	* Synced to current u2_10_11_05.
 
+	* include/ircd_features.h, ircd/ircd_features.c: Added HIS_GLINE
+	(default off).
+
 	* ircd/gline.c: Fixed bugs in syncing.
 
 	* ircd/s_user.c: Fixed gcc warning.
