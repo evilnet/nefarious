@@ -3,7 +3,7 @@
 	* include/ircd_string.h: Add an ircd_strrcmp() macro.
 
 	* ircd/gline.c: Tidy up clsk's fix and remove redundancy by
-	using refactoring.
+	using refactoring (plus fix it).
 	(thanks IK!)
 
 	* ircd/m_ircops.c: Completely hide any opers on servers ending
