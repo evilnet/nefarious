@@ -410,6 +410,8 @@ unsigned int deliver_it(struct Client *cptr, struct MsgQ *buf)
     break;
   case IO_FAILURE:
     cli_error(cptr) = errno;
+    /* If errno is 0:"Success" what does that mean exactly?
+     * SSL_get_error() might have more info for ssl clients..*/
     SetFlag(cptr, FLAG_DEADSOCKET);
     break;
   }
@@ -1091,6 +1093,12 @@ static void client_sock_callback(struct Event* ev)
     cli_error(cptr) = ev_data(ev);
     if (s_state(&(con_socket(con))) == SS_CONNECTING) {
       completed_connection(cptr);
+      /* From .12 patch:
+       * for some reason, the os_get_sockerr() in completed_connect()
+       * can return 0 even when ev_data(ev) indicates a real error, so
+       * re-assign the client error here.
+       */
+      cli_error(cptr) = ev_data(ev);
       break;
     }
     /*FALLTHROUGH*/

@@ -202,6 +202,9 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
   int k;
   struct iovec iov[IOV_MAX];
   IOResult retval = IO_BLOCKED;
+  int ssl_err = 0;
+  int openssl_err = 0;
+  char err_buff[120];
 
   assert(0 != socket);
   assert(0 != buf);
@@ -210,12 +213,14 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
 
   *count_in = 0;
   *count_out = 0;
-  errno = 0;
+  extern int errno;
+  int errno_sv;
 
   count = msgq_mapiov(buf, iov, IOV_MAX, count_in);
   for (k = 0; k < count; k++) {
     res = SSL_write(socket->ssl, iov[k].iov_base, iov[k].iov_len);
-    switch (SSL_get_error(socket->ssl, res)) {
+    ssl_err = SSL_get_error(socket->ssl, res);
+    switch (ssl_err) {
     case SSL_ERROR_NONE:
       *count_out += (unsigned) res;
       retval = IO_SUCCESS;
@@ -226,12 +231,18 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
       Debug((DEBUG_DEBUG, "SSL_write returned WANT_ - retrying"));
       return retval;
     case SSL_ERROR_SYSCALL:
-      Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SYSCALL res=%d errno=%d retval=%d", res, errno, retval));
-      return (res < 0 && errno == EINTR) ? retval : IO_FAILURE;
+      errno_sv = errno; /* Debug may use lib calls that tank errno */
+      Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SYSCALL res=%d errno=%d retval=%d", res, errno_sv, retval));
+      openssl_err = ERR_get_error();
+      Debug((DEBUG_DEBUG, "ERR_get_error() returned %d: %s", openssl_err, 
+                                 ERR_error_string(openssl_err, err_buff)));
+      
+      return (res < 0 && errno_sv == EINTR) ? retval : IO_FAILURE;
     case SSL_ERROR_ZERO_RETURN:
       SSL_shutdown(socket->ssl);
       return IO_FAILURE;
     default:
+      Debug((DEBUG_DEBUG, "SSL_write returned an unhandled error, we are assuming failure: %d", ssl_err));
       return IO_FAILURE;
     }
   }
