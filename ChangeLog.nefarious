@@ -3,7 +3,19 @@
 
 2005-12-20  Neil Spierling <sirvulcan@gmail.com>
 
-	* include/example.conf: Added new feature DNSBL_LOC. If enabled
+	* doc/example.conf: Dropped DNSBL_LOC, merged with DNSBL_LOC_EXEMPT.
+
+	* include/ircd_features.h: Same as above.
+
+	* ircd/ircd_features.c: Same as above.
+
+	* ircd/s_user.c: Same as above. Also fixed a small issue with
+	users still being prompoted for their authserv details after
+	they successfully auth with LOC.
+
+2005-12-20  Neil Spierling <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added new feature DNSBL_LOC. If enabled
 	along with LOGIN_ON_CONNECT, anyone matching on a DNSBL will be
 	given a chance to bypass being rejected by logging into the
 	services via login on connect. Im tempted to combine this with

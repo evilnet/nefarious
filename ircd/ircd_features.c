@@ -457,7 +457,6 @@ static struct FeatureDesc {
   F_S(DIEPASS, FEAT_NULL | FEAT_CASE | FEAT_NODISP | FEAT_READ, 0, 0),
   F_B(DNSBL_CHECKS, 0, 0, 0),
   F_I(DNSBL_EXEMPT_CLASS, 0, 0, 0),
-  F_B(DNSBL_LOC, 0, 0, 0),
   F_B(HIS_STATS_X, 0, 1, 0),
   F_B(ANNOUNCE_INVITES, 0, 0, 0),
   F_B(OPERFLAGS, 0, 0, 0),

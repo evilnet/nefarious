@@ -609,7 +609,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 	loc_exempt = 0;
 	class_exempt = 0;
       } else
-        if (feature_bool(FEAT_DNSBL_LOC)) {
+        if (feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) {
           sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr,
                                  format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
                                                   cli_user(sptr)->realhost, user->username,
@@ -621,9 +621,10 @@ int register_user(struct Client *cptr, struct Client *sptr,
           MyFree(cli_loc(sptr));
           return 0;
         } else
-          return exit_client_msg(sptr, cptr, &me, "%s",
-  			         format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-				  		  cli_user(sptr)->realhost, user->username,
+          if ((feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) || !feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+            return exit_client_msg(sptr, cptr, &me, "%s",
+    			         format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+ 				  		  cli_user(sptr)->realhost, user->username,
 						  cli_name(sptr), cli_dnsblformat(sptr))
 						  );
     }
