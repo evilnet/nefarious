@@ -76,19 +76,20 @@ static struct {
   const char*  message;
   unsigned int length;
 } HeaderMessages [] = {
-  /* 123456789012345678901234567890123456789012345678901234567890 */
-  { "NOTICE AUTH :*** Looking up your hostname\r\n",       43 },
-  { "NOTICE AUTH :*** Found your hostname\r\n",            38 },
-  { "NOTICE AUTH :*** Found your hostname, cached\r\n",    46 },
-  { "NOTICE AUTH :*** Couldn't look up your hostname\r\n", 49 },
-  { "NOTICE AUTH :*** Checking Ident\r\n",                 33 },
-  { "NOTICE AUTH :*** Got ident response\r\n",             37 },
-  { "NOTICE AUTH :*** No ident response\r\n",              36 },
-  { "NOTICE AUTH :*** Your forward and reverse DNS do not match, " \
-    "ignoring hostname.\r\n",                              80 },
-  { "NOTICE AUTH :*** Invalid hostname\r\n",               35 },
-  { "NOTICE AUTH :*** Checking your IP against DNS ban " \
-    "lists\r\n",                                           57 },
+#define MSG(STR) { STR, sizeof(STR) - 1 }
+  MSG("NOTICE AUTH :*** Looking up your hostname\r\n"),
+  MSG("NOTICE AUTH :*** Found your hostname\r\n"),
+  MSG("NOTICE AUTH :*** Found your hostname, cached\r\n"),
+  MSG("NOTICE AUTH :*** Couldn't look up your hostname\r\n"),
+  MSG("NOTICE AUTH :*** Checking Ident\r\n"),
+  MSG("NOTICE AUTH :*** Got ident response\r\n"),
+  MSG("NOTICE AUTH :*** No ident response\r\n"),
+  MSG("NOTICE AUTH :*** Your forward and reverse DNS do not match, "
+    "ignoring hostname.\r\n"),
+  MSG("NOTICE AUTH :*** Invalid hostname\r\n"),
+  MSG("NOTICE AUTH :*** Checking your IP against DNS ban lists\r\n"),
+  MSG("NOTICE AUTH :*** DNS ban list checks complete, results pending\r\n")
+#undef MSG
 };
 
 typedef enum {
@@ -101,7 +102,8 @@ typedef enum {
   REPORT_FAIL_ID,
   REPORT_IP_MISMATCH,
   REPORT_INVAL_DNS,
-  REPORT_DO_DNSBL
+  REPORT_DO_DNSBL,
+  REPORT_FIN_DNSBL
 } ReportType;
 
 #ifdef USE_SSL
@@ -132,6 +134,8 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
    * to delete anyways. --Bleep
    */
 
+  --cli_dnsblcount(auth->client);
+
   if (reply) {
     const struct hostent* hp = reply->hp;
     int i;
@@ -139,7 +143,6 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
     assert(0 != hp);
 
     for (i = 0; hp->h_addr_list[i]; ++i) {
-      --cli_dnsblcount(auth->client);
       if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name)) {
         /* rah */
       }
@@ -148,13 +151,19 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
 
   if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && !IsDoingAuth(auth)) {
     ClearDNSBLPending(auth);
+    if (IsUserPort(auth->client))
+      sendheader(auth->client, REPORT_FIN_DNSBL);
     Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]", cli_username(auth->client),
          cli_sockhost(auth->client), cli_sock_ip(auth->client)));
     release_auth_client(auth->client);
     unlink_auth_request(auth, &AuthIncompleteList);
     free_auth_request(auth);
-  } else if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && IsDoingAuth(auth))
+  } else if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && IsDoingAuth(auth)) {
+    if (IsUserPort(auth->client))
+      sendheader(auth->client, REPORT_FIN_DNSBL);
     ClearDNSBLPending(auth);
+  }
+
 
   return;
 }
@@ -194,8 +203,8 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
       Debug((DEBUG_DEBUG, "DNSBL entry for %p was cached (%s %s)", auth->client,  
             cli_dnsbl_reply(client)->hp->h_name, hname));
       ++(cli_dnsbl_reply(client))->ref_count;
+      --cli_dnsblcount(auth->client);
       for (i = 0; cli_dnsbl_reply(client)->hp->h_addr_list[i]; ++i) {
-        --cli_dnsblcount(auth->client);
         if (!find_blline(auth->client, ircd_ntoa((char*)cli_dnsbl_reply(client)->hp->h_addr_list[i]), hname)) {
           /* rah */
         }
@@ -203,8 +212,11 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
     }
   }
 
-  if (cli_dnsblcount(auth->client) == 0)
+  if (cli_dnsblcount(auth->client) == 0) {
+    if (IsUserPort(auth->client))
+      sendheader(client, REPORT_FIN_DNSBL);
     ClearDNSBLPending(auth);
+  }
 
   return 0;
 }

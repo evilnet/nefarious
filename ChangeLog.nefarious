@@ -3,6 +3,13 @@
 
 2005-02-24  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/s_auth.c: Dont decrement in the loop where we check for
+		 	   multiple ips in the reply, do it before.
+			 Implemented .12's header code.. much simpler.
+			 Also added another reply for dnsbls.
+
+2005-02-24  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/s_auth.c: Check every dnsbl.
 
 	* ircd/s_conf.c: If the client has already been marked return 1.
