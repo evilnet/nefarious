@@ -514,12 +514,13 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   ++ServerStats->is_kill;
   SetFlag(acptr, FLAG_KILLED);
+
+  if (lastnick == cli_lastnick(acptr)) 
+    samelastnick = 1;
+
   /*
    * This exits the client we had before getting the NICK message
    */
-  if (lastnick == cli_lastnick(acptr)) 
-    samelastnick=1; 
-
   if (differ) {
     sendcmdto_serv_butone(&me, CMD_KILL, NULL, "%C :%s (older nick "
 			  "overruled)", acptr, cli_name(&me));

@@ -4,6 +4,13 @@
 	nick change before cli_name(sptr) is overwritten with
 	the new nick. (requested by royalsexy)
 
+	* Sync with u2.10.11.05.
+
+	* Fix a silly bug in the old version of IRCOPS. New version
+	coming soon (as soon as clsk finishes with his bug fixes).
+
+	* Added MODE_NONOTICE (Yet Another QuakeNet Mode[tm]).
+
 2003-09-27  Reed Loden  <reed@reedloden.com>
 
 	* Got rid of a lot of the HEAD_IN_SAND stuff.

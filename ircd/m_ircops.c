@@ -59,7 +59,7 @@
  */
 int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
   struct Client *acptr;
-  struct User *user;
+  struct User *user = cli_user(sptr);
   char buf[BUFSIZE];
   int ircops = 0;
 

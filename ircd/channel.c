@@ -745,6 +745,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'C';
   if (chptr->mode.mode & MODE_ACCONLY)
     *mbuf++ = 'M';
+  if (chptr->mode.mode & MODE_NONOTICE)
+    *mbuf++ = 'N';
   if (chptr->mode.mode & MODE_OPERONLY)
     *mbuf++ = 'O';
   if (chptr->mode.mode & MODE_NOQUITPARTS)
@@ -1410,6 +1412,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
+    MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'S',
@@ -1773,8 +1776,8 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
 
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
-	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_OPERONLY |
-	   MODE_NOQUITPARTS | MODE_SSLONLY);
+	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
+	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1881,6 +1884,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
+    MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'S',
@@ -2553,6 +2557,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
+    MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'S',
