@@ -1752,6 +1752,13 @@ int m_dns(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   int     i;
   struct hostent* hp;
 
+  if (parv[1] && *parv[1] == 'r') {
+    log_write(LS_SYSTEM, L_INFO, 0, "Resolver: restarting resolver.");
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Resolver: restarting resolver.", sptr);
+    restart_resolver();                                               
+    return 0;
+  }
+
   if (parv[1] && *parv[1] == 'l') {
     for(cp = cacheTop; cp; cp = cp->list_next) {
       hp = &cp->he.h;

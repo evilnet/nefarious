@@ -1,3 +1,9 @@
+2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+
+	* ircd/res.c: Send out a notice for a resolver restart.
+
+	* ircd/s_user.c: Restart the resolver upon a rehash, patch from Fredrik Söderblom (froo).
+
 2004-06-18  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/m_account.c: Fixed small issue.
