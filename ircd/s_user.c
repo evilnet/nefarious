@@ -649,6 +649,16 @@ int register_user(struct Client *cptr, struct Client *sptr,
       if (IsDNSBLMarked(sptr)) {
         ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
         strcat(flagbuf, "m");
+
+        if (feature_bool(FEAT_FAKEHOST) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST)) {
+          SetFakeHost(sptr);
+          SetHiddenHost(sptr);
+          ircd_snprintf(0, cli_user(sptr)->fakehost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));  
+          hide_hostmask(sptr);
+  
+          sendcmdto_serv_butone(sptr, CMD_FAKEHOST, cptr, "%C %s", sptr,
+                                cli_user(sptr)->fakehost);
+        }
       }
 
       strcat(flagbuf, "a");

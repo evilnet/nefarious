@@ -3,6 +3,25 @@
 
 2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
 
+	* doc/example.conf: Added new feature DNSBL_MARK_FAKEHOST. Default
+	TRUE. When true a client who has been marked will get their dnsbl
+	host placed in their fakehost.
+
+	* include/ircd_features.h: Added FEAT_DNSBL_MARK_FAKEHOST.
+
+	* ircd/ircd_features.c: Added DNSBL_MARK_FAKEHOST.
+
+	* ircd/m_account.c: If a client is marked, if they have a fakehost
+	set, if their fakehost matches their dnsbl host, and if
+	DNSBL_MARK_FAKEHOST is enabled then ClearFakeHost when a valid
+	account is set. Clients can then use normal host hiding. They
+	can still be banned via dnsblname.host.com in channels.
+
+	* ircd/s_user.c: Set the dnsblhost to the fakehost and enable
+	it and hide the user if DNSBL_MARK_FAKEHOST is TRUE/
+
+2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
+
         * ircd/m_exempt.c: If we are recieving new exemptions during a
 	netburst then dont spit out notices over adding.. this could
 	cause a large flood. (nb = netburst, nm = normal).

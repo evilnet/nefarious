@@ -257,6 +257,10 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	     "timestamp %Tu", parv[3], cli_user(acptr)->acc_create));
     }
 
+    if (HasFakeHost(acptr) && !ircd_strcmp(cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost) &&
+        IsDNSBLMarked(acptr) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST))
+      ClearFakeHost(acptr);
+
     hidden = HasHiddenHost(acptr);
     SetAccount(acptr);
     ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
