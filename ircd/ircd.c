@@ -181,9 +181,8 @@ static void outofmemory(void) {
  * write_pidfile
  *--------------------------------------------------------------------------*/
 static void write_pidfile(void) {
-#ifndef NOPIDFILE
   char buff[20];
-  if (thisServer.pid_fd >= 0) {
+  if ((thisServer.pid_fd >= 0) && (!feature_bool(FEAT_EVILNET))) {
     memset(buff, 0, sizeof(buff));
     sprintf(buff, "%5d\n", (int)getpid());
     if (write(thisServer.pid_fd, buff, strlen(buff)) == -1)
@@ -193,7 +192,6 @@ static void write_pidfile(void) {
   }
   Debug((DEBUG_NOTICE, "Error opening pid file %s: %m",
 	 feature_str(FEAT_PPATH)));
-#endif
 }
 
 /* check_pid
@@ -207,7 +205,6 @@ static void write_pidfile(void) {
  */
 static int check_pid(void)
 {
-#ifndef NOPIDFILE
   struct flock lock;
 
   lock.l_type = F_WRLCK;
@@ -215,10 +212,9 @@ static int check_pid(void)
   lock.l_whence = SEEK_SET;
   lock.l_len = 0;
 
-  if ((thisServer.pid_fd = open(feature_str(FEAT_PPATH), O_CREAT | O_RDWR,
-				0600)) >= 0)
+  if (((thisServer.pid_fd = open(feature_str(FEAT_PPATH),
+	O_CREAT | O_RDWR, 0600)) >= 0) && (!feature_bool(FEAT_EVILNET)))
     return fcntl(thisServer.pid_fd, F_SETLK, &lock);
-#endif
   return 0;
 }
   
