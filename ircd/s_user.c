@@ -1729,7 +1729,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           if (MyConnect(acptr)) {
             tmpmask = cli_snomask(acptr) & ~SNO_OPER;
             cli_handler(acptr) = CLIENT_HANDLER;
-            cli_oflags(acptr) = NULL;
+            cli_oflags(acptr) = 0;
           }
         }
         break;
