@@ -609,11 +609,23 @@ int register_user(struct Client *cptr, struct Client *sptr,
 	loc_exempt = 0;
 	class_exempt = 0;
       } else
-        return exit_client_msg(sptr, cptr, &me, "%s",
-			       format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-						cli_user(sptr)->realhost, user->username,
-						cli_name(sptr), cli_dnsblformat(sptr))
-						);
+        if (feature_bool(FEAT_DNSBL_LOC)) {
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr,
+                                 format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+                                                  cli_user(sptr)->realhost, user->username,
+                                                  cli_name(sptr), cli_dnsblformat(sptr))
+                                                  );
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :If you have an account with %s services then you can bypass the dnsbl ban by logging in like this: (where Account is your account name and Password is your password.",
+                        sptr, feature_str(FEAT_NETWORK));
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Type \002/QUOTE PASS AuthServ Account :Password\002 to connect", sptr);
+          MyFree(cli_loc(sptr));
+          return 0;
+        } else
+          return exit_client_msg(sptr, cptr, &me, "%s",
+  			         format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+				  		  cli_user(sptr)->realhost, user->username,
+						  cli_name(sptr), cli_dnsblformat(sptr))
+						  );
     }
   }
 

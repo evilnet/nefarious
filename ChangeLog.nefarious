@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-12-20  Neil Spierling <sirvulcan@gmail.com>
+
+	* include/example.conf: Added new feature DNSBL_LOC. If enabled
+	along with LOGIN_ON_CONNECT, anyone matching on a DNSBL will be
+	given a chance to bypass being rejected by logging into the
+	services via login on connect. Im tempted to combine this with
+	DNSBL_LOC_EXEMPT.
+
+	* include/ircd_features.h: Added FEAT_DNSBL_LOC.
+
+	* ircd/ircd_features.c: Added DNSBL_LOC, default FALSE.
+
+	* ircd/s_user.c: Added code for DNSBL_LOC. See example.conf
+	entry above for what it does. The notice will be F:Lined
+	later most likely.
+
 2004-12-16  Reed Loden  <reed@reedloden.com>
 
 	* include/channel.h: Removed the MyConnect() restraint from 
