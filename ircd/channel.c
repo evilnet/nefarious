@@ -2805,12 +2805,12 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
     if (!(flags & CHFL_ZOMBIE))
       sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL,
 				       ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
-					|| !jbuf->jb_comment) ?
+					|| !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && IsColor(jbuf->jb_comment))) ?
 				       "%H" : "%H :%s", chan, jbuf->jb_comment);
     else if (MyUser(jbuf->jb_source))
       sendcmdto_one(jbuf->jb_source, CMD_PART, jbuf->jb_source,
 		    ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
-		     || !jbuf->jb_comment) ?
+		     || !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && IsColor(jbuf->jb_comment))) ?
 		    "%H" : "%H :%s", chan, jbuf->jb_comment);
     /* XXX: Shouldn't we send a PART here anyway? */
     /* to users on the channel?  Why?  From their POV, the user isn't on
@@ -2918,11 +2918,13 @@ int IsInvited(struct Client* cptr, struct Channel* chptr)
   return 0;
 }
 
-int IsColorChannel(char *name)
+int IsColor(char *text)
 {
 	int j, found = 0;
 
-	for (j = 0; name[j]; j++) if (IsCntrl(name[j])) found++;
+	if (!text) return 0;
+
+	for (j = 0; text[j]; j++) if (IsCntrl(text[j])) found++;
 
 	if (found) return 1;
 	return 0;

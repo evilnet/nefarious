@@ -89,7 +89,7 @@ int ms_sajoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   clean_channelname(name);
 
   /* bad channel name */
-  if ((!IsChannelName(name)) || (IsColorChannel(name))) {
+  if ((!IsChannelName(name)) || (IsColor(name))) {
     return 0;
   }
 

@@ -59,8 +59,9 @@
  */
 int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
   struct Client *acptr;
+  struct User *user;
   char buf[BUFSIZE];
-  int locals = 0, globals = 0;
+  int ircops = 0;
 
   if (!MyUser(sptr))
   return 0;
@@ -68,29 +69,28 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
 
   strcpy(buf, "==========================================================================");
   send_reply(sptr, RPL_IRCOPS, buf);
-  strcpy(buf, "\2Nick                            Status            Server\2");
+  strcpy(buf, "\002Nick                            Idle              Server\002");
   send_reply(sptr, RPL_IRCOPS, buf);
   strcpy(buf, "--------------------------------------------------------------------------");
   send_reply(sptr, RPL_IRCOPS, buf);
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
-        if (!IsChannelService(acptr) && IsAnOper(acptr))
+        if (!IsChannelService(acptr) && IsOper(acptr))
         {
           if (!acptr->cli_user) continue;
-          ircd_snprintf(0, buf, sizeof(buf), "\2%-30s\2  %s  %-8s  %s",
+          ircd_snprintf(0, buf, sizeof(buf), "\002%-30s\002  %d  %-8s  %s",
 			acptr->cli_name ? acptr->cli_name : "<Desconhecido>",
-			IsOper(acptr) ? "Global" : "Local",
+			CurrentTime - user->last,
 			acptr->cli_user->away ? "(AWAY)" : "",
 			cli_name(acptr->cli_user->server));
           send_reply(sptr, RPL_IRCOPS, buf);
           send_reply(sptr, RPL_IRCOPS, "-");
-          if (IsOper(acptr)) globals++;
-          else locals++;
+          ircops++;
         }
   }
-  ircd_snprintf(0, buf, sizeof(buf), "Total: \2%d\2 IRCop%s connected - \2%d\2 Globa%s, \2%d\2 Loca%s", globals+locals,
-                        (globals+locals) > 1 ? "s" : "", globals, globals > 1 ? "ls" : "l", locals, 
-                         locals > 1 ? "ls" : "l");  send_reply(sptr, RPL_IRCOPS, buf);  
+  ircd_snprintf(0, buf, sizeof(buf), "Total: \002%d\002 IRCop%s connected",
+		ircops, (ircops) > 1 ? "s" : "");
+  send_reply(sptr, RPL_IRCOPS, buf);  
   strcpy(buf, "==========================================================================");
   send_reply(sptr, RPL_IRCOPS, buf);
   send_reply(sptr, RPL_ENDOFIRCOPS, buf);

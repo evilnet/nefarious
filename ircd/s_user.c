@@ -433,7 +433,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         && !(HasSetHost(sptr))); /* No tilde for S-lined users. */
 
     /* Have to set up "realusername" before doing the gline check below */
-    ircd_strncpy(user->realusername, username, USERLEN);
+    ircd_strncpy(user->realusername, user->username, USERLEN);
 
     if ((user->username[0] == '\0')
         || ((user->username[0] == '~') && (user->username[1] == '\000')))
@@ -1318,6 +1318,8 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
    * and set the modes, if any
    */
   for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
+    if (IsZombie(chan)) 
+      continue;
     sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr,
       "%H", chan->channel);
     if (IsChanOp(chan) && HasVoice(chan)) {

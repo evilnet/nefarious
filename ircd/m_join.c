@@ -194,19 +194,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       continue;
 
     /* bad channel name */
-    if ((!IsChannelName(name)) || (IsColorChannel(name))) {
-      send_reply(sptr, ERR_NOSUCHCHANNEL, name);
-      continue;
-    }
-
-    /* This checks if the channel contains control codes and rejects em
-     * until they are gone, then we will do it otherwise - *SOB Mode*
-     */
-    for (k = 0, j = 0; name[j]; j++)
-      if (IsCntrl(name[j]))
-	k++;
-
-    if ( k > 0 ) {
+    if ((!IsChannelName(name)) || (IsColor(name))) {
       send_reply(sptr, ERR_NOSUCHCHANNEL, name);
       continue;
     }

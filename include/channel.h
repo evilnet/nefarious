@@ -295,7 +295,7 @@ extern int             LocalChanOperMode;
 /*
  * Proto types
  */
-int IsColorChannel(char *name);
+int IsColor(char *text);
 
 extern void clean_channelname(char* name);
 extern void channel_modes(struct Client *cptr, char *mbuf, char *pbuf,

@@ -1,3 +1,14 @@
+2003-09-27  Reed Loden  <reed@reedloden.com>
+
+	* Got rid of a lot of the HEAD_IN_SAND stuff.
+
+	* Changed IsColorChannel to IsColor and added a check for
+	colors in quit/part msgs when MODE_NOCOLOUR is on. -wasted
+
+	* Reverted map and links back to original.
+
+	* IRCOPS now only shows globals and idle time has been added.
+
 2003-09-05  Reed Loden  <reed@reedloden.com>
 
 	* Added a lot and fixed a ton. I'll finish this ChangeLog entry
