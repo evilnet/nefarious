@@ -99,6 +99,8 @@ struct Client;
 #define MODE_SAVE		0x400000 /* save this mode-with-arg 'til later */
 #define MODE_FREE		0x800000 /* string needs to be passed to MyFree() */
 #define MODE_BURSTADDED		0x1000000 /* channel was created by a BURST */
+#define MODE_NOLISTMODES        0x2000000 /* channel modes hidden in LIST output */
+
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */

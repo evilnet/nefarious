@@ -64,7 +64,7 @@
 			"(ov)@+", "b,k,l,imnpstrcCMNOQSTz", "rfc1459", \
 			feature_str(FEAT_NETWORK)
 
-#define infochanmodes "biklmnopstvrcCMNOQSTz"
+#define infochanmodes "biklmnopstvrcCMNOQSTzL"
 #define infochanmodeswithparams "bklov"
 #define infousermodes "dioswkgxhBRXInf"
 

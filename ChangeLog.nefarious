@@ -1,5 +1,19 @@
 2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
 
+	* include/channel.h: Added MODE_NOLISTMODES (+L).
+
+	* include/supported.h: Added new mode into the string of channel modes.
+
+	* ircd/channel.c: Added fluff for the new mode.
+			  If the user doing the /list is not an oper and the channel
+			   currently being processed has +L set then the modes will
+			   not be displayed beside the topic.
+			  Feature idea/request from Bell (AfterNet).
+
+	* ircd/m_clearmode.c: Added fluff for MODE_NOLISTMODES.
+
+2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/res.c: Send out a notice for a resolver restart.
 
 	* ircd/s_user.c: Restart the resolver upon a rehash, patch from Fredrik Söderblom (froo).

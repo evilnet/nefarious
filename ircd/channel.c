@@ -774,6 +774,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'z';
   if (chptr->mode.mode & MODE_NOAMSG)
     *mbuf++ = 'T';
+  if (chptr->mode.mode & MODE_NOLISTMODES)
+    *mbuf++ = 'L';
   if (chptr->mode.limit) {
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
@@ -1271,15 +1273,17 @@ void list_next_channels(struct Client *cptr, int nr)
       {
         if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr)) {
 	  modebuf[0] = parabuf[0] = modestuff[0] = 0;
-	  channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
-	  if (modebuf[1] != '\0') {
-	    strcat(modestuff, "[");
-	    strcat(modestuff, modebuf);
-	    if (parabuf[0]) {
-	      strcat(modestuff, " ");
-	      strcat(modestuff, parabuf);
+	  if (!(chptr->mode.mode & MODE_NOLISTMODES) || (IsOper(cptr))) {
+	    channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
+	    if (modebuf[1] != '\0') {
+	      strcat(modestuff, "[");
+	      strcat(modestuff, modebuf);
+	      if (parabuf[0]) {
+	        strcat(modestuff, " ");
+	        strcat(modestuff, parabuf);
+	      }
+	      strcat(modestuff, "] ");
 	    }
-	    strcat(modestuff, "] ");
 	  }
 	  strcat(modestuff, chptr->topic);
 	  send_reply(cptr, RPL_LIST, chptr->chname, chptr->users,
@@ -1455,6 +1459,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'z',
     MODE_NOAMSG,	'T',
+    MODE_NOLISTMODES,	'L',
     0x0, 0x0
   };
   int i;
@@ -1817,7 +1822,7 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
 	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
 	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
-	   MODE_STRIP | MODE_NOAMSG);
+	   MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1930,6 +1935,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'z',
     MODE_NOAMSG,	'T',
+    MODE_NOLISTMODES,	'L',
     0x0, 0x0
   };
   unsigned int add;
@@ -2623,6 +2629,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'z',
     MODE_NOAMSG,	'T',
+    MODE_NOLISTMODES,	'L',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0
