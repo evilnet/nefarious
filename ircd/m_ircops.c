@@ -24,7 +24,6 @@
  */
 
 #include "channel.h"
-#include "config.h"
 #include "client.h"
 #include "handlers.h"
 #include "hash.h"
@@ -36,16 +35,14 @@
 #include "ircd_string.h"
 #include "ircd_snprintf.h"
 #include "list.h"
+#include "match.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
-#include "querycmds.h"
 #include "send.h"
 #include "s_conf.h"
 #include "s_user.h"
 #include "s_debug.h"
-#include "userload.h"
-#include "patchlevel.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -59,41 +56,67 @@
  */
 int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
   struct Client *acptr;
-  struct User *user = cli_user(sptr);
+  struct Client *server = 0;
   char buf[BUFSIZE];
   int ircops = 0;
 
   if (!MyUser(sptr))
   return 0;
 
+  /*
+   * If user is only looking for opers on a specific server, we need 
+   * to find that server.
+   */
+  if (parc > 1)
+  {
+    if (!string_has_wildcards(parv[1]))
+    {
+      server = FindServer(parv[1]);
+    }
+    else
+    {
+      for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
+      {        
+        if (FindServer(acptr->cli_name) != 0 && match(parv[1], acptr->cli_name) == 0)
+        { 
+          server = acptr;
+          break;
+        }
+      }
+    }
+    if (!server)
+      return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
+  }   
 
-  strcpy(buf, "==========================================================================");
-  send_reply(sptr, RPL_IRCOPS, buf);
-  strcpy(buf, "\002Nick                            Idle              Server\002");
-  send_reply(sptr, RPL_IRCOPS, buf);
-  strcpy(buf, "--------------------------------------------------------------------------");
-  send_reply(sptr, RPL_IRCOPS, buf);
+  if (parc > 1)
+    strcpy(buf, "%s IRC Operators:", cli_name(server));
+  else
+    strcpy(buf, "%s IRC Operators:", feature_str(FEAT_NETWORK));
+
+  send_reply(sptr, RPL_IRCOPSHEADER, buf);
+
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
-        if (!IsChannelService(acptr) && IsOper(acptr))
-        {
-          if (!acptr->cli_user) continue;
-          ircd_snprintf(0, buf, sizeof(buf), "\002%-30s\002  %d  %-8s  %s",
-			acptr->cli_name ? acptr->cli_name : "<Desconhecido>",
-			CurrentTime - user->last,
-			acptr->cli_user->away ? "(AWAY)" : "",
-			cli_name(acptr->cli_user->server));
-          send_reply(sptr, RPL_IRCOPS, buf);
-          send_reply(sptr, RPL_IRCOPS, "-");
-          ircops++;
-        }
+    if (acptr->cli_user && !IsChannelService(acptr) && IsOper(acptr))
+    {
+      if ((parc > 1) && (ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)) == 0))
+	ircd_snprintf(0, buf, sizeof(buf), "%s%s (%s)  Idle: %d",
+			acptr->cli_name ? acptr->cli_name : "<Unknown>",
+			acptr->cli_user->away ? " (AWAY)" : "",
+			cli_name(acptr->cli_user->server),
+			CurrentTime - acptr->cli_user->last);
+      else
+	ircd_snprintf(0, buf, sizeof(buf), "%s%s  Idle: %d",
+			acptr->cli_name ? acptr->cli_name : "<Unknown>",
+			acptr->cli_user->away ? " (AWAY)" : "",
+			CurrentTime - acptr->cli_user->last):
+      send_reply(sptr, RPL_IRCOPS, buf);
+      ircops++;
+    }
   }
-  ircd_snprintf(0, buf, sizeof(buf), "Total: \002%d\002 IRCop%s connected",
-		ircops, (ircops) > 1 ? "s" : "");
-  send_reply(sptr, RPL_IRCOPS, buf);  
-  strcpy(buf, "==========================================================================");
-  send_reply(sptr, RPL_IRCOPS, buf);
+
+  ircd_snprintf(0, buf, sizeof(buf), "Total: %d IRCop%s connected",
+		ircops, (ircops != 1) ? "s" : "");
   send_reply(sptr, RPL_ENDOFIRCOPS, buf);
   return 0;
-
 }

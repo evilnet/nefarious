@@ -804,11 +804,11 @@ static Numeric replyTable[] = {
 /* 385 */
   { RPL_NOTOPERANYMORE, 0, "385" }, /* not used */
 /* 386 */
-  { RPL_IRCOPS, ":%s", "386" },
+  { RPL_IRCOPSHEADER, ":%s", "386" },
 /* 387 */
-  { RPL_ENDOFIRCOPS, ":End of /IRCOPS list.", "387" },
+  { RPL_IRCOPS, ":%s", "387" },
 /* 388 */
-  { 0 },
+  { RPL_ENDOFIRCOPS, ":End of /IRCOPS list.", "388" },
 /* 389 */
   { 0 },
 /* 390 */

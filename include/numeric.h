@@ -298,8 +298,9 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_YOURSERVICE	     383	   Numeric List: various */
 #define RPL_MYPORTIS         384	/* not used */
 #define RPL_NOTOPERANYMORE   385        /* Extension to RFC1459, not used */
-#define RPL_IRCOPS           386
-#define RPL_ENDOFIRCOPS      387
+#define RPL_IRCOPSHEADER     386	/* evilnet extension */
+#define RPL_IRCOPS           387	/* evilnet extension */
+#define RPL_ENDOFIRCOPS      388	/* evilnet extension */
 /*	RPL_QLIST	     386	unreal */
 /*	RPL_ENDOFQLIST	     387	unreal */
 /*	RPL_ALIST	     388	unreal */

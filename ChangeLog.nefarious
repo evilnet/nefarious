@@ -11,6 +11,9 @@
 
 	* Added MODE_NONOTICE (Yet Another QuakeNet Mode[tm]).
 
+	* Completely new IRCOPS version made mostly by clsk and
+	modified a bit by myself.
+
 2003-09-27  Reed Loden  <reed@reedloden.com>
 
 	* Got rid of a lot of the HEAD_IN_SAND stuff.
