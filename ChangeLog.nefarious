@@ -1,5 +1,21 @@
 2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
 
+	* configure.in: Added a macro to for kerberos includes. Should fix SSL errors.
+	configure will be regenerated and committed in 5 mins on another box.
+
+	* include/ssl.h: Cleaned up a bit and added in declerations for some new
+	functions.
+
+	* ircd/IPcheck.c: SSL Clean up.
+
+	* ircd/s_user.c: Notice a connecting user with SSL what cipher they are
+	connected via.
+
+	* ircd/ssl.c: Added functions used for fetching ciphers for a client who
+	is connected via SSL.
+
+2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/handlers.h: Add copyright function declerations.
 
 	* include/msg.h Add COPYRIGHT fluff.

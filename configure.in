@@ -414,6 +414,13 @@ if test x"$unet_cv_enable_ssl" = xyes; then
   AC_DEFINE_UNQUOTED(SSL_LIBS_PATH, "$unet_cv_with_openssl_prefix",
   [Path name used as a base for the ssl lib files.])
 
+  AC_MSG_CHECKING([for Kerberos includes])
+  AC_ARG_WITH(kerberos-includes,
+  [  --with-kerb-includes    Specify location of Kerberos includes (default /usr/kerberos/include)],
+  [unet_cv_with_kerberos_prefix=$withval],
+  [unet_cv_with_kerberos_prefix=/usr/kerberos/include])
+  AC_MSG_RESULT([$unet_cv_with_kerberos_prefix])
+
   save_CFLAGS=$CFLAGS;
   CFLAGS="-lcrypto";
 
@@ -435,7 +442,7 @@ if test x"$unet_cv_enable_ssl" = xyes; then
     AC_DEFINE([USE_SSL], , [Define if you are using OpenSSL])
 
     LIBS="$LIBS -L$unet_cv_with_openssl_prefix $OPENSSL_LDFLAGS"
-    CFLAGS="$CFLAGS -I$unet_cv_with_openssl_inc_prefix"
+    CFLAGS="$CFLAGS -I$unet_cv_with_openssl_inc_prefix -I$unet_cv_with_kerberos_prefix"
   fi
 fi
 

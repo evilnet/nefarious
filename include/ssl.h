@@ -22,22 +22,36 @@
  */
    
 #include "ircd_osdep.h"
+#include "config.h"
+
+#ifdef USE_SSL
 
 #include <openssl/crypto.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
+#ifndef IOV_MAX
+#define IOV_MAX 1024
+#endif /* IOV_MAX */
+
 struct Socket;
 struct Listener;
+
+char *my_itoa(int i);
  
 extern IOResult ssl_recv(struct Socket *socket, char* buf, unsigned int length, unsigned int* count_out);
 extern IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf, unsigned int* count_in, unsigned int* count_out);
+
+extern char  *ssl_get_cipher(SSL *ssl);
+
 extern int ssl_send(struct Client *cptr, const char *buf, unsigned int len);
 extern int ssl_murder(void *ssl, int fd, const char *buf);
+extern int ssl_count(void);
+
 extern void ssl_add_connection(struct Listener *listener, int fd);
 extern void ssl_free(struct Socket *socket);
 extern void ssl_init(void);
-extern int ssl_count(void);
 
+#endif /* USE_SSL */
 #endif /* INCLUDED_ssl_h */
