@@ -1,3 +1,9 @@
+2003-12-07  Reed Loden  <reed@reedloden.com>
+
+	* include/patchlevel.h: Bump patchlevel.
+
+	* ircd/m_pass.c: Fix core caused by no password.
+
 2003-12-06  Reed Loden  <reed@reedloden.com>
 
 	* ircd/ircd_features.c: Send notice to "from", also.

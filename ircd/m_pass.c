@@ -99,13 +99,15 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   assert(cptr == sptr);
   assert(!IsRegistered(sptr));
 
+  if (EmptyString(password))
+    return need_more_params(cptr, "PASS");
+
   /* TODO: For protocol negotiation */
 #if 0
   if (ircd_strcmp(password,"PROT")==0) {
   	/* Do something here */
   }
 #endif
-
   ircd_strncpy(cli_passwd(cptr), password, PASSWDLEN);
   return 0;
 }
