@@ -295,7 +295,7 @@ static struct FeatureDesc {
   F_B(SHOW_ALL_INVISIBLE_USERS, 0, 1, 0),
   F_B(UNLIMIT_OPER_QUERY, 0, 0, 0),
   F_B(LOCAL_KILL_ONLY, 0, 0, 0),
-  F_B(CONFIG_OPERCMDS, 0, 0, 0),
+  F_B(CONFIG_OPERCMDS, 0, 1, 0),
 
   /* features that affect global opers on this server */
   F_B(OPER_KILL, 0, 1, 0),
@@ -380,7 +380,7 @@ static struct FeatureDesc {
 
   /* Misc. random stuff */
   F_S(NETWORK, 0, "ChatterNet", 0),
-  F_S(URL_CLIENTS, 0, "ftp://ftp.undernet.org/pub/irc/clients", 0),
+  F_S(URL_CLIENTS, 0, "http://www.ChatterNet.Org/clients.php", 0),
 
 #undef F_S
 #undef F_B

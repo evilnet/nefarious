@@ -1,3 +1,11 @@
+2003-01-01  Reed Loden  <reed@reedloden.com>
+
+	* Sync of UnderNet IRCu.
+
+	* ircd/ircd_features.c: Default CONFIG_OPERCMDS to TRUE.
+
+	* ircd/m_links.c, ircd/m_map.c: Removed the part about CFV-165.
+
 2002-12-30  Reed Loden  <reed@reedloden.com>
 
 	* More work and syncing of UnderNet IRCu.
