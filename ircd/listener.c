@@ -134,7 +134,11 @@ void show_ports(struct Client* sptr, struct StatDesc* sd, int stat,
   for (listener = ListenerPollList; listener; listener = listener->next) {
     if (port && port != listener->port)
       continue;
+#ifdef USE_SSL
+    flags[0] = (listener->server) ? 'S' : ((listener->ssl) ? 'E' : 'C');
+#else
     flags[0] = (listener->server) ? 'S' : 'C';
+#endif /* USE_SSL */
     if (listener->hidden) {
       if (!show_hidden)
         continue;

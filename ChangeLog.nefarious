@@ -24,6 +24,9 @@
 	* ircd/channel.c: Fix bug related to +O and +z chmodes that 
 	caused the IRCd to call send_notoper().
 
+	* ircd/listener.c: Make encrypted (SSL) ports display 'E'
+	instead of 'C'.
+
 	* ircd/m_burst.c: Burst MODE_NOLISTMODES.
 
 	* ircd/m_clearmode.c: Correct chmode 'L' placement.
