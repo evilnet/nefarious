@@ -1,5 +1,13 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Bumped up the max excepts to 45.
+			    Adjust various HIS lines to TRUE.
+
+	* ircd/ircd_features.c: Bumped up the max excepts to 45.
+				Adjust various HIS lines to TRUE.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* include/ircd_features.h: Added feature to disable target limiting.
 
 	* include/patchlevel.h: Bumped patchlevel.
