@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-265  Neil Spierling  <sirvulcan@gmail.com>
+
+        * ircd/m_whois.c: Display dnsbl status even if its disabled on the
+	local server.
+
 2005-02-25  Reed Loden  <reed@reedloden.com>
 
 	* ChangeLog.nefarious: Cleaned-up Rubin's ChangeLog entry.

@@ -245,7 +245,7 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (IsBot(acptr))
       send_reply(sptr, RPL_WHOISBOT, name);
 
-    if (feature_bool(FEAT_DNSBL_CHECKS) && IsDNSBL(acptr))
+    if (IsDNSBL(acptr))
       send_reply(sptr, RPL_WHOISDNSBL, name, cli_dnsbl(acptr));
 
     if (IsSSL(acptr) && ((parc >= 3) || (acptr == sptr) ||
