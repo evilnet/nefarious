@@ -1,7 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2005-12-20  Neil Spierling <sirvulcan@gmail.com>
+2005-01-24  Neil Spierling <sirvulcan@gmail.com>
+
+	* ChangeLog.nefarious: Hey its jan not decemeber :).
+
+	* doc/example.conf: Added DISALLOW_CHMODE_L to prevent normal users
+	using the mode. Default FALSE
+
+	* ircd/channel.c: Allow servers to set exempts even if disabled,
+	prevents desyncs. Disallow channel mode +L to normal users.
+
+	* include/ircd_features.h: Same as example.conf.
+
+	* ircd/ircd_features.c: Same as example.cinf.
+
+2005-01-20  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Dropped DNSBL_LOC, merged with DNSBL_LOC_EXEMPT.
 
@@ -13,7 +27,7 @@
 	users still being prompoted for their authserv details after
 	they successfully auth with LOC.
 
-2005-12-20  Neil Spierling <sirvulcan@gmail.com>
+2005-01-20  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new feature DNSBL_LOC. If enabled
 	along with LOGIN_ON_CONNECT, anyone matching on a DNSBL will be

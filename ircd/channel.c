@@ -3445,7 +3445,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	break;
 
       case 'e': /* deal with excepts */
-        if (feature_bool(FEAT_EXCEPTS) && feature_bool(FEAT_BREAK_P10))
+        if ((feature_bool(FEAT_EXCEPTS) && feature_bool(FEAT_BREAK_P10)) || IsServer(sptr))
           mode_parse_except(&state, flag_p);
         break;
 
@@ -3494,6 +3494,14 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	}
 	break;
+
+      case 'L': /* deal with no list modes */
+        if (!feature_bool(FEAT_DISALLOW_CHMODE_L) || IsServer(sptr) || IsOper(sptr)) {
+          mode_parse_mode(&state, flag_p);
+        } else {
+          send_reply(sptr, ERR_NOPRIVILEGES);
+        }
+        break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);
