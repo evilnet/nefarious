@@ -1907,12 +1907,6 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     if ((FlagHas(&setflags, FLAG_OPER) || FlagHas(&setflags, FLAG_LOCOP)) &&
         !IsAnOper(acptr)) {
       det_confs_butmask(acptr, CONF_CLIENT & ~CONF_OPS);
-      if (feature_bool(FEAT_OPERHOST_HIDING))
-	hide_hostmask(acptr);
-    } else if ((!FlagHas(&setflags, FLAG_OPER) ||
-	     !FlagHas(&setflags, FLAG_LOCOP)) && IsAnOper(acptr)) {
-      if (feature_bool(FEAT_OPERHOST_HIDING))
-	hide_hostmask(acptr);
     }
 
     if (SendServNotice(acptr)) {
