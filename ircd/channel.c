@@ -3477,8 +3477,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_DEL,		'-',
     0x0, 0x0
   };
-  int i, destroyed = 0;
-  int plusorminus = -1; /* feels ugly but 1 = + and 0 = - */
+  int i;
   int *flag_p;
   unsigned int t_mode;
   char *modestr;
@@ -3538,9 +3537,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       switch (*modestr) {
       case '+': /* switch direction to MODE_ADD */
-        plusorminus = 1;
       case '-': /* switch direction to MODE_DEL */
-        plusorminus = 0;
 	state.dir = flag_p[0];
 	break;
 
@@ -3673,10 +3670,6 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
 	   (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
 	  break;
-	else if (plusorminus == 0)
-	  destroyed = 1;
-	else if (plusorminus == 1)
-	  destroyed = 0;
 	mode_parse_mode(&state, flag_p);
 	break;
 
@@ -3763,13 +3756,6 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   /* process client changes */
   if (state.cli_change[0].flag)
     mode_process_clients(&state);
-
-  if (destroyed) {
-    if (state.flags & MODE_PARSE_BURST)
-      protocol_violation(&me, "Received -z during netburst (%H)", chptr);
-    else
-      destroy_unregistered_channel(chptr);
-  }
 
   return state.args_used; /* tell our parent how many args we gobbled */
 }

@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-26  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Dont destroy channels when -z is removed for
+	now. If your wondering why drop into #evilnet. Its a complicated
+	issue that there isnt an easy way to solve it at the moment.
+
 2005-03-23  Reed Loden  <reed@reedloden.com>
 
 	* .cvsignore: Revert inadvertent addition of configure to 
