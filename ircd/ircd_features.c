@@ -431,7 +431,7 @@ static struct FeatureDesc {
   F_S(GEO_LOCATION, FEAT_NULL, 0, 0),
   F_B(MOTD_LAST_CHANGED, 0, 0, 0),
   F_B(SPAMBOT_CHECKS, 0, 0, 0),
-  F_B(HOST_IN_TOPIC, 0, 1, 0),
+  F_B(HOST_IN_TOPIC, 0, 0, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
   F_B(HALFOPS, 0, 0, 0),
   F_B(EXCEPTS, 0, 0, 0),

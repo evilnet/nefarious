@@ -1,6 +1,13 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/m_account.c: quick fix.
+	* doc/example.conf: Default HOST_IN_TOPIC to false, had a seg fault on a network
+	where it had been working fine for a week.
+
+	* ircd/ircd_features.c: Same as above, will be working on a fix.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* ircd/m_account.c: Quick fix.
 
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
