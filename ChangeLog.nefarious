@@ -1,6 +1,10 @@
 2003-10-23  Reed Loden  <reed@reedloden.com>
 
+	* include/patchlevel.h: Bump patchlevel.
+
 	* ircd/gline.c: Add IK's fixes.
+
+	* tools/linesync/linesync.conf: Update linesync information.
 
 2003-10-19  Reed Loden  <reed@reedloden.com>
 
