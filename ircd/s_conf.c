@@ -1022,6 +1022,9 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     return 0;
   }
 
+  if (IsDNSBL(sptr))
+    return 1;
+
   strcpy(ipl, replyip);
   for (oct = strtok_r(ipl, ".", &brktb);
        oct;

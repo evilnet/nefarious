@@ -139,11 +139,9 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
     assert(0 != hp);
 
     for (i = 0; hp->h_addr_list[i]; ++i) {
-      if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name))
-        --cli_dnsblcount(auth->client);
-      else {
-        cli_dnsblcount(auth->client) = 0;
-        break;
+      --cli_dnsblcount(auth->client);
+      if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name)) {
+        /* rah */
       }
     }
   }
@@ -197,13 +195,9 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
             cli_dnsbl_reply(client)->hp->h_name, hname));
       ++(cli_dnsbl_reply(client))->ref_count;
       for (i = 0; cli_dnsbl_reply(client)->hp->h_addr_list[i]; ++i) {
-        if (!find_blline(auth->client, ircd_ntoa((char*)
-	    cli_dnsbl_reply(client)->hp->h_addr_list[i]),
-	    hname))
-          --cli_dnsblcount(auth->client);
-        else {
-          cli_dnsblcount(auth->client) = 0;
-          break;
+        --cli_dnsblcount(auth->client);
+        if (!find_blline(auth->client, ircd_ntoa((char*)cli_dnsbl_reply(client)->hp->h_addr_list[i]), hname)) {
+          /* rah */
         }
       }
     }
