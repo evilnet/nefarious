@@ -7,6 +7,10 @@
 
 	* ircd/Makefile.in: Run "make depend".
 
+	* ircd/m_ircops.c: Fix problem when using /ircops server.* where
+	the total number of IRCops was always the number of network
+	opers and not just the number on the specific server.
+
 	* ircd/m_svsjoin.c: Instead of using FindClient and FindUser,
 	use findNUser; also changed other various stuff.
 

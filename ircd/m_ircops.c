@@ -87,18 +87,21 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
 	ircd_strrcmp(cli_name(acptr->cli_user->server), feature_str(FEAT_SERVICES_TLD)))
     {
       if ((parc > 1) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
+      {
 	ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
 			acptr->cli_name ? acptr->cli_name : "<Unknown>",
 			acptr->cli_user->away ? " (AWAY)" : "",
 			CurrentTime - acptr->cli_user->last);
-      else
+	ircops++;
+      } else {
 	ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
 			acptr->cli_name ? acptr->cli_name : "<Unknown>",
 			acptr->cli_user->away ? " (AWAY)" : "",
 			cli_name(acptr->cli_user->server),
 			CurrentTime - acptr->cli_user->last);
+	ircops++;
+      }
       send_reply(sptr, RPL_IRCOPS, buf);
-      ircops++;
     }
   }
 
