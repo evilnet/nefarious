@@ -678,8 +678,7 @@ static const struct UserMode {
   { FLAG_HIDDENHOST,  'x' },
   { FLAG_SETHOST,     'h' },
   { FLAG_ACCOUNTONLY, 'R' },
-  { FLAG_BOT,         'B' },
-  { FLAG_SSL,         'S' }
+  { FLAG_BOT,         'B' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)

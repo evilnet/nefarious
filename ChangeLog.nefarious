@@ -27,6 +27,9 @@
 	* Sync with u2.10.11.05: Unwrap the connected counter in
 	ip_registry_check_local() before returning.
 
+	* As per Math's recommendation, removed umode +S. Now, SSL users
+	are only kept track of via FLAG_SSL.
+
 2003-07-05  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_user.c: Fixed a problem of when an oper was +xh and
