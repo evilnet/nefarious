@@ -1,6 +1,27 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-26  Neil Spierling <sirvulcan@gmail.com>
+
+	* doc/example.conf: Updated X:Lines for type support.
+                            Added in F:Lines for dnsbl loc rejection notices.
+
+	* include/ircd_features.h: Added DNSBL_LOC_EXEMPT_N_ONE and
+	DNSBL_LOC_EXEMPT_N_TWO.
+
+	* include/s_conf.h: Added type to blline struct.
+
+	* ircd/ircd_features.c: Same as ircd_features.h.
+
+	* ircd/s_conf.c: Added support for Bitmask dnsbl's.
+
+	* ircd/s_err.c: Extended RPL_STATSXLINE so that the type can be
+	displayed
+
+	* ircd/s_stats.c: See above.
+
+	* ircd/s_user.c: Make use of the two new features.
+
 2005-01-24  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/m_ircops.c: Differ between irc admins and irc operators

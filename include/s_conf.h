@@ -198,6 +198,7 @@ struct svcline {
 struct blline {
   struct blline *next;
   char *server;
+  char *type;
   char *replies;
   char *reply;
 };

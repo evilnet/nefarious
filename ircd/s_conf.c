@@ -926,13 +926,14 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   struct blline *blline;
 
   if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-     EmptyString(fields[3]))
+     EmptyString(fields[3]) || EmptyString(fields[4]))
     return;
 
   blline = (struct blline *) MyMalloc(sizeof(struct blline));
   DupString(blline->server, fields[1]);
-  DupString(blline->replies, fields[2]);
-  DupString(blline->reply, fields[3]);
+  DupString(blline->type, fields[2]);
+  DupString(blline->replies, fields[3]);
+  DupString(blline->reply, fields[4]);
   blline->next = GlobalBLList;
   GlobalBLList = blline;
 }
@@ -943,6 +944,7 @@ void clear_dnsbl_list(void)
   while ((blline = GlobalBLList)) {
     GlobalBLList = blline->next;
     MyFree(blline->server);
+    MyFree(blline->type);
     MyFree(blline->replies);
     MyFree(blline->reply);
     MyFree(blline);
@@ -955,12 +957,18 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 
   static char dhname[HOSTLEN + 1] = "";
 
+  char *name;
   char* rep = NULL;
   char* p = 0;
+  char* q = 0;
+  char test[80];
+  char *sep = ",";
+  char *word, *brkt;
+  char ipname[16];
 
   int c = 0;
   int a = 0;
-
+  int total = 0;
 
   for (rep = ircd_strtok(&p, checkhost, "."); rep; rep = ircd_strtok(&p, 0, ".")) {
     if (c == 4) {
@@ -973,13 +981,34 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 
   Debug((DEBUG_LIST, "DNSBL find_blline server %s", dhname));
 
-
   for (blline = GlobalBLList; blline; blline = blline->next) {
-    if (!ircd_strcmp(dhname, blline->server)) {
-      if (!ircd_strcmp(blline->replies, replyip)) {
-        SetDNSBL(sptr);
-        ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
-        a = 1;
+    Debug((DEBUG_LIST, "DNSBL type %s", blline->type));
+    if (!strcmp(blline->type, "BITMASK")) {
+      total = 0;
+      strcpy(test, blline->replies);
+
+      for (word = strtok_r(test, sep, &brkt);
+          word;
+          word = strtok_r(NULL, sep, &brkt))
+      {
+        total = total + atoi(word);
+        Debug((DEBUG_LIST, "DNSBL bitmask p (%s) t (%d)", word, total));
+      }
+      ircd_snprintf(0, ipname, sizeof(ipname), "127.0.0.%d", total);
+      if (!ircd_strcmp(dhname, blline->server)) {
+        if (!ircd_strcmp(ipname, replyip)) {
+          SetDNSBL(sptr);
+          ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
+          a = 1;
+        }
+      }
+    } else {
+      if (!ircd_strcmp(dhname, blline->server)) {
+        if (!ircd_strcmp(blline->replies, replyip)) {
+          SetDNSBL(sptr);
+          ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
+          a = 1;
+        }
       }
     }
   }

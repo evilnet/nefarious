@@ -615,9 +615,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
                                                   cli_user(sptr)->realhost, user->username,
                                                   cli_name(sptr), cli_dnsblformat(sptr))
                                                   );
-          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :If you have an account with %s services then you can bypass the dnsbl ban by logging in like this: (where Account is your account name and Password is your password.",
-                        sptr, feature_str(FEAT_NETWORK));
-          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Type \002/QUOTE PASS AuthServ Account :Password\002 to connect", sptr);
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_DNSBL_LOC_EXEMPT_N_ONE));
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_DNSBL_LOC_EXEMPT_N_TWO));
           MyFree(cli_loc(sptr));
           return 0;
         } else
