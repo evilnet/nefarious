@@ -1,0 +1,74 @@
+
+	Welcome to ircu2.10.11, the Undernet IRC daemon
+
+Version u2.10.11 of the Undernet ircd incorporates many new features
+over its predecessor, and we feel that using it will make you very
+happy indeed.
+
+New features include:
+  - A completely rewritten network event engine, which make full use
+    of the asynchronous event engines available in FreeBSD (kqueue)
+    and Solaris (/dev/poll), resulting in dramaticaly improved
+    performance.
+  - New F: (feature) lines in ircd.conf, and the GET/SET commands allow
+    many settings to be changed dynamically, rather than by with compile-
+    time configuration.
+  - The new "account" feature added to the P10 protocol, allows people to
+    remain logged in to service bots (i.e., gnuworld) during a netsplit.
+    This means people will not have to login again once the network rejoins.
+
+INSTALLATION
+
+Please see the INSTALL file for installation instructions, for hints on how
+to best configure your OS for running ircu under high load, see the various
+README.<platform> files.
+
+COMPATIBILITY
+
+This version of ircu will only work with servers that use the P10 protocol,
+some of the new features will only work between ircu2.10.11 servers.
+
+GENERAL PERFORMANCE HINTS
+
+For platform-specific notes and hints, see the various README.<platform>
+files included in this distribution. The notes below apply to servers that
+will serve large numbers (thousands) of clients simultaneously. If your
+server serves a small amount of users, you will not really have to do much
+of anything about performance tuning.
+
+ - Run an OS that supports an asynchronous network event engine; currently
+   these are FreeBSD (kqueue), and Solaris (/dev/poll); possibly other BSDs
+   will also support kqueue. This will have a dramatic effect on performance.
+ - Make things as lean as possible: Make your server dedicated to ircu,
+   disable anything that is not neccesary, and build a custom kernel (where
+   possible). 
+ - Tune kernel parameters; see the various README.<platform> files as well
+   as your OS documentation for more information.
+ - With many clients connecting each second, ircu will be doing lots of DNS
+   lookups. Make sure that the DNS server(s) in your /etc/resolv.conf are as
+   close as possible, or run a local caching DNS server on your IRC server.
+
+TIME SYNCHRONIZATION
+
+Many things can and will go horribly wrong when the clocks on the servers
+on your network become (too far) out of sync. It is therefore highly
+recommended that all servers run a version of ntpd that will keep their
+clocks from going astray.
+
+INFORMATION HIDING
+
+As per undernet-admins CFV-165, this server contains code that will,
+by default, hide certain information from ordinary users. If you do
+not want this, please make sure you add -DINCLUDED_ircd_policy_h to
+CFLAGS prior to running ./configure, like in:
+
+> CFLAGS=-DINCLUDED_ircd_policy_h ./configure
+
+MORE INFORMATION
+
+For more information on this software, see the included documentation
+in the doc/ directory, as well as http://coder-com.undernet.org.
+
+For general information on the Undernet, vist http://www.undernet.org
+
+Happy IRCing!
