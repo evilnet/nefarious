@@ -309,8 +309,8 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     do_names(sptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
 
     if (((chptr->mode.mode & MODE_ACCONLY) && !IsAccount(sptr)) || 
-	(chptr->mode.mode & MODE_MODERATED) &&
-	(flex == 1) && feature_bool(FEAT_FLEXABLEKEYS)) {
+	((chptr->mode.mode & MODE_MODERATED) &&
+	(flex == 1) && feature_bool(FEAT_FLEXABLEKEYS))) {
       sendcmdto_one(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
       sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr,
 				       "%H +v %C", chptr, sptr);

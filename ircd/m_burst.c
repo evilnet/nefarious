@@ -355,7 +355,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	        chptr->banlist = newban;
 	    }
           } else if (type == 1) {
-            char *exceptlist = parv[param] + 1, *p = 0, *except, *ptr;
+            char *except, *ptr;
             struct SLink *newexcept;
             ecount++;
             if (ecount > 1) { /* miss the first one as its just the ~ seperator */

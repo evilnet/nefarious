@@ -91,6 +91,7 @@
 #include "jupe.h"
 #include "list.h"
 #include "match.h"
+#include "map.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"

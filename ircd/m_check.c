@@ -23,6 +23,7 @@
 
 #include "channel.h"
 #include "check.h"
+#include "class.h"
 #include "client.h"
 #include "hash.h"
 #include "ircd.h"

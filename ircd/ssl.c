@@ -64,6 +64,8 @@ static void abort_ssl(struct ssl_data *data)
  
 static void accept_ssl(struct ssl_data *data)
 {
+  const char* const error_ssl = "ERROR :SSL Connection Error\r\n";
+
   if (SSL_accept(data->socket.ssl) <= 0) {
     unsigned long err = ERR_get_error();
     char string[120];
@@ -72,7 +74,6 @@ static void accept_ssl(struct ssl_data *data)
       ERR_error_string(err, string);
       Debug((DEBUG_ERROR, "SSL_accept: %s", string));
 
-      const char* const error_ssl = "ERROR :SSL Connection Error\r\n";
       write(data->fd, error_ssl, strlen(error_ssl));
 
       abort_ssl(data);

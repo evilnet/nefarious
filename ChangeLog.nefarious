@@ -3,6 +3,20 @@
 
 2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/m_burst.c: Warning cleanup.
+
+	* ircd/m_check.c: Warning cleanup.
+
+	* ircd/m_join.c: Warning cleanup.
+
+	* ircd/m_server.c: Warning cleanup.
+
+	* ircd/m_svsnick.c: Uncommented some code + made it work.
+
+	* ircd/ssl.c: Warning cleanup.
+
+2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+
 	* doc/example.conf: typo fix.
 
 	* ircd/ircd_features.c: typo fix.
