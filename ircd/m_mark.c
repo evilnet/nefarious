@@ -138,7 +138,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
 
       ircd_snprintf(0, cli_user(acptr)->dnsblhost, HOSTLEN, "%s", parv[5]);
 
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s :%s", cli_name(acptr), MARK_DNSBL,
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s %s :%s", cli_name(acptr), MARK_DNSBL,
                             cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
     } else
       Debug((DEBUG_DEBUG, "Mark Cant Find %s", parv[1]));

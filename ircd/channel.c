@@ -977,6 +977,9 @@ static int channel_all_zombies(struct Channel* chptr)
 {
   struct Membership* member;
 
+  if (chptr->mode.mode & MODE_PERSIST)
+    return 0;
+
   for (member = chptr->members; member; member = member->next_member) {
     if (!IsZombie(member))
       return 0;

@@ -1,6 +1,15 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Added a missing check for persist (doesnt fix a known
+	non critical bug)
+
+	* ircd/m_mark.c: Added a %s to CMD_MARK.
+
+	* ircd/s_user.c: Added a %s to CMD_MARK.
+
 2005-03-21  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_conf.c: attempting to fix crash bug
