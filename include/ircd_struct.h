@@ -29,6 +29,9 @@
 #ifndef INCLUDED_ircd_defs_h
 #include "ircd_defs.h"       /* sizes */
 #endif
+#ifndef INCLUDED_ircd_reply_h
+#include "ircd_reply.h"
+#endif
 
 struct DLink;
 struct Client;
@@ -81,8 +84,7 @@ struct User {
   time_t	     acc_create;
   char               virtip[SOCKIPLEN + 30];
   char               virthost[HOSTLEN + 1];
-  char               dnsblurl[255];
-  char               dnsblname[255];
+  char               dnsblformat[MAXLEN + 1];
 };
 
 struct LOCInfo {

@@ -923,14 +923,13 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   struct blline *blline;
 
   if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-     EmptyString(fields[3]) || EmptyString(fields[4]))
+     EmptyString(fields[3]))
     return;
 
   blline = (struct blline *) MyMalloc(sizeof(struct blline));
   DupString(blline->server, fields[1]);
   DupString(blline->replies, fields[2]);
-  DupString(blline->url, fields[3]);
-  DupString(blline->name, fields[4]);
+  DupString(blline->reply, fields[3]);
   blline->next = GlobalBLList;
   GlobalBLList = blline;
 }
@@ -942,8 +941,7 @@ void clear_dnsbl_list(void)
     GlobalBLList = blline->next;
     MyFree(blline->server);
     MyFree(blline->replies);
-    MyFree(blline->url);
-    MyFree(blline->name);
+    MyFree(blline->reply);
     MyFree(blline);
   }
 }
@@ -978,8 +976,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       ircd_snprintf(0, rname, HOSTLEN + 1, "127.0.0.%s", repb);
       if (!ircd_strcmp(rname, replyip)) {
         SetDNSBL(sptr);
-        ircd_strncpy(cli_dnsblurl(sptr), blline->url, HOSTLEN);
-        ircd_strncpy(cli_dnsblname(sptr), blline->name, HOSTLEN);
+        ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
         a = 1;
       }
     }

@@ -23,6 +23,15 @@
 #define INCLUDED_ircd_reply_h
 
 struct Client;
+struct dnsbl_format_assoc
+{
+   char key;
+   void *data;
+   int type;
+};
+
+extern char *format_dnsbl_msg(char *dnsblip, char *dnsblhost, char *dnsbluser,
+                              char *dnsblnick, char *format);
 
 extern int protocol_violation(struct Client* cptr, const char* pattern, ...);
 extern int need_more_params(struct Client* cptr, const char* cmd);
@@ -30,6 +39,8 @@ extern int send_error_to_client(struct Client* cptr, int error, ...);
 extern int send_reply(struct Client* to, int reply, ...);
 
 #define SND_EXPLICIT	0x40000000	/* first arg is a pattern to use */
+#define FORMATTYPE_STRING 1
+#define MAXLEN 512 + 1
 
 #endif /* INCLUDED_ircd_reply_h */
 

@@ -640,9 +640,13 @@ int register_user(struct Client *cptr, struct Client *sptr,
       release_dnsbl_reply(sptr);
 
       if (IsDNSBL(sptr) && (get_client_class(sptr) != feature_int(FEAT_DNSBL_EXEMPT_CLASS)))
-        return exit_client_msg(cptr, sptr, &me, "Your IP (%s) has been found in %s. See %s%s for further information.",
-                              (char*)ircd_ntoa((const char*) &(cli_ip(sptr))), cli_dnsblname(sptr), cli_dnsblurl(sptr),
-                              (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
+        return exit_client_msg(cptr, sptr, &me, "%s",
+                               format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+                                                cli_user(sptr)->host, cli_username(sptr), 
+                                                cli_name(sptr), cli_dnsblformat(sptr))
+                               );
+
+
     }
 
   /*

@@ -3,7 +3,22 @@
 
 2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
 
+	* README: Added BOPM to list.
+
+	* doc/example.conf: Updated X:Line entry with new format.
+
+	* include/client.h: Drop url and name.
+
+	* include/ircd_reply.h: Message formatting declerations.
+
+	* include/ircd_struct.h: Drop url and name.
+
+	* include/s_conf.h: Drop url and name and just use reply.
+
 	* ircd/channel.c: Warning cleanup.
+
+	* ircd/ircd_reply.c: Added a new function from BOPM for
+	formatting a message (replacing %i with an IP for example).
 
 	* ircd/m_pass.c: Warning cleanup.
 
@@ -12,6 +27,14 @@
 			 notice issue with more than one DNSBL.
 
 	* ircd/s_conf.c: Warning cleanup.
+			 Drop url and name and just use reply.
+
+	* ircd/s_err.c: Shaved off a uneeded %s.
+
+	* ircd/s_stats.c: Removed name section off RPL_STATSXLINE.
+
+	* ircd/s_user.c: Format the DNSBL rejection message using
+	format_dnsbl_msg and reject the client.
 
 2004-10-18  Alex Schumann  <rubinlinux@gmail.com>
 

@@ -38,6 +38,9 @@
 #include <assert.h>
 #include <string.h>
 
+
+char message[MAXLEN];  /* OUTPUT */
+
 /* Report a protocol violation warning to anyone listening.  This can be
  * easily used to cleanup the last couple of parts of the code up.
  */
@@ -99,4 +102,87 @@ int send_reply(struct Client *to, int reply, ...)
 }
 
 
+extern char *format_dnsbl_msg(char *dnsblip, char *dnsblhost, char *dnsbluser,
+                              char *dnsblnick, char *format)
+{
+   unsigned short pos = 0;   /* position in format */
+   unsigned short len = 0;   /* position in message */
+   unsigned short size = 0;  /* temporary size buffer */
 
+   unsigned int i;
+
+   struct dnsbl_format_assoc table[] =
+      {
+         {'i',   (void *) NULL,         FORMATTYPE_STRING },
+         {'h',   (void *) NULL,         FORMATTYPE_STRING },
+         {'u',   (void *) NULL,         FORMATTYPE_STRING },
+         {'n',   (void *) NULL,         FORMATTYPE_STRING },
+
+      };
+
+   table[0].data = dnsblip;
+   table[1].data = dnsblhost;
+   table[2].data = dnsbluser;
+   table[3].data = dnsblnick;
+
+   /*
+    * Copy format to message character by character, inserting any matching
+    * data after %.
+    */
+   while(format[pos] != '\0' && len < (MAXLEN - 2))
+   {
+      switch(format[pos])
+      {
+
+         case '%':
+            /* % is the last char in the string, move on */
+            if(format[pos + 1] == '\0')
+               continue;
+
+            /* %% escapes % and becomes % */
+            if(format[pos + 1] == '%')
+            {
+               message[len++] = '%';
+               pos++; /* skip past the escaped % */
+               break;
+            }
+            /* Safe to check against table now */
+            for(i = 0; i < (sizeof(table) / sizeof(struct dnsbl_format_assoc)); i++)
+            {
+               if(table[i].key == format[pos + 1])
+               {
+                  switch(table[i].type)
+                  {
+                     case FORMATTYPE_STRING:
+
+                        size = strlen( (char *) table[i].data);
+
+                        /* Check if the new string can fit! */
+                        if( (size + len) > (MAXLEN - 1) )
+                           break;
+                        else
+                        {
+                           strcat(message, (char *) table[i].data);
+                           len += size;
+                        }
+
+                     default:
+                        break;
+                  }
+               }
+            }
+            /* Skip key character */
+            pos++;
+            break;
+
+         default:
+            message[len++] = format[pos];
+            message[len] = '\0';
+            break;
+      }
+      /* continue to next character in format */
+      pos++;
+   }
+
+  return message;
+}

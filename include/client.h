@@ -259,8 +259,7 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
-  char cli_dnsblurl[BUFSIZE + 1];
-  char cli_dnsblname[BUFSIZE + 1];
+  char cli_dnsblformat[BUFSIZE + 1];
 };
 
 #define CLIENT_MAGIC 0x4ca08286
@@ -290,8 +289,7 @@ struct Client {
 #define cli_name(cli)		((cli)->cli_name)
 #define cli_username(cli)	((cli)->cli_username)
 #define cli_info(cli)		((cli)->cli_info)
-#define cli_dnsblurl(cli)       ((cli)->cli_dnsblurl)
-#define cli_dnsblname(cli)      ((cli)->cli_dnsblname)
+#define cli_dnsblformat(cli)    ((cli)->cli_dnsblformat)
 #define cli_oflags(cli)         ((cli)->cli_oflags)
 
 #define cli_count(cli)		((cli)->cli_connect->con_count)

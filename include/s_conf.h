@@ -199,8 +199,7 @@ struct blline {
   struct blline *next;
   char *server;
   char *replies;
-  char *url;
-  char *name;
+  char *reply;
 };
 
 
