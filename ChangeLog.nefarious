@@ -1,5 +1,23 @@
 2004-06-15  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Added in feature MOTD_LAST_CHANGED (default FALSE).
+
+	* include/ircd_features.h: Added in feature MOTD_LAST_CHANGED.
+
+	* include/struct.h: Added in MAX_DATE_STRING, will possible change to a
+	different .h file.
+
+	* ircd/ircd_features.c: Added in feature MOTD_LAST_CHANGED.
+
+	* ircd/motd.c: Set the last modified date of ircd.motd into a char for
+	use in s_user.c.
+
+	* ircd/s_user.c: if MOTD_LAST_CHANGED is enabled then send out a notice to
+	connecting users before the motd is displayed. The notice contains the date
+	of when the motd was last modified (RFE 972238).
+
+2004-06-15  Neil Spierling <vulcan@linux-boxen.org>
+
 	* doc/readme.features: Documented FEAT_GEO_LOCATION.
 
 	* include/ircd_features.h: Added in FEAT_GEO_LOCATION.
