@@ -98,8 +98,14 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
 	return;
       }
 
-  if (chptr->mode.mode & MODE_STRIP)
+  if (chptr->mode.mode & MODE_STRIP) {
     text = StripColour(text);
+    if (strlen(text) < 1) {
+      send_reply(sptr, ERR_NOTEXTTOSEND);
+      return;
+    }
+  }
+
 
   sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);
@@ -150,8 +156,13 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
         return;
       }
 
-  if (chptr->mode.mode & MODE_STRIP)
+  if (chptr->mode.mode & MODE_STRIP) {
     text = StripColour(text);
+    if (strlen(text) < 1) {
+      send_reply(sptr, ERR_NOTEXTTOSEND);
+      return;
+    }
+  }
 
   sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
