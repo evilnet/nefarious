@@ -26,8 +26,8 @@ halfops.srvx2.diff	0.1	Afternet SRVX2	Adds in support so that SRVX2 can handle	N
 
 Author					Patch
 -----------------------------------------------------------------------------------------------------------------------
-SiRVulcaN <vulcan@linux-boxen.org>	banexempts.srvx2.diff
-SiRVulcaN <vulcan@linux-boxen.org>	halfops.srvx2.diff
+SiRVulcaN <sirvulcan@gmail.com>	banexempts.srvx2.diff
+SiRVulcaN <sirvulcan@gmail.com>	halfops.srvx2.diff
 
 
 Service		Location					Notes

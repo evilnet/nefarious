@@ -1,13 +1,25 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2004-10-03  Neil Spierling <vulcan@linux-boxen.org>
+2004-10-03  Neil Spierling <sirvulcan@gmail.com>
+
+	* ChangeLog.nefarious: Updated my email address.
+
+	* README: Updated my email address.
+
+	* ircd/ircd_relay.c: Quakenet updates.
+
+	* ircd/hosthiding.c: Updated my email address.
 
         * ircd/s_conf.c: Dont parse "include" lines fully, gets an ugly
 	I:Line without this continue. Probably would cause issues for
 	connecting clients.
 
-2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
+	* ircd/version.c.SH: Updated my email address.
+
+	* patches/README: Updated my email address.
+
+2004-09-29  Neil Spierling <sirvulcan@gmail.com>
 
 	* configure: Reran autoconf again.
 
@@ -17,7 +29,7 @@
 
 	* config.h.in: Regenerated (header added back in after).
 
-2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-29  Neil Spierling <sirvulcan@gmail.com>
 
 	* configure: Reran autoconf.
 
@@ -25,7 +37,7 @@
 	this everytime we run autoheader (unless i actually read the man
 	page properly as there may be a way of preserving it).
 
-2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-29  Neil Spierling <sirvulcan@gmail.com>
 
 	* acinclude.m4: Cleaned up some AC_DEFINE's, dont need acconfig.h now.
 
@@ -33,18 +45,18 @@
 
 	* config.h.in: Regenerated (autoheader).
 
-2004-09-27  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-27  Neil Spierling <sirvulcan@gmail.com>
 
 	* include/supported.h: Fixed a client parsing issue.
 
-2004-09-20  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-20  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Only use flexable keys if its enabled and the
 	key is set and valid on a join.
 
 	* ircd/m_join.c: Send out CMD_MODE to other servers.
 
-2004-09-16  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-16  Neil Spierling <sirvulcan@gmail.com>
 
 	* Include feature from WhatNet's IRCd 
 	(http://coder-com.whatnet.org).
@@ -54,11 +66,11 @@
 	* ircd/s_user.c: Modified read configuration file functions
 	to handle includes.
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* Undernet sync.
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* include/channel.h: Added MODE_ADMINONLY.
 
@@ -75,12 +87,12 @@
 
 	* ircd/s_err.c: See supported.h entry.
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/m_whois.c: Small bug fix, display +s channels for opers
 	now in WHOIS's (prefixed with *).
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Renamed OPLEVELS to OPERLEVELS.
 
@@ -93,7 +105,7 @@
 
 	* ircd/s_user.c: See above.
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: New F:lines added OPLEVELS, WHOIS_OPER,
 	WHOIS_ADMIN, and WHOIS_SERVICE.
@@ -129,33 +141,33 @@
 	* ircd/s_user.c: Clear the admin flag if OPLEVELS is disabled.
 	This is also done in m_oper.c.
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* configure: Reran autoconf.
 
 	* configure.in: Add -Wno-long-long to CFLAGS on BSD systems.
 
-2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/ircd_relay.c: Minor fix, thought i had put it in the
 	place originally. Fixed now.
 
 	* ircd/m_join.c: Small bug fix.
 
-2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-12  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/Makefile.in: Remove version.c on a make install, makes
 	life easier for keeping track of CVS version when coding.
 	
-2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-12  Neil Spierling <sirvulcan@gmail.com>
 
 	* More bug fixes, see ChangeLog.
 
-2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-12  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/gline.c: Bug fix (see ChangeLog).
 
-2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-12  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added ANNOUNCE_INVITES.
 
@@ -187,21 +199,21 @@
 
 	* ircd/send.c: sendcmdto_channel_butserv_butone updates.
 
-2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-12  Neil Spierling <sirvulcan@gmail.com>
 
 	* include/supported.h: Added STATUSMSG (isupport), and
 	CHANNELLEN.
 
-2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-11  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Small bug fix, was sending the wrong header.
 
-2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-11  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/parse.c: Fixed bug with commands like /1 or /2 being
 	accepted, which had wierd sideaffects. Fix by Entrope.
 
-2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-11  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added X:Lines stuff.
 			    Added features, DNSBL_CHECKS.
@@ -338,7 +350,7 @@
 	* ircd/version.c.SH: Moved some stuff around and added a list of 
 	very helpful testers.
 
-2004-09-03  Neil Spierling  <vulcan@linux-boxen.org>
+2004-09-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added feature TPATH (default "ircd.tune").
 
@@ -355,12 +367,12 @@
 	* ircd/s_user.c: Update the tune file when user counts go up
 	above the highest known count.
 
-2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-02  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/m_wallhops.c: Couple of fixes with displaying "%".
 	% was being duplicated on each server the msg went to.
 
-2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-02  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/m_burst.c: Warning cleanup.
 
@@ -374,13 +386,13 @@
 
 	* ircd/ssl.c: Warning cleanup.
 
-2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-02  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: typo fix.
 
 	* ircd/ircd_features.c: typo fix.
 
-2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-02  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added FEAT_MAX_CHECK_OUTPUT.
 
@@ -390,7 +402,7 @@
 
 	* ircd/m_check.c: Actually use FEAT_MAX_CHECK_OUTPUT.
 
-2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-02  Neil Spierling <sirvulcan@gmail.com>
 
 	* Sync with u2.10.11.07(pre1) as per 2004-08-31 (2 Commits).
 
@@ -407,7 +419,7 @@
 
 	* ircd/m_account.c: Re added verified accounts.
 	
-2004-08-31  Neil Spierling <vulcan@linux-boxen.org>
+2004-08-31  Neil Spierling <sirvulcan@gmail.com>
 
 	* include/s_user.h: do_nick_name can be called outside of
 	m_nick.c now.
@@ -449,7 +461,7 @@
 
 	* ircd/s_user.c: /SETHOST now ignores hosts that change nothing.
 
-2004-08-28  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-28  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new feature FLEXABLEKEYS. When TRUE, a
 	user joining a channel with the correct key can get past +rliOMm.
@@ -490,7 +502,7 @@
 
 	* ircd/m_oper.c: Flip-flop'd an 'if' check.
 
-2004-08-25  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-25  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new feature CHECK_EXTENDED.
 
@@ -507,24 +519,24 @@
 	Small F:Line tweak for EXCEPTS.
 	Small bug fix with displaying modes in CHECK output.
 
-2004-08-25  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-25  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/ssl.c: Generate an error message when a client connects
 	to a SSL port on a normal connection (non-SSL).
 
-2004-08-24  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-24  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_bsd.c: SSL bug fix, was causing cores.
 
-2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_serv.c: Burst AWAY messages on links.
 
-2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Last 2 commits removed (one with no changelog).
 
-2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/map.h: Added an extra var to map_update for removing
 	a server.
@@ -539,7 +551,7 @@
 
 	* ircd/s_serv.c: Save as m_server.c entry.
 
-2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added F:Lines for HIS_MAP_SCRAMBLED,
 	HIS_LINKS_SCRAMBLED and HIS_SCRAMBLED_CACHE_TIME.
@@ -566,19 +578,19 @@
 
 	* ircd/s_serv.c: Update the map on links.
 
-2004-08-21  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-21  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_ircops.c: Tweak to IRCOPS HIS stuff.
 
 	* ircd/m_oper.c: Small tweak to yesterdays bug fix.
 
-2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_oper.c: Bug fix, allow an oper to "remote oper" on the
 	server he/she is on.
 	(user on irc.abc.com, /oper irc.abc.com user pass)
 
-2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added lines for HIS_IRCOPS and
 	HIS_IRCOPS_SERVERS.
@@ -592,46 +604,46 @@
 	normal user can use IRCOPS the opers server will not display.
 	HIS_SERVERNAME will be displayed instead.
 
-2004-08-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Bug fix for with default umodes, the mode(s)
 	were being sent out to other servers before the nick was even
 	sent out.
 
-2004-08-17  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-17  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/os_linux.c: Bug fix for fedora systems. This should fix
 	the `_SC_CLK_TCK' undeclared  error.
 
-2004-08-15  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-15  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Bug fix for setting +B, the server was letting
 	any user set +B. Reported by CaptKirk.
 
-2004-08-13  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-13  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Bug fix for DEFAULT_UMODE, dont know why I
 	added the clearhiddenhost part in the first place. When +x was
 	auto set and a user logged in, their hidden host wasn't being
 	set. This fixes that.
 
-2004-08-13  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-13  Neil Spierling  <sirvulcan@gmail.com>
 
 	* patches/halfops.srvx2.diff: Removed a couple of unneeded
 	debugging bits I added while creating the patch. Small code fix
 	also.
 
-2004-08-12  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-12  Neil Spierling  <sirvulcan@gmail.com>
 
 	* patches/banexempts.srvx2.diff: Changed strcat to strncat.
 
-2004-08-11  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-11  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: This should fix the issue with parting a +M
 	channel while your not logged in. Previously it would return a
 	cannot send to channel error with some data beside it.
 
-2004-08-11  Neil Spierling  <vulcan@linux-boxen.org>
+2004-08-11  Neil Spierling  <sirvulcan@gmail.com>
 
 	* patches: Added new directory for services patches
 
@@ -687,7 +699,7 @@
 
 	* ircd/version.c.SH: Used a cleaner way to get cvs_version.
 
-2004-07-12  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-12  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/numeric.h: Removed CVS_VERSION.
 
@@ -700,7 +712,7 @@
 	CVS version out of ChangeLog.nefarious and throw it into a char
 	like creation, version, etc.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added feature BADUSER_URL, gives the user a url
 	to go to when they get an invalid username error upon connect.
@@ -720,13 +732,13 @@
 	* ircd/s_user.c: Do something with BADUSER_URL, send it out with
 	an invalid username error.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/ircd_features.c: Fixed up bug in HIS_NETSPLIT.
 
         * ircd/m_version.c: Added nessecary include for CVS_VERSION.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Bumped up the max excepts to 45.
 	Adjust various HIS lines to TRUE.
@@ -734,7 +746,7 @@
 	* ircd/ircd_features.c: Bumped up the max excepts to 45.
 	Adjust various HIS lines to TRUE.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/ircd_features.h: Added feature to disable target limiting.
 
@@ -744,11 +756,11 @@
 
 	* ircd/s_user.c: Added feature to disable target limiting.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_topic.c: Possibly fixed that crash with HOST_IN_TOPIC.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_wallchops.c: Fixed an issue where notices that you sent would be
 	echoed back to you.
@@ -757,18 +769,18 @@
 
 	* ircd/m_wallvoices.c: Same as above.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Default HOST_IN_TOPIC to false, had a seg fault on a network
 	where it had been working fine for a week.
 
 	* ircd/ircd_features.c: Same as above, will be working on a fix.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_account.c: Quick fix.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Odd fix for +z, adding brackets to the check if the user is
 		   	   connected via SSL or is a server.
@@ -779,7 +791,7 @@
 			   rewritten we will be able to check whats enabled on link and
 			   deny the link if things are not set right.
 
-2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Removed verified accounts code, will be re added later.
 
@@ -804,13 +816,13 @@
 
 	* ircd/s_user.c: Removed verified accounts code, will be re added later.
 
-2004-07-07  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-07  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_whois.c: Reverted verified accounts code back.
 
 	* ircd/s_err.c: Reverted verified accounts code back.
 
-2004-07-07  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-07  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/ircd.h: Include ircd_struct.h instead of struct.h.
 
@@ -886,24 +898,24 @@
 
 	* ircd/whowas.c: Include ircd_struct.h instead of struct.h.
 
-2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
 
         * ircd/channel.c: Removed some unnessecary checks
 
 	* ircd/m_burst.c: Removed some unnessecary checks
 
-2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/patchlevel.h: Bumped the patchlevel, so we can differ between
 	who has +he and who doesnt. Should be a bump after every major commit.
 
-2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Default halfops to false, suggestion by Rubin.
 
 	* ircd/ircd_features.c Default halfops to false, suggestion by Rubin.
 
-2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
 
 	* README: Added Whatnet's ircd in as we got the halfops code
 	from their ircd ty ty.
@@ -994,7 +1006,7 @@
 	* ircd/version.c.SH: Fix whitespacing and copyright text.
 
 2004-07-03  Reed Loden  <reed@reedloden.com>
-	    Neil Spierling  <vulcan@linux-boxen.org>
+	    Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Actually fixed the problem with MODE_OPERONLY 
 	and MODE_SSLONLY not bursting correctly.
@@ -1047,7 +1059,7 @@
 	* ircd/version.c.SH: Correct indent/spacing and add current 
 	maintainers of IRCu.
 
-2004-06-23  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/ircd_features.h: Changed spambot check feature to
 	FALSE.
@@ -1058,27 +1070,27 @@
 
 	* ircd/ircd_features.c: Changed spambot check feature to FALSE.
 
-2004-06-21  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-21  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_rehash.c: Added new flag "s" so that an ircd.pem file
 	can be reloaded.
 
-2004-06-21  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-21  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_topic.c: Fixed potential crash; don't want to do the
 	user@host for a topic coming from a server (in topic bursts).
 
-2004-06-20  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* tools/makepem: Added basic support for users who already have 
 	an existing SSL certificate they wish to use.
 
-2004-06-20  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Don't let unregistered users send B:Line'd 
 	commands.
 
-2004-06-20  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/channel.h: Bumped up the size of topic_nick more so
 	it can hold a user's ident and a !.
@@ -1089,7 +1101,7 @@
 	[03:03] * Set by gandalf!BigDaddy@306cb8dc.15ce75d4.jet.net.nz
 	on Sun Jun 20 02:28:41
 
-2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new F:Line.
 
@@ -1100,7 +1112,7 @@
 	* ircd/ircd.c: Display the amount of time since the last ping
 	in the time in the Ping Timeout message.
 
-2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new F:Line.
 
@@ -1111,7 +1123,7 @@
 	* ircd/m_topic: Made FEAT_HOST_IN_TOPIC useful, if it's enabled
 	the host will be added to topic_nick (See Below). RFE 975655.
 
-2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/channel.h: Bump up the size of topic_nick so it can
 	hold a host.
@@ -1122,7 +1134,7 @@
 	[09:45] * Set by gandalf@36df16fa.25b5c948.jet.net.nz
 	on Sat Jun 19 09:34:55
 
-2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added feature DEFAULT_UMODE.
 
@@ -1137,7 +1149,7 @@
 	* ircd/s_user.c: Took out the AUTOHIDE stuff and put in some
 	code to handle DEFAULT_UMODE.
 
-2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/channel.h: Added MODE_NOLISTMODES (+L).
 
@@ -1152,18 +1164,18 @@
 
 	* ircd/m_clearmode.c: Added fluff for MODE_NOLISTMODES.
 
-2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/res.c: Send out a notice for a resolver restart.
 
 	* ircd/s_user.c: Restart the resolver upon a rehash;
 	patch from Fredrik Söderblom (froo).
 
-2004-06-18  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-18  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_account.c: Fixed small issue.
 
-2004-06-18  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-18  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added features NOTVERIFIED (string msg) and
 	VERIFIED_ACCOUNTS (default: FALSE).
@@ -1195,12 +1207,12 @@
 	when VERIFIED_ACCOUNTS is TRUE. Note that VERIFIED_ACCOUNTS 
 	only works with hosthiding style 1.
 
-2004-06-17  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-17  Neil Spierling  <sirvulcan@gmail.com>
 
 	* tools/zBounce/*: Major sync of zBounce off the main zBounce
 	project CVS.
 
-2004-06-17  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-17  Neil Spierling  <sirvulcan@gmail.com>
 
 	* README: Updated my email address + bumped date.
 
@@ -1227,15 +1239,15 @@
 	* ircd/m_part.c: If SPAMBOT_CHECKS is TRUE and the client isnt
 	an oper then check for spambot warnings.
 
-2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Only send the cipher notice to SSL users only!
 
-2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: Regenerated configure.
 
-2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure.in: Added a macro to for kerberos includes. Should
 	fix SSL errors. configure will be regenerated and committed in
@@ -1252,7 +1264,7 @@
 	* ircd/ssl.c: Added functions used for fetching ciphers for a 
 	client who is connected via SSL.
 
-2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/handlers.h: Add copyright function declerations.
 
@@ -1269,14 +1281,14 @@
 
 	* ircd/version.c.SH: Added GPL/Copyright text.
 
-2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/msg.h: Added CREDITS fluff.
 
 	* ircd/parse.c: Added CREDITS command, simply calls the m_info,
 	etc. functions.
 
-2004-06-15  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-15  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added in feature MOTD_LAST_CHANGED
 	(default FALSE).
@@ -1296,7 +1308,7 @@
 	notice contains the date of when the motd was last modified
 	(RFE 972238).
 
-2004-06-15  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-15  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/readme.features: Documented FEAT_GEO_LOCATION.
 
@@ -1374,7 +1386,7 @@
 
 	* ircd/random.c: Remove unneeded #include.
 
-2004-06-06  Neil Spierling  <vulcan@linux-boxen.org>
+2004-06-06  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure.in: Added --disable/enable-nickglines;
 	used throughout the ircd in ifdef's.

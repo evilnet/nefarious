@@ -50,7 +50,7 @@
 #endif
 
  /* This coded was ported from Ultimate IRCd (http://www.shadow-realm.org),
-  * modifications made by SiRVu|caN <vulcan@linux-boxen.org> to work on 
+  * modifications made by SiRVulcaN <sirvulcan@gmail.com> to work on 
   * IRCu.
   */
 

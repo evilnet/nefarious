@@ -86,7 +86,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
   /* +cC checks */
   if (chptr->mode.mode & MODE_NOCOLOUR)
     for (ch=text;*ch;ch++)
-      if (*ch==3 || *ch==27) {
+      if (*ch==2 || *ch==3 || *ch==22 || *ch==27 || *ch==31) {
 	send_reply(sptr, ERR_NOCOLORSONCHAN, chptr->chname);
 	send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
 	return;
@@ -139,7 +139,7 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
   /* +cC checks */
   if (chptr->mode.mode & MODE_NOCOLOUR)
     for (ch=text;*ch;ch++)
-      if (*ch==3 || *ch==27) {
+      if (*ch==2 || *ch==3 || *ch==22 || *ch==27 || *ch==31) {
         send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
         return;
       }

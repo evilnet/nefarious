@@ -93,7 +93,7 @@ const char *infotext[] = {
     "[http://sourceforge.net/projects/evilnet/]",
     "reed         Reed Loden               <reed@reedloden.com>",
     "Math         Mathieu Rene             <math@rootservices.net>",
-    "SiRVulcaN    Neil Spierling           <vulcan@linux-boxen.org>",
+    "SiRVulcaN    Neil Spierling           <sirvulcan@gmail.com>",
     "-",
     "Other contributors to Nefarious:",
     "ULtimaTe_    Matthias Crauwels        <ultimate_@wol.be>",
