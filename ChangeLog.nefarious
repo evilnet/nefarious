@@ -1,5 +1,16 @@
 2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Added new F:Line.
+
+	* include/ircd_features.h: Added FEAT_HOST_IN_TOPIC.
+
+	* ircd/ircd_features.h: Added FEAT_HOST_IN_TOPIC (Default TRUE).
+
+	* ircd/m_topic: Made FEAT_HOST_IN_TOPIC useful, if its enabled the host
+	will be added to topic_nick (See Below). RFE 975655.
+
+2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/channel.h: Bump up the size of topic_nick so it can hold a host.
 
 	* ircd/m_topic.c: When a topic is set, add the host into topic_nick so that

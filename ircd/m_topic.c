@@ -117,8 +117,10 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    /* setting a topic */
    ircd_strncpy(chptr->topic, topic, TOPICLEN);
    ircd_strncpy(chptr->topic_nick, cli_name(from), NICKLEN);
-   strcat(chptr->topic_nick, "@");
-   strcat(chptr->topic_nick, cli_user(from)->host);
+   if (feature_bool(FEAT_HOST_IN_TOPIC)) {
+     strcat(chptr->topic_nick, "@");
+     strcat(chptr->topic_nick, cli_user(from)->host);
+   }
    chptr->topic_time = ts ? ts : TStime();
    /* Fixed in 2.10.11: Don't propagate local topics */
    if (!IsLocalChannel(chptr->chname))
