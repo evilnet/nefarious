@@ -191,7 +191,7 @@ void do_trace(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   /* report all direct connections */
 
   for (i = 0; i <= HighestFd; i++) {
-    const char *conClass;
+    unsigned int conClass;
 
     if (!(acptr = LocalClientArray[i])) /* Local Connection? */
       continue;
