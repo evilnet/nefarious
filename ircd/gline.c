@@ -308,7 +308,7 @@ do_badchanneled(struct Channel *chptr, struct Gline *gline) {
     sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :%s (%s)", chptr,
 			  member->user, feature_str(FEAT_BADCHAN_REASON),
 			  gline->gl_reason);
-    sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL,
+    sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, 0,
 			  "%H %C :%s (%s)", chptr, member->user,
 			  feature_str(FEAT_BADCHAN_REASON), 
 			  gline->gl_reason);

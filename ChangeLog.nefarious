@@ -3,6 +3,38 @@
 
 2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Added ANNOUNCE_INVITES.
+
+	* include/ircd_features.h: Same as example.conf entry.
+
+	* include/numeric.h: Added RPL_ISSUEDINVITE (345).
+
+	* include/send.h: Modified sendcmdto_channel_butserv_butone,
+	added sendcmdto_channel_servers_butone.
+
+	* ircd/channel.c: Bug fix (see ChangeLog),
+	sendcmdto_channel_butserv_butone updates.
+
+	* ircd/gline.c: sendcmdto_channel_butserv_butone updates.
+
+	* ircd/ircd_features.c: Same as example.conf entry.
+
+	* ircd/m_burst.c: sendcmdto_channel_butserv_butone updates.
+
+	* ircd/m_invite.c: Added announce invites feature.
+
+	* ircd/m_kick.c: sendcmdto_channel_butserv_butone updates.
+
+	* ircd/m_topic.c: sendcmdto_channel_butserv_butone updates.
+
+	* ircd/s_err.c: see numeric.h entry.
+
+	* ircd/s_user.c: sendcmdto_channel_butserv_butone updates.
+
+	* ircd/send.c: sendcmdto_channel_butserv_butone updates.
+
+2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/supported.h: Added STATUSMSG (isupport), and
 	CHANNELLEN.
 

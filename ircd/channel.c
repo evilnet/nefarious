@@ -1757,7 +1757,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_KEY,		'k', */
 /*  MODE_BAN,		'b', */
 /*  MODE_EXCEPT         'e', */
-/*  MODE_LIMIT,		'l', */
+    MODE_LIMIT,		'l',
     MODE_NOCOLOUR,	'c',
     MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
@@ -1979,7 +1979,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 		addbuf_i ? "+" : "", addbuf, remstr, addstr);
 
     if (mbuf->mb_dest & MODEBUF_DEST_CHANNEL)
-      sendcmdto_channel_butserv_butone(app_source, CMD_MODE, mbuf->mb_channel, NULL,
+      sendcmdto_channel_butserv_butone(app_source, CMD_MODE, mbuf->mb_channel, NULL, 0,
 				"%H %s%s%s%s%s%s", mbuf->mb_channel,
 				rembuf_i ? "-" : "", rembuf,
 				addbuf_i ? "+" : "", addbuf, remstr, addstr);
@@ -2172,6 +2172,11 @@ modebuf_mode_uint(struct ModeBuf *mbuf, unsigned int mode, unsigned int uint)
 {
   assert(0 != mbuf);
   assert(0 != (mode & (MODE_ADD | MODE_DEL)));
+ 
+  if (mode == (MODE_LIMIT | MODE_DEL)) {
+    mbuf->mb_rem |= mode;
+    return;
+  }
 
   MB_TYPE(mbuf, mbuf->mb_count) = mode;
   MB_UINT(mbuf, mbuf->mb_count) = uint;
@@ -3497,7 +3502,7 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
 
     /* Send notification to channel */
     if (!(flags & CHFL_ZOMBIE))
-      sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL,
+      sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL, 0,
 				       ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
 					|| !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && HasColour(jbuf->jb_comment))) ?
 				       "%H" : "%H :%s", chan, jbuf->jb_comment);
@@ -3526,11 +3531,11 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
 			    "%H %Tu", chan, chan->creationtime);
 
     /* Send the notification to the channel */
-    sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_JOIN, chan, NULL, "%H", chan);
+    sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_JOIN, chan, NULL, 0, "%H", chan);
 
     /* send an op, too, if needed */
     if (!MyUser(jbuf->jb_source) && jbuf->jb_type == JOINBUF_TYPE_CREATE)
-      sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_MODE, chan, NULL, "%H +o %C",
+      sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_MODE, chan, NULL, 0, "%H +o %C",
 				chan, jbuf->jb_source);
   }
 

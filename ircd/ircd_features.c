@@ -460,6 +460,7 @@ static struct FeatureDesc {
   F_B(DNSBL_CHECKS, 0, 0, 0),
   F_I(DNSBL_EXEMPT_CLASS, 0, 0, 0),
   F_B(HIS_STATS_X, 0, 1, 0),
+  F_B(ANNOUNCE_INVITES, 0, 1, 0),
 
 #undef F_S
 #undef F_B
