@@ -175,7 +175,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
     switch (can_oper(sptr, name, password, &aconf)) {
     case ERR_NOOPERHOST:
-     sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O: Lines)",
+     sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
 			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
      send_reply(sptr, ERR_NOOPERHOST);
      return 0;
@@ -256,7 +256,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
 	     case ERR_NOOPERHOST:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
-		    "Failed OPER attempt by %s (%s@%s) (No O: Lines)", 
+		    "Failed OPER attempt by %s (%s@%s) (No O:line)", 
 		    parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
 		     return 0;
 		     break;

@@ -699,6 +699,8 @@ read_packet(struct Client *cptr, int socket_ready)
 
   if (socket_ready &&
       !(IsUser(cptr) && (feature_bool(FEAT_EVILNET) && !IsOper(cptr)) &&
+	(feature_int(FEAT_BOT_CLASS) == 0 ||
+	get_client_class(cptr) != feature_int(FEAT_BOT_CLASS)) &&
 	DBufLength(&(cli_recvQ(cptr))) > feature_int(FEAT_CLIENT_FLOOD))) {
     switch (os_recv_nonb(cli_fd(cptr), readbuf, sizeof(readbuf), &length)) {
     case IO_SUCCESS:
@@ -740,7 +742,8 @@ read_packet(struct Client *cptr, int socket_ready)
 
     if (IsUser(cptr)) {
       if (DBufLength(&(cli_recvQ(cptr))) > feature_int(FEAT_CLIENT_FLOOD)
-        && (feature_bool(FEAT_EVILNET) && !IsOper(cptr)))
+        && (feature_bool(FEAT_EVILNET) && !IsOper(cptr)) &&
+	(get_client_class(cptr) != feature_int(FEAT_BOT_CLASS)))
       return exit_client(cptr, cptr, &me, "Excess Flood");
     }
 

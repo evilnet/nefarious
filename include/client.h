@@ -145,6 +145,8 @@ enum Flag {
     FLAG_DEBUG,                     /* send global debug/anti-hack info */
     FLAG_ACCOUNT,                   /* account name has been set */
     FLAG_HIDDENHOST,                /* user's host is hidden */
+    FLAG_ACCOUNTONLY,               /* hide privmsgs/notices if user is
+                                       not authed or opered */
     FLAG_SLINE,                     /* user is S:Lined */
     FLAG_REMOTEOPER,
 
@@ -435,6 +437,7 @@ struct Client {
 #define IsAccount(x)            HasFlag(x, FLAG_ACCOUNT)
 #define IsHiddenHost(x)		HasFlag(x, FLAG_HIDDENHOST)
 #define HasHiddenHost(x)	(IsAccount(x) && IsHiddenHost(x))
+#define IsAccountOnly(x)	HasFlag(x, FLAG_ACCOUNTONLY)
 #define HasSLine(x)             HasFlag(x, FLAG_SLINE)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
@@ -458,6 +461,7 @@ struct Client {
 #define SetService(x)           SetFlag(x, FLAG_SERVICE)
 #define SetAccount(x)           SetFlag(x, FLAG_ACCOUNT)
 #define SetHiddenHost(x)	SetFlag(x, FLAG_HIDDENHOST)
+#define SetAccountOnly(x)	SetFlag(x, FLAG_ACCOUNTONLY)
 #define SetSLined(x)            SetFlag(x, FLAG_SLINE)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -474,6 +478,7 @@ struct Client {
 #define ClearWallops(x)         ClrFlag(x, FLAG_WALLOP)
 #define ClearServNotice(x)      ClrFlag(x, FLAG_SERVNOTICE)
 #define ClearHiddenHost(x)	ClrFlag(x, FLAG_HIDDENHOST)
+#define ClearAccountOnly(x)	ClrFlag(x, FLAG_ACCOUNTONLY)
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/* socket needs to be freed */

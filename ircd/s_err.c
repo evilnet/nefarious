@@ -36,7 +36,7 @@ static Numeric replyTable[] = {
 /* 003 */
   { RPL_CREATED, ":This server was created %s", "003" },
 /* 004 */
-  { RPL_MYINFO, "%s %s dioswkgx biklmnopstvr bklov", "004" },
+  { RPL_MYINFO, "%s %s dioswkgxR biklmnopstvrDcC bklov", "004" },
 /* 005 */
   { RPL_ISUPPORT, "%s :are supported by this server", "005" },
 /* 006 */
@@ -1004,7 +1004,7 @@ static Numeric replyTable[] = {
 /* 485 */
   { 0 },
 /* 486 */
-  { 0 },
+  { ERR_ACCOUNTONLY, "%s :You must be authed in order to message this user", "486" },
 /* 487 */
   { 0 },
 /* 488 */

@@ -662,7 +662,8 @@ static const struct UserMode {
   { FLAG_CHSERV,      'k' },
   { FLAG_DEBUG,       'g' },
   { FLAG_ACCOUNT,     'r' },
-  { FLAG_HIDDENHOST,  'x' }
+  { FLAG_HIDDENHOST,  'x' },
+  { FLAG_ACCOUNTONLY, 'R' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -891,10 +892,16 @@ int check_target_limit(struct Client *sptr, void *target, const char *name,
   /* If user is invited to channel, give him/her a free target */
   if (IsChannelName(name) && IsInvited(sptr, target))
     return 0;
+
   /* If feature evilnet is true and user is an oper, he/she always has a
      free target -reed */
   if (feature_bool(FEAT_EVILNET) && IsOper(sptr))
     return 0;
+
+  /* If user is in the BOT_CLASS, he/she always has a free target */
+  if (get_client_class(sptr) == feature_int(FEAT_BOT_CLASS))
+    return 0;
+
   /*
    * Same target as last time?
    */
@@ -1095,8 +1102,16 @@ int hide_hostmask(struct Client *cptr, unsigned int flag)
    * and set the modes, if any
    */
   for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
-    sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr,
-      "%H", chan->channel);
+    /* If this channel has delayed joins and the user has no modes, just set
+     * the delayed join flag rather than showing the join, even if the user
+     * was visible before */
+    if (!IsChanOp(chan) && !HasVoice(chan)
+        && (chan->channel->mode.mode & CHFL_DELAYED)) {
+      SetDelayedJoin(chan);
+    } else {
+      sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr,
+        "%H", chan->channel);
+    }
     if (IsChanOp(chan) && HasVoice(chan)) {
       sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr,
         "%H +ov %C %C", chan->channel, cptr, cptr);
@@ -1284,6 +1299,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         if (what == MODE_ADD)
 	  do_host_hiding = 1;
 	break;
+      case 'R':
+        if (what == MODE_ADD)
+          SetAccountOnly(acptr);
+        else
+          ClearAccountOnly(acptr);
+        break;
       default:
         break;
       }
@@ -1312,7 +1333,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearWallops(acptr);
 
     if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(acptr) && 
-	!IsAnOper(acptr) && !FlagHas(&setflags, FLAG_SERVNOTICE)) {
+	!IsAnOper(acptr) && !FlagHas(&setflags, FLAG_SERVNOTICE) &&
+	(get_client_class(sptr) != feature_int(FEAT_BOTSERVICE_CLASS))) {
       ClearServNotice(acptr);
       set_snomask(acptr, 0, SNO_SET);
     }

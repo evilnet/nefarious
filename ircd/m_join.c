@@ -82,6 +82,7 @@
 #include "config.h"
 
 #include "channel.h"
+#include "class.h"
 #include "client.h"
 #include "gline.h"
 #include "hash.h"
@@ -228,6 +229,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       flags = CHFL_CHANOP;
 
     if (cli_user(sptr)->joined >= feature_int(FEAT_MAXCHANNELSPERUSER) &&
+	get_client_class(sptr) != feature_int(FEAT_BOT_CLASS) &&
 	!HasPriv(sptr, PRIV_CHAN_LIMIT)) {
       send_reply(sptr, ERR_TOOMANYCHANNELS, chptr ? chptr->chname : name);
       break; /* no point processing the other channels */

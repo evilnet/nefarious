@@ -617,7 +617,7 @@ int has_voice(struct Client* cptr, struct Channel* chptr)
   return 0;
 }
 
-int member_can_send_to_channel(struct Membership* member)
+int member_can_send_to_channel(struct Membership* member, int reveal)
 {
   assert(0 != member);
 
@@ -636,10 +636,17 @@ int member_can_send_to_channel(struct Membership* member)
    */
   if (MyUser(member->user) && is_banned(member->user, member->channel, member))
     return 0;
+  
+  if (IsDelayedJoin(member) && reveal) {
+    ClearDelayedJoin(member);
+    sendcmdto_channel_butserv_butone(member->user, CMD_JOIN, member->channel, member->user, ":%H", 
+				     member->channel);
+  }
+    
   return 1;
 }
 
-int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
+int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr, int reveal)
 {
   struct Membership *member;
   assert(0 != cptr); 
@@ -659,7 +666,7 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
     else
       return !is_banned(cptr, chptr, NULL);
   }
-  return member_can_send_to_channel(member); 
+  return member_can_send_to_channel(member, reveal); 
 }
 
 /*
@@ -707,6 +714,12 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'n';
   if (chptr->mode.mode & MODE_REGONLY)
     *mbuf++ = 'r';
+  if (chptr->mode.mode & MODE_NOCOLOUR)
+    *mbuf++ = 'c';
+  if (chptr->mode.mode & MODE_NOCTCP)
+    *mbuf++ = 'C';
+  if (chptr->mode.mode & MODE_DELJOINS)
+    *mbuf++ = 'D';
   if (chptr->mode.limit) {
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
@@ -848,6 +861,10 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
     msgq_clean(mb);
   }                             /* Continue when there was something
                                  that didn't fit (full==1) */
+
+  if (*chptr->topic)
+    sendcmdto_one(&me, CMD_TOPIC, cptr, "%H %Tu :%s", chptr,
+                 chptr->topic_time, chptr->topic);
 }
 
 /*
@@ -1342,9 +1359,12 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_INVITEONLY,	'i',
     MODE_NOPRIVMSGS,	'n',
     MODE_REGONLY,	'r',
+    MODE_DELJOINS,       'D',
 /*  MODE_KEY,		'k', */
 /*  MODE_BAN,		'b', */
 /*  MODE_LIMIT,		'l', */
+    MODE_NOCOLOUR,      'c',
+    MODE_NOCTCP,        'C',
     0x0, 0x0
   };
   int i;
@@ -1702,7 +1722,8 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
   assert(0 != (mode & (MODE_ADD | MODE_DEL)));
 
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
-	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY);
+	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
+	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_DELJOINS );
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1806,6 +1827,9 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
 /*  MODE_BAN,		'b', */
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
+    MODE_NOCOLOUR,      'c',
+    MODE_NOCTCP,        'C',
+    MODE_DELJOINS,      'D',
     0x0, 0x0
   };
   unsigned int add;
@@ -2390,6 +2414,11 @@ mode_process_clients(struct ParseState *state)
     /* actually effect the change */
     if (state->flags & MODE_PARSE_SET) {
       if (state->cli_change[i].flag & MODE_ADD) {
+	if (IsDelayedJoin(member)) {
+	  ClearDelayedJoin(member);  
+	  sendcmdto_channel_butserv_butone(member->user, CMD_JOIN, member->channel, 
+					   member->user, ":%H", member->channel);
+	}
 	member->status |= (state->cli_change[i].flag &
 			   (MODE_CHANOP | MODE_VOICE));
 	if (state->cli_change[i].flag & MODE_CHANOP)
@@ -2459,6 +2488,9 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_BAN,		'b',
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
+    MODE_NOCOLOUR,      'c',
+    MODE_NOCTCP,        'C',
+    MODE_DELJOINS,      'D',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0
@@ -2673,7 +2705,7 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
   if (jbuf->jb_type == JOINBUF_TYPE_PART ||
       jbuf->jb_type == JOINBUF_TYPE_PARTALL) {
     /* Send notification to channel */
-    if (!(flags & CHFL_ZOMBIE))
+    if (!(flags & (CHFL_ZOMBIE | CHFL_DELAYED)))
       sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL,
 				(flags & CHFL_BANNED || !jbuf->jb_comment) ?
 				":%H" : "%H :%s", chan, jbuf->jb_comment);
@@ -2693,20 +2725,26 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
       remove_user_from_channel(jbuf->jb_source, chan);
   } else {
     /* Add user to channel */
-    add_user_to_channel(chan, jbuf->jb_source, flags);
-
+    if ((chan->mode.mode & MODE_DELJOINS) && !(flags & CHFL_VOICED_OR_OPPED))
+      add_user_to_channel(chan, jbuf->jb_source, flags|CHFL_DELAYED);
+    else
+      add_user_to_channel(chan, jbuf->jb_source, flags);
+    
     /* send notification to all servers */
     if (jbuf->jb_type != JOINBUF_TYPE_CREATE && !IsLocalChannel(chan->chname))
       sendcmdto_serv_butone(jbuf->jb_source, CMD_JOIN, jbuf->jb_connect,
 			    "%H %Tu", chan, chan->creationtime);
 
-    /* Send the notification to the channel */
-    sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_JOIN, chan, NULL, ":%H", chan);
+    if (!((chan->mode.mode & MODE_DELJOINS) && !(flags & CHFL_VOICED_OR_OPPED))) {
+      /* Send the notification to the channel */
+      sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_JOIN, chan, NULL, ":%H", chan);
 
-    /* send an op, too, if needed */
-    if (!MyUser(jbuf->jb_source) && jbuf->jb_type == JOINBUF_TYPE_CREATE)
-      sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_MODE, chan, NULL, "%H +o %C",
-				chan, jbuf->jb_source);
+      /* send an op, too, if needed */
+      if (!MyUser(jbuf->jb_source) && jbuf->jb_type == JOINBUF_TYPE_CREATE)
+        sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_MODE, chan, NULL, "%H +o %C",
+                                       chan, jbuf->jb_source);
+    } else if (MyUser(jbuf->jb_source))
+      sendcmdto_one(jbuf->jb_source, CMD_JOIN, jbuf->jb_source, ":%H", chan);
   }
 
   if (jbuf->jb_type == JOINBUF_TYPE_PARTALL ||

@@ -1,7 +1,20 @@
-2003-01-14  Mathieu Rene <math@rootservices.net>
+2003-01-15  Reed Loden  <reed@reedloden.com>
+
+	* Added several ASUKA patches: delayedjoin, cC, accountonly,
+	topicburst (needs to be fixed), and parts of badchan.
+
+	* ircd/m_join.c: Added reason to BADCHAN kick message.
+
+	* ircd/m_oper.c: Changed "No O: Lines" to "No O:line".
+
+	* Add an edited version of OUTsider's botservice patch for use
+	on Bots.*.
+
+2003-01-14  Mathieu Rene  <math@rootservices.net>
+
 	* ircd/m_oper.c: Added remote OPER capability
 
-	* ircd/m_join.c: Send reason instead of RPL_BANNEDROMCHAN when
+	* ircd/m_join.c: Send reason instead of RPL_BANNEDFROMCHAN when
 	attempting to join a BADCHAN'd channel + allow wildcards in badchans.
 
 	* ircd/m_set.c: Added remote SET support
@@ -9,25 +22,25 @@
 	* ircd/parse.c: Addes ms_set reference
 
 	* ircd/table_gen.c: Forbid * in a channel name since this will break
-	 wildcards
+	wildcards
 
 	* ircd/client.c: Send privileges according to the defaults
-			 rather than using a hardcoded list.
+	rather than using a hardcoded list.
 
-        * ircd/ircd_features.c: Added a new feature: REMOTE_OPER, default
-           to TRUE
+	* ircd/ircd_features.c: Added a new feature: REMOTE_OPER, default
+	to TRUE
 	
 	* include/client.h: Added FLAG_REMOTEOPER
 
-	* include/ircd_features.h: Added a new feature: REMOTE_OPER, default
-	   to TRUE
+	* include/ircd_features.h: Added a new feature: REMOTE_OPER,
+	default to TRUE
 
-	 * include/msg.h: Added CMD_SET definition
+	* include/msg.h: Added CMD_SET definition
 
-	 * include/handlers.h: Added ms_set prototype
+	* include/handlers.h: Added ms_set prototype
 
+2003-01-13  Mathieu Rene  <math@rootservices.net>
 
-2003-01-13  Mathieu Rene <math@rootservices.net>
 	* ircd/m_oper.c: Isolated OPER Authentication procedure
 	
 	* ircd/m_svsnick.c: Fixed stuff that didnt compile

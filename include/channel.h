@@ -66,6 +66,7 @@ struct Client;
 #define CHFL_BANVALID           0x0800  /* CHFL_BANNED bit is valid */
 #define CHFL_BANNED             0x1000  /* Channel member is banned */
 #define CHFL_SILENCE_IPMASK     0x2000  /* silence mask is an IP-number mask */
+#define CHFL_DELAYED            0x4000  /* delayed join */
 
 #define CHFL_OVERLAP         (CHFL_CHANOP | CHFL_VOICE)
 #define CHFL_BANVALIDMASK    (CHFL_BANVALID | CHFL_BANNED)
@@ -85,6 +86,9 @@ struct Client;
 #define MODE_BAN        0x0200
 #define MODE_LIMIT      0x0400
 #define MODE_REGONLY    0x0800  /* Only +r users may join */
+#define MODE_NOCOLOUR   0x1000
+#define MODE_NOCTCP     0x2000
+#define MODE_DELJOINS   0x4000
 #define MODE_LISTED     0x10000
 #define MODE_SAVE	0x20000	/* save this mode-with-arg 'til later */
 #define MODE_FREE	0x40000 /* string needs to be passed to MyFree() */
@@ -175,6 +179,7 @@ struct Membership {
 #define IsServOpOk(x)       ((x)->status & CHFL_SERVOPOK)
 #define IsBurstJoined(x)    ((x)->status & CHFL_BURST_JOINED)
 #define IsVoicedOrOpped(x)  ((x)->status & CHFL_VOICED_OR_OPPED)
+#define IsDelayedJoin(x)    ((x)->status & CHFL_DELAYED)
 
 #define SetBanned(x)        ((x)->status |= CHFL_BANNED)
 #define SetBanValid(x)      ((x)->status |= CHFL_BANVALID)
@@ -182,13 +187,14 @@ struct Membership {
 #define SetServOpOk(x)      ((x)->status |= CHFL_SERVOPOK)
 #define SetBurstJoined(x)   ((x)->status |= CHFL_BURST_JOINED)
 #define SetZombie(x)        ((x)->status |= CHFL_ZOMBIE)
+#define SetDelayedJoin(x)   ((x)->status |= CHFL_DELAYED)
 
 #define ClearBanned(x)      ((x)->status &= ~CHFL_BANNED)
 #define ClearBanValid(x)    ((x)->status &= ~CHFL_BANVALID)
 #define ClearDeopped(x)     ((x)->status &= ~CHFL_DEOPPED)
 #define ClearServOpOk(x)    ((x)->status &= ~CHFL_SERVOPOK)
 #define ClearBurstJoined(x) ((x)->status &= ~CHFL_BURST_JOINED)
-
+#define ClearDelayedJoin(x) ((x)->status &= ~CHFL_DELAYED)
 
 struct Mode {
   unsigned int mode;
@@ -319,8 +325,8 @@ int number_of_zombies(struct Channel *chptr);
 extern const char* find_no_nickchange_channel(struct Client* cptr);
 extern struct Membership* IsMember(struct Client *cptr, struct Channel *chptr);
 extern struct Membership* find_channel_member(struct Client* cptr, struct Channel* chptr);
-extern int member_can_send_to_channel(struct Membership* member);
-extern int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr);
+extern int member_can_send_to_channel(struct Membership* member, int reveal);
+extern int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr, int reveal);
 
 extern void remove_user_from_channel(struct Client *sptr, struct Channel *chptr);
 extern void remove_user_from_all_channels(struct Client* cptr);
