@@ -1,7 +1,3 @@
-#define CVS_VERSION "$Id:"
-
-/*
-
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Bumped up the max excepts to 45.
@@ -1487,4 +1483,3 @@
 
 	* Imported u2_10_11_04 into CVS.
 
-*/
