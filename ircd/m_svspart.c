@@ -108,7 +108,7 @@
  */
 int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
   struct Client *acptr;
-  char* newparv[];
+  char* newparv[BUFSIZE];
 
   if (parc < 3) {
     protocol_violation(sptr, "Too few arguments for SVSPART");
