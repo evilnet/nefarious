@@ -63,6 +63,8 @@ struct ServerStatistics {
  * Prototypes
  */
 
+unsigned int bllinecount;
+
 extern int check_registered(struct Client *sptr);
 extern int check_registered_user(struct Client *sptr);
 extern int exit_client(struct Client *cptr, struct Client *bcptr,

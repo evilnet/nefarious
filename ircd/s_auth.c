@@ -131,24 +131,32 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
    * try have the resolver delete the query it's about
    * to delete anyways. --Bleep
    */
-  ClearDNSBLPending(auth);
 
   if (reply) {
     const struct hostent* hp = reply->hp;
-    int i, pass = 0;
+    int i;
 
     assert(0 != hp);
 
     for (i = 0; hp->h_addr_list[i]; ++i) {
       if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name))
-	pass = 1;
+        --cli_dnsblcount(auth->client);
       else {
-	pass = 0;
-	break;
+        cli_dnsblcount(auth->client) = 0;
+        break;
       }
     }
-
   }
+
+  if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && !IsDoingAuth(auth)) {
+    ClearDNSBLPending(auth);
+    Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]", cli_username(auth->client),
+         cli_sockhost(auth->client), cli_sock_ip(auth->client)));
+    release_auth_client(auth->client);
+    unlink_auth_request(auth, &AuthIncompleteList);
+    free_auth_request(auth);
+  } else if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && IsDoingAuth(auth))
+    ClearDNSBLPending(auth);
 
   return;
 }
@@ -160,7 +168,7 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   static char hname[HOSTLEN + 1] = "";
   struct blline *blline;
   struct DNSQuery query;
-  int i, pass = 0;
+  int i;
 
   if (!feature_bool(FEAT_DNSBL_CHECKS))
     return 0;
@@ -173,6 +181,11 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   if (IsUserPort(auth->client))
     sendheader(client, REPORT_DO_DNSBL);
 
+  Debug((DEBUG_DEBUG, "DNSBL t: %d", bllinecount));
+
+  cli_dnsblcount(auth->client) = bllinecount;
+  SetDNSBLPending(auth);
+
   for (blline = GlobalBLList; blline; blline = blline->next) {
     ircd_snprintf(0, hname, HOSTLEN + 1, "%d.%d.%d.%d.%s", ipo[3],
                   ipo[2], ipo[1], ipo[0], blline->server);
@@ -180,23 +193,24 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
     cli_dnsbl_reply(client) = gethost_byname(hname, &query);
 
     if (cli_dnsbl_reply(client)) {
-      Debug((DEBUG_LIST, "DNSBL entry for %p was cached (%s %s)", auth->client,  
+      Debug((DEBUG_DEBUG, "DNSBL entry for %p was cached (%s %s)", auth->client,  
             cli_dnsbl_reply(client)->hp->h_name, hname));
       ++(cli_dnsbl_reply(client))->ref_count;
       for (i = 0; cli_dnsbl_reply(client)->hp->h_addr_list[i]; ++i) {
         if (!find_blline(auth->client, ircd_ntoa((char*)
 	    cli_dnsbl_reply(client)->hp->h_addr_list[i]),
 	    hname))
-	  pass = 1;
-	else {
-	  pass = 0;
-	  break;
-	}
+          --cli_dnsblcount(auth->client);
+        else {
+          cli_dnsblcount(auth->client) = 0;
+          break;
+        }
       }
-
-    } else
-      SetDNSBLPending(auth);
+    }
   }
+
+  if (cli_dnsblcount(auth->client) == 0)
+    ClearDNSBLPending(auth);
 
   return 0;
 }
@@ -485,7 +499,9 @@ static void auth_dns_callback(void* vptr, struct DNSReply* reply)
     if (IsUserPort(auth->client))
       sendheader(auth->client, REPORT_FAIL_DNS);
   }
-  if (!IsDoingAuth(auth)) {
+  if ((feature_bool(FEAT_DNSBL_CHECKS) && !IsDNSBLPending(auth)) && !IsDoingAuth(auth)) {
+    Debug((DEBUG_DEBUG, "Freeing auth after dns %s@%s [%s]", cli_username(auth->client),
+	 cli_sockhost(auth->client), cli_sock_ip(auth->client)));
     release_auth_client(auth->client);
     unlink_auth_request(auth, &AuthIncompleteList);
     free_auth_request(auth);

@@ -1,6 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-24  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/client.h: Added a count to the client struct for counting
+	down dnsbls as we scan through them on connect.
+
+	* ircd/s_misc.h: Global int for the total amount of X:Lines. This
+	is updated on start and rehashes.
+
+	* ircd/s_auth.c: Set the client dnsbl pending for the whole scan
+	then count down the total in the client struct till it reaches 0.
+	Once its 0 we are able to release the client auth safely and are
+	able to clear dnsbl pending.
+
+	* ircd/s_conf.c: Update bllinecount on start and rehash.
+
 2005-02-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_conf.c: Somehow find_blline was being called with missing

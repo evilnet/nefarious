@@ -260,6 +260,7 @@ struct Client {
   struct Flags   cli_flags;     /* client flags */
   unsigned int   cli_oflags;    /* oper flags */
   unsigned int   cli_hopcount;  /* number of servers to this 0 = local */
+  unsigned int   cli_dnsblcount; /* number of dnsbls left to check */
   struct in_addr cli_ip;        /* Real ip# NOT defined for remote servers! */
   short          cli_status;    /* Client type */
   unsigned char  cli_local;     /* local or remote client */
@@ -301,6 +302,7 @@ struct Client {
 #define cli_oflags(cli)		((cli)->cli_oflags)
 #define cli_dnsbl(cli)		((cli)->cli_dnsbl)
 #define cli_dnsblformat(cli)	((cli)->cli_dnsblformat)
+#define cli_dnsblcount(cli)	((cli)->cli_dnsblcount)
 
 #define cli_count(cli)		((cli)->cli_connect->con_count)
 #define cli_fd(cli)		((cli)->cli_connect->con_fd)
