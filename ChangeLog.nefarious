@@ -1,5 +1,10 @@
 2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* include/patchlevel.h: Bumped the patchlevel, so we can differ between
+	who has +he and who doesnt. Should be a bump after every major commit.
+
+2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Default halfops to false, suggestion by Rubin.
 
 	* ircd/ircd_features.c Default halfops to false, suggestion by Rubin.
