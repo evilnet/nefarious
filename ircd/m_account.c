@@ -136,23 +136,24 @@ static struct Client *decode_auth_id(const char *id)
 /*
  * ms_account - server message handler
  *
- * parv[0] = sender prefix
- * parv[1] = numeric of client to act on
- * parv[2] = account name (12 characters or less)
- * parv[3] = message sub-type
+ * This func is complex because it has many ways its called:
+ * 
+ * 0     1     2     3              4          
+ * ----------------------------------------------------
+ *  FEAT_EXTENDED_ACCOUNTS == TRUE :
+1* Az AC ABAAC R     Rubin          1037526164   -- New (standard)
+2* Az AC ABAAC R     Rubin                       -- New but No timestamp
+3* Az AC AB    A     .15.1835576208 1037526164   -- LOC authorised
+4* Az AC AB    D     .15.1835576208 1037526164   -- LOC denied
+5* Az AC ABAAC U                                 -- Unregister
+6* Az AC ABAAC R     Rewbin                      -- Rename
+
+ * FEAT_EXTENDED_ACCOUNTS == FALSE :
+7* AK AC AoAAI Rubin 1037526164                  -- Old w/ timestamp 
+8* AK AC AoAAI Rubin                             -- Original
  *
- * for parv[4] == 'R' (remote auth):
- * parv[4] = account name (12 characters or less)
- * parv[5] = account TS (optional)
- *
- * for parv[4] == 'C' (auth check):
- * parv[4] = request id (transparent, uninterpreted string)
- * parv[5] = username
- * parv[parc-1] = password
- *
- * for parv[3] == 'A' (auth ok) or
- * for parv[3] == 'D' (auth denied):
- * parv[4] = request id (transparent, uninterpreted string)
+ * also, sent FROM ircd to service:
+ * AB AC AzAAC C .15.1835576208 rubin :password  -- LOC Approval
  *
  * for parv[3] == 'U' (unregister)
  * no extra parms
@@ -175,165 +176,182 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     return protocol_violation(cptr, "ACCOUNT from non-server %s",
 			      cli_name(sptr));
 
-  if (parv[2][1] != '\0' && *parv[2] != 'U' && *parv[2] != 'M') {
-    if (parc < 4) {
-      /* old-school message, remap it to 'R' */
-      parv[4] = NULL;
-      parv[3] = parv[2];
-      parv[2] = "R";
-      parc = 4;
-    } else if (parc == 4 && atoi(parv[3])) {
-      /* old-school message with timestamp, remap it to 'R' */
-      parv[5] = NULL;
-      parv[4] = parv[3];
-      parv[3] = parv[2];
-      parv[2] = "R";
-      parc = 5;
-    }
+  if(feature_bool(FEAT_EXTENDED_ACCOUNTS))
+  {
+    if(strlen(parv[2]) != 1)
+        return protocol_violation(cptr, "ACCOUNT detected invalid subcommand token '%s'. Old syntax maybe? See EXDENDED_ACCOUNTS F:line", parv[2]);
+
+    type = parv[2][0];
+
+    switch(type)
+    {
+        case 'U':  /* account removal */
+          if (!(acptr = findNUser(parv[1])))
+            return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+
+          if (!IsAccount(acptr))
+            return protocol_violation(cptr, "User %s does not have an account set (ACCOUNT Removal)", cli_name(acptr));
+
+          assert(0 != cli_user(acptr)->account[0]);
+
+          ircd_strncpy(cli_user(acptr)->account, "", ACCOUNTLEN);
+
+          hidden = HasHiddenHost(acptr);
+          if (hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+            unhide_hostmask(acptr);
+
+          ClearAccount(acptr);
+          --UserStats.authed;
+
+          sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C U", acptr);
+          return 0;
+        case 'M': /* account renaming */
+          if(parc < 4)
+            return protocol_violation(cptr, "ACCOUNT M (rename) missing new account name param. Is the EXTENDED_ACCOUNTS F:line set right?");
+          if (!(acptr = findNUser(parv[1])))
+            return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+          if (strlen(parv[3]) > ACCOUNTLEN) {
+              return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring. (rename)",
+                                        parv[3], ACCOUNTLEN, cli_name(acptr));
+          }
+          ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
+          hidden = HasHiddenHost(acptr);
+          if (hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+            hide_hostmask(acptr);
+          sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C M %s", acptr, parv[3]);
+          return 0;
+        case 'R': /* account login */
+          if(parc < 4)
+            return protocol_violation(cptr, "ACCOUNT called without account name.. Is the EXTENDED_ACCOUNTS F:line set right?");
+          if (!(acptr = findNUser(parv[1])))
+            return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+          if (IsAccount(acptr))
+            return protocol_violation(cptr, "ACCOUNT for already registered user %s "
+                                      "(%s -> %s)", cli_name(acptr), cli_user(acptr)->account, parv[3]);
+          assert(0 == cli_user(acptr)->account[0]);
+
+          if (strlen(parv[3]) > ACCOUNTLEN)
+            return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.",
+                                      parv[3], ACCOUNTLEN, cli_name(acptr));
+          if (parc > 4) {
+            cli_user(acptr)->acc_create = atoi(parv[4]);
+            Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
+                   "timestamp %Tu", parv[3], cli_user(acptr)->acc_create));
+          }
+          Debug((DEBUG_DEBUG, "ACC TEST: hf: %s fh %s dh %s id %s dmf %s", HasFakeHost(acptr) ? "1" : "0",
+                             cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost, IsDNSBLMarked(acptr) ? "1" : "0",
+                             feature_bool(FEAT_DNSBL_MARK_FAKEHOST) ? "1" : "0"));
+          if (HasFakeHost(acptr) && !ircd_strcmp(cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost) &&
+              IsDNSBLMarked(acptr) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST))
+            ClearFakeHost(acptr);
+          hidden = HasHiddenHost(acptr);
+          SetAccount(acptr);
+          ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
+          ++UserStats.authed;
+          /* Fake hosts have precedence over account-based hidden hosts,
+             so, if the user was already hidden, don't do it again */
+          if (!hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+             hide_hostmask(acptr);
+          sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
+                                cli_user(acptr)->acc_create ? "%C R %s %Tu" : "%C R %s",
+                                acptr, cli_user(acptr)->account,
+                                cli_user(acptr)->acc_create);
+          break;
+        case 'C':  /* LOC request */
+          if(parc < 6)
+            return need_more_params(sptr, "ACCOUNT");
+
+          /* findNUser("AB") seems to return Sirvulcan, whois numnick is ABAAB.. 
+           * This is a bug with findNUser no? 
+           * so you cant do this, because acptr is the user not the server. 
+           * Hopefully reversing them will be ok.
+           *    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
+          */
+          if(!(acptr = FindNServer(parv[1])) && !(acptr = findNUser(parv[1])))
+            return 0; /* target not online, ignore */
+          
+          if (!IsMe(acptr)) {
+            /* in-transit message, forward it */
+            sendcmdto_one(sptr, CMD_ACCOUNT, acptr,
+                         type == 'C' ? "%s %s %s %s :%s" : "%s %s %s",
+                         parv[1], parv[2], parv[3], parv[4], parv[parc-1]);
+            return 0;
+          }
+          else /* auth checks are for services, not servers */
+            return protocol_violation(cptr, "ACCOUNT check (%s %s %s)", parv[3], parv[4], parv[5]);
+         
+        case 'A':
+        case 'D':
+          if(parc < 4)
+            return need_more_params(sptr, "ACCOUNT");
+          if(!(acptr = FindNServer(parv[1])))
+              return 0; /* target not online, ignore */
+          if (!IsMe(acptr)) {
+            /* in-transit message, forward it */
+            sendcmdto_one(sptr, CMD_ACCOUNT, acptr, "%s %s %s", parv[1], parv[2], parv[3]);
+            return 0;
+          }
+          if (!(acptr = decode_auth_id(parv[3])))
+            return 0; /* most probably, user disconnected */
+          /* If we get here its a local user */
+          if (type == 'A') {
+            SetAccount(acptr);
+            ircd_strncpy(cli_user(acptr)->account, cli_loc(acptr)->account, ACCOUNTLEN);
+            if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+              SetHiddenHost(acptr);
+              hide_hostmask(acptr);
+            }
+          }
+          sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :AUTHENTICATION %s as %s", acptr,
+                       type == 'A' ? "SUCCESSFUL" : "FAILED",
+                       cli_loc(acptr)->account);
+          MyFree(cli_loc(acptr));
+          if (type == 'D') {
+            sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Type \002/QUOTE PASS\002 to connect anyway", acptr);
+            return 0;
+          }
+            
+          return register_user(acptr, acptr, cli_name(acptr), cli_user(acptr)->username);
+        default:
+            return protocol_violation(cptr, "ACCOUNT sub-type '%s' not implemented", parv[2]);
+     }
   }
-
-  type = parv[2][0];
-
-  if (type == 'U') { /* account removal */
+  else { /* OLD style FEAT_EXTENDED_ACCOUNTS==FALSE accounts */
+    if(parc > 4)
+      return protocol_violation(cptr, "ACCOUNT recieved too many arguments.. Is the EXTENDED_ACCOUNTS F:line set right?");
     if (!(acptr = findNUser(parv[1])))
       return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
-
-    if (!IsAccount(acptr))
-      return protocol_violation(cptr, "User %s does not have an account set (ACCOUNT Removal)", cli_name(acptr));
-
-    assert(0 != cli_user(acptr)->account[0]);
-
-    ircd_strncpy(cli_user(acptr)->account, "", ACCOUNTLEN);
-
-    hidden = HasHiddenHost(acptr);
-    if (hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
-      unhide_hostmask(acptr);
-
-    ClearAccount(acptr);
-    --UserStats.authed;
-
-    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C U", acptr);
-    return 0;
-  } else if (type == 'M') { /* account renaming */
-
-    if (!(acptr = findNUser(parv[1])))
-      return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
-
-    if (!IsAccount(acptr)) {
-      parv[2] = "R";
-    } else {
-      if (strlen(parv[3]) > ACCOUNTLEN) {
-	return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring. (rename)",
-                                  parv[3], ACCOUNTLEN, cli_name(acptr));
-      }
-
-      ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
-
-      hidden = HasHiddenHost(acptr);
-      if (hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
-        hide_hostmask(acptr);
-
-      sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C M %s", acptr, parv[3]);
-      return 0;
-    }
-  }
-
-  /* Ended here just in case an account rename was remapped to a R */
-
-  if (type == 'R') { /* account login */
-    if (!(acptr = findNUser(parv[1])))
-      return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
-
     if (IsAccount(acptr))
       return protocol_violation(cptr, "ACCOUNT for already registered user %s "
-			        "(%s -> %s)", cli_name(acptr),
-			        cli_user(acptr)->account, parv[3]);
-
+                                "(%s -> %s)", cli_name(acptr), cli_user(acptr)->account, parv[3]);
     assert(0 == cli_user(acptr)->account[0]);
 
-    if (strlen(parv[3]) > ACCOUNTLEN)
+    if (strlen(parv[2]) > ACCOUNTLEN)
       return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.",
-                                parv[3], ACCOUNTLEN, cli_name(acptr));
-
-    if (parc > 4) {
-      cli_user(acptr)->acc_create = atoi(parv[4]);
+                                parv[2], ACCOUNTLEN, cli_name(acptr));
+    if (parc > 3) {
+      cli_user(acptr)->acc_create = atoi(parv[3]);
       Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
-	     "timestamp %Tu", parv[3], cli_user(acptr)->acc_create));
+             "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
     }
-
     Debug((DEBUG_DEBUG, "ACC TEST: hf: %s fh %s dh %s id %s dmf %s", HasFakeHost(acptr) ? "1" : "0",
                        cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost, IsDNSBLMarked(acptr) ? "1" : "0",
                        feature_bool(FEAT_DNSBL_MARK_FAKEHOST) ? "1" : "0"));
-
     if (HasFakeHost(acptr) && !ircd_strcmp(cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost) &&
         IsDNSBLMarked(acptr) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST))
       ClearFakeHost(acptr);
-
     hidden = HasHiddenHost(acptr);
     SetAccount(acptr);
-    ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
+    ircd_strncpy(cli_user(acptr)->account, parv[2], ACCOUNTLEN);
     ++UserStats.authed;
-
     /* Fake hosts have precedence over account-based hidden hosts,
        so, if the user was already hidden, don't do it again */
     if (!hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
        hide_hostmask(acptr);
-
     sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
-			  cli_user(acptr)->acc_create ? "%C R %s %Tu" : "%C R %s",
-			  acptr, cli_user(acptr)->account,
-			  cli_user(acptr)->acc_create);
-  } else {
-    if (type == 'C' && parc < 6)
-      return need_more_params(sptr, "ACCOUNT");
-
-    /* findNUser("AB") seems to return Sirvulcan, whois numnick is ABAAB.. 
-     * This is a bug with findNUser no? 
-     * so you cant do this, because acptr is the user not the server. 
-     * Hopefully reversing them will be ok.
-     *    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
-    */
-    if(!(acptr = FindNServer(parv[1])) && !(acptr = findNUser(parv[1])))
-      return 0; /* target not online, ignore */
-    
-    if (!IsMe(acptr)) {
-      /* in-transit message, forward it */
-      sendcmdto_one(sptr, CMD_ACCOUNT, acptr,
-                   type == 'C' ? "%s %s %s %s :%s" : "%s %s %s",
-                   parv[1], parv[2], parv[3], parv[4], parv[parc-1]);
-      return 0;
-    }
-    
-    /* the message is for &me, process it */
-    if (type == 'C')
-      /* auth checks are for services, not servers */
-      return protocol_violation(cptr, "ACCOUNT check (%s %s %s)", parv[3], parv[4], parv[5]);
-    else if (type != 'A' && type != 'D' && type != 'U' && type != 'M')
-      return protocol_violation(cptr, "ACCOUNT sub-type '%s' not implemented", parv[2]);
-    
-    if (!(acptr = decode_auth_id(parv[3])))
-      return 0; /* most probably, user disconnected */
-
-    if (type == 'A') {
-      SetAccount(acptr);
-      ircd_strncpy(cli_user(acptr)->account, cli_loc(acptr)->account, ACCOUNTLEN);
-      if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
-        SetHiddenHost(acptr);
-        hide_hostmask(acptr);
-      }
-    }
-    
-    sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :AUTHENTICATION %s as %s", acptr,
-                 type == 'A' ? "SUCCESSFUL" : "FAILED",
-                 cli_loc(acptr)->account);
-    MyFree(cli_loc(acptr));
-
-    if (type == 'D') {
-      sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Type \002/QUOTE PASS\002 to connect anyway", acptr);
-      return 0;
-    }
-    
-    return register_user(acptr, acptr, cli_name(acptr), cli_user(acptr)->username);
+                          cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s",
+                          acptr, cli_user(acptr)->account,
+                          cli_user(acptr)->acc_create);
   }
 
   return 0;

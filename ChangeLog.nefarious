@@ -1,6 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-04-01  Alex Schumann <rubin@afternet.org>
+
+	* ircd/m_mode.c: Fixed a core when +k users set bans. Thanks to
+	jaden for discovering this on the production net... :/
+
+	* ircd/m_account.c: Redid m_account() to move backward compatability
+	code to an F line. The old way was overrunning the parv array. Added
+	tons of protocol validity checks.
+
+	* doc/example.conf: added F:EXTENDED_ACCOUNTS
+
+	* doc/readme.features: added F:EXTENDED_ACCOUNTS
+
 2005-03-31  Alex Schumann <rubin@afternet.org>
 
 	* ircd/m_account.c: check for null in decode_auth_id (crash on playa's

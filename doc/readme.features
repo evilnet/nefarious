@@ -293,6 +293,15 @@ connects to or disconnects from the server.  Enabling this feature may
 have a performance impact. If using this features make sure you take
 a look at snomask.html in this directory.
 
+EXTENDED_ACCOUNTS
+ * Type: boolean
+ * Default: TRUE
+
+This enables 'extended' style AC syntax (used by your service to set
+the account name.)  TRUE uses the subcommand paramiter R,M,U,C,A,D
+to do LOC, rename and removal. FALSE uses old style. Set this to
+TRUE if you use X3, FALSE for other services.
+
 LOGIN_ON_CONNECT
  * Type: boolean
  * Default: FALSE
