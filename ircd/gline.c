@@ -281,7 +281,8 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	  if ((chptr=FindChannel(gline->gl_user))) { 
 	    retval = do_badchanneled(chptr, gline);
 	  }
-        } 
+	}
+	continue;
       } else { /* Host/IP gline */
 	      if (cli_user(acptr)->username && 
 			      match (gline->gl_user, (cli_user(acptr))->realusername) != 0)

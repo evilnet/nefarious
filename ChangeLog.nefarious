@@ -2,8 +2,13 @@
 
 	* Sync with u2.10.11.05pre5.(part).(whois)
 
+	* ircd/gline.c: Added missing "continue;" so badchanneling
+	works properly.
+
 	* ircd/ircd_features.c: Update hidden hosts as per voting
 	results.
+
+	* ircd/m_info.c: Added missing comma.
 
 2003-10-23  Reed Loden  <reed@reedloden.com>
 
