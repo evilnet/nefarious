@@ -164,7 +164,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
   sendto_opmask_butone(acptr, SNO_OLDSNO, "Link with %s established.", inpath);
   cli_serv(cptr)->up = &me;
   cli_serv(cptr)->updown = add_dlink(&(cli_serv(&me))->down, cptr);
-  map_update(cptr, 1);
+  map_update(cptr, 0);
   sendto_opmask_butone(0, SNO_NETWORK, "Net junction: %s %s", cli_name(&me),
                        cli_name(cptr));
   SetJunction(cptr);

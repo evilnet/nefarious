@@ -666,7 +666,7 @@ int mr_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       SetFlag(acptr, FLAG_TS8);
     add_client_to_list(acptr);
     hAddClient(acptr);
-    map_update(acptr, 1);
+    map_update(acptr, 0);
     if (*parv[5] == 'J')
     {
       SetBurst(acptr);
@@ -1314,7 +1314,7 @@ int ms_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       SetFlag(acptr, FLAG_TS8);
     add_client_to_list(acptr);
     hAddClient(acptr);
-    map_update(acptr, 1);
+    map_update(acptr, 0);
     if (*parv[5] == 'J')
     {
       SetBurst(acptr);
