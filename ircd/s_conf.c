@@ -957,18 +957,35 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 
   static char dhname[HOSTLEN + 1] = "";
 
-  char *name;
   char* rep = NULL;
   char* p = 0;
   char* q = 0;
-  char test[80];
-  char *sep = ",";
-  char *word, *brkt;
+
+  char *name;
+  char *csep;
+  char *brkt;
+  char *brktb;
+  char *oct;
+
+  char cstr[80];
   char ipname[16];
+  char ipl[80];
 
   int c = 0;
   int a = 0;
   int total = 0;
+  int octcount = 0;
+
+
+  strcpy(ipl, replyip);
+  for (oct = strtok_r(ipl, ".", &brktb);
+       oct;
+       oct = strtok_r(NULL, ".", &brktb))
+  {
+    octcount++;
+    if (octcount == 4)
+      break;
+  }
 
   for (rep = ircd_strtok(&p, checkhost, "."); rep; rep = ircd_strtok(&p, 0, ".")) {
     if (c == 4) {
@@ -979,35 +996,40 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     c++;
   }
 
-  Debug((DEBUG_LIST, "DNSBL find_blline server %s", dhname));
 
   for (blline = GlobalBLList; blline; blline = blline->next) {
-    Debug((DEBUG_LIST, "DNSBL type %s", blline->type));
     if (!strcmp(blline->type, "BITMASK")) {
       total = 0;
-      strcpy(test, blline->replies);
+      strcpy(cstr, blline->replies);
 
-      for (word = strtok_r(test, sep, &brkt);
-          word;
-          word = strtok_r(NULL, sep, &brkt))
+      for (csep = strtok_r(cstr, ",", &brkt);
+          csep;
+          csep = strtok_r(NULL, ",", &brkt))
       {
-        total = total + atoi(word);
-        Debug((DEBUG_LIST, "DNSBL bitmask p (%s) t (%d)", word, total));
+        total = total + atoi(csep);
       }
-      ircd_snprintf(0, ipname, sizeof(ipname), "127.0.0.%d", total);
+      ircd_snprintf(0, ipname, sizeof(ipname), "%d", total);
       if (!ircd_strcmp(dhname, blline->server)) {
-        if (!ircd_strcmp(ipname, replyip)) {
+        if (!ircd_strcmp(ipname, oct)) {
           SetDNSBL(sptr);
           ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
           a = 1;
         }
       }
     } else {
-      if (!ircd_strcmp(dhname, blline->server)) {
-        if (!ircd_strcmp(blline->replies, replyip)) {
-          SetDNSBL(sptr);
-          ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
-          a = 1;
+      strcpy(cstr, blline->replies);
+
+      for (csep = strtok_r(cstr, ",", &brkt);
+          csep;
+          csep = strtok_r(NULL, ",", &brkt))
+      {
+        if (!ircd_strcmp(dhname, blline->server)) {
+          if (!ircd_strcmp(csep, oct)) {
+            SetDNSBL(sptr);
+            ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
+            a = 1;
+            break;
+          }
         }
       }
     }

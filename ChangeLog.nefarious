@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+
+	* doc/example.conf: Updated X:Lines entry.
+
+	* ircd/s_conf.c: Only check the last octet of the ip.
+			 Added support for comma seperate replies for RECORD replies.
+			 General cleanup, removed debugging stuff.
+
 2005-01-26  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Updated X:Lines for type support.
