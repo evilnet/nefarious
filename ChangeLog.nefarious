@@ -1,5 +1,11 @@
 2004-07-07  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/m_whois.c: Reverted verified accounts code back.
+
+	* ircd/s_err.c: Reverted verified accounts code back.
+
+2004-07-07  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* include/ircd.h: Include ircd_struct.h instead of struct.h.
 
 	* include/ircd_struct.h: Old struct.h.

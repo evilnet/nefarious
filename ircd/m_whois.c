@@ -217,12 +217,8 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (SeeOper(sptr, acptr))
        send_reply(sptr, RPL_WHOISOPERATOR, name);
 
-    if (IsAccount(acptr)) {
+    if (IsAccount(acptr))
       send_reply(sptr, RPL_WHOISACCOUNT, name, user->account);
-      if (feature_bool(FEAT_VERIFIED_ACCOUNTS) && IsVerified(acptr) && 
-	  (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
-        send_reply(sptr, RPL_WHOISVERIFIED, name);
-    }
 
     if ((((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ?
 	  HasHiddenHost(acptr) : IsHiddenHost(acptr)) ||
@@ -246,6 +242,13 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
 
     if (IsBot(acptr))
       send_reply(sptr, RPL_WHOISBOT, name);
+
+    if (IsVerified(acptr) && feature_bool(FEAT_VERIFIED_ACCOUNTS) &&
+       (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+      send_reply(sptr, RPL_WHOISVERIFIED, name, "Verified");
+    else if (!IsVerified(acptr) && IsAccount(acptr) &&
+      feature_bool(FEAT_VERIFIED_ACCOUNTS))
+      send_reply(sptr, RPL_WHOISVERIFIED, name, "UnVerified");
 
     if (MyConnect(acptr) &&
 	(IsAnOper(sptr) ||
