@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+
+        * ircd/Makefile.in: Ran make depend.
+
 2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new feature DNSBL_MARK_FAKEHOST. Default
