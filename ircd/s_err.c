@@ -804,7 +804,7 @@ static Numeric replyTable[] = {
 /* 385 */
   { RPL_NOTOPERANYMORE, 0, "385" }, /* not used */
 /* 386 */
-  { RPL_IRCOPSHEADER, ":%s", "386" },
+  { RPL_IRCOPSHEADER, ":%s IRC Operators:", "386" },
 /* 387 */
   { RPL_IRCOPS, ":%s", "387" },
 /* 388 */

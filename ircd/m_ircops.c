@@ -88,12 +88,8 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
       return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
   }   
 
-  if (parc > 1)
-    strcpy(buf, "%s IRC Operators:", cli_name(server));
-  else
-    strcpy(buf, "%s IRC Operators:", feature_str(FEAT_NETWORK));
-
-  send_reply(sptr, RPL_IRCOPSHEADER, buf);
+  send_reply(sptr, RPL_IRCOPSHEADER, (parc > 1) ? cli_name(server) :
+	     feature_str(FEAT_NETWORK));
 
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
@@ -109,7 +105,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
 			acptr->cli_name ? acptr->cli_name : "<Unknown>",
 			acptr->cli_user->away ? " (AWAY)" : "",
 			cli_name(acptr->cli_user->server),
-			CurrentTime - acptr->cli_user->last):
+			CurrentTime - acptr->cli_user->last);
       send_reply(sptr, RPL_IRCOPS, buf);
       ircops++;
     }
@@ -117,7 +113,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
 
   ircd_snprintf(0, buf, sizeof(buf), "Total: %d IRCop%s connected",
 		ircops, (ircops != 1) ? "s" : "");
-  send_reply(sptr, RPL_IRCOPSHEADER, buf);
+  send_reply(sptr, SND_EXPLICIT | RPL_IRCOPSHEADER, buf);
   send_reply(sptr, RPL_ENDOFIRCOPS);
   return 0;
 }

@@ -838,8 +838,9 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     if (feature_bool(FEAT_CONNEXIT_NOTICES))
       sendto_opmask_butone(0, SNO_CONNEXIT,
 			   "Nick change: From %s to %s [%s@%s]",
-			   cli_name(sptr), nick, user->username,
-			   user->host);
+			   cli_name(sptr), nick,
+			   cli_user(sptr)->username,
+			   cli_user(sptr)->host);
 
     if ((cli_name(sptr))[0])
       hRemClient(sptr);

@@ -173,7 +173,7 @@ int match(const char *mask, const char *name)
       wild = 1;
     }
     if (*m == '\\')  /* next wildcard is disregarded */
-      *m++;
+      m++;
 
     if (!*m) {
       if (!*n)
@@ -197,7 +197,7 @@ int match(const char *mask, const char *name)
 
       return (*m != 0);
     }
-    if (tolower(*m) != tolower(*n) && *m != '?') {
+    if (ToLower(*m) != ToLower(*n) && *m != '?') {
       if (!wild)
         return 1;  /* failure! */
 
