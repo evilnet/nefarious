@@ -1300,7 +1300,7 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
     send_reply(cptr, ERR_NOPRIVILEGES);
     return 0;
   }
- 
+
   /* MODE_DEL: restore original hostmask */
   if (EmptyString(hostmask)) {
     /* is already sethost'ed? */

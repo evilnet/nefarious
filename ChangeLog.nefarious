@@ -3,7 +3,8 @@
 	* include/patchlevel.h: Bump patchlevel (0.1.0).
 
 	* ircd/m_ircops.c: Allow opers to view all opers including 
-	services.
+	services; allow users to see non-+k users (remove 
+	FEAT_SERVICES_TLD).
 
 	* ircd/s_user.c: Fix bug with sethost not being sent in burst.
 

@@ -555,7 +555,6 @@ Q:\#coder-com:"What the hell do you think you are doing?!"
 #F:SETHOST_USER:TRUE
 #F:SETHOST_AUTO:TRUE
 #F:SETHOST_FREEFORM:FALSE
-#F:SERVICES_TLD:".Services"
 #F:OPER_KILL:TRUE
 #F:OPER_REHASH:TRUE
 #F:OPER_RESTART:TRUE

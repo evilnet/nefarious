@@ -133,9 +133,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     else
       server = find_match_server(parv[1]);
 
-    if (!server || IsService(server) ||
-	(!ircd_strrcmp(cli_name(server), feature_str(FEAT_SERVICES_TLD))
-	 && !IsOper(sptr)))
+    if (!server || (!IsOper(sptr) && IsService(server)))
       return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
   }   
 
@@ -147,9 +145,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     if (acptr->cli_user && IsOper(acptr))
     {
       if (IsOper(sptr) || (!IsOper(sptr) && !IsChannelService(acptr) 
-	  && !IsService(acptr->cli_user->server) &&
-	  ircd_strrcmp(cli_name(acptr->cli_user->server),
-		       feature_str(FEAT_SERVICES_TLD))))
+	  && !IsService(acptr->cli_user->server)))
       {
 	if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
 	{

@@ -403,7 +403,6 @@ static struct FeatureDesc {
   F_I(BOT_CLASS, 0, 0, 0),
   F_B(LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_LOCAL_CHANNELS, 0, 1, 0),
-  F_S(SERVICES_TLD, 0, ".Services", 0),
   F_B(ASUKA_XTRAOP, 0, 0, 0),
   F_B(ASUKA_HIDECHANS, 0, 0, 0),
   F_B(ASUKA_HIDEIDLE, 0, 0, 0),
