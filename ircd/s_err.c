@@ -978,23 +978,23 @@ static Numeric replyTable[] = {
 /* 470 */
   { ERR_OPERONLYCHAN, "%s :Cannot join channel (+O)", "470" },
 /* 471 */
-  { ERR_CHANNELISFULL, "%s :Cannot join channel (+l)", "471" },
+  { ERR_CHANNELISFULL, "%s :Cannot join channel, channel is full (+l)", "471" },
 /* 472 */
   { ERR_UNKNOWNMODE, "%c :is unknown mode char to me", "472" },
 /* 473 */
-  { ERR_INVITEONLYCHAN, "%s :Cannot join channel (+i)", "473" },
+  { ERR_INVITEONLYCHAN, "%s :Cannot join channel, you must be invited (+i)", "473" },
 /* 474 */
-  { ERR_BANNEDFROMCHAN, "%s :Cannot join channel (+b)", "474" },
+  { ERR_BANNEDFROMCHAN, "%s :Cannot join channel, you are banned (+b)", "474" },
 /* 475 */
-  { ERR_BADCHANNELKEY, "%s :Cannot join channel (+k)", "475" },
+  { ERR_BADCHANNELKEY, "%s :Cannot join channel, you need the correct key (+k)", "475" },
 /* 476 */
   { ERR_BADCHANMASK, "%s :Bad Channel Mask", "476" },
 /* 477 */
-  { ERR_NEEDREGGEDNICK, "%s :Cannot join channel (+r)", "477" },
+  { ERR_NEEDREGGEDNICK, "%s :Cannot join channel, you must be authed to join (+r)", "477" },
 /* 478 */
   { ERR_BANLISTFULL, "%s %s :Channel ban/ignore list is full", "478" },
 /* 479 */
-  { ERR_BADCHANNAME, "%s :Cannot join channel (%s)", "479" },
+  { ERR_BADCHANNAME, "%s :Cannot join channel (BADCHAN: %s)", "479" },
 /* 480 */
   { ERR_ADMINONLYCHAN, "%s :Cannot join channel (+A)", "480" },
 /* 481 */

@@ -409,13 +409,15 @@ extern int mode_parse(struct ModeBuf *mbuf, struct Client *cptr,
 #define MODE_PARSE_NOTMEMBER	0x20	/* send "not member" to user */
 #define MODE_PARSE_WIPEOUT	0x40	/* wipe out +k and +l during burst */
 #define MODE_PARSE_BURST	0x80	/* be even more strict w/extra args */
-#define MODE_PARSE_ISHALFOP	0x100
-
+#define MODE_PARSE_ISHALFOP	0x100	/* op and halfop differentiation */
+ 
 extern void joinbuf_init(struct JoinBuf *jbuf, struct Client *source,
 			 struct Client *connect, unsigned int type,
 			 char *comment, time_t create);
 extern void joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan,
 			 unsigned int flags);
 extern int joinbuf_flush(struct JoinBuf *jbuf);
+
+extern int SetAutoChanModes(struct Channel *chptr);
 
 #endif /* INCLUDED_channel_h */

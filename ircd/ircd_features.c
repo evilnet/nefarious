@@ -468,6 +468,7 @@ static struct FeatureDesc {
   F_B(LOGIN_ON_CONNECT, 0, 0, 0),
   F_B(DNSBL_LOC_EXEMPT, 0, 0, 0),
   F_B(OPER_WHOIS_SECRET, 0, 1, 0),
+  F_B(AUTOINVISIBLE, 0, 0, 0),
 
 #undef F_S
 #undef F_B

@@ -387,8 +387,6 @@ AC_MSG_RESULT([$unet_cv_with_cloakthree (random if unspecified)])
 AC_DEFINE_UNQUOTED(KEY3, $unet_cv_with_cloakthree,
 [Third key used for crypting hostnames under host hiding style 2 (random if not given).])
 
-
-
 dnl **
 dnl **  SSL Library checks (OpenSSL)
 dnl ** 
@@ -457,6 +455,29 @@ if test x"$unet_cv_enable_ssl" = xyes; then
   fi
 fi
 
+dnl dnl SSL/TLS Library checks (GNU TLS)
+dnl if test x"$unet_cv_enable_ssl" = xyes; then
+dnl   unet_cv_enable_ssl="no";
+dnl   AC_CHECK_HEADER(gnutls/gnutls.h,
+dnl    dnl Save the current libraries so the crypto stuff isn't always
+dnl    dnl included...
+dnl    save_LIBS="$LIBS"
+
+dnl    TEST_GNUTLS_LIBS=`libgnutls-config --libs`
+dnl    AC_CHECK_LIB(gnutls, gnutls_init,
+dnl      [SSLLIBS=$TEST_GNUTLS_LIBS
+dnl       unet_cv_enable_ssl="yes"],,
+dnl       $TEST_GNUTLS_LIBS)
+dnl 
+dnl    LIBS=$save_LIBS)
+dnl fi
+
+dnl if test "x$unet_cv_enable_ssl" = xyes; then
+dnl     AC_DEFINE([USE_SSL], , [Define if you are using SSL/TLS])
+dnl     SSL_C=ssl.c
+dnl     AC_SUBST(SSL_C)
+dnl     LIBS="$LIBS $SSLLIBS"
+dnl fi
 
 dnl --disable-devpoll check...
 AC_MSG_CHECKING([whether to enable the /dev/poll event engine])

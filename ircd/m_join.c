@@ -299,8 +299,13 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     } else if (feature_bool(FEAT_CREATE_CHAN_OPER_ONLY) && !IsAnOper(sptr)) {
       send_reply(sptr, ERR_NOSUCHCHANNEL, name);
       continue;
-    } else
+    } else {
       joinbuf_join(&create, chptr, flags);
+      if (feature_bool(FEAT_AUTOCHANMODES) &&
+	  feature_str(FEAT_AUTOCHANMODES_LIST) &&
+	  strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+	SetAutoChanModes(chptr);
+    }
 
     del_invite(sptr, chptr);
 

@@ -592,33 +592,30 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
   }
 
-  if (MyConnect(sptr)) {
-    if (feature_bool(FEAT_DNSBL_CHECKS)) {
-      release_dnsbl_reply(sptr);
+  if (MyConnect(sptr) && feature_bool(FEAT_DNSBL_CHECKS)) {
+    release_dnsbl_reply(sptr);
 
-      if (IsDNSBL(sptr)) {
-        int class_exempt = 0, loc_exempt = 0;
+    if (IsDNSBL(sptr)) {
+      int class_exempt = 0, loc_exempt = 0;
 
-        if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
-           (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0))
-          class_exempt = 1;
+      if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
+	   (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0))
+	class_exempt = 1;
 
-        if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT))
-          loc_exempt = 1;
+      if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+	loc_exempt = 1;
 
-        if ((class_exempt == 1) || (loc_exempt == 1)) {
-          loc_exempt = 0;
-          class_exempt = 0;
-        } else
-          return exit_client_msg(sptr, cptr, &me, "%s",
-                                 format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-                                                  cli_user(sptr)->realhost, user->username,
-                                                  cli_name(sptr), cli_dnsblformat(sptr))
-                                 );
-      }
+      if ((class_exempt == 1) || (loc_exempt == 1)) {
+	loc_exempt = 0;
+	class_exempt = 0;
+      } else
+        return exit_client_msg(sptr, cptr, &me, "%s",
+			       format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+						cli_user(sptr)->realhost, user->username,
+						cli_name(sptr), cli_dnsblformat(sptr))
+						);
     }
   }
-
 
   if (MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
     if (conf_check_slines(sptr)) {
@@ -631,6 +628,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyConnect(sptr) && cli_socket(sptr).ssl)
     SetSSL(sptr);
 #endif /* USE_SSL */
+
+  if (MyConnect(sptr) && feature_bool(FEAT_AUTOINVISIBLE))
+    SetInvisible(sptr);
 
   SetUser(sptr);
 
@@ -1835,7 +1835,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         if (what == MODE_ADD)
           SetInvisible(acptr);
         else
-          ClearInvisible(acptr);
+          if (!feature_bool(FEAT_AUTOINVISIBLE) || IsOper(sptr)) /* Don't allow non-opers to -i if FEAT_AUTOINVISIBLE is set */
+            ClearInvisible(sptr);
         break;
       case 'd':
         if (what == MODE_ADD)

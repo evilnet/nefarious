@@ -26,10 +26,14 @@
 
 #ifdef USE_SSL
 
+#if 1 /* HAVE_OPENSSL */
 #include <openssl/crypto.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
+#elif defined(HAVE_GNUTLS)
+#include <gnutls/openssl.h>
+#endif /* HAVE_{OPENSSL,GNUTLS} */
 
 #ifndef IOV_MAX
 #define IOV_MAX 1024

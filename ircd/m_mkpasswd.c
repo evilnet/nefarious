@@ -150,7 +150,7 @@ int mo_mkpasswd(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
     }
   }
 
-  sendcmdto_one(&me, CMD_NOTICE, sptr, "%C: Encryption for [%s]: %s",
+  sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Encryption for [%s]: %s",
 		sptr, parv[1], crypt(parv[1], is_md5 ?
 				    make_md5_salt() : make_salt()));
 

@@ -156,10 +156,11 @@ int ms_create(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       continue;
 
     if ((chptr = FindChannel(name))) {
-      name = chptr->chname;
-
-      if (find_member_link(chptr, sptr))
-        continue;
+      /* Is the remote server confused? */
+      if (find_member_link(chptr, sptr)) {
+	protocol_violation(sptr, "%s tried to CREATE a channel already joined", cli_name(sptr));
+	continue;
+      }
 
       /* Check if we need to bounce a mode */
       if (TStime() - chanTS > TS_LAG_TIME ||

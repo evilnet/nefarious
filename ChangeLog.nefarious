@@ -1,6 +1,39 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-12-15  Reed Loden  <reed@reedloden.com>
+
+	* configure: Ran autoconf.
+
+	* configure.in: Added base for what will later become checks for
+	gnuTLS.
+
+	* include/channel.h: Added prototype for SetAutoChanModes() and 
+	commented on the MODE_PARSE_ISHALFOP define.
+
+	* include/ircd_features.h: Added FEAT_AUTOINVISIBLE.
+
+	* include/ssl.h: Added base for what will later become options 
+	for different SSL programs (OpenSSL/gnuTLS/etc.).
+
+	* ircd/ircd_features.c: Added FEAT_AUTOINVISIBLE
+	(default: FALSE) from QuakeNet.
+
+	* ircd/m_create.c: Don't allow a client to join a channel
+	multiple times (patch from Entrope).
+
+	* ircd/m_join.c: More work from QuakeNet on AutoChanModes 
+	(added SetAutoChanModes() to run when someone creates a chan).
+
+	* ircd/m_mkpasswd.c: Moved ':' to correct location
+	(found by Rubin).
+
+	* ircd/s_err.c: Add "BADCHAN:" to ERR_BADCHANNAME notice and
+	added patch from QuakeNet to make error messages more friendly.
+
+	* ircd/s_user.c: Optimized code, cleaned up whitespacing, and
+	added FEAT_AUTOINVISIBLE (from QuakeNet asuka).
+
 2004-12-15  Neil Spierling  <sirvulcan@gmail.com>
 
         * doc/example.conf: Updated X:Line entry.
