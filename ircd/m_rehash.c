@@ -94,7 +94,7 @@
 #include "send.h"
 #ifdef USE_SSL
 #include "ssl.h"
-#endif
+#endif /* USE_SSL */
 
 #include <assert.h>
 
@@ -103,6 +103,7 @@
  * 
  * parv[1] = 'm' flushes the MOTD cache and returns
  * parv[1] = 'l' reopens the log files and returns
+ * parv[1] = 's' reopens the SSL pem file
  * parv[1] = 'q' to not rehash the resolver (optional)
  */
 int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
@@ -116,22 +117,24 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   if (parc == 2) { /* special processing */
-    if (*parv[1] == 'm') {
-      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
-      motd_recache(); /* flush MOTD cache */
-      return 0;
-    } else if (*parv[1] == 'l') {
-      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
-      log_reopen(); /* reopen log files */
-      return 0;
+    if (*parv[2] == '\0') { /* one character server name */
+      if (*parv[1] == 'm') {
+	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
+	motd_recache(); /* flush MOTD cache */
+	return 0;
+      } else if (*parv[1] == 'l') {
+	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
+	log_reopen(); /* reopen log files */
+	return 0;
 #ifdef USE_SSL
-    } else if (*parv[1] == 's') {
-      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening SSL pem file");
-      ssl_init();
-      return 0;
+      } else if (*parv[1] == 's') {
+	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening SSL pem file");
+	ssl_init();
+	return 0;
 #endif
-    } else if (*parv[1] == 'q')
-      flag = 2;
+      } else if (*parv[1] == 'q')
+	flag = 2;
+    }
     /*
      * Maybe the user wants to rehash another server with no parameters.
      * NOTE: Here we assume that there are no servers named
@@ -158,22 +161,24 @@ int ms_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   if (parc > 1) { /* special processing */
-    if (*parv[1] == 'm') {
-      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
-      motd_recache(); /* flush MOTD cache */
-      return 0;
-    } else if (*parv[1] == 'l') {
-      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
-      log_reopen(); /* reopen log files */
-      return 0;
+    if (*parv[2] == '\0') { /* one character server name */
+      if (*parv[1] == 'm') {
+	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
+	motd_recache(); /* flush MOTD cache */
+	return 0;
+      } else if (*parv[1] == 'l') {
+	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
+	log_reopen(); /* reopen log files */
+	return 0;
 #ifdef USE_SSL
-    } else if (*parv[1] == 's') {
-      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening SSL pem file");
-      ssl_init();
-      return 0;
+      } else if (*parv[1] == 's') {
+	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening SSL pem file");
+	ssl_init();
+	return 0;
 #endif
-    } else if (*parv[1] == 'q')
-      flag = 2;
+      } else if (*parv[1] == 'q')
+	flag = 2;
+    }
     /*
      * Maybe the user wants to rehash another server with no parameters.
      * NOTE: Here we assume that there are no servers named

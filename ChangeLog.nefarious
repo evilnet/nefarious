@@ -6,9 +6,10 @@
 	* ircd/channel.c: Oops, I thought I fixed this.
 
 	* ircd/m_rehash.c: Added SSL pem reopening support where it was
-	missing.
+	missing and restricted special commands to one character server
+	names only.
 
-	* ircd/s_conf.c: Reopen SSL pem files on rehash.
+	* ircd/s_conf.c: Reopen the SSL pem file on rehash.
 
 2004-12-15  Reed Loden  <reed@reedloden.com>
 
