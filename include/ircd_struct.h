@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, include/struct.h
+ * IRC - Internet Relay Chat, include/ircd_struct.h
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  * Copyright (C) 1996 -1997 Carlo Wood
@@ -83,4 +83,4 @@ struct User {
   char               virthost[HOSTLEN + 1];
 };
 
-#endif /* INCLUDED_struct_h */
+#endif /* INCLUDED_ircd_struct_h */
