@@ -199,8 +199,8 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 {
   struct Client *acptr;
   int fd, retval = 0, tval, i;
-  char *reason = "";
-  char tmp[] = "";
+  char *reason = 0;
+  char *tmp = 0;
 
   if (!GlineIsActive(gline)) /* no action taken on inactive glines */
     return 0;
@@ -278,6 +278,8 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       sendto_opmask_butone(0, SNO_GLINE, "G-line active for %s",
       		     get_client_name(acptr, TRUE));
 
+      tmp = malloc(sizeof(gline->gl_reason));
+      reason = malloc(sizeof(gline->gl_reason));
       /* decide about the gline reason */
       if (feature_bool(FEAT_HIS_GLINE)) {
 	if (IsService(sptr) && strchr(gline->gl_reason, ' ') &&
@@ -306,6 +308,8 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
         retval = tval; /* retain killed status */
     }
   }
+  free(tmp);
+  free(reason);
   return retval;
 }
 
