@@ -8,8 +8,6 @@
 
 	* ircd/ircd_xopen.c: Remove excess line at EOF.
 
-	* ircd/m_ircops.c: Remove unneeded include.
-
 	* ircd/m_mkpasswd.c: Randomize the seed a bit more and get rid
 	of the include of crypt.h since it is not even needed.
 

@@ -85,6 +85,7 @@
 #include "client.h"
 #include "handlers.h"
 #include "hash.h"
+#include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_defs.h"
 #include "ircd_features.h"
