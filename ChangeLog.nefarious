@@ -6,6 +6,10 @@
 	* ircd/channel.c: sv: You cant destroy that chptr its used more
 	down farther in that function... (as state.chptr)
 
+	* ircd/m_mark.c: fixed some parv confusion
+
+	* ircd/s_conf.c: added an assert for flags
+
 2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Fixed a small issue with -z'ing an empty channel. 
