@@ -1804,9 +1804,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	!FlagHas(&setflags, FLAG_DEBUG))
       ClearDebug(acptr);
 
-    if (!FlagHas(&setflags, FLAG_BOT) && (feature_int(FEAT_BOT_CLASS) > 0)
+    if (!(FlagHas(&setflags, FLAG_BOT))
 	&& (get_client_class(acptr) != feature_int(FEAT_BOT_CLASS)))
       ClearBot(acptr);
+
   }
 
   if (MyConnect(acptr)) {
