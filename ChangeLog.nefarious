@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-29  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_conf.c: Rewrite of find_blline from nearly scratch.
+	not yet well tested but committed to put on air* and look at.
+
 2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Woops changed the wrong one.
