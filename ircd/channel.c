@@ -1253,7 +1253,7 @@ void list_next_channels(struct Client *cptr, int nr)
         if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr)) {
 	  modebuf[0] = parabuf[0] = modestuff[0] = 0;
 	  channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
-	  if (!modebuf[1]) {
+	  if (modebuf[1] != '\0') {
 	    strcat(modestuff, "[");
 	    strcat(modestuff, modebuf);
 	    if (parabuf[0]) {
