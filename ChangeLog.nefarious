@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-22  Alex Schumann   <rubin@afternet.org>
+
+	* ircd/s_user.c: Dont send null host in mark, send "notmarked" to 
+	keep param count right.
+
+	* ircd/s_serv.c: Dont send null host in mark, send "notmarked" to
+	keep param count right.
+
 2005-03-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Ok -z is hopefully fixed now.
