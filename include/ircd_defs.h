@@ -38,7 +38,7 @@
  * it.  Thanks for helping debug guys.
  */
 #ifndef NICKLEN
-#define NICKLEN		15
+#define NICKLEN		30
 #endif
 /*
  * USERLEN is the maximum length allowed of a user name including an optional
@@ -71,7 +71,7 @@
  * with the ACCOUNT (AC) command.  This is used for keeping track of who's
  * logged into which account, for the benefit of irc services.
  */
-#define ACCOUNTLEN	12
+#define ACCOUNTLEN	15
 /*
  * REALLEN is the maximum length for user supplied information about a client
  * connection (gcos). This information is set at client/server registration
