@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-17  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* ircd/os_linux.c: Bug fix for fedora systems. This should fix the
+	`_SC_CLK_TCK' undeclared  error.
+
 2004-08-15  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/s_user.c: Bug fix for setting +B, the server was letting any user

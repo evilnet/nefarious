@@ -26,6 +26,7 @@
 #include "ircd_osdep.h"
 #include "msgq.h"
 
+#include <unistd.h>
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -40,7 +41,6 @@
 #include <sys/times.h>
 #include <sys/uio.h>
 #include <sys/param.h>
-#include <unistd.h>
 
 /*
  * This is part of the STATS replies. There is no offical numeric for this
