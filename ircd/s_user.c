@@ -674,7 +674,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ++UserStats.inv_clients;
   if (IsOper(sptr))
     ++UserStats.opers;
-  if (feature_bool(FEAT_LUSERS_AUTHED) && IsAccount(sptr))
+  if (IsAccount(sptr))
     ++UserStats.authed;
 
   if (MyConnect(sptr))
@@ -1731,7 +1731,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     if (IsServer(sptr)) {
       if (!MyConnect(acptr)) {
         /* Just propagate and ignore */
-        char buf[512] = ""; /* A P10 message can NEVER be longer than 512 */
+        char buf[BUFSIZE] = "";
         for (i=1;i<parc;i++) {
           strcat(buf, " ");
           strcat(buf, parv[i]);
@@ -2034,11 +2034,9 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     --UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))
     ++UserStats.inv_clients;
-  if (feature_bool(FEAT_LUSERS_AUTHED) &&
-      (FlagHas(&setflags, FLAG_ACCOUNT) && !IsAccount(acptr)))
+  if (FlagHas(&setflags, FLAG_ACCOUNT) && !IsAccount(acptr))
     --UserStats.authed;
-  if (feature_bool(FEAT_LUSERS_AUTHED) &&
-      (!FlagHas(&setflags, FLAG_ACCOUNT) && IsAccount(acptr)))
+  if (!FlagHas(&setflags, FLAG_ACCOUNT) && IsAccount(acptr))
     ++UserStats.authed;
   if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding) {
     if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {

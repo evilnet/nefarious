@@ -487,7 +487,7 @@ static struct FeatureDesc {
   F_B(CHMODE_S, 0, 1, 0),
   F_B(CHMODE_T, 0, 1, 0),
   F_B(CHMODE_Z, 0, 1, 0),
-  F_B(LUSERS_AUTHED, FEAT_READ, 0, 0),
+  F_B(LUSERS_AUTHED, 0, 0, 0),
 
 #undef F_S
 #undef F_B

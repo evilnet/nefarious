@@ -98,9 +98,7 @@ int ms_copyright(struct Client* cptr, struct Client* sptr, int parc, char* parv[
  */
 int m_isnef(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-
-  send_reply(sptr, SND_EXPLICIT | RPL_INFO,
-	     "NI %s [%s].", version, cvs_version);
-
+  send_reply(sptr, SND_EXPLICIT | RPL_INFO, ":NI %s [%s]",
+	     version, cvs_version);
   return 0;
 }

@@ -1,8 +1,27 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2005-01-30  Neil Spierling  <sirvulcan@gmail.com>
+2005-01-29  Reed Loden  <reed@reedloden.com>
 
+	* include/channel.h: Added a comment for MODE_PERSIST.
+
+	* include/s_conf.h: Cleaned up whitespacing.
+
+	* ircd/channel.c: Moved MODE_PERSIST. Cleaned up whitespacing.
+	Cleaned up some MODE_PERSIST code as to fend off future
+	problems.
+
+	* ircd/ircd_features.c: Removed FEAT_READ from
+	FEAT_LUSERS_AUTHED.
+
+	* ircd/m_oper.c: Cleaned up whitespacing.
+
+	* ircd/s_misc.c: Removed check for FEAT_LUSERS_AUTHED.
+
+	* ircd/s_user.c: Removed check for FEAT_LUSERS_AUTHED. Changed a
+	hardcoded 512 to BUFSIZE.
+
+2005-01-30  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added b:lines (lowercase b) for prefix'ed
 	commands to be redirected to the specified server. Stats b

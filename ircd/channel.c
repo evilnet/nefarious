@@ -195,15 +195,14 @@ int destroy_unregistered_channel(struct Channel* chptr)
   struct SLink *tmp;
   struct SLink *obtmp;
 
-  if (chptr->users > 0)         /* Can be 0, called for an empty channel too */
+  if (chptr->users > 0) /* Can be 0, called for an empty channel too */
   {
-    if(0 == chptr->members)
+    if (0 == chptr->members)
       return 1;
     return 0;
   }
 
-
-  if ((chptr->mode.mode & MODE_PERSIST)) // channel is registered
+  if ((chptr->mode.mode & MODE_PERSIST)) /* channel is registered */
     return 0;
 
   assert(0 == chptr->members);
@@ -1622,7 +1621,8 @@ int SetAutoChanModes(struct Channel *chptr)
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
-    MODE_NOLISTMODES,	'L'
+    MODE_NOLISTMODES,	'L',
+    MODE_PERSIST,	'z'
   };
   unsigned int *flag_p;
   unsigned int t_mode;
@@ -1957,7 +1957,6 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_BAN,		'b', */
 /*  MODE_EXCEPT         'e', */
     MODE_LIMIT,		'l',
-    MODE_PERSIST,	'z',
     MODE_NOCOLOUR,	'c',
     MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
@@ -1969,6 +1968,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
+    MODE_PERSIST,	'z',
     0x0, 0x0
   };
   int i;
@@ -2348,8 +2348,8 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
 	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
-	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY | MODE_PERSIST |
-	   MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES | MODE_ADMINONLY);
+	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY | MODE_STRIP |
+	   MODE_NOAMSG | MODE_NOLISTMODES | MODE_ADMINONLY | MODE_PERSIST);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -2469,9 +2469,9 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
-    MODE_PERSIST,	'z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
+    MODE_PERSIST,	'z',
     0x0, 0x0
   };
   unsigned int add;
@@ -3439,10 +3439,10 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_OPERONLY,	'O',
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
-    MODE_PERSIST,	'z',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
+    MODE_PERSIST,	'z',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0
@@ -3636,11 +3636,14 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	break;
 
-      case 'z': /* deal with registered channels */
-	if(!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) || (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
-		break;
-	else if(state.dir == '-')
-		destroy_unregistered_channel(chptr);
+      case 'z': /* deal with persistant (MODE_PERSIST) channels */
+	if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
+	    (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
+	  break;
+	else if (state.dir == '-')
+	  destroy_unregistered_channel(chptr);
+	mode_parse_mode(&state, flag_p);
+	break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);

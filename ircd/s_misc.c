@@ -255,7 +255,7 @@ static void exit_one_client(struct Client* bcptr, const char* comment)
       --UserStats.inv_clients;
     if (IsOper(bcptr))
       --UserStats.opers;
-    if (feature_bool(FEAT_LUSERS_AUTHED) && IsAccount(bcptr))
+    if (IsAccount(bcptr))
       --UserStats.authed;
     if (MyConnect(bcptr))
       Count_clientdisconnects(bcptr, UserStats);

@@ -108,7 +108,7 @@ struct Client;
 #define MODE_NOLISTMODES	0x200000 /* channel modes hidden in LIST output */
 #define MODE_EXCEPT		0x400000 /* ban exceptions */
 #define MODE_ADMINONLY		0x800000 /* only admins may join */
-#define MODE_PERSIST            0x1000000
+#define MODE_PERSIST            0x1000000 /* channel is persistant */
 #define MODE_LISTED		0x2000000
 #define MODE_SAVE		0x4000000 /* save this mode-with-arg 'til later */
 #define MODE_FREE		0x8000000 /* string needs to be passed to MyFree() */

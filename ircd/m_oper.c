@@ -216,16 +216,15 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
        * prevent someone from being both oper and local oper
        */
       ClearLocOp(sptr);
-      if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN))
-      {        /* Global Oper  */
-           SetOper(sptr);
-           ClearAdmin(sptr);
-      }
-      else
-      {     /* Admin */
-            SetOper(sptr);
-            OSetGlobal(sptr);
-            SetAdmin(sptr);
+      if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
+	/* Global Oper  */
+	SetOper(sptr);
+	ClearAdmin(sptr);
+      } else {
+	/* Admin */
+	SetOper(sptr);
+	OSetGlobal(sptr);
+	SetAdmin(sptr);
       }
       ++UserStats.opers;
     }
