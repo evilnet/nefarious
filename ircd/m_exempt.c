@@ -151,12 +151,21 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
 int ms_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  char           c;
+  char*          cp;
 
-  if (*parv[2] == '-')
-    del_exempt(sptr, parv[2]);
+  cp = parv[2];
+  c = *cp;
+  if (c == '-' || c == '+')
+    cp++;
+  else if (!(strchr(cp, '@') || strchr(cp, '.') || strchr(cp, '*'))) {
+    return 0;
+  }
   else
-    add_exempt(sptr, parv[2]);
+    c = '+';
 
-  sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s", sptr, parv[2]);
+  if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp)))
+    sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s", sptr, parv[2]);
+
   return 0;
 }
