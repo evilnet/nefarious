@@ -195,9 +195,10 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
 }
 
 static int
-do_badchanneled(struct Client *chptr, struct Gline *gline) {
+do_badchanneled(struct Channel *chptr, struct Gline *gline) {
   struct Membership *member,*nmember;
-  for (member=chptr->members;member;member=nmember,nmember=member->next_member) {
+  for (member=chptr->members;member;member=nmember) {
+    nmember=member->next_member;
     if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
       continue;
     sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
@@ -236,7 +237,6 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 
       } else if (gline->gl_flags & GLINE_BADCHAN) { /* Badchan Gline */
         struct Channel *chptr,*nchptr;
-        struct Membership *member,*nmember;
 	if (string_has_wildcards(gline->gl_user)) {
 	  for(chptr=GlobalChannelList;chptr;chptr=nchptr) {
 	    nchptr=chptr->next;
@@ -300,7 +300,7 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 			sptr->cli_name, gline->gl_reason);
 	}
       } else {
-	strcat(reason, gline->gl_reason);
+	strcpy(reason, gline->gl_reason);
       }
 
       /* and get rid of him */
