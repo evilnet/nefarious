@@ -125,16 +125,14 @@ int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   ClrFlag(acptr, FLAG_TS8);
 
+  if (!(chptr = get_channel(acptr, parv[2], CGT_NO_CREATE)))
+    return 0;
+
+  if (!(member = find_member_link(chptr, acptr)))
+    return 0;
+
   /* init join/part buffer */
   joinbuf_init(&parts, acptr, acptr, JOINBUF_TYPE_PART, 0, 0);
-
-  chptr = get_channel(acptr, parv[2], CGT_NO_CREATE); /* look up channel */ 
-
-  if (!chptr) /* complain if there isn't such a channel */
-    return 0;
-
-  if (!(member = find_member_link(chptr, acptr))) /* complain if not on */
-    return 0;
 
   assert(!IsZombie(member)); /* Local users should never zombie */
 

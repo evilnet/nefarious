@@ -1767,7 +1767,7 @@ int m_dns(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     }
     return 0;
   }
-  sendcmdto_one(&me, CMD_NOTICE, sptr,"%C :\x02Cache\x02: "
+  sendcmdto_one(&me, CMD_NOTICE, sptr,"%C :\x02" "Cache\x02: "
 		  	"Adds %d Dels %d Expires %d Lookups %d "
 			"Hits(addr/name)) %d/%d "
 		"Cu %d", sptr,
@@ -1775,11 +1775,11 @@ int m_dns(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		cainfo.ca_lookups, cainfo.ca_na_hits, cainfo.ca_nu_hits, 
 		cainfo.ca_updates);
   
-  sendcmdto_one(&me, CMD_NOTICE, sptr,"%C :\x02Resolver\x02: "
+  sendcmdto_one(&me, CMD_NOTICE, sptr,"%C :\x02" "Resolver\x02: "
 		  "Errors %d Lookups %d/%d Replies %d Requests %d",
 		sptr, reinfo.re_errors, reinfo.re_na_look,
 		reinfo.re_nu_look, reinfo.re_replies, reinfo.re_requests);
-  sendcmdto_one(&me, CMD_NOTICE, sptr,"%C :\x02Resolver\x02: "
+  sendcmdto_one(&me, CMD_NOTICE, sptr,"%C :\x02" "Resolver\x02: "
 		  "Unknown Reply %d Short TTL(<10m) %d Resent %d Resends %d "
 		  "Timeouts: %d", sptr,
 		reinfo.re_unkrep, reinfo.re_shortttl, reinfo.re_sent,
