@@ -6,6 +6,8 @@
 
 	* Fix bugs in m_mkpasswd.c and m_ircops.c.
 
+	* Revert parse.c to old version because db's new one is b0rked.
+
 	* Removed login-on-connect.
 
 	* Modified operhost patch to use "? :" construct rather than if
