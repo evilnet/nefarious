@@ -249,6 +249,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      } else if (!IsMe(acptr)) {
 	     sendcmdto_one(sptr, CMD_OPER, acptr, "%C %s %s", 
 			     acptr, parv[2], parv[3]);
+	     return 0;
      }
      if (!feature_bool(FEAT_REMOTE_OPER))
 	     return send_reply(sptr, ERR_NOOPERHOST);
@@ -257,13 +258,13 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	     case ERR_NOOPERHOST:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		     "Failed OPER attempt by %s (%s@%s) (No O:line)", 
-		     parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
+		     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->realhost);
 		     return 0;
 		     break;
 	     case ERR_PASSWDMISMATCH:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 	             "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
-		     parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
+		     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->realhost);
 		     return 0;
 		     break;
 	     case 0: /* Authentication successful */
@@ -271,7 +272,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			     send_reply(sptr, ERR_NOOPERHOST);
 		             sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 			     "Failed OPER attempt by %s (%s@%s) (Local Oper)",
-			     parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
+			     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->realhost);
 			     return 0;
 		     }
 		     SetRemoteOper(sptr);
@@ -283,7 +284,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		     send_reply(sptr, RPL_YOUREOPER);
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		         "%s (%s@%s) is now operator (O)",
-                         parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
+                         parv[0], cli_user(sptr)->realusername, cli_user(sptr)->realhost);
 		     return 0;
 		     break;
 	     default:
