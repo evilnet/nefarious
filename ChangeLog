@@ -1,3 +1,23 @@
+2004-01-31  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* include/patchlevel.h (PATCHLEVEL): update patchlevel...
+
+	* ircd/channel.c (mode_parse_key): don't allow , in keys!
+
+2004-01-11  Perry Lorier <isomer@undernet.org>
+
+	* include/patchlevel.h: Release 2.10.11.06
+
+2004-01-04  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* ircd/s_numeric.c (do_numeric): fix a crash when a numeric is
+	sent to a channel...
+
+2003-12-31  Perry Lorier <isomer@undernet.org>
+	* ircd/s_misc.c: Fix bug in incorrect %Tu format specifier
+
+	* Doxyfile: Doxygen file for generating documation for code
+
 2003-12-02  Perry Lorier <isomer@undernet.org>
 	* ircd/gline.c: Patch gline_find not to core on the *second* gline
 	added.

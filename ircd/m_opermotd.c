@@ -26,7 +26,6 @@
 #include "config.h"
 
 #include "client.h"
-#include "h.h"
 #include "handlers.h"
 #include "ircd.h"
 #include "ircd_features.h"

@@ -22,7 +22,6 @@
 
 #include "support.h"
 #include "fileio.h"
-#include "h.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
 #include "ircd_snprintf.h"
@@ -235,4 +234,3 @@ int is_timestamp(char *str)
 
   return *str == '\0';
 }
-

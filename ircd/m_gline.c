@@ -83,7 +83,6 @@
 
 #include "client.h"
 #include "gline.h"
-#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_features.h"

@@ -84,7 +84,6 @@
 
 #include "client.h"
 #include "jupe.h"
-#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_features.h"

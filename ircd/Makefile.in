@@ -653,7 +653,7 @@ m_gline.o: m_gline.c ../config.h ../include/client.h \
  ../include/ircd_string.h ../include/ircd_chattr.h ../include/match.h \
  ../include/msg.h ../include/numeric.h ../include/numnicks.h \
  ../include/s_conf.h ../include/s_misc.h ../include/send.h \
- ../include/support.h ../include/h.h
+ ../include/support.h
 m_help.o: m_help.c ../config.h ../include/client.h \
  ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
  ../include/ircd_events.h ../include/ircd_handler.h ../include/hash.h \
@@ -709,7 +709,7 @@ m_jupe.o: m_jupe.c ../config.h ../include/client.h \
  ../include/ircd_string.h ../include/ircd_chattr.h ../include/match.h \
  ../include/msg.h ../include/numeric.h ../include/numnicks.h \
  ../include/s_conf.h ../include/s_misc.h ../include/send.h \
- ../include/support.h ../include/h.h
+ ../include/support.h
 m_kick.o: m_kick.c ../config.h ../include/channel.h \
  ../include/ircd_defs.h ../include/client.h ../include/dbuf.h \
  ../include/msgq.h ../include/ircd_events.h ../include/ircd_handler.h \
@@ -1289,7 +1289,7 @@ support.o: support.c ../config.h ../include/support.h \
  ../include/fileio.h ../include/ircd.h ../include/struct.h \
  ../include/ircd_defs.h ../include/ircd_chattr.h \
  ../include/ircd_snprintf.h ../include/s_bsd.h ../include/s_debug.h \
- ../include/send.h ../include/sys.h ../include/h.h
+ ../include/send.h ../include/sys.h
 uping.o: uping.c ../config.h ../include/uping.h ../include/ircd_defs.h \
  ../include/ircd_events.h ../include/client.h ../include/dbuf.h \
  ../include/msgq.h ../include/ircd_handler.h ../include/ircd.h \

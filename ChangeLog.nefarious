@@ -1,4 +1,4 @@
-2004-02-15  Neil Spierling <sirvulcan@sirvulcan.org>
+2004-02-15  Neil Spierling  <sirvulcan@sirvulcan.org>
 
 	* configure.in: Added in some humor.
 			Epoll checks fixed.
@@ -16,7 +16,7 @@
 
 	* doc/ircd.motd: MOTD template.
 
-	* include/h.h: Added file for new declarations etc.
+	* include/nefarious.h: Added file for new declarations, etc.
 
 	* ircd/Makefile.in: Run makepem at the end of make,
 	makepem will exit if SSL is disabled.
@@ -45,6 +45,19 @@
 	* ircd/support.c: Added dgets function.
 			  Added is_timestamp.
 			  Added ParseInterval.
+
+2004-02-14  Reed Loden  <reed@reedloden.com>
+
+	* Renamed everything to nefarious as per merger between 
+	BoxenIRCu and evilnet IRCu.
+
+	* Synced with u2.10.11.07(pre1).
+
+	* config.guess, config.sub: Updated to latest svn version
+	from savannah.gnu.org.
+
+	* include/ircd_features.h, ircd/ircd_features.c: Moved some 
+	new features down to the "nefarious features" block.
 
 2003-12-07  Reed Loden  <reed@reedloden.com>
 
@@ -123,8 +136,8 @@
 	* Rename MODE_SSLONLY to +z.
 
 	* Add a lot of ASUKA stuff that is disabled by default for
-	various other networks that use evilnet. Most of these required
-	that I redo other things so they would work properly.
+	various other networks that use nefarious. Most of these
+	required that I redo other things so they would work properly.
 	- Check
 	- XtraOp
 	- HideChans
@@ -203,7 +216,7 @@
 	* ircd/m_clearmode.c: Add more modes to the default clearmode.
 
 	* ircd/m_ircops.c: Use FEAT_SERVICES_TLD instead of ".Services"
-	so that other networks using evilnet ircd can change it more
+	so that other networks using nefarious ircd can change it more
 	easily.
 
 	* ircd/m_trace.c: Remove excess lines at EOF.
@@ -489,7 +502,7 @@
 
 	* Added OUTsider's whoisaccountonly (shows if client is +R).
 
-	* Modified some FEAT_EVILNET stuff.
+	* Modified some FEAT_NEFARIOUS stuff.
 
 	* Added asuka's opersendq patch (which was made by me).
 
@@ -641,9 +654,9 @@
 
 	* include/patchlevel.h: Fix patchlevel so it fits. :P
 
-	* ircd/ircd.c: Use FEAT_EVILNET instead of another #define.
+	* ircd/ircd.c: Use FEAT_NEFARIOUS instead of another #define.
 
-	* ircd/version.c.SH: Added evilnet to the list.
+	* ircd/version.c.SH: Added nefarious to the list.
 
 2003-01-06  Mathieu Rene  <math@rootservices.net>
 

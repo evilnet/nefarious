@@ -758,7 +758,6 @@ AC_ARG_WITH(sense-of-humor, [  --without-sense-of-humor   Specify this if you ha
             fi
 ])
 
-
 if test -z "$HUMOR"; then
   AC_CHECK_LIB(Fridge,mass_quantities_of_beer)
   AC_CHECK_LIB(Fridge,mass_quantities_of_any_alcohol, , [

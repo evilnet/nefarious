@@ -74,9 +74,6 @@ enum Feature {
 
   /* Some misc. default paths */
   FEAT_MPATH,
-  FEAT_OMPATH,
-  FEAT_QPATH,
-  FEAT_EPATH,
   FEAT_RPATH,
   FEAT_PPATH,
 
@@ -185,8 +182,11 @@ enum Feature {
   FEAT_NETWORK,
   FEAT_URL_CLIENTS,
 
-  /* evilnet features */
-  FEAT_EVILNET,
+  /* nefarious features */
+  FEAT_NEFARIOUS,
+  FEAT_OMPATH,
+  FEAT_QPATH,
+  FEAT_EPATH,
   FEAT_OPERHOST_HIDING,
   FEAT_HIDDEN_OPERHOST,
   FEAT_TOPIC_BURST,

@@ -19,10 +19,13 @@ extern unsigned int max_client_count;
 /*
  * Prototypes
  */
+
+int rules_send(struct Client* cptr);
+int opermotd_send(struct Client* cptr);
+
 extern int exit_new_server(struct Client* cptr, struct Client* sptr,
                            const char* host, time_t timestamp, const char* fmt, ...);
 extern int a_kills_b_too(struct Client *a, struct Client *b);
 extern int server_estab(struct Client *cptr, struct ConfItem *aconf);
-
 
 #endif /* INCLUDED_s_serv_h */

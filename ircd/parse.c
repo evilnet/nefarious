@@ -25,7 +25,6 @@
 #include "client.h"
 #include "channel.h"
 #include "handlers.h"
-#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"

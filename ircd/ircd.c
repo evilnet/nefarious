@@ -185,7 +185,7 @@ static void outofmemory(void) {
  *--------------------------------------------------------------------------*/
 static void write_pidfile(void) {
   char buff[20];
-  if ((thisServer.pid_fd >= 0) && (!feature_bool(FEAT_EVILNET))) {
+  if ((thisServer.pid_fd >= 0) && (!feature_bool(FEAT_NEFARIOUS))) {
     memset(buff, 0, sizeof(buff));
     sprintf(buff, "%5d\n", (int)getpid());
     if (write(thisServer.pid_fd, buff, strlen(buff)) == -1)
@@ -216,7 +216,7 @@ static int check_pid(void)
   lock.l_len = 0;
 
   if (((thisServer.pid_fd = open(feature_str(FEAT_PPATH),
-	O_CREAT | O_RDWR, 0600)) >= 0) && (!feature_bool(FEAT_EVILNET)))
+	O_CREAT | O_RDWR, 0600)) >= 0) && (!feature_bool(FEAT_NEFARIOUS)))
     return fcntl(thisServer.pid_fd, F_SETLK, &lock);
   return 0;
 }

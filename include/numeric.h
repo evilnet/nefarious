@@ -111,9 +111,9 @@ extern const struct Numeric* get_error_numeric(int err);
 	RPL_STATSNLINE	     226	   unreal
 	RPL_STATSGLINE	     227	   Dalnet 
 	RPL_STATSVLINE	     227	   unreal */
-#define RPL_STATSRLINE       227	/* evilnet extension */
+#define RPL_STATSRLINE       227	/* nefarious extension */
 #define RPL_STATSQLINE       228        /* Undernet extension */
-#define RPL_STATSBLINE       229	/* evilnet extension */
+#define RPL_STATSBLINE       229	/* nefarious extension */
 
 #define RPL_SERVICEINFO      231	/* unused */
 #define RPL_ENDOFSERVICES    232	/* unused */
@@ -179,14 +179,14 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_JUPELIST         282        /* Undernet extension - jupe -Kev */
 #define RPL_ENDOFJUPELIST    283        /* Undernet extension - jupe -Kev */
 #define RPL_FEATURE	     284	/* Undernet extension - features */
-#define RPL_NEWHOSTIS        285        /* QuakeNet - Asuka / evilnet */
-#define RPL_CHKHEAD          286        /* QuakeNet - Asuka / evilnet */
-#define RPL_CHANUSER         287        /* QuakeNet - Asuka / evilnet */
-#define RPL_PATCHHEAD        288        /* QuakeNet - Asuka / evilnet */
-#define RPL_PATCHCON         289        /* QuakeNet - Asuka / evilnet */
-#define RPL_DATASTR          290        /* QuakeNet - Asuka / evilnet */
-#define RPL_ENDOFCHECK       291        /* QuakeNet - Asuka / evilnet */
-#define ERR_SEARCHNOMATCH    292	/* QuakeNet - Asuka / evilnet */
+#define RPL_NEWHOSTIS        285        /* QuakeNet - Asuka / nefarious */
+#define RPL_CHKHEAD          286        /* QuakeNet - Asuka / nefarious */
+#define RPL_CHANUSER         287        /* QuakeNet - Asuka / nefarious */
+#define RPL_PATCHHEAD        288        /* QuakeNet - Asuka / nefarious */
+#define RPL_PATCHCON         289        /* QuakeNet - Asuka / nefarious */
+#define RPL_DATASTR          290        /* QuakeNet - Asuka / nefarious */
+#define RPL_ENDOFCHECK       291        /* QuakeNet - Asuka / nefarious */
+#define ERR_SEARCHNOMATCH    292	/* QuakeNet - Asuka / nefarious */
 
 /*      RPL_CHANINFO_HANDLE  285           aircd */
 /*      RPL_CHANINFO_USERS   286           aircd */
@@ -228,7 +228,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_WHOISHELPER	     309	austnet */
 /*      RPL_WHOISSVCMSG      310         Dalnet */
 /*	RPL_WHOISHELPOP	     310	unreal */
-#define	RPL_WHOISSERVICE     310	/* austnet/evilnet */
+#define	RPL_WHOISSERVICE     310	/* austnet/nefarious */
 #define RPL_WHOISUSER        311        /* See also RPL_ENDOFWHOIS */
 #define RPL_WHOISSERVER      312
 #define RPL_WHOISOPERATOR    313
@@ -259,9 +259,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_LISTUSAGE        334        /* Undernet extension */
 /*	RPL_COMMANDSYNTAX    334	   Dalnet */
 /*	RPL_LISTSYNTAX	     334	   unreal */
-#define RPL_WHOISACCOUNTONLY 335	/* evilnet extension */
-#define RPL_WHOISBOT         336	/* evilnet extension */
-#define RPL_WHOISSSL         337	/* evilnet extension */
+#define RPL_WHOISACCOUNTONLY 335	/* nefarious extension */
+#define RPL_WHOISBOT         336	/* nefarious extension */
+#define RPL_WHOISSSL         337	/* nefarious extension */
 /*      RPL_CHANPASSOK       338           IRCnet extension (?)*/
 #define	RPL_WHOISACTUALLY    338	/* Undernet extension, dalnet */
 /*      RPL_BADCHANPASS      339           IRCnet extension (?)*/
@@ -308,9 +308,9 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_YOURSERVICE	     383	   Numeric List: various */
 #define RPL_MYPORTIS         384	/* not used */
 #define RPL_NOTOPERANYMORE   385        /* Extension to RFC1459, not used */
-#define RPL_IRCOPSHEADER     386	/* evilnet extension */
-#define RPL_IRCOPS           387	/* evilnet extension */
-#define RPL_ENDOFIRCOPS      388	/* evilnet extension */
+#define RPL_IRCOPSHEADER     386	/* nefarious extension */
+#define RPL_IRCOPS           387	/* nefarious extension */
+#define RPL_ENDOFIRCOPS      388	/* nefarious extension */
 /*	RPL_QLIST	     386	unreal */
 /*	RPL_ENDOFQLIST	     387	unreal */
 /*	RPL_ALIST	     388	unreal */
@@ -339,9 +339,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_TOOMANYTARGETS   407
 /*      ERR_NOSUCHSERVICE    408  IRCnet */
 /*	ERR_NOCOLORSONCHAN   408  Dalnet */
-#define ERR_NOCOLORSONCHAN   408	/* evilnet extension */
+#define ERR_NOCOLORSONCHAN   408	/* nefarious extension */
 #define ERR_NOORIGIN         409
-#define ERR_NOMULTITARGET    410	/* evilnet extension */
+#define ERR_NOMULTITARGET    410	/* nefarious extension */
 
 #define ERR_NORECIPIENT      411
 #define ERR_NOTEXTTOSEND     412
@@ -379,7 +379,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_USERONCHANNEL    443
 /*      ERR_NOLOGIN          444           removed from RFC1459 */
 /*      ERR_SUMMONDISABLED   445           removed from RFC1459 */
-#define ERR_NEEDACCCHAN      446	/* evilnet extension */
+#define ERR_NEEDACCCHAN      446	/* nefarious extension */
 /*      ERR_USERSDISABLED    446           removed from RFC1459 */
 /*	ERR_NONICKCHANGE     447	 unreal */
 
@@ -405,7 +405,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_LINKSET	     469	unreal */
 /*	ERR_LINKCHANNEL	     470	unreal */
 /*      ERR_KICKEDFROMCHAN   470         aircd */
-#define ERR_OPERONLYCHAN     470	/* evilnet extension */
+#define ERR_OPERONLYCHAN     470	/* nefarious extension */
 #define ERR_CHANNELISFULL    471
 #define ERR_UNKNOWNMODE      472
 #define ERR_INVITEONLYCHAN   473
@@ -424,7 +424,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_CANTKILLSERVER   483
 #define ERR_ISCHANSERVICE    484        /* Undernet extension */
-#define ERR_ISREALSERVICE    485        /* QuakeNet Asuka / evilnet extension */
+#define ERR_ISREALSERVICE    485        /* QuakeNet Asuka / nefarious extension */
 /*	ERR_DESYNC	     484	 Dalnet,PTlink */
 /*	ERR_ATTACKDENY	     484	 unreal */
 /*	ERR_RESTRICTED	     484	   IRCnet extension */
@@ -432,7 +432,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_KILLDENY         485	   unreal */
 /*	ERR_CANTKICKADMIN    485	   PTlink */
 /*	ERR_HTMDISABLED      486	   unreal */
-#define ERR_ACCOUNTONLY      486	/* ASUKA/evilnet extension */
+#define ERR_ACCOUNTONLY      486	/* ASUKA/nefarious extension */
 /*      ERR_CHANTOORECENT    487           IRCnet extension (?) */
 /*      ERR_TSLESSCHAN       488           IRCnet extension (?) */
 #define ERR_VOICENEEDED      489        /* Undernet extension */

@@ -374,17 +374,17 @@ struct Client;
 #define TOK_PRIVS		"PRIVS"
 #define CMD_PRIVS		MSG_PRIVS, TOK_PRIVS
 
-#define MSG_SETHOST		"SETHOST"	/* SETHOST */
+#define MSG_SETHOST		"SETHOST"	/* SETH */
 #define TOK_SETHOST		"SH"
 #define CMD_SETHOST		MSG_SETHOST, TOK_SETHOST
 
-#define MSG_OPERMOTD            "OPERMOTD"	/* OPERMOTD */
-#define TOK_OPERMOTD            "OPM"
-#define CMD_OPERMOTD            MSG_OPERMOTD, TOK_OPERMOTD
+#define MSG_OPERMOTD		"OPERMOTD"	/* OPMO */
+#define TOK_OPERMOTD		"OPM"
+#define CMD_OPERMOTD		MSG_OPERMOTD, TOK_OPERMOTD
 
-#define MSG_RULES               "RULES"
-#define TOK_RULES               "RL"
-#define CMD_RULES               MSG_RULES, TOK_RULES
+#define MSG_RULES		"RULES"		/* RULE */
+#define TOK_RULES		"RL"
+#define CMD_RULES		MSG_RULES, TOK_RULES
 
 /*
  * Constants

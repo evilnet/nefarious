@@ -29,7 +29,6 @@
 #include "channel.h"
 #include "client.h"
 #include "gline.h"
-#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -57,10 +56,10 @@
 #include "userload.h"
 
 #include <assert.h>
-#include <stdlib.h>
-#include <string.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 unsigned int max_connection_count = 0;
