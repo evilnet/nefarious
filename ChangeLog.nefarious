@@ -1,5 +1,13 @@
 2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
 
+	* include/channel.h: Bump up the size of topic_nick so it can hold a host.
+
+	* ircd/m_topic.c: When a topic is set, add the host into topic_nick so that
+	when a topic is displayed the full user@host is in the Set by part. Eg,
+	[09:45] * Set by gandalf@36df16fa.25b5c948.jet.net.nz on Sat Jun 19 09:34:55
+
+2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Added feature DEFAULT_UMODE.
 
 	* doc/readme.features: Documented new feature.
