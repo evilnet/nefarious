@@ -1,5 +1,9 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
+20050218   Rubin  <rubin@afternet.org>	
+
+	* include/ircd_features.h, ircd/irc_features.c, m_pass.c: Added
+	improved login-on-connect syntax, and fixed a bug.
 
 2005-02-11  Reed Loden  <reed@reedloden.com>
 
