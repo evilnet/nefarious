@@ -632,7 +632,7 @@ void add_connection(struct Listener* listener, int fd) {
   if (!os_get_peername(fd, &addr) || !os_set_nonblocking(fd)) {
     ++ServerStats->is_ref;
 #ifdef USE_SSL
-    ssl_murder(ssl, fd, NULL);
+    ssl_murder(ssl, fd, "");
 #else
     close(fd);
 #endif /* USE_SSL */
