@@ -38,14 +38,14 @@ network! You have been warned.
 
 - Nefarious coders --------------------------------------------------
 
-reed - Reed Loden - <reed@reedloden.com>
+reed      - Reed Loden     - <reed@reedloden.com>
 SiRVulcaN - Neil Spierling - <sirvulcan@gmail.com>
+Rubin     - Alex Schumann  - <rubin@afternet.org>
 
 - documentation -------------------------------------------------------
 
 README (this file)	- Credits, some feature lists, ssl notes
-READNE.cygwin		- Cygwin installation instructions
-doc/nefarious.features	- Nefarious IRCu specific features
+READNE.cygwin		- Cygwin installation instructions (Unsupported)
 doc/readme.features	- Full list of ircd.conf F:lines with explanations
 doc/example.conf	- Example ircd.conf
 doc/ircd.conf.sample	- Example ircd.conf
@@ -96,101 +96,18 @@ If you wish to run bounce in another dir then either copy the Bounce
 dir out or copy the bounce binary and bounce.conf to another directory 
 and run.
 
-- added ircd.conf lines -----------------------------------------------
-
-[R:lines]
-
-These are redirection lines, when a client connects and his/her host
-matches a R:line then a 010 reply is sent with the redir server and
-port. Currently only epic supports a autoredirection when it gets a
-010 reply (ie it will automatically connect to the server said in the
-010 reply. Other clients will get a nessage saying what server and
-port to connect to. Aswell as a unauthorised connection quit.
-
-Syntax:
- R:<mask>:<redirection server>:<redirection port>
-
-Examples:
- R:*.aol.com:irc.aol.com:6667
- R:*.us:us.nefarious.irc:6667
- R:*.nz:nz.nefarious.irc:6667
-
-
-[S:lines]
-
-Syntax:
- S:<spoof host>:<password>:<*.host.cc|a.b.c.*|CIDR>:<ident>
-<spoof host>  A hostname to be spoofed
-<password>    A password for this spoof host. Used if SETHOST_USER is enabled.
-<hostmask>    A hostmask for matching against users that are to be auto
-              spoofed. Used if SETHOST_AUTO is enabled. Can be of form:
-              host.domain.cc, 127.0.0.1 or 127.0.0.0/24, supports wildcards
-              for non-CIDR.
-<ident>       A mask for matching against the user's ident reply.
-
-Examples:
-Oper sethost for 'moo.fish.moo'
- S:moo.fish.moo:::
-User & Oper sethost for 'moo.fish.moo'
- S:moo.fish.moo:elitepassword::
-Oper sethost for 'moo.fish.moo' with auto on 'ident@*.example.com"
- S:moo.fish.moo::*.example.com:ident
-Oper sethost for 'moo.fish.moo' with auto on 'user*@*.example.com"
- S:moo.fish.moo::*.example.com:user*
-
-
-[B:lines]
-These are lines intended to improve the generic irc users ability to
-use network services. Each line sets up a /<service> alias so that
-users may type that instead of a full /msg command.
-
-for example.. adding:
- B:X:cservice@nefarious.irc:*
-would result in commands like this being possible
- /X HELP
-
-Syntax:
- B:<name of command/service>:<target>:<anything to prepend to message>
-
-Examples:
- B:X:cservice@nefarious.irc:*
- B:AUTH:AuthServ@nefarious.irc:"AUTH"
-
-
-[P:Lines]
-(Refer to example.conf or ircd.conf for full information on P:Lines)
-
-P:<hostmask>:<interface>:<[CS][E][H]>:<port number>
-C- Client
-S- Service
-E- SSL Port
-H- Hidden Port
- 
-This is a Encrypted SSL Port
-P:::E:7000
-
-
-[F:Lines]
-(Refer to readme.features for more information and their default values)
-
-
 - installation ---------------------------------------------------------
 
 (see ./configure --help for a range of compile time options)
 ./configure
 make
 make install
-(ircd.pem generation will be prompted if ircd.pem doesnt exist)
-
-Key Notes:
-- If you run a network of more than one client server and host hiding 
-  style 2, then your 3 cloak keys need to be the same on each server.
-  You can specify each key with configure
-  (--with-cloakone=num --with-cloaktwo=num --with-cloakthree=num).
+(ircd.pem generation will be prompted if ircd.pem doesnt exist, assuming
+ ssl is enabled, this is skipped if its disabled.)
 
 - cygwin installation --------------------------------------------------
 
-see README.cygwin
+see README.cygwin (CYGWIN IS UNSUPPORTED)
 
 - configuration --------------------------------------------------------
 
@@ -209,6 +126,33 @@ cd /home/ircduser/bin
 
 If all goes well the ircd should run. If not, check your ircd.conf
 CAREFULLY for errors.
+
+- crashes --------------------------------------------------------------
+
+If your nefarious has crashed then check your dir containing ircd.conf
+firstly (default ~/lib). In that dir _hopefully_ is a core file, the
+format of name filename will be ircd.DATE.core. Take note of DATE and
+go into your dir containing the ircd binary (default ~/bin). In this dir
+do this:
+
+ls | grep DATE
+
+You should get a result, now you will have 2 files:
+
+ircd.DATE.core
+ircd.DATE
+
+The dates on both files may not match by one number at the end, dont
+worry. Now do this:
+
+tar -cf ~/corefiles.tar /path/to/ircd.DATE.core /path/to/ircd.DATE
+gzip ~/corefiles.tar
+
+Look in your home directory for corefiles.tar.gz and email this to any
+email address in the Nefarious coders section towards the top of this
+document, along with a description of what you were doing at the time
+of the crash on the server. If you know how to reproduce it then tell
+us how.
 
 - disclaimer -----------------------------------------------------------
 
@@ -235,4 +179,4 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-- evilnet development - 11.07.2004 -----------------------------------------
+- evilnet development - 04.04.2005 -----------------------------------------

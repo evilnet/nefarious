@@ -1,6 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-04-04  Neil Spierling  <sirvulcan@gmail.com>
+
+	* configure: regenerated.
+
+	* configure.in: Adjusted the version in preperation for the
+	upcomming release. This version on affects configure stuff. Also
+	note that this change does not mean Nefarious is released, we
+	are just making preperations.
+
+	* README: Small cleanup.
+
+	* README.Cygwin: Important notice added.
+
+	* ircd/version.c.SH: Added Rubin.
+
 2005-04-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/readme.log: Added DNSBL Section.

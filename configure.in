@@ -23,7 +23,7 @@ dnl $Id$
 
 dnl Make sure we are in the correct directory (someone could have run
 dnl 'configure' with a wrong '--srcdir').
-AC_INIT(Nefarious IRCu, 0.4-CVS, evilnet-devel@lists.sourceforge.net)
+AC_INIT(Nefarious IRCu, 0.4.0, evilnet-devel@lists.sourceforge.net)
 AC_CONFIG_SRCDIR([ircd/ircd.c])
 
 dnl Set the default prefix

@@ -3,6 +3,9 @@ Compiling Nefarious IRCu in Cygwin
 By Neil Spierling <sirvulcan@sirvulcan.org>
 --------------------------------------------
 
+Important notes:
+- This howto is unsupported. If you wish to use nefarious ircu on cygwin then you are on your own.
+
 pre-requirements:
 - windows username with NO spaces in it (spaces play hell in cygwin with various key steps in the configuring and 
 compiling process)
