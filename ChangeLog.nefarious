@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_mkpasswd.c: Replaced &me with sptr in the password reply.
+
 2004-10-17  Reed Loden  <reed@reedloden.com>
 
 	* Finally committed my work...
