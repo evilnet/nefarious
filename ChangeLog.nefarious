@@ -1,9 +1,14 @@
+2003-07-15  Mathieu Rene  <math@rootservices.net>
+
+	* include/s_user.h, ircd/s_user.c: Fixed a warning by removing
+	a "const" qualifier.
+
 2003-07-15  Reed Loden  <reed@reedloden.com>
 
 	* Added and modified some more of SiRVulCaN's patches.
 	  - +M ACCOUNT Only Channel Mode
 	  - Local/Global LUSERS Counts
-	  - RPL_REDIR Connection Redirection (q:lines)
+	  - RPL_REDIR Connection Redirection (R:lines)
 	  - SAJOIN Command (services only)
 	  - SAPART Command (services only)
 
