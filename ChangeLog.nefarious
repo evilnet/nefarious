@@ -1,11 +1,31 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-31  Reed Loden  <reed@reedloden.com>
+
+	* include/client.h: Added new FLAG_WHOIS (+W) aka
+	WHOIS_PARANOIA. Cleaned up some whitespacing.
+
+	* include/supported.h: Added +W to usermode list.
+
+	* include/ircd_features.h: Added FEAT_OPER_WHOIS_PARANOIA.
+
+	* ircd/channel.c: Changed a comment.
+
+	* ircd/ircd_features.c: Added FEAT_OPER_WHOIS_PARANOIA
+	(default: FALSE)
+
+	* ircd/m_whois.c: Implemented FEAT_OPER_WHOIS_PARANOIA under the 
+	SeeOper() if check.
+
+	* ircd/s_user.c: Added FLAG_WHOIS (+W) and gave
+	FEAT_OPER_WHOIS_PARANOIA control over it.
+
 2005-01-31  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Trash excepts when destroying channels (+z).
 
-2005-01-29  Reed Loden  <reed@reedloden.com>
+2005-01-30  Reed Loden  <reed@reedloden.com>
 
 	* include/channel.h: Added a comment for MODE_PERSIST.
 

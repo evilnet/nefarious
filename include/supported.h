@@ -73,6 +73,6 @@
 #define infochanmodes "bcehiklmnoprstvzACLMNOQSTZ"
 #define clearchanmodes "bcehiklmoprsvzACLMNOQSTZ" /* ditto except for +nt */
 #define infochanmodeswithparams "behklov"
-#define infousermodes "dfghiknoswxABIRX"
+#define infousermodes "dfghiknoswxABIRWX"
 
 #endif /* INCLUDED_supported_h */

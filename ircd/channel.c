@@ -281,7 +281,7 @@ int sub1_from_channel(struct Channel* chptr)
     return 1;
   }
 
-  if ((chptr->mode.mode & MODE_PERSIST)) /* channel is registered */
+  if ((chptr->mode.mode & MODE_PERSIST)) /* channel is persistant */
   {
     --chptr->users;
     return 0;

@@ -858,7 +858,8 @@ static const struct UserMode {
   { FLAG_XTRAOP,      'X' },
   { FLAG_NOCHAN,      'n' },
   { FLAG_NOIDLE,      'I' },
-  { FLAG_ADMIN,       'A' }
+  { FLAG_ADMIN,       'A' },
+  { FLAG_WHOIS,       'W' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -1937,6 +1938,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	else
 	  ClearBot(acptr);
 	break;
+      case 'W':
+	if (what == MODE_ADD)
+	  SetWhois(acptr);
+	else
+	  ClearWhois(acptr);
+	break;
       default:
 	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, *m);
         break;
@@ -2001,6 +2008,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     if (feature_bool(FEAT_HIS_DEBUG_OPER_ONLY) && !IsAnOper(acptr) && 
 	!FlagHas(&setflags, FLAG_DEBUG))
       ClearDebug(acptr);
+
+    if (!FlagHas(&setflags, FLAG_WHOIS) &&
+	!(feature_bool(FEAT_OPER_WHOIS_PARANOIA) && IsOper(acptr)))
+      ClearWhois(acptr);
   }
 
   if (MyConnect(acptr)) {

@@ -163,6 +163,7 @@ enum Flag {
     FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
     FLAG_DNSBL,                     /* Client in DNSBL */
     FLAG_ADMIN,                     /* Client is an admin */
+    FLAG_WHOIS,                     /* oper sees who /WHOISes him/her */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -473,6 +474,7 @@ struct Client {
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
 #define IsDNSBL(x)		HasFlag(x, FLAG_DNSBL)
 #define IsAdmin(x)		(HasFlag(x, FLAG_ADMIN) && feature_bool(FEAT_OPERFLAGS))
+#define IsWhois(x)		HasFlag(x, FLAG_WHOIS)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -506,6 +508,7 @@ struct Client {
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
 #define SetDNSBL(x)		SetFlag(x, FLAG_DNSBL)
 #define SetAdmin(x)		SetFlag(x, FLAG_ADMIN)
+#define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)
@@ -532,9 +535,11 @@ struct Client {
 #define ClearNoChan(x)		ClrFlag(x, FLAG_NOCHAN)
 #define ClearNoIdle(x)		ClrFlag(x, FLAG_NOIDLE)
 #define ClearAdmin(x)		ClrFlag(x, FLAG_ADMIN)
+#define ClearWhois(x)		ClrFlag(x, FLAG_WHOIS)
 
-#define SeeOper(sptr,acptr) (IsAnOper(acptr) && (HasPriv(acptr, PRIV_DISPLAY) \
-                            || HasPriv(sptr, PRIV_SEE_OPERS)))
+#define SeeOper(sptr, acptr) (IsAnOper(acptr) \
+			      && (HasPriv(acptr, PRIV_DISPLAY) \
+			      || HasPriv(sptr, PRIV_SEE_OPERS)))
 
 /* Oper Flags */
 #define OFLAG_GLOBAL	0x001 /* Global Oper (O) */
