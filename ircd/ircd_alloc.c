@@ -92,6 +92,8 @@ void* MyMalloc(size_t size)
 #ifdef FROBONMALLOC
   memfrob(p, size);
 #endif
+  // DEBUG ONLY!! HACK FOR TESTING!! TAKE THIS OUT!!
+  memset(p, 'B', size);
   return p;
 }
 

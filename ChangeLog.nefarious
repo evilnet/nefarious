@@ -1,6 +1,15 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-28  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/s_conf.c: Several conf line clear_* functions were freeing
+	memory but not re-terminating the global head. Someone please look
+	at this and tell me if im missing something...
+
+	* ircd/s_auth.c: reformatted some stuff so i could read it. Trying
+	to figure out why RBL stuff is so broken :/
+
 2005-03-27  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_bsd.c: Applied a connection fix from .12 may help ssl

@@ -133,10 +133,10 @@ const char dflagstr(const char* dflags)
   assert(flagstr != 0);
 
   for (; *flagstr; flagstr++) {
-    for (flag_p = (unsigned int*)dnsbl_flags; flag_p[0];
-         flag_p += 2)
+    for (flag_p = (unsigned int*)dnsbl_flags; flag_p[0]; flag_p += 2) {
       if (flag_p[1] == *flagstr)
         break;
+    }
 
     if (!flag_p[0])
       continue;
@@ -926,6 +926,7 @@ void clear_quarantines(void)
     MyFree(qline->chname);
     MyFree(qline);
   }
+  GlobalQuarantineList = 0;
 }
 
 int find_csline(struct Client* sptr, const char* mask)
@@ -965,6 +966,7 @@ void clear_cslines(void)
     MyFree(csline->port);
     MyFree(csline);
   }
+  GlobalConnStopList=0;
 }
 
 
@@ -979,6 +981,7 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   ++GlobalBLCount;
 
   blline = (struct blline *) MyMalloc(sizeof(struct blline));
+  memset(blline, 0, sizeof(struct blline));
   DupString(blline->server, fields[1]);
   DupString(blline->name, fields[2]);
   DupString(blline->flags, fields[3]);
@@ -1000,6 +1003,7 @@ void clear_dnsbl_list(void)
     MyFree(blline->reply);
     MyFree(blline);
   }
+  GlobalBLList = 0;
 }
 
 int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
@@ -1037,12 +1041,11 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       break;
   }
 
-  for (rep = ircd_strtok(&p, checkhost, "."); rep;
-       rep = ircd_strtok(&p, 0, ".")) {
+  for (rep = ircd_strtok(&p, checkhost, "."); rep; rep = ircd_strtok(&p, 0, ".")) {
     if (c == 4)
       ircd_snprintf(0, dhname, HOSTLEN + 1, "%s", rep);
     else if (c > 4)
-      ircd_snprintf(0, dhname, HOSTLEN + 1, "%s.%s", dhname,rep);
+      ircd_snprintf(0, dhname, HOSTLEN + 1, "%s.%s", dhname, rep); /* XXX YIKES!! */
     c++;
   }
 
@@ -1054,9 +1057,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       total = 0;
       strcpy(cstr, blline->replies);
 
-      for (csep = strtok_r(cstr, ",", &brkt);
-          csep;
-          csep = strtok_r(NULL, ",", &brkt))
+      for (csep = strtok_r(cstr, ",", &brkt); csep; csep = strtok_r(NULL, ",", &brkt))
         total = total + atoi(csep);
 
       ircd_snprintf(0, ipname, sizeof(ipname), "%d", total);
@@ -1080,8 +1081,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     } else if (x_flag & DFLAG_REPLY) {
       strcpy(cstr, blline->replies);
 
-      for (csep = strtok_r(cstr, ",", &brkt); csep;
-	   csep = strtok_r(NULL, ",", &brkt)) {
+      for (csep = strtok_r(cstr, ",", &brkt); csep; csep = strtok_r(NULL, ",", &brkt)) {
         if (!ircd_strcmp(dhname, blline->server)) {
           if (!ircd_strcmp(csep, oct)) {
             SetDNSBL(sptr);
@@ -2151,6 +2151,7 @@ void clear_svclines(void)
 	   MyFree(svc->prepend);
 	 MyFree(svc);
   }
+  GlobalServicesList=0;
 }
 
 struct svcline *find_svc(const char *cmd)
@@ -2234,6 +2235,7 @@ void clear_slines(void)
       MyFree(sline->username);
     MyFree(sline);
   }
+  GlobalSList=0;
 }
 
 /*
