@@ -117,7 +117,7 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    /* setting a topic */
    ircd_strncpy(chptr->topic, topic, TOPICLEN);
    ircd_strncpy(chptr->topic_nick, cli_name(from), NICKLEN);
-   if (feature_bool(FEAT_HOST_IN_TOPIC)) {
+   if (feature_bool(FEAT_HOST_IN_TOPIC) && !IsServer(from)) {
      strcat(chptr->topic_nick, "!");
      strcat(chptr->topic_nick, cli_username(from));
      strcat(chptr->topic_nick, "@");

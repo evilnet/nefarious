@@ -1,3 +1,8 @@
+2004-06-21  Neil Spierling <vulcan@linux-boxen.org>
+
+	* ircd/m_topic.c: Fixed potential crash, dont want to do the user@host for a
+	topic comming from a server (in topic bursts).
+
 2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
 
 	* tools/makepem: Added basic support for users who already have an existing SSL
