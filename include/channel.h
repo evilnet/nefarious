@@ -108,10 +108,11 @@ struct Client;
 #define MODE_NOLISTMODES	0x200000 /* channel modes hidden in LIST output */
 #define MODE_EXCEPT		0x400000 /* ban exceptions */
 #define MODE_ADMINONLY		0x800000 /* only admins may join */
-#define MODE_LISTED		0x1000000
-#define MODE_SAVE		0x2000000 /* save this mode-with-arg 'til later */
-#define MODE_FREE		0x4000000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED		0x8000000 /* channel was created by a BURST */
+#define MODE_PERSIST            0x1000000
+#define MODE_LISTED		0x2000000
+#define MODE_SAVE		0x4000000 /* save this mode-with-arg 'til later */
+#define MODE_FREE		0x8000000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x10000000 /* channel was created by a BURST */
 
 /*
  * mode flags which take another parameter (With PARAmeterS)
@@ -342,6 +343,7 @@ extern struct Channel *get_channel(struct Client *cptr,
                                    char *chname, ChannelGetType flag);
 extern struct Membership* find_member_link(struct Channel * chptr,
                                            const struct Client* cptr);
+extern int destroy_unregistered_channel(struct Channel* chptr);
 extern int sub1_from_channel(struct Channel* chptr);
 extern int can_join(struct Client *sptr, struct Channel *chptr, char *key);
 extern void add_user_to_channel(struct Channel* chptr, struct Client* who,

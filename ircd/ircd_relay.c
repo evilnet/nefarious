@@ -102,7 +102,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
     text = StripColour(text);
 
   sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
-			   SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
+			   SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);
 }
 
 void relay_channel_notice(struct Client* sptr, const char* name, const char* text, int total)
@@ -154,7 +154,7 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
     text = StripColour(text);
 
   sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
-			   SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
+			   SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
 }
 
 void server_relay_channel_message(struct Client* sptr, const char* name, const char* text)
@@ -176,7 +176,7 @@ void server_relay_channel_message(struct Client* sptr, const char* name, const c
    */
   if (client_can_send_to_channel(sptr, chptr)) {
     sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
-			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
+			     SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);
   }
   else
     send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
@@ -196,7 +196,7 @@ void server_relay_channel_notice(struct Client* sptr, const char* name, const ch
    */
   if (client_can_send_to_channel(sptr, chptr)) {
     sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
-			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
+			     SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
   }
 }
 

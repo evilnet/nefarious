@@ -480,7 +480,7 @@ static Numeric replyTable[] = {
 /* 225 */
   { 0 },
 /* 226 */
-  { 0 },
+  { RPL_STATSbLINE, "b %s", "226" },
 /* 227 */
   { RPL_STATSRLINE, "R %s %s [%s]", "227" },
 /* 228 */

@@ -118,6 +118,7 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   ClrFlag(sptr, FLAG_TS8);
 
+
   if (parc < 3) {
     char modebuf[MODEBUFLEN];
     char parabuf[MODEBUFLEN];
@@ -130,7 +131,7 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     return 0;
   }
 
-  if (!(member = find_member_link(chptr, sptr)) || (!IsChanOp(member) && !IsHalfOp(member))) {
+  if (!IsChannelService(sptr) && (!(member = find_member_link(chptr, sptr)) || (!IsChanOp(member) && !IsHalfOp(member)))) {
     if (IsLocalChannel(chptr->chname) && HasPriv(sptr, PRIV_MODE_LCHAN)) {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_CHANNEL | /* Send mode to channel */
@@ -194,7 +195,7 @@ ms_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		MODE_PARSE_STRICT | /* Interpret it strictly */
 		MODE_PARSE_FORCE), NULL); /* And force it to be accepted */
   } else {
-    if (!(member = find_member_link(chptr, sptr)) || (!IsChanOp(member) && !IsHalfOp(member))) {
+    if (!IsChannelService(sptr) && (!(member = find_member_link(chptr, sptr)) || (!IsChanOp(member) && !IsHalfOp(member)))) {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_SERVER |  /* Send mode to server */
 		    MODEBUF_DEST_HACK2  |  /* Send a HACK(2) message */

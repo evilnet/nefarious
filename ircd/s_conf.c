@@ -79,6 +79,7 @@ struct sline*    GlobalSList = 0;
 struct csline*   GlobalConnStopList = 0;
 struct svcline*  GlobalServicesList = 0;
 struct blline*   GlobalBLList = 0;
+char*            GlobalForwards[256];
 
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
@@ -842,6 +843,21 @@ void conf_add_listener(const char* const* fields, int count)
 #endif /* USE_SSL */
 }
 
+void conf_add_lbline(const char* const* fields, int count)
+{
+    unsigned char ch = fields[1][0];
+    MyFree(GlobalForwards[ch]);
+    DupString(GlobalForwards[ch], fields[2]);
+}
+
+
+void clear_lblines(void)
+{
+  unsigned int ii;
+  for (ii = 0; ii < 256; ++ii)
+    MyFree(GlobalForwards[ii]);
+}
+
 void conf_add_quarantine(const char* const* fields, int count)
 {
   struct qline *qline;
@@ -1409,10 +1425,13 @@ read_actual_config(const char *cfile)
       aconf->status = CONF_ILLEGAL;
       break;
     case 'B':                /* 'services' lines (aka 'bot lines'). */
-    case 'b':                /* I honestly couldn't think of a better letter. -akl */
       conf_add_svcline(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
+    case 'b':                /* service forward lines */
+       conf_add_lbline(field_vector, field_count);
+       aconf->status = CONF_ILLEGAL;
+       break;
     case 'C':                /* Server where I should try to connect */
     case 'c':                /* in case of lp failures             */
       ++ccount;
@@ -1724,6 +1743,7 @@ int rehash(struct Client *cptr, int sig)
   clear_cslines();
   clear_dnsbl_list();
   clear_svclines();
+  clear_lblines();
 
   if (sig != 2)
     flush_resolver_cache();

@@ -1,6 +1,49 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-30  Neil Spierling  <sirvulcan@gmail.com>
+
+
+	* doc/example.conf: Added b:lines (lowercase b) for prefix'ed
+	commands to be redirected to the specified server. Stats b
+	F:Line added also but not in use yet.
+
+	* include/channel.h: Added MODE_PERSIST (+z).
+
+	* include/ircd_features.h: Fixed a bug in the F:lines. Added
+	stats b F:line.
+
+	* include/numeric.h: Numeric for stats b.
+
+	* include/s_conf.h: GlobalForwards decleration.
+
+	* include/send.h: sendcmdto_channel_butone adjusted to support
+	a prefix.
+
+	* ircd/channel.c: Handle MODE_PERSIST.
+
+	* ircd/ircd_features.c: Added stats b F:Line.
+
+	* ircd/ircd_relay.c: Updated sendcmdto_channel_butone usage.
+
+	* ircd/m_endburst.c: Add empty channels which contain +z.
+
+	* ircd/m_kick.c: No change really just the same as .12.
+
+	* ircd/m_mode.c: No change really just the same as .12.
+
+	* ircd/m_wall*.c (except m_wallops.c): Updated sendcmdto_channel_butone
+	usage.
+
+	* ircd/s_conf.c: Read and handle b:lines.
+
+	* ircd/s_err.c: Added numeric for stats b.
+
+	* ircd/s_numeric.c: Updated sendcmdto_channel_butone usage.
+
+	* ircd/send.c: Updated main sendcmdto_channel_butone to look
+	for prefix's and foward messages if needed.
+
 2005-01-29  Reed Loden  <reed@reedloden.com>
 
 	* include/ircd_features.h: Added FEAT_CHMODE_Z and

@@ -27,6 +27,7 @@
 #include "class.h"
 #include "client.h"
 #include "gline.h"
+#include "hash.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
 #include "ircd_events.h"
@@ -452,7 +453,7 @@ stats_help(struct Client* to, struct StatDesc* sd, int stat, char* param)
  * stats.  Struct StatDesc is defined in s_stats.h.
  */
 struct StatDesc statsinfo[] = {
-  { 'b', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_b,
+  { 'B', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_B,
     stats_configured_svcs, 0,
     "Service mappings." },
   { 'c', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_c,

@@ -188,6 +188,73 @@ static char *make_nick_user_ip(char *ipbuf, char *nick, char *name,
 }
 
 /*
+ * Destroy the channel if it has no users and is not registered
+ */
+int destroy_unregistered_channel(struct Channel* chptr)
+{
+  struct SLink *tmp;
+  struct SLink *obtmp;
+
+  if (chptr->users > 0)         /* Can be 0, called for an empty channel too */
+  {
+    if(0 == chptr->members)
+      return 1;
+    return 0;
+  }
+
+
+  if ((chptr->mode.mode & MODE_PERSIST)) // channel is registered
+    return 0;
+
+  assert(0 == chptr->members);
+
+  /* Channel became (or was) empty: Remove channel */
+  if (is_listed(chptr))
+  {
+    int i;
+    for (i = 0; i <= HighestFd; i++)
+    {
+      struct Client *acptr = 0;
+      if ((acptr = LocalClientArray[i]) && cli_listing(acptr) &&
+          (cli_listing(acptr))->chptr == chptr)
+      {
+        list_next_channels(acptr, 1);
+        break;                  /* Only one client can list a channel */
+      }
+    }
+  }
+  /*
+   * Now, find all invite links from channel structure
+   */
+  while ((tmp = chptr->invites))
+    del_invite(tmp->value.cptr, chptr);
+
+  tmp = chptr->banlist;
+  while (tmp)
+  {
+    obtmp = tmp;
+    tmp = tmp->next;
+    MyFree(obtmp->value.ban.banstr);
+    MyFree(obtmp->value.ban.who);
+    free_link(obtmp);
+  }
+  if (chptr->prev)
+    chptr->prev->next = chptr->next;
+  else
+    GlobalChannelList = chptr->next;
+  if (chptr->next)
+    chptr->next->prev = chptr->prev;
+  hRemChannel(chptr);
+  --UserStats.channels;
+  /*
+   * make sure that channel actually got removed from hash table
+   */
+  assert(chptr->hnext == chptr);
+  MyFree(chptr);
+  return 1;
+}
+
+/*
  * Subtract one user from channel i (and free channel
  * block, if channel became empty).
  * Returns: true  (1) if channel still exists
@@ -200,9 +267,16 @@ int sub1_from_channel(struct Channel* chptr)
 
   if (chptr->users > 1)         /* Can be 0, called for an empty channel too */
   {
-    assert(0 != chptr->members);
+    if(0 == chptr->members)
+      return 0;
     --chptr->users;
     return 1;
+  }
+
+  if ((chptr->mode.mode & MODE_PERSIST)) // channel is registered
+  {
+    --chptr->users;
+    return 0;
   }
 
   assert(0 == chptr->members);
@@ -1085,6 +1159,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'T';
   if (chptr->mode.mode & MODE_NOLISTMODES)
     *mbuf++ = 'L';
+  if (chptr->mode.mode & MODE_PERSIST)
+    *mbuf++ = 'z';
   if (chptr->mode.limit) {
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
@@ -1881,6 +1957,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_BAN,		'b', */
 /*  MODE_EXCEPT         'e', */
     MODE_LIMIT,		'l',
+    MODE_PERSIST,	'z',
     MODE_NOCOLOUR,	'c',
     MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
@@ -2271,7 +2348,7 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
 	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
-	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
+	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY | MODE_PERSIST |
 	   MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES | MODE_ADMINONLY);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
@@ -2392,6 +2469,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
+    MODE_PERSIST,	'z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
     0x0, 0x0
@@ -3361,6 +3439,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_OPERONLY,	'O',
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
+    MODE_PERSIST,	'z',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
@@ -3556,6 +3635,12 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	else
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	break;
+
+      case 'z': /* deal with registered channels */
+	if(!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) || (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
+		break;
+	else if(state.dir == '-')
+		destroy_unregistered_channel(chptr);
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);

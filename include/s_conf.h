@@ -218,6 +218,7 @@ extern struct sline*	GlobalSList;
 extern struct csline*	GlobalConnStopList;
 extern struct svcline*	GlobalServicesList;
 extern struct blline*	GlobalBLList;
+extern char*            GlobalForwards[256];
 
 /*
  * Proto types

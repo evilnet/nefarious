@@ -126,7 +126,7 @@ int ms_end_of_burst(struct Client* cptr, struct Client* sptr, int parc, char* pa
   for (chan = GlobalChannelList; chan; chan = next_chan) {
     next_chan = chan->next;
 
-    if (!chan->members) { /* empty channel */
+    if (!chan->members && !(chan->mode.mode & MODE_PERSIST)) { /* empty channel and not registered */
       if (!(chan->mode.mode & MODE_BURSTADDED))
 	sendto_opmask_butone(0, SNO_OLDSNO, "Empty channel %H not added by "
 			     "BURST!", chan);
