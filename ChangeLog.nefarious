@@ -10,9 +10,14 @@
 
 2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
 
+	* patches/README: Updated with loc patch info etc.
+
+	* ircd/channel.c: Typo fix, -A works now (tested).
+
 	* ircd/m_mkpasswd.c: Replaced &me with sptr in the password reply.
 
 	* ircd/m_account.c: Only use hide_hostmask if we are using style 1.
+			    Fixed a bug with AC's being transit'ed.
 
 2004-10-17  Reed Loden  <reed@reedloden.com>
 

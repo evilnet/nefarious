@@ -22,12 +22,15 @@ banexempts.srvx2.diff	0.2	Afternet SRVX2	Adds in support so that SRVX2 will not 
 						exempts.
 halfops.srvx2.diff	0.1	Afternet SRVX2	Adds in support so that SRVX2 can handle	Nefarious IRCu 0.3.0+
 						halfops.
+loc.srvx2.diff		0.1	Afternet SRVX2	Adds in support so that SRVX2 will properly	Nefarious IRCu 0.4.0+
+						handle login on connect messages from
+						Nefarious.
 
 
-Author					Patch
+Author					Patches
 -----------------------------------------------------------------------------------------------------------------------
-SiRVulcaN <sirvulcan@gmail.com>	banexempts.srvx2.diff
-SiRVulcaN <sirvulcan@gmail.com>	halfops.srvx2.diff
+SiRVulcaN <sirvulcan@gmail.com>		banexempts.srvx2.diff, halfops.srvx2.diff
+Rubin	  <rubinlinux@gmail.com>	loc.srvx2.diff
 
 
 Service		Location					Notes
