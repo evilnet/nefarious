@@ -1559,6 +1559,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 		&& get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
 		|| force)
 	    SetBot(acptr);
+	}
 	else
 	  ClearBot(acptr);
 	break;

@@ -21,7 +21,7 @@
 
 	* ircd/numnicks.c: Remove excess lines at EOF.
 
-	* ircd/s_user.c: Redo some various stuff.
+	* ircd/s_user.c: Redo some various stuff and add a missing '}'.
 
 2003-11-02  Reed Loden  <reed@reedloden.com>
 
