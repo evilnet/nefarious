@@ -10,6 +10,12 @@
 	* Finally committed my work...
 	Look down a bit in ChangeLog to see changes.
 
+	* ircd/channel.c: Removed redundant code.
+
+	* ircd/m_mkpasswd.c: Replaced &me with sptr in error reply.
+
+	* ircd/s_conf.c: Changed 'O' to "O" to fix warning.
+
 2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Note login on connect code by Alex Badea

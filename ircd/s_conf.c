@@ -1504,7 +1504,7 @@ read_actual_config(const char *cfile)
       if (aconf->status & CONF_OPERATOR) {
 	int* i;
 	int flag;
-	char *m = 'O';
+	char *m = "O";
 	if (*field_vector[4])
 	  DupString(m, field_vector[4]);
 	for (; *m; m++) {

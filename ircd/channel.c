@@ -3475,7 +3475,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'A': /* deal with admin only */
 	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
-	if ((IsAdmin(sptr) && feature_bool(FEAT_OPERFLAGS)) || IsServer(sptr)) {
+	if (IsAdmin(sptr) || IsServer(sptr)) {
 	  mode_parse_mode(&state, flag_p);
 	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);

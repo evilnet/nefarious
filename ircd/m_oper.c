@@ -244,7 +244,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_umode_out(cptr, sptr, &old_mode, HasPriv(sptr, PRIV_PROPAGATE));
     send_reply(sptr, RPL_YOUREOPER);
 
-    if(IsAdmin(sptr))
+    if (IsAdmin(sptr))
       sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
                            parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
     else
