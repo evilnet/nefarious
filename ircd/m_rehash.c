@@ -117,7 +117,7 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   if (parc == 2) { /* special processing */
-    if (*parv[2] == '\0') { /* one character server name */
+    if (parv[1][1] == '\0') { /* one character server name */
       if (*parv[1] == 'm') {
 	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
 	motd_recache(); /* flush MOTD cache */
@@ -161,7 +161,7 @@ int ms_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   if (parc > 1) { /* special processing */
-    if (*parv[2] == '\0') { /* one character server name */
+    if (parv[1][1] == '\0') { /* one character server name */
       if (*parv[1] == 'm') {
 	send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
 	motd_recache(); /* flush MOTD cache */
