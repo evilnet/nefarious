@@ -3,6 +3,16 @@
 
 2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
 
+	* configure: Reran autoconf again.
+
+	* configure.in: Ran autoscan against the src, picked up a bunch
+	of stuff thats not being checked for, also added package name,
+	version and bug report address.
+
+	* config.h.in: Regenerated (header added back in after).
+
+2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
+
 	* configure: Reran autoconf.
 
 	* config.h.in: Added header and define back in. We will have to add
