@@ -83,6 +83,7 @@
 
 #include "IPcheck.h"
 #include "client.h"
+#include "gline.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
@@ -96,7 +97,6 @@
 #include "s_misc.h"
 #include "s_user.h"
 #include "send.h"
-#include "gline.h"
 #include "sys.h"
 
 #include <assert.h>

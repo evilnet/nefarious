@@ -189,9 +189,9 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   if (IsUserPort(auth->client))
     sendheader(client, REPORT_DO_DNSBL);
 
-  Debug((DEBUG_DEBUG, "DNSBL t: %d", bllinecount));
+  Debug((DEBUG_DEBUG, "DNSBL t: %u", GlobalBLCount));
 
-  cli_dnsblcount(auth->client) = bllinecount;
+  cli_dnsblcount(auth->client) = GlobalBLCount;
   SetDNSBLPending(auth);
 
   for (blline = GlobalBLList; blline; blline = blline->next) {

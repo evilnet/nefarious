@@ -72,8 +72,6 @@
 #define INADDR_NONE 0xffffffff
 #endif
 
-unsigned int bllinecount = 0;
-
 struct ConfItem* GlobalConfList  = 0;
 int              GlobalConfCount = 0;
 struct qline*    GlobalQuarantineList = 0;
@@ -81,6 +79,7 @@ struct sline*    GlobalSList = 0;
 struct csline*   GlobalConnStopList = 0;
 struct svcline*  GlobalServicesList = 0;
 struct blline*   GlobalBLList = 0;
+unsigned int     GlobalBLCount = 0;
 char*            GlobalForwards[256];
 
 static struct LocalConf   localConf;
@@ -974,7 +973,7 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
      EmptyString(fields[3]) || EmptyString(fields[4]) || EmptyString(fields[5]))
     return;
 
-  ++bllinecount;
+  ++GlobalBLCount;
 
   blline = (struct blline *) MyMalloc(sizeof(struct blline));
   DupString(blline->server, fields[1]);
@@ -1353,7 +1352,7 @@ read_actual_config(const char *cfile)
   struct ConfItem *aconf = 0;
   FBFILE *file;
 
-  bllinecount = 0;
+  GlobalBLCount = 0;
 
   Debug((DEBUG_DEBUG, "read_actual_config: ircd.conf = %s", cfile));
   sendto_opmask_butone(0, SNO_OLDSNO, "Reading configuration file: %s",

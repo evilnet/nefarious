@@ -1,7 +1,29 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2005-02-25  Alex Schumann   <rubin@afternet.org>
+2005-02-25  Reed Loden  <reed@reedloden.com>
+
+	* ChangeLog.nefarious: Cleaned-up Rubin's ChangeLog entry.
+
+	* include/s_conf.h: Added GlobalBLCount global (from s_misc.h).
+
+	* include/s_misc.h: Removed bllinecount global.
+
+	* ircd/m_nick.c: Somewhat alphabetized #include list.
+
+	* ircd/m_svsnick.c: Added #include "gline.h" to fix a warning
+	when using NICKGLINES.
+
+	* ircd/parse.c: Use QuakeNet's methodology when dealing with
+	MFLG_SLOW (puts some checks on what the oper is doing).
+
+	* ircd/s_auth.c: Renamed bllinecount to GlobalBLCount.
+
+	* ircd/s_conf.c: Renamed bllinecount to GlobalBLCount (and used
+	it!).
+
+2005-02-25  Alex Schumann  <rubin@afternet.org>
+
 	* ircd/s_auth.c: Add check for IsDNSPending(auth) in addition
 	to IsDoingAuth(auth) before freeing auth.
 
@@ -12,10 +34,10 @@
 
 2005-02-25  Neil Spierling  <sirvulcan@gmail.com>
 
-	* ircd/s_auth.c: Dont decrement in the loop where we check for
-		 	   multiple ips in the reply, do it before.
-			 Implemented .12's header code.. much simpler.
-			 Also added another reply for dnsbls.
+	* ircd/s_auth.c: Don't decrement in the loop where we check for
+	multiple ips in the reply; do it before.
+	Implemented .12's header code.. much simpler.
+	Also added another reply for dnsbls.
 
 2005-02-24  Neil Spierling  <sirvulcan@gmail.com>
 

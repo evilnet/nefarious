@@ -949,7 +949,7 @@ parse_client(struct Client *cptr, char *buffer, char *bufend)
   mptr->bytes += i;
   if ((mptr->flags & MFLG_SLOW)) {
     if (IsOper(cptr))
-     cli_since(cptr) = 0;
+     cli_since(cptr) += 1;
     else
      cli_since(cptr) += (2 + i / 120);
   }
