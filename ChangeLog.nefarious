@@ -1,5 +1,14 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/m_wallchops.c: Fixed an issue where notices that you sent would be
+	echoed back to you.
+
+	* ircd/m_wallhops.c: Same as above.
+
+	* ircd/m_wallvoices.c: Same as above.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Default HOST_IN_TOPIC to false, had a seg fault on a network
 	where it had been working fine for a week.
 
