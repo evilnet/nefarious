@@ -14,7 +14,8 @@
 
 	* ircd/res.c: do not cache certain types of ip aliases
 	when the lookup is for an rbl. This appears to solve
-	the false positives with sorbs.
+	the false positives with sorbs. (and added): Also dont find them either.
+	The cache appears to be working right now. gonna upgrade afternet.
 
 	* ircd/ssl.c: added EBUSY and EAGAIN to errno's not to die on.
 

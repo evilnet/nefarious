@@ -1583,6 +1583,8 @@ static struct CacheEntry* find_cache_name(const char* name)
   return NULL;
 }
 
+void auth_dnsbl_callback(void* vptr, struct DNSReply* reply);
+
 /*
  * find_cache_number - find a cache entry by ip# and update its expire time
  */
@@ -1594,6 +1596,9 @@ static struct CacheEntry* find_cache_number(struct ResRequest* request,
   int     i;
 
   assert(0 != addr);
+  if(request && request->query.callback == auth_dnsbl_callback)
+    return NULL;
+
   hashv = hash_number((const unsigned char*) addr);
   cp = hashtable[hashv].num_list;
 
@@ -1625,7 +1630,6 @@ static struct CacheEntry* find_cache_number(struct ResRequest* request,
   return NULL;
 }
 
-void auth_dnsbl_callback(void* vptr, struct DNSReply* reply);
 
 static struct CacheEntry* make_cache(struct ResRequest* request)
 {
