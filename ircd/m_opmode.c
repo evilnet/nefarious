@@ -140,6 +140,7 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   struct ModeBuf mbuf;
   char *chname, *qreason;
   int force = 0;
+  struct Membership *tmp;
 
   if (!feature_bool(FEAT_CONFIG_OPERCMDS))
     return send_reply(sptr, ERR_DISABLED, "OPMODE");
@@ -165,6 +166,13 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (!force && (qreason = find_quarantine(chptr->chname)))
     return send_reply(sptr, ERR_QUARANTINED, chptr->chname, qreason);
+
+  for (tmp = chptr->members; tmp; tmp = tmp->next_member)
+    if (IsChannelService(tmp->user)) {
+      /* Impersonate the abuser */
+      sendwallto_group_butone(&me, WALL_DESYNCH, NULL, "Failed OPMODE for registred channel %s by %C", chptr->chname, sptr);
+      return send_reply(sptr, ERR_QUARANTINED, chptr->chname, "This channel is registered");
+    }
 
   modebuf_init(&mbuf, sptr, cptr, chptr,
 	       (MODEBUF_DEST_CHANNEL | /* Send MODE to channel */
