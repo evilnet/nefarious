@@ -221,7 +221,13 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     if (type == 'C' && parc < 6)
       return need_more_params(sptr, "ACCOUNT");
 
-    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
+    /* findNUser("AB") seems to return Sirvulcan, whois numnick is ABAAB.. 
+     * This is a bug with findNUser no? 
+     * so you cant do this, because acptr is the user not the server. 
+     * Hopefully reversing them will be ok.
+     *    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
+    */
+    if(!(acptr = FindNServer(parv[1])) && !(acptr = findNUser(parv[1])))
       return 0; /* target not online, ignore */
     
     if (!IsMe(acptr)) {
@@ -243,7 +249,9 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
       return 0; /* most probably, user disconnected */
 
     if (type == 'A') {
+      SetAccount(acptr);
       ircd_strncpy(cli_user(acptr)->account, cli_loc(acptr)->account, ACCOUNTLEN);
+      SetHiddenHost(acptr);
       hide_hostmask(acptr);
     }
     

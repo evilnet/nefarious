@@ -1,6 +1,9 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-18 Alex Schumann <rubinlinux@gmail.com>
+	* ircd/m_account.c: modded LOC code to resolve some bugs with it.
+
 2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_mkpasswd.c: Replaced &me with sptr in the password reply.
