@@ -3,6 +3,21 @@
 
 2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* include/map.h: Added an extra var to map_update for removing a
+	server.
+
+	* ircd/m_server.c: Updated map_update() call.
+
+	* ircd/map.c: if map_update is called with a 1 then the server
+	will thats being updated will be removed. This really drops the
+	need for the cache time stuff. Ill see how this goes.
+
+	* ircd/s_misc.c: Save as m_server.c entry.
+
+	* ircd/s_serv.c: Save as m_server.c entry.
+
+2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Added F:Lines for HIS_MAP_SCRAMBLED,
 	HIS_LINKS_SCRAMBLED and HIS_SCRAMBLED_CACHE_TIME.
 
