@@ -218,7 +218,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 			  MODE_NOPRIVMSGS | MODE_REGONLY | MODE_NOCOLOUR |
 			  MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
 			  MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
-			  MODE_STRIP | MODE_NOAMSG);
+			  MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES);
 
     parse_flags |= (MODE_PARSE_SET | MODE_PARSE_WIPEOUT); /* wipeout keys */
 

@@ -284,7 +284,7 @@ int
 mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Channel *chptr;
-  char *control = "ovpsmikblrcCMNOQSTzL"; /* default control string */
+  char *control = "ovpsmikblrcCLMNOQSTz"; /* default control string */
   char *chname, *qreason;
   struct Membership *tmp;
   int force = 0;

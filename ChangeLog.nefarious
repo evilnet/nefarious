@@ -24,6 +24,10 @@
 	* ircd/channel.c: Fix bug related to +O and +z chmodes that 
 	caused the IRCd to call send_notoper().
 
+	* ircd/m_burst.c: Burst MODE_NOLISTMODES.
+
+	* ircd/m_clearmode.c: Correct chmode 'L' placement.
+
 	* ircd/m_copyright.c: Correct indent/spacing.
 
 	* ircd/m_ircops.c: Revert to version in which opers cannot see
