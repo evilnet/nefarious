@@ -127,11 +127,9 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (IsChannelService(acptr))
     return 0;
 
-  if (!FindChannel(parv[2])) {
-    chptr = get_channel(acptr, parv[2], CGT_CREATE);
-  } else {
-    chptr = get_channel(acptr, parv[2], CGT_NO_CREATE);
-  }
+  chptr = get_channel(acptr, parv[2],
+		      (!FindChannel(parv[2])) ? CGT_CREATE :
+		      CGT_NO_CREATE);
 
   if (find_member_link(chptr, acptr))
     return 0;
@@ -146,21 +144,14 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if ((!IsChannelName(name)) || (HasCntrl(name)))
     return 0;
 
-  if (chptr->users == 0) {
-    flags = CHFL_CHANOP;
-  } else {
-    flags = CHFL_DEOPPED;
-  }
+  flags = (chptr->users == 0) ? CHFL_CHANOP : CHFL_DEOPPED;
 
- if (chptr) {
+  if (chptr)
     joinbuf_join(&join, chptr, flags);
- } else if (!(chptr = get_channel(acptr, name, CGT_CREATE)))
-     return 0;
-   else if (check_target_limit(acptr, chptr, chptr->chname, 1)) {
-    sub1_from_channel(chptr); /* created it... */
-     return 0;
-  } else
-      joinbuf_join(&create, chptr, flags);
+  else if (!(chptr = get_channel(acptr, name, CGT_CREATE)))
+    return 0;
+  else
+    joinbuf_join(&create, chptr, flags);
 
   if (chptr->topic[0]) {
     send_reply(acptr, RPL_TOPIC, chptr->chname, chptr->topic);

@@ -2122,19 +2122,17 @@ void conf_add_sline(const char* const* fields, int count)
   if (!EmptyString(fields[3])) {
     DupString(sline->realhost, fields[3]);
     if (check_if_ipmask(sline->realhost)) {
-      if (str2prefix(sline->realhost, p) == 0) {
-        Debug((DEBUG_FATAL, "S-Line: \"%s\" appears not to be a valid IP address."));
-        MyFree(p);
-        MyFree(sline);
-        return;
-      }
-      sline->address = p->address;
-      sline->bits = p->bits;
-      Debug((DEBUG_DEBUG, "S-Line: %s = %08x/%i (%08x)", sline->realhost,
+      if (str2prefix(sline->realhost, p) != 0) {
+        sline->address = p->address;
+        sline->bits = p->bits; 
+        Debug((DEBUG_DEBUG, "S-Line: %s = %08x/%i (%08x)", sline->realhost,
              sline->address, sline->bits, NETMASK(sline->bits)));
-      sline->flags = SLINE_FLAGS_IP;
-    }
-    else
+        sline->flags = SLINE_FLAGS_IP; 
+      } else {
+        Debug((DEBUG_FATAL, "S-Line: \"%s\" appears not to be a valid IP address, might be wildcarded."));
+        sline->flags = SLINE_FLAGS_HOSTNAME;
+      }
+    } else
       sline->flags = SLINE_FLAGS_HOSTNAME;
   } else {
     sline->realhost = NULL;
@@ -2195,7 +2193,8 @@ conf_check_slines(struct Client *cptr)
       if (((cli_ip(cptr)).s_addr & NETMASK(sconf->bits)) != sconf->address.s_addr)
         continue;
     } else if (sconf->flags == SLINE_FLAGS_HOSTNAME) {
-        if (match(sconf->realhost, cli_sockhost(cptr)) != 0)
+        if ((match(sconf->realhost, cli_sockhost(cptr)) != 0) &&
+           (match(sconf->realhost, cli_sock_ip(cptr)) != 0))	/* wildcarded IP address */
           continue;
     } else {
         continue;

@@ -132,6 +132,7 @@ int ms_end_of_burst(struct Client* cptr, struct Client* sptr, int parc, char* pa
 			     "BURST!", chan);
 
       sub1_from_channel(chan); /* ok, nuke channel now */
+      return 0;
     }
 
     chan->mode.mode &= ~MODE_BURSTADDED;

@@ -101,7 +101,8 @@ static void userip_formatter(struct Client* cptr, struct Client *sptr, struct Ms
 	      cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
 	      (((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ?
 		HasHiddenHost(cptr) : IsHiddenHost(cptr)) || 
-	       HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
+	       HasSetHost(cptr) || feature_bool(FEAT_HIS_USERIP)) &&
+	       !IsAnOper(sptr) && (sptr != cptr) ?
 	       ((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ? 
 		feature_str(FEAT_HIDDEN_IP) : cli_user(cptr)->virtip) :
 		ircd_ntoa((const char*) &(cli_ip(cptr))));
@@ -114,9 +115,6 @@ int m_userip(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   assert(0 != cptr);
   assert(cptr == sptr);
-
-  if (feature_bool(FEAT_HIS_USERIP) && !IsAnOper(sptr))
-    return send_reply(sptr, ERR_DISABLED, "USERIP");
 
   if (parc < 2)
     return need_more_params(sptr, "USERIP");

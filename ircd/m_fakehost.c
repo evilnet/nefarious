@@ -114,26 +114,21 @@ int ms_fakehost(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
                               cli_name(sptr));
 
   /* Locate our target user; ignore the message if we can't */
-  if(!(target = findNUser(parv[1])))
+  if (!(target = findNUser(parv[1])))
     return 0;
 
   /* fakehost enabled? */
-  if (MyConnect(cptr) && !feature_bool(FEAT_FAKEHOST)) {
-    send_reply(cptr, ERR_DISABLED, "FAKEHOST");
-    return 0;
-  }
+  if (MyConnect(cptr) && !feature_bool(FEAT_FAKEHOST))
+    return send_reply(cptr, ERR_DISABLED, "FAKEHOST");
 
   /* Fake host assignments must be from services */
-  if (!find_conf_byhost(cli_confs(cptr), cli_name(sptr), CONF_UWORLD)) {
+  if (!find_conf_byhost(cli_confs(cptr), cli_name(sptr), CONF_UWORLD))
     return protocol_violation(cptr, "Non-U:lined server %s set fake host on user %s", cli_name(sptr), cli_name(target));
-  }
 
   /* Ignore the assignment if it changes nothing */
   if (HasFakeHost(target) &&
       ircd_strcmp(cli_user(target)->fakehost, parv[2]) == 0)
-  {
     return 0;
-  }
 
   /* Assign and propagate the fakehost */
   SetFakeHost(target);

@@ -124,7 +124,9 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
   {
     const char* p2 = (((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ?
 		       HasHiddenHost(acptr) : IsHiddenHost(acptr))
-		      || HasSetHost(acptr)) && !IsAnOper(sptr) ?
+		      || HasSetHost(acptr)
+		      || feature_bool(FEAT_HIS_USERIP))
+		      && !IsAnOper(sptr) && (sptr != acptr) ?
 		      feature_str(FEAT_HIDDEN_IP) :
 		      ircd_ntoa((const char*) &(cli_ip(acptr)));
     *(p1++) = ' ';

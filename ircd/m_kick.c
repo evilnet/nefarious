@@ -215,7 +215,7 @@ int ms_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    * of channel membership.  -- aaronc
    */
   if (!IsServer(sptr) && !IsChannelService(sptr) && member && cli_from(who) != cptr &&
-      (!(sptr_link = find_member_link(chptr, sptr)) || !IsChanOp(sptr_link) && !IsHalfOp(sptr_link))) {
+      (!(sptr_link = find_member_link(chptr, sptr)) || (!IsChanOp(sptr_link) && !IsHalfOp(sptr_link)))) {
     sendto_opmask_butone(0, SNO_HACK2, "HACK: %C KICK %H %C %s", sptr, chptr,
 			 who, comment);
 

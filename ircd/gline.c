@@ -865,13 +865,10 @@ gline_find(char *userhost, unsigned int flags)
 
   DupString(t_uh, userhost);
 #ifdef NICKGLINES
-  canon_userhost(t_uh, &nick, &user, &host, 0);
+  canon_userhost(t_uh, &nick, &user, &host, "*");
 #else
-  canon_userhost(t_uh, &user, &host, 0);
+  canon_userhost(t_uh, &user, &host, "*");
 #endif
-
-  if(BadPtr(user))
-    return 0;
 
   for (gline = GlobalGlineList; gline; gline = sgline) {
     sgline = gline->gl_next;
@@ -886,16 +883,14 @@ gline_find(char *userhost, unsigned int flags)
       if ((gline->gl_nick == NULL) && (gline->gl_host == NULL)) {
          if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0) ||
             (!gline->gl_host && !host)) &&
-            ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-            (user && ircd_strcmp(gline->gl_user, user) == 0)) &&
+            (ircd_strcmp(gline->gl_user, user) == 0) &&
             ((!nick && gline->gl_nick && ircd_strcmp(gline->gl_nick, "*") == 0) ||
             (nick && gline->gl_nick && ircd_strcmp(gline->gl_nick, nick) == 0) || (!gline->gl_nick && !nick)))
            break;
      } else {
          if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0) ||
             (!gline->gl_host && !host)) &&
-            ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-            (user && match(gline->gl_user, user) == 0)) &&
+            (ircd_strcmp(gline->gl_user, user) == 0) &&
             ((!nick && gline->gl_nick && ircd_strcmp(gline->gl_nick, "*") == 0) ||
             (nick && gline->gl_nick && (match(gline->gl_nick, nick) == 0)) || (!gline->gl_nick && !nick)))
   	   break;
@@ -903,8 +898,7 @@ gline_find(char *userhost, unsigned int flags)
 #else
       if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0)
 	 ||(!gline->gl_host && !host)) &&
-	  ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-	   ircd_strcmp(gline->gl_user, user) == 0))
+	  (ircd_strcmp(gline->gl_user, user) == 0))
 	break;
 #endif
     } else {
@@ -912,23 +906,20 @@ gline_find(char *userhost, unsigned int flags)
       if ((nick == NULL) && (host == NULL)) {
         if (((gline->gl_host && host && match(gline->gl_host,host) == 0)
   	   ||(!gline->gl_host && !host)) &&
-		 ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-		 (user && match(gline->gl_user, user) == 0)) &&
+		 (match(gline->gl_user, user) == 0) &&
 		 ((!nick && ircd_strcmp(gline->gl_nick, "*") == 0) ||
 		 (nick && (match(gline->gl_nick, nick) == 0))))
            break;
       } else {
         if (((gline->gl_host && host && match(gline->gl_host,host) == 0) ||
            (!gline->gl_host && !host)) &&
-           ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-           (user && match(gline->gl_user, user) == 0)))
+           (match(gline->gl_user, user) == 0))
           break;
       }
 #else
       if (((gline->gl_host && host && match(gline->gl_host,host) == 0)
 	 ||(!gline->gl_host && !host)) &&
-	  ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
-	   match(gline->gl_user, user) == 0))
+	  (match(gline->gl_user, user) == 0))
       break;
 #endif
     }

@@ -106,7 +106,7 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct Channel *chptr = 0;
   unsigned int hoflags  = 0;
   struct ModeBuf mbuf;
-  struct Membership *member;
+  struct Membership *member = 0;
 
   if (parc < 2)
     return need_more_params(sptr, "MODE");
@@ -165,7 +165,7 @@ ms_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
   struct Channel *chptr = 0;
   struct ModeBuf mbuf;
-  struct Membership *member;
+  struct Membership *member = 0;
 
   if (parc < 3)
     return need_more_params(sptr, "MODE");

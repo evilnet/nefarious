@@ -1,6 +1,32 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-10  Reed Loden  <reed@reedloden.com>
+
+	* ircd/gline.c
+
+	* ircd/m_endburst.c
+
+	* ircd/m_fakehost.c
+
+	* ircd/m_invite.c
+
+	* ircd/m_kick.c
+
+	* ircd/m_mode.c
+
+	* ircd/m_svsjoin.c
+
+	* ircd/m_userip.c
+
+	* ircd/motd.c
+
+	* ircd/s_conf.c
+
+	* ircd/s_user.c
+
+	* ircd/whocmds.c
+
 2005-01-31  Reed Loden  <reed@reedloden.com>
 
 	* include/client.h: Added new FLAG_WHOIS (+W) aka
