@@ -1,6 +1,12 @@
 /*
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/ircd_features.c: Fixed up bug in HIS_NETSPLIT.
+
+        * ircd/m_version.c: Added nessecary include for CVS_VERSION.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Bumped up the max excepts to 45.
 			    Adjust various HIS lines to TRUE.
 

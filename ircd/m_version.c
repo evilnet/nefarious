@@ -80,6 +80,7 @@
  *                    non-NULL pointers.
  */
 #include "config.h"
+#include "ChangeLog.nefarious"
 
 #include "client.h"
 #include "hash.h"

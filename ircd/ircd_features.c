@@ -380,7 +380,7 @@ static struct FeatureDesc {
   F_B(HIS_KILLWHO, 0, 0, 0),
   F_B(HIS_REWRITE, 0, 1, 0),
   F_I(HIS_REMOTE, 0, 1, 0),
-  F_B(HIS_NETSPLIT, 1, 0, 0),
+  F_B(HIS_NETSPLIT, 0, 1, 0),
   F_S(HIS_SERVERNAME, 0, "*.Nefarious", 0),
   F_S(HIS_SERVERINFO, 0, "evilnet development", 0),
   F_S(HIS_URLSERVERS, 0, "http://sourceforge.net/projects/evilnet/", 0),
