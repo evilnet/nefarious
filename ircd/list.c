@@ -165,6 +165,8 @@ static void dealloc_connection(struct Connection* con)
   DBufClear(&(con_recvQ(con)));
   if (con_listener(con))
     release_listener(con_listener(con));
+  if (con_loc(con))
+    MyFree(con_loc(con));
 
 #ifdef DEBUGMODE
   --connections.inuse;

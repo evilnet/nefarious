@@ -57,6 +57,7 @@ struct DNSReply;
 struct hostent;
 struct Privs;
 struct AuthRequest;
+struct LOCInfo;
 
 
 /*
@@ -173,7 +174,6 @@ enum Flag {
     FLAG_NOCHAN,                    /* ASUKA_n: hide channels */
     FLAG_NOIDLE,                    /* ASUKA_I: hide idle time */
     FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
-    FLAG_VERIFIED,                  /* Verified user */
     FLAG_DNSBL,                     /* Client in DNSBL */
     FLAG_ADMIN,                     /* Client is an admin */
 
@@ -240,6 +240,7 @@ struct Connection {
   struct Socket       con_socket; /* socket descriptor for client */
   struct Timer        con_proc; /* process latent messages from client */
   struct AuthRequest* con_auth; /* auth request for client */
+  struct LOCInfo*     con_loc;  /* Login-on-connect information */
 };
 
 #define CONNECTION_MAGIC 0x12f955f3
@@ -344,6 +345,7 @@ struct Client {
 #define cli_socket(cli)		((cli)->cli_connect->con_socket)
 #define cli_proc(cli)		((cli)->cli_connect->con_proc)
 #define cli_auth(cli)		((cli)->cli_connect->con_auth)
+#define cli_loc(cli)		((cli)->cli_connect->con_loc)
 
 #define con_verify(con)		((con)->con_magic == CONNECTION_MAGIC)
 #define con_magic(con)		((con)->con_magic)
@@ -384,6 +386,7 @@ struct Client {
 #define con_socket(con)		((con)->con_socket)
 #define con_proc(con)		((con)->con_proc)
 #define con_auth(con)		((con)->con_auth)
+#define con_loc(con)		((con)->con_loc)
 
 #define STAT_CONNECTING         0x001 /* connecting to another server */
 #define STAT_HANDSHAKE          0x002 /* pass - server sent */
@@ -480,7 +483,6 @@ struct Client {
 #define IsXtraOp(x)		HasFlag(x, FLAG_XTRAOP)
 #define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
-#define IsVerified(x)		HasFlag(x, FLAG_VERIFIED)
 #define IsDNSBL(x)              HasFlag(x, FLAG_DNSBL)
 #define IsAnAdmin(x)            HasFlag(x, FLAG_ADMIN)
 
@@ -514,7 +516,6 @@ struct Client {
 #define SetXtraOp(x)		SetFlag(x, FLAG_XTRAOP)
 #define SetNoChan(x)		SetFlag(x, FLAG_NOCHAN)
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
-#define SetVerified(x)		SetFlag(x, FLAG_VERIFIED)
 #define SetDNSBL(x)             SetFlag(x, FLAG_DNSBL)
 #define SetAdmin(x)             SetFlag(x, FLAG_ADMIN)
 

@@ -55,6 +55,7 @@ struct ServerStatistics {
   unsigned int is_asuc;         /* successful auth requests */
   unsigned int is_abad;         /* bad auth requests */
   unsigned int is_loc;          /* local connections made */
+  unsigned int is_login;        /* login-on-connect attempts */
   unsigned int uping_recv;      /* UDP Pings received */
 };
 

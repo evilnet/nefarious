@@ -82,25 +82,30 @@
 #include "config.h"
 
 #include "client.h"
+#include "ircd_alloc.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "send.h"
+#include "ircd_struct.h"
+#include "s_user.h"
+#include "msg.h"
 
 #include <assert.h>
+
+/* XXX */
+#include "s_debug.h"
 
 /*
  * mr_pass - registration message handler
  */
 int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  const char* password = parc > 1 ? parv[1] : 0;
+  const char* password;
 
   assert(0 != cptr);
   assert(cptr == sptr);
   assert(!IsRegistered(sptr));
-
-  if (EmptyString(password))
-    return need_more_params(cptr, "PASS");
 
   /* TODO: For protocol negotiation */
 #if 0
@@ -108,6 +113,57 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   	/* Do something here */
   }
 #endif
-  ircd_strncpy(cli_passwd(cptr), password, PASSWDLEN);
+
+  if (parc == 2 && parv[1][0] == ':') {
+    /*
+     * All hail code duplication! 
+     *
+     * Here we emulate parse_client, for the benefit of buggy clients.
+     * If there's only one arg that starts with a literal ':', we
+     * split it again. Thus, a valid line might be:
+     *     PASS ::X username :pass phrase
+     * or
+     *     PASS ::I-line-pass X username :pass phrase
+     */
+     char* s = &parv[1][1];
+     int k;
+     
+     parc = 1;
+     for (;;) {
+       while (*s == ' ')
+         *s++ = 0;
+       if (*s == 0)
+         break;
+       if (*s == ':') {
+         parv[parc++] = s + 1;
+	 break;
+       }
+       parv[parc++] = s;
+       if (parc >= MAXPARA)
+         break;
+       while (*s != ' ' && *s)
+         s++;
+     }
+     parv[parc] = NULL;
+  }
+
+  password = parc > 1 ? parv[1] : 0;
+  if (!EmptyString(password))
+    ircd_strncpy(cli_passwd(cptr), password, PASSWDLEN);
+
+  if (feature_bool(FEAT_LOGIN_ON_CONNECT) && !cli_loc(cptr)) {
+    if (parc > 3) {
+      cli_loc(cptr) = MyMalloc(sizeof(struct LOCInfo));
+      cli_loc(cptr)->cookie = 0;
+      ircd_strncpy(cli_loc(cptr)->service, parv[parc - 3], NICKLEN);
+      ircd_strncpy(cli_loc(cptr)->account, parv[parc - 2], ACCOUNTLEN);
+      ircd_strncpy(cli_loc(cptr)->password, parv[parc - 1], ACCPASSWDLEN);
+    }
+    
+    /* handle retries */
+    if ((cli_name(cptr))[0] && cli_cookie(cptr) == COOKIE_VERIFIED)
+      return register_user(cptr, cptr, cli_name(cptr), cli_user(cptr)->username);
+  }
+
   return 0;
 }

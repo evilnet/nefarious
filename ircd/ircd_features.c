@@ -452,8 +452,6 @@ static struct FeatureDesc {
   F_B(FLEXABLEKEYS, 0, 0, 0),
   F_B(NOTHROTTLE, 0, 0, 0),
   F_B(CREATE_CHAN_OPER_ONLY, 0, 0, 0),
-  F_B(VERIFIED_ACCOUNTS, 0, 0, 0),
-  F_S(UNVERIFIED, 0, "Your account is unverified, please verify it, reconnect and login again.", 0),
   F_I(MAX_CHECK_OUTPUT, 0, 1000, 0),
   F_S(RESTARTPASS, FEAT_NULL | FEAT_CASE | FEAT_NODISP | FEAT_READ, 0, 0),
   F_S(DIEPASS, FEAT_NULL | FEAT_CASE | FEAT_NODISP | FEAT_READ, 0, 0),
@@ -467,6 +465,7 @@ static struct FeatureDesc {
   F_S(WHOIS_SERVICE, 0, "is a Network Service", 0),
   F_B(AUTOCHANMODES, 0, 0, 0),
   F_S(AUTOCHANMODES_LIST, FEAT_CASE | FEAT_NULL, 0, 0),
+  F_B(LOGIN_ON_CONNECT, 0, 0, 0),
 
 #undef F_S
 #undef F_B

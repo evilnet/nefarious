@@ -374,7 +374,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   parv[0] = cli_name(sptr);
   parv[1] = parv[2] = NULL;
 
-  if (MyConnect(sptr))
+  if (MyConnect(sptr) && DoAccess(sptr))
   {
     static time_t last_too_many1;
     static time_t last_too_many2;
@@ -427,7 +427,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
       return exit_client(cptr, sptr, &me,
 			 "No Authorization - use another server");
 
-    ircd_strncpy(user->host, cli_sockhost(sptr), HOSTLEN);
+    /* The host might already be set by login-on-connect */
+    if (!HasHiddenHost(sptr) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+      ircd_strncpy(user->host, cli_sockhost(sptr), HOSTLEN);
     ircd_strncpy(user->realhost, cli_sockhost(sptr), HOSTLEN);
 
     if (feature_bool(FEAT_FAKEHOST) && feature_str(FEAT_DEFAULT_FAKEHOST)) {
@@ -552,11 +554,42 @@ int register_user(struct Client *cptr, struct Client *sptr,
 		 feature_str(FEAT_BADUSER_URL));
       return exit_client(cptr, sptr, &me, "USER: Bad username");
     }
-    Count_unknownbecomesclient(sptr, UserStats);
   }
-  else {
+
+  if (!MyConnect(sptr)) {
     ircd_strncpy(user->username, username, USERLEN);
-    Count_newremoteclient(UserStats, user->server);
+  } else if (cli_loc(sptr)) {
+    /* Do the login-on-connect thing.
+     * This happens after the checks above, but before incrementing any
+     * counters as it may be called more than once
+     */
+    struct Client *acptr;
+
+    if (cli_loc(sptr)->cookie)
+      /* if already doing auth, ignore; 
+       * broken and/or evil clients might trigger this
+       */
+      return 0;
+    if (!(acptr = FindUser(cli_loc(sptr)->service)) || !IsChannelService(acptr)) {
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Service '%s' is not available", sptr, cli_loc(sptr)->service);
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Type \002/QUOTE PASS\002 to connect anyway", sptr);
+      MyFree(cli_loc(sptr));
+    } else {
+      /* the cookie is used to verify replies from the service, in case the
+       * client disconnects and the fd is reused
+       */
+      do {
+        cli_loc(sptr)->cookie = ircrandom() & 0x7fffffff;
+      } while (!cli_loc(sptr)->cookie);
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Attempting service login to %s",
+	            sptr, cli_loc(sptr)->service);
+      sendcmdto_one(&me, CMD_ACCOUNT, acptr, "%C C .%u.%u %s :%s", acptr,
+	            cli_fd(sptr), cli_loc(sptr)->cookie,
+	            cli_loc(sptr)->account, cli_loc(sptr)->password);
+      ServerStats->is_login++;
+    }
+    return 0;
+
   }
 
   if (MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
@@ -593,6 +626,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ++UserStats.inv_clients;
   if (IsOper(sptr))
     ++UserStats.opers;
+
+  if (MyConnect(sptr))
+    Count_unknownbecomesclient(sptr, UserStats);
+  else
+    Count_newremoteclient(UserStats, user->server);
 
   if (MyConnect(sptr)) {
     cli_handler(sptr) = CLIENT_HANDLER;
@@ -716,6 +754,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
   /* Send umode to client */
   if (MyUser(sptr))
   {
+    struct Flags flags;
+
     /*
      * Set user's initial modes
      */
@@ -724,6 +764,12 @@ int register_user(struct Client *cptr, struct Client *sptr,
     parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
     parv[3] = NULL; /* needed in case of +s */
     set_user_mode(sptr, sptr, 3, parv);
+
+    /* hack the 'old flags' so we don't send +r */
+    if (HasFlag(sptr, FLAG_ACCOUNT))
+      FlagSet(&flags, FLAG_ACCOUNT);
+    else
+      FlagClr(&flags, FLAG_ACCOUNT);
 
     if (cli_snomask(sptr) != SNO_DEFAULT && HasFlag(sptr, FLAG_SERVNOTICE))
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
@@ -1301,7 +1347,7 @@ int hide_hostmask(struct Client *cptr)
   make_hidden_hostmask(cli_user(cptr)->host, cptr);
 
   /* ok, the client is now fully hidden, so let them know -- hikari */
-  if (MyConnect(cptr))
+  if (MyConnect(cptr) && IsRegistered(cptr))
    send_reply(cptr, RPL_HOSTHIDDEN, cli_user(cptr)->host);
 
   /*
@@ -1740,21 +1786,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           ClearDebug(acptr);
         break;
       case 'x':
-        if ((IsVerified(acptr) && feature_bool(FEAT_VERIFIED_ACCOUNTS) &&
-           (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) || !feature_bool(FEAT_VERIFIED_ACCOUNTS)) {
-          if (what == MODE_ADD) {
-            SetHiddenHost(acptr);
-            if (!FlagHas(&setflags, FLAG_HIDDENHOST))
-              do_host_hiding = 1;
-          } else {
-            if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-              ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
-              ClearHiddenHost(acptr);
-            }
-          }
-        } else
-          send_reply(acptr, ERR_NOTVERIFIED, feature_str(FEAT_UNVERIFIED));
-
+        if (what == MODE_ADD) {
+	  SetHiddenHost(acptr);
+	  if (!FlagHas(&setflags, FLAG_HIDDENHOST))
+	    do_host_hiding = 1;
+	} else {
+	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+  	    ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
+	    ClearHiddenHost(acptr);
+	  }
+	}
 	break;
       case 'h':
         if (what == MODE_ADD) {

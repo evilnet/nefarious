@@ -84,6 +84,12 @@
  */
 #define PASSWDLEN	20
 /*
+ * ACCPASSWDLEN is the maximum length for a password used with the
+ * login-on-connect feature, and it should match the length used by
+ * your service bot (e.g. gnuworld)
+ */
+#define ACCPASSWDLEN	40
+/*
  * SOCKIPLEN is the length of a dotted quad ip address "XXX.XXX.XXX.XXX"
  */
 #define SOCKIPLEN	15

@@ -85,4 +85,11 @@ struct User {
   char               dnsblname[255];
 };
 
+struct LOCInfo {
+  unsigned int       cookie;
+  char               service[NICKLEN + 1];
+  char               account[ACCOUNTLEN + 1];
+  char               password[ACCPASSWDLEN + 1];
+};
+
 #endif /* INCLUDED_ircd_struct_h */

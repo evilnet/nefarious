@@ -293,6 +293,13 @@ connects to or disconnects from the server.  Enabling this feature may
 have a performance impact. If using this features make sure you take
 a look at snomask.html in this directory.
 
+LOGIN_ON_CONNECT
+ * Type: boolean
+ * Default: FALSE
+
+This selects whether local clients can specify a service bot login in
+the connection phase. Read doc/readme.login-on-connect for details.
+
 DEFAULT_UMODE
  * Type: string
  * Default: "+"
@@ -616,15 +623,6 @@ MOTD_LAST_CHANGED
 A noticed will be displayed to connecting users stating when the message
 of the day was last changed.
 
-VERIFIED_ACCOUNTS
- * Type: boolean
- * Default: FALSE
-
-This enables verified accounts which relies on services support. This feature
-is still under development and is very minimal at the moment. If you wish to
-add verified account support to your services contact sirvulcan@gmail.com on
-how to send back a verified reply or view m_account.c
-
 OPERLEVELS
  * Type: boolean
  * Default: FALSE
@@ -650,13 +648,6 @@ WHOIS_SERVICE
  * Default: is a Network Service
 
 Default whois reply for is a network service line.
-
-UNVERIFIED
- * Type: string
- * Default: Your account is unverified, please verify it, reconnect and login again.
-
-Reply given for users trying to set +x when Verfied accounts are
-enabled and the user is not verified.
 
 QUOTES
  * Type: boolean

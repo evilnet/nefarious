@@ -617,6 +617,8 @@ void tstats(struct Client *cptr, struct StatDesc *sd, int stat, char *param)
 	     ":auth successes %u fails %u", sp->is_asuc, sp->is_abad);
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":local connections %u",
 	     sp->is_loc);
+  send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":login-on-connect %u",
+	     sp->is_login);
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":Client server");
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":connected %u %u",
 	     sp->is_cl, sp->is_sv);

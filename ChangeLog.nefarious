@@ -3,6 +3,50 @@
 
 2004-10-18  Neil Spierling <sirvulcan@gmail.com>
 
+	* Note login on connect code by Alex Badea  <decampos@users.sourceforge.net>
+
+	* doc/readme.login-on-connect: Readme file describing how things
+	work with login on connect.
+
+	* include/client.h: added con_loc to struct Connection for
+	login-on-connect (aka LOC).
+	
+	* include/ircd_defs.h: added ACCPASSWDLEN define for
+	maximum account password length.
+
+	* include/ircd_features.h: Added login on connect F:Line and removed
+	verified account ones.
+	
+	* include/s_misc.h: added LOC counter to ServerStats.
+
+	* include/ircd_struct.h: added struct LOCInfo.
+	
+	* ircd/ircd_features.c: new feature FEAT_LOGIN_ON_CONNECT
+
+	* ircd/list.c (dealloc_connection): make sure con_loc is free'd.
+	
+	* ircd/m_account.c: Added AC message sub-types to allow
+	authentication requests/replies to travel across the net;
+	handle LOC replies. Verified account code removed.
+
+	* ircd/s_user.c (register_user): handle LOC requests; allow
+	multiple calls (for LOC retries), using FLAG_CHKACCESS
+
+	* ircd/s_user.c (hide_hostmask): only send RPL_HOSTHIDDEN
+	to registered clients, since we might be called by LOC
+	before registration.
+	
+	* ircd/m_pass.c: store auth information for LOC.
+	
+	* ircd/s_bsd.c (add_connection): set FLAG_CHKACCESS on new local
+	clients.
+	
+	* ircd/s_misc.c (tstats): report login-on-connect counter
+	from ServerStats.
+
+
+2004-10-18  Neil Spierling <sirvulcan@gmail.com>
+
 	* ircd/channel.c: Applied a small fix posted on sourceforge for
 	CIDR bans and freebsd (also applied to exempts).
 
