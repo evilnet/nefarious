@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-31  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Fixed a bug with style 2 and banning sethost
+	users. Also applied to exempts.
+
+	* ircd/s_conf.c: Few unused vars removed.
+
 2005-03-29  Alex Schumann <rubin@afternet.org>
 
 	* ircd/s_conf.c: Rewrite of find_blline from nearly scratch.

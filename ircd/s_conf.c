@@ -1016,18 +1016,12 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 {
   struct blline *blline;
   char *dhname;
-  char* rep = NULL;
-  char* p = NULL;
   char *csep;
   char oct[4]; /* last bit of replyip, and a null */
-  char ipinvert[HOSTLEN + 1];
   char cstr_buf[HOSTLEN +1];
   char *cstr = cstr_buf;
-  char ipl[80];
   int c = 0;
   int j = 0;
-  int total = 0;
-  int octcount = 0;
   unsigned int x_flag = 0;
 
   /* Wierd sanity checks :) */

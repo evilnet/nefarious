@@ -633,7 +633,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   char          nu_ipe[NUI_BUFSIZE];
   char*         se;
   char*         sae = NULL;
-  char*         sre = NULL;
+  char*         she = NULL;
   char*         sfe = NULL;
   char*         sde = NULL;
   char*         ip_se = NULL;
@@ -660,7 +660,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
                               cli_user(cptr)->dnsblhost);
 
   if (HasSetHost(cptr))
-    sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
+    she = make_nick_user_host(nu_realhoste, cli_name(cptr),
                              cli_user(cptr)->realusername,
                              cli_user(cptr)->realhost);
 
@@ -684,12 +684,12 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
     }
   } else {
      if (IsHiddenHost(cptr) && !HasSetHost(cptr))
-       sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
+       sae = make_nick_user_host(nu_accthoste, cli_name(cptr),
                                cli_user(cptr)->realusername,
                                cli_user(cptr)->realhost);
      else {
        ircd_snprintf(0, tmphoste, HOSTLEN, "%s", cli_user(cptr)->virthost);
-       sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
+       sae = make_nick_user_host(nu_accthoste, cli_name(cptr),
                                 cli_user(cptr)->username,
                                 tmphoste);
      }
@@ -734,7 +734,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
       break;
     else if (sde && match(tmpe->value.except.exceptstr, sde) == 0)
       break;
-    else if (sre && match(tmpe->value.except.exceptstr, sre) == 0)
+    else if (she && match(tmpe->value.except.exceptstr, she) == 0)
       break;
     else if (sfe && match(tmpe->value.except.exceptstr, sfe) == 0)
       break;
@@ -774,7 +774,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char          nu_ip[NUI_BUFSIZE];
   char*         s;
   char*         sa = NULL;
-  char*         sr = NULL;
+  char*         sh = NULL;
   char*         sf = NULL;
   char*         sd = NULL;
   char*         ip_s = NULL;
@@ -787,7 +787,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     return IsBanned(member);
 
   /* This is horrible code.  s is always set to the apparent host */
-  /* If the user is sethosted, sr is set to the real host */
+  /* If the user is sethosted, sh is set to the real host */
   /* If the user is fakehosted, sf is set to the real host */
   /* If the user is authed and +x (and not +h), then sa is set to the real host */
   /* If the user is authed and -x (or +h), then sa is set to the "account" host */
@@ -801,7 +801,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
                              cli_user(cptr)->dnsblhost);
 
   if (HasSetHost(cptr))
-    sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+    sh = make_nick_user_host(nu_realhost, cli_name(cptr),
 			     cli_user(cptr)->realusername,
 			     cli_user(cptr)->realhost);
 
@@ -825,12 +825,12 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     }
   } else {
      if (IsHiddenHost(cptr) && !HasSetHost(cptr))
-       sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+       sa = make_nick_user_host(nu_accthost, cli_name(cptr),
                                cli_user(cptr)->realusername,
                                cli_user(cptr)->realhost);
      else {
        ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
-       sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+       sa = make_nick_user_host(nu_accthost, cli_name(cptr),
                                 cli_user(cptr)->username,
                                 tmphost);
      }
@@ -873,7 +873,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     }
     if (match(tmp->value.ban.banstr, s) == 0)
       break;
-    else if (sr && match(tmp->value.ban.banstr, sr) == 0)
+    else if (sh && match(tmp->value.ban.banstr, sh) == 0)
       break;
     else if (sd && match(tmp->value.ban.banstr, sd) == 0)
       break;
