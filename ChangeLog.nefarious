@@ -3,6 +3,8 @@
 
 2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
 
+	* configure: Reran autoconf.
+
 	* config.h.in: Added header and define back in. We will have to add
 	this everytime we run autoheader (unless i actually read the man
 	page properly as there may be a way of preserving it).
