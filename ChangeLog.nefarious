@@ -1,5 +1,16 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/channel.c: Odd fix for +z, adding brackets to the check if the user is
+		   	   connected via SSL or is a server.
+			  Also done this to the +h and +O checks for now. Just in case.
+			  Allow halfops to be set if its comming from a server (burst),
+			   even if halfops is disabled, will prevent desynchs. This will
+			   be removed when i have rewritten my VCTRL code. Once its
+			   rewritten we will be able to check whats enabled on link and
+			   deny the link if things are not set right.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Removed verified accounts code, will be re added later.
 
 	* doc/readme.login-on-connect: Readme detailing login on connects. While the

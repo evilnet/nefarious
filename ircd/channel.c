@@ -3320,24 +3320,27 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
        break;
 
       case 'h':
-        if (feature_bool(FEAT_HALFOPS))
+        if (feature_bool(FEAT_HALFOPS) || IsServer(sptr)) {
           mode_parse_client(&state, flag_p);
-       break;
+	}
+	break;
 
       case 'O': /* deal with operonly */
 	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
-	if (IsOper(sptr) || IsServer(sptr))
+	if (IsOper(sptr) || IsServer(sptr)) {
 	  mode_parse_mode(&state, flag_p);
-	else
+	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);
+	}
 	break;
 
       case 'z': /* deal with sslonly */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
-        if (IsSSL(sptr) || IsServer(sptr))
+        if (IsSSL(sptr) || IsServer(sptr)) {
           mode_parse_mode(&state, flag_p);
-	else
+	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);
+	}
 	break;
 
       default: /* deal with other modes */
