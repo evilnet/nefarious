@@ -634,6 +634,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   char*         sae = NULL;
   char*         sre = NULL;
   char*         sfe = NULL;
+  char*         sfd = NULL;
   char*         ip_se = NULL;
   in_addr_t     cli_addr = 0;
 
@@ -651,6 +652,11 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
 
   se = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->username,
                           (cli_user(cptr))->host);
+
+  if (IsDNSBLMarked(cptr))
+    sfd = make_nick_user_host(nu_realhoste, cli_name(cptr),
+                              cli_user(cptr)->realusername,
+                              cli_user(cptr)->dnsblhost);
 
   if (HasSetHost(cptr))
     sre = make_nick_user_host(nu_realhoste, cli_name(cptr),
@@ -725,6 +731,8 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
     }
     if (match(tmpe->value.except.exceptstr, se) == 0)
       break;
+    else if (sfd && match(tmpe->value.except.exceptstr, sfd) == 0)
+      break;
     else if (sre && match(tmpe->value.except.exceptstr, sre) == 0)
       break;
     else if (sfe && match(tmpe->value.except.exceptstr, sfe) == 0)
@@ -766,6 +774,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char*         sa = NULL;
   char*         sr = NULL;
   char*         sf = NULL;
+  char*         sd = NULL;
   char*         ip_s = NULL;
   in_addr_t     cli_addr = 0;
 
@@ -783,6 +792,11 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
   s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->username,
 			  (cli_user(cptr))->host);
+
+  if (IsDNSBLMarked(cptr))
+    sd = make_nick_user_host(nu_realhost, cli_name(cptr),
+                             cli_user(cptr)->realusername,
+                             cli_user(cptr)->dnsblhost);
 
   if (HasSetHost(cptr))
     sr = make_nick_user_host(nu_realhost, cli_name(cptr),
@@ -858,6 +872,8 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     if (match(tmp->value.ban.banstr, s) == 0)
       break;
     else if (sr && match(tmp->value.ban.banstr, sr) == 0)
+      break;
+    else if (sd && match(tmp->value.ban.banstr, sd) == 0)
       break;
     else if (sf && match(tmp->value.ban.banstr, sf) == 0)
       break;

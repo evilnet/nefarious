@@ -198,7 +198,8 @@ struct svcline {
 struct blline {
   struct blline *next;
   char *server;
-  char *type;
+  char *name;
+  char *flags;
   char *replies;
   char *reply;
 };
@@ -267,5 +268,6 @@ extern void conf_add_svcline(const char * const* fields, int count);
 extern void clear_svclines(void);
 extern struct svcline *find_svc(const char *cmd);
 extern char *oflagstr(long);
+extern const char dflagstr(const char* dflags);
 
 #endif /* INCLUDED_s_conf_h */

@@ -41,6 +41,7 @@
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
 #include "list.h"
+#include "mark.h"
 #include "match.h"
 #include "motd.h"
 #include "msg.h"
@@ -596,7 +597,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyConnect(sptr) && feature_bool(FEAT_DNSBL_CHECKS)) {
     release_dnsbl_reply(sptr);
 
-    if (IsDNSBL(sptr)) {
+    if (IsDNSBL(sptr) && !IsDNSBLAllowed(sptr)) {
       if (feature_bool(FEAT_DNSBL_WALLOPS_ONLY))
          sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
                 "DNSBL Detected %s!%s@%s (%s)", cli_name(sptr), user->username,
@@ -633,6 +634,22 @@ int register_user(struct Client *cptr, struct Client *sptr,
 						      cli_name(sptr), cli_dnsblformat(sptr))
 		                                      );
       }
+    } else if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
+      char flagbuf[BUFSIZE];
+
+      if (IsDNSBLMarked(sptr)) {
+        ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
+        strcat(flagbuf, "m");
+      }
+
+      strcat(flagbuf, "a");
+
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s :%s",
+                            sptr, MARK_DNSBL, cli_dnsbl(sptr), flagbuf, cli_dnsblformat(sptr));
+
+      Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
+          cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
+          IsDNSBL(sptr) ? "1" : "0", IsDNSBLMarked(sptr) ? "1" : "0", IsDNSBLAllowed(sptr) ? "1" : "0"));
     }
   }
 

@@ -87,6 +87,14 @@ static struct ServerConf* serverConfList;
 static struct DenyConf*   denyConfList;
 
 
+static int dnsbl_flags[] = {
+  DFLAG_BITMASK,  'b',
+  DFLAG_REPLY,    'r',
+  DFLAG_ALLOW,    'a',
+  DFLAG_MARK,     'm'
+};
+
+
 static int oper_access[] = {
 	OFLAG_GLOBAL,	'O',
 	OFLAG_ADMIN,	'A',
@@ -112,6 +120,28 @@ char *oflagstr(long oflag)
  return oflagbuf;
 }
 
+const char dflagstr(const char* dflags)
+{
+  unsigned int *flag_p;
+  unsigned int x_flag = 0;
+  const char *flagstr;
+
+  flagstr = dflags;
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)dnsbl_flags; flag_p[0];
+         flag_p += 2)
+      if (flag_p[1] == *flagstr)
+        break;
+
+    if (!flag_p[0])
+      continue;
+
+    x_flag |= flag_p[0];
+  }
+
+  return x_flag;
+}
 
 /*
  * output the reason for being k lined from a file  - Mmmm
@@ -939,14 +969,15 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   struct blline *blline;
 
   if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-     EmptyString(fields[3]) || EmptyString(fields[4]))
+     EmptyString(fields[3]) || EmptyString(fields[4]) || EmptyString(fields[5]))
     return;
 
   blline = (struct blline *) MyMalloc(sizeof(struct blline));
   DupString(blline->server, fields[1]);
-  DupString(blline->type, fields[2]);
-  DupString(blline->replies, fields[3]);
-  DupString(blline->reply, fields[4]);
+  DupString(blline->name, fields[2]);
+  DupString(blline->flags, fields[3]);
+  DupString(blline->replies, fields[4]);
+  DupString(blline->reply, fields[5]);
   blline->next = GlobalBLList;
   GlobalBLList = blline;
 }
@@ -957,7 +988,8 @@ void clear_dnsbl_list(void)
   while ((blline = GlobalBLList)) {
     GlobalBLList = blline->next;
     MyFree(blline->server);
-    MyFree(blline->type);
+    MyFree(blline->name);
+    MyFree(blline->flags);
     MyFree(blline->replies);
     MyFree(blline->reply);
     MyFree(blline);
@@ -978,6 +1010,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   int a = 0;
   int total = 0;
   int octcount = 0;
+  unsigned int x_flag = 0;
 
   strcpy(ipl, replyip);
   for (oct = strtok_r(ipl, ".", &brktb);
@@ -1000,7 +1033,10 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 
 
   for (blline = GlobalBLList; blline; blline = blline->next) {
-    if (!strcmp(blline->type, "BITMASK")) {
+    x_flag = dflagstr(blline->flags);
+
+    if (x_flag & DFLAG_BITMASK) {
+      Debug((DEBUG_DEBUG, "Bitmask DNSBL"));
       total = 0;
       strcpy(cstr, blline->replies);
 
@@ -1013,11 +1049,20 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       if (!ircd_strcmp(dhname, blline->server)) {
         if (!ircd_strcmp(ipname, oct)) {
           SetDNSBL(sptr);
-          ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
+
+          if (x_flag & DFLAG_MARK)
+            SetDNSBLMarked(sptr);
+
+          if (x_flag & DFLAG_ALLOW)
+            SetDNSBLAllowed(sptr);
+
+          ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
+          ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
           a = 1;
         }
       }
-    } else {
+    } else if (x_flag & DFLAG_REPLY) {
+      Debug((DEBUG_DEBUG, "Reply DNSBL"));
       strcpy(cstr, blline->replies);
 
       for (csep = strtok_r(cstr, ",", &brkt); csep;
@@ -1025,7 +1070,15 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
         if (!ircd_strcmp(dhname, blline->server)) {
           if (!ircd_strcmp(csep, oct)) {
             SetDNSBL(sptr);
-            ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
+
+            if (x_flag & DFLAG_MARK)
+              SetDNSBLMarked(sptr);
+
+            if (x_flag & DFLAG_ALLOW)
+              SetDNSBLAllowed(sptr);
+
+            ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
+            ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
             a = 1;
             break;
           }

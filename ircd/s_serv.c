@@ -39,6 +39,7 @@
 #include "jupe.h"
 #include "list.h"
 #include "map.h"
+#include "mark.h"
 #include "match.h"
 #include "msg.h"
 #include "msgq.h"
@@ -252,6 +253,10 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
       if (cli_user(acptr)->swhois)
 	sendcmdto_one(cli_user(acptr)->server, CMD_SWHOIS, cptr,
 		      "%C :%s", acptr, cli_user(acptr)->swhois);
+      if (IsDNSBLMarked(acptr)) /* Burst even if dnsbl is disabled */
+        sendcmdto_serv_butone(acptr, CMD_MARK, cptr, "%C %s %s ma :%s",
+                              acptr, MARK_DNSBL, cli_dnsbl(acptr), cli_dnsblformat(acptr));
+
     }
   }
   /*

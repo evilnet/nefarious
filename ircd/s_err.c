@@ -508,7 +508,7 @@ static Numeric replyTable[] = {
 /* 239 */
   { 0 },
 /* 240 */
-  { RPL_STATSXLINE, "X %s %s %s :%s", "240" },
+  { RPL_STATSXLINE, "X %s %s %s %s :%s", "240" },
 /* 241 */
   { RPL_STATSLLINE, "%c %s * %s %d %d", "241" },
 /* 242 */
@@ -714,7 +714,7 @@ static Numeric replyTable[] = {
 /* 338 */
   { RPL_WHOISACTUALLY, "%s %s@%s %s :Actual user@host, Actual IP", "338" },
 /* 339 */
-  { 0 },
+  { RPL_WHOISDNSBL, "%s :is DNSBL listed on %s", "339" },
 /* 340 */
   { RPL_USERIP, ":", "340" },
 /* 341 */

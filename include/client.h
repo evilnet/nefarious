@@ -161,9 +161,11 @@ enum Flag {
     FLAG_NOCHAN,                    /* ASUKA_n: hide channels */
     FLAG_NOIDLE,                    /* ASUKA_I: hide idle time */
     FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
-    FLAG_DNSBL,                     /* Client in DNSBL */
     FLAG_ADMIN,                     /* Client is an admin */
     FLAG_WHOIS,                     /* oper sees who /WHOISes him/her */
+    FLAG_DNSBL,                     /* Client in DNSBL */
+    FLAG_DNSBLMARKED,               /* Client in DNSBL Marked */
+    FLAG_DNSBLALLOWED,              /* Client in DNSBL Allowed in */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -265,7 +267,9 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
-  char cli_dnsblformat[BUFSIZE + 1];
+
+  char cli_dnsbl[BUFSIZE + 1];       /* dnsbl identifier */
+  char cli_dnsblformat[BUFSIZE + 1]; /* dnsbl rejection message */
 };
 
 #define CLIENT_MAGIC 0x4ca08286
@@ -295,8 +299,9 @@ struct Client {
 #define cli_name(cli)		((cli)->cli_name)
 #define cli_username(cli)	((cli)->cli_username)
 #define cli_info(cli)		((cli)->cli_info)
-#define cli_dnsblformat(cli)    ((cli)->cli_dnsblformat)
 #define cli_oflags(cli)         ((cli)->cli_oflags)
+#define cli_dnsbl(cli)          ((cli)->cli_dnsbl)
+#define cli_dnsblformat(cli)    ((cli)->cli_dnsblformat)
 
 #define cli_count(cli)		((cli)->cli_connect->con_count)
 #define cli_fd(cli)		((cli)->cli_connect->con_fd)
@@ -473,6 +478,8 @@ struct Client {
 #define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
 #define IsDNSBL(x)		HasFlag(x, FLAG_DNSBL)
+#define IsDNSBLMarked(x)        HasFlag(x, FLAG_DNSBLMARKED)
+#define IsDNSBLAllowed(x)       HasFlag(x, FLAG_DNSBLALLOWED)
 #define IsAdmin(x)		(HasFlag(x, FLAG_ADMIN) && feature_bool(FEAT_OPERFLAGS))
 #define IsWhois(x)		HasFlag(x, FLAG_WHOIS)
 
@@ -507,6 +514,8 @@ struct Client {
 #define SetNoChan(x)		SetFlag(x, FLAG_NOCHAN)
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
 #define SetDNSBL(x)		SetFlag(x, FLAG_DNSBL)
+#define SetDNSBLMarked(x)       SetFlag(x, FLAG_DNSBLMARKED)
+#define SetDNSBLAllowed(x)      SetFlag(x, FLAG_DNSBLALLOWED)
 #define SetAdmin(x)		SetFlag(x, FLAG_ADMIN)
 #define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
 
@@ -553,6 +562,12 @@ struct Client {
 
 #define OClearGlobal(x)		(cli_oflags(x) &= ~OFLAG_GLOBAL)
 #define OClearAdmin(x)		(cli_oflags(x) &= ~OFLAG_ADMIN)
+
+/* DNSBL X:Line Flags */
+#define DFLAG_BITMASK   0x001  /* Bitmask X:Line */
+#define DFLAG_REPLY     0x002  /* Reply X:Line */
+#define DFLAG_ALLOW     0x004  /* Client is allowed to connect regardless of results */
+#define DFLAG_MARK      0x008  /* Client hostname is marked */
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/* socket needs to be freed */

@@ -1,6 +1,53 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
-20050218   Rubin  <rubin@afternet.org>	
+
+2005-02-21  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Updated X:Lines with new flags/name bits.
+
+	* include/client.h: Added 2 new flags for dnsbl's for marking
+	and allowing clients.  Added junk for X:Line flags also.
+
+	* include/handlers.h: Added define for ms_mark.
+
+	* inclide/ircd_struct.c: Added dnsblhost entry to the client
+	struct.
+
+	* include/mark.h: New file, just general mark stuff.
+
+	* include/msg.h: Added stuff for the new MARK command.
+
+	* include/numeric.h: Added new numeric RPL_WHOISDNSBL (339).
+
+	* include/s_conf.c: Adjusted blline struct for flags and name
+	support.
+
+	* ircd/Makefile.in: Added m_mark.c.
+
+	* ircd/channel.c: Check the dnsblhost for banning and excepting.
+
+	* ircd/m_mark.c:  New command, used for marking clients on 
+	remote servers with information. In this case DNSBL information.
+
+	* ircd/m_whois.c: Do something with RPL_WHOISDNSBL.
+
+	* ircd/parse.c: Added MARK command.
+
+	* ircd/s_conf.c: Properly handle dnsbl flags and the new name
+	bit. Set the right flags on clients if we needed to.
+
+	* ircd/s_err.c: Updated the stats reply line for X:lines. Also
+	added RPL_WHOISDNSBL.
+
+	* ircd/s_serv.c: Burst dnsbl information with MARK.
+
+	* ircd/s_stats.c: Updated the stats reply line for X:lines.
+
+	* ircd/s_user.c: Mark the client hostname if nessecary. If the client
+	is allowed then also let them in even if they are on a dnsbl. Also
+	send out a MARK to all servers.
+
+2005-02-18  Rubin  <rubin@afternet.org>	
 
 	* include/ircd_features.h, ircd/irc_features.c, m_pass.c: Added
 	improved login-on-connect syntax, and fixed a bug.
