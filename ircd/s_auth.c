@@ -180,11 +180,13 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
     cli_dnsbl_reply(client) = gethost_byname(hname, &query);
 
     if (cli_dnsbl_reply(client)) {
+      Debug((DEBUG_LIST, "DNSBL entry for %p was cached (%s %s)", auth->client,  
+            cli_dnsbl_reply(client)->hp->h_name, hname));
       ++(cli_dnsbl_reply(client))->ref_count;
       for (i = 0; cli_dnsbl_reply(client)->hp->h_addr_list[i]; ++i) {
         if (!find_blline(auth->client, ircd_ntoa((char*)
 	    cli_dnsbl_reply(client)->hp->h_addr_list[i]),
-	    cli_dnsbl_reply(client)->hp->h_name))
+	    hname))
 	  pass = 1;
 	else {
 	  pass = 0;

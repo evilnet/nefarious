@@ -951,12 +951,9 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   struct blline *blline;
 
   static char dhname[HOSTLEN + 1] = "";
-  static char rname[HOSTLEN + 1] = "";
 
-  char* rep;
+  char* rep = NULL;
   char* p = 0;
-  char* repb;
-  char* q = 0;
 
   int c = 0;
   int a = 0;
@@ -971,10 +968,12 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     c++;
   }
 
+  Debug((DEBUG_LIST, "DNSBL find_blline server %s", dhname));
+
+
   for (blline = GlobalBLList; blline; blline = blline->next) {
-    for (repb = ircd_strtok(&q, blline->replies, ","); repb; repb = ircd_strtok(&q, 0, ",")) {
-      ircd_snprintf(0, rname, HOSTLEN + 1, "127.0.0.%s", repb);
-      if (!ircd_strcmp(rname, replyip)) {
+    if (!ircd_strcmp(dhname, blline->server)) {
+      if (!ircd_strcmp(blline->replies, replyip)) {
         SetDNSBL(sptr);
         ircd_strncpy(cli_dnsblformat(sptr), blline->reply, HOSTLEN);
         a = 1;

@@ -1,6 +1,18 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-12-15  Neil Spierling  <sirvulcan@gmail.com>
+
+        * doc/example.conf: Updated X:Line entry.
+
+	* ircd/s_auth.c: Use hname instead of the host from the host to
+	ip reply. Debugging stuff added also.
+
+	* ircd/s_conf.c: Only support one reply per X:Line, temp fix for
+	now. Damn entries list would get truncated after the first read.
+	Tried everything to get around it being truncated. Debugging
+	stuff added also.
+
 2004-12-10  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added OPER_WHOIS_SECRET.
