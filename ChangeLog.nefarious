@@ -1,77 +1,83 @@
 2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
 
-	README: Added Whatnet's ircd in as we got the halfops code
+	* doc/example.conf: Default halfops to false, suggestion by Rubin.
+
+	* ircd/ircd_features.c Default halfops to false, suggestion by Rubin.
+
+2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* README: Added Whatnet's ircd in as we got the halfops code
 	from their ircd ty ty.
 
-	doc/example.conf: Added in all the new F:Lines
+	* doc/example.conf: Added in all the new F:Lines
 
-	include/channel.h: Halfop / Except fluff.
+	* include/channel.h: Halfop / Except fluff.
 
-	include/handlers.h: Fluff for WALLHOPS.
+	* include/handlers.h: Fluff for WALLHOPS.
 
-	include/ircd_features.h: Fluff for the new features.
+	* include/ircd_features.h: Fluff for the new features.
 
-	include/list.h: struct for excepts.
+	* include/list.h: struct for excepts.
 
-	include/msg.h: WALLHOPS fluff (WV).
+	* include/msg.h: WALLHOPS fluff (WV).
 
-	include/numeric.h: New numerics added for excepts and half ops.
+	* include/numeric.h: New numerics added for excepts and half ops.
 
-	include/send.h: Fluff for WALLHOPS.
+	* include/send.h: Fluff for WALLHOPS.
 
-	include/supported.h: Added in except and half op stuff. Now we still
+	* include/supported.h: Added in except and half op stuff. Now we still
 	send it EVEN if the functions are disabled. The code is important
 	because if you enable say half ops after clients have connected
-	the clients will know how to parse the +h stuff and now screw up.
+	the clients will not know how to parse the +h stuff and now screw up.
 
-	ircd/Makefile.in: Added m_wallhops.c
+	* ircd/Makefile.in: Added m_wallhops.c
 
-	ircd/channel.c: So many changes/additions. Added in half ops and
+	* ircd/channel.c: So many changes/additions. Added in half ops and
 	excepts.
 
-	ircd/ircd_features.c: Added in fluff for the new F:Lines.
+	* ircd/ircd_features.c: Added in fluff for the new F:Lines.
 
-	ircd/m_burst.c: New code to handle excepts and half ops, to burst
+	* ircd/m_burst.c: New code to handle excepts and half ops, to burst
 	excepts its done like this:
 	S BURST #channel 87654321 +modes clients:ohv :%ban1 ~ except1
 	The ~ is a seperator, its not a ban or an except.
 
-	ircd/m_check.c: Code to understand excepts and half ops.
+	* ircd/m_check.c: Code to understand excepts and half ops.
 
-	ircd/m_clearmode.c: Same as above.
+	* ircd/m_clearmode.c: Same as above.
 
-	ircd/m_invite.c: Allow half ops to invitre.
+	* ircd/m_invite.c: Allow half ops to invitre.
 
-	ircd/m_kick.c: Allow half ops to kick users but not ops.
+	* ircd/m_kick.c: Allow half ops to kick users but not ops.
 
-	ircd/m_mode.c: Halfop stuff.
+	* ircd/m_mode.c: Halfop stuff.
 
-	ircd/m_names.c: Show a % in the NAMES output for half oped
+	* ircd/m_names.c: Show a % in the NAMES output for half oped
 	users.
 
-	ircd/m_topic.c: Allow half ops to change the topic.
+	* ircd/m_topic.c: Allow half ops to change the topic.
 
-	ircd/m_wallchops.c: Know what WALLHOPS are.
+	* ircd/m_wallchops.c: Know what WALLHOPS are.
 
-	ircd/m_wallhops.c: New command WALLHOPS, just like WALLCHOPS
+	* ircd/m_wallhops.c: New command WALLHOPS, just like WALLCHOPS
 	and WALLVOICES.
 
-	ircd/m_wallvoices.c: Know what WALLHOPS are.
+	* ircd/m_wallvoices.c: Know what WALLHOPS are.
 
-	ircd/m_whois.c Show a % in the WHOIS output for half oped
+	* ircd/m_whois.c Show a % in the WHOIS output for half oped
 	users.
 
-	ircd/parse.c: WALLHOPS fluff.
+	* ircd/parse.c: WALLHOPS fluff.
 
-	ircd/s_debug.c: Debug code for excepts.
+	* ircd/s_debug.c: Debug code for excepts.
 
-	ircd/s_err.c: Added in the new numerics.
+	* ircd/s_err.c: Added in the new numerics.
 
-	ircd/s_user.c: Halfops stuff.
+	* ircd/s_user.c: Halfops stuff.
 
-	ircd/send.c: WALLHOPS stuff.
+	* ircd/send.c: WALLHOPS stuff.
 
-	ircd/whocmds.c: Show a % in the WHO output for half oped
+	* ircd/whocmds.c: Show a % in the WHO output for half oped
 	users.
 
 2004-07-03  Reed Loden  <reed@reedloden.com>
