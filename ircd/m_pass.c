@@ -102,6 +102,8 @@
 int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   const char* password;
+  char* loc = NULL;
+  char* locargv[3] = {NULL, NULL, NULL};
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -110,7 +112,7 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   /* TODO: For protocol negotiation */
 #if 0
   if (ircd_strcmp(password,"PROT")==0) {
-  	/* Do something here */
+      /* Do something here */
   }
 #endif
 
@@ -124,6 +126,15 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      *     PASS ::X username :pass phrase
      * or
      *     PASS ::I-line-pass X username :pass phrase
+     * or
+     *     PASS ::I-Line-pass /X/username/passphrase
+     *     PASS ::/X/username/passphrase
+     *     PASS ::/username/passphrase
+     *     PASS ::/passphrase   ??pull username from user/ident string??
+     *
+     * after a while we'll remove the non '/' version
+     * when noone is using it anymore, and clean
+     * this function up significantly.
      */
      char* s = &parv[1][1];
      
@@ -135,7 +146,7 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
          break;
        if (*s == ':') {
          parv[parc++] = s + 1;
-	 break;
+         break;
        }
        parv[parc++] = s;
        if (parc >= MAXPARA)
@@ -151,18 +162,49 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     ircd_strncpy(cli_passwd(cptr), password, PASSWDLEN);
 
   if (feature_bool(FEAT_LOGIN_ON_CONNECT) && !cli_loc(cptr)) {
-    if (parc > 3) {
+    /* Check for leading '/' to indicate new-fangled LOC syntax */
+    if(parc > 1 && parv[1][0] == '/')
+        loc = parv[1]+1;
+    else if(parc > 2 && parv[2][0] == '/')
+        loc = parv[2]+1;
+    if(loc && *loc) {  /* Split loc up into locargv[0 through 2] */
+      int locargc = 0;
+
+      locargv[locargc++] = loc;
+      for(;*loc;loc++) {
+        if(*loc == '/') {
+          *loc = 0;
+          locargv[locargc++] = loc + 1;
+          if(locargc > 2)
+            break;
+        }
+      }
+      if(locargc == 2) {
+        /* Missing service nick, fill in default and shift arguments up */
+        locargv[2] = locargv[1];
+        locargv[1] = locargv[0];
+        locargv[0] = (char *) feature_str(FEAT_LOC_DEFAULT_NICK);
+      }
+    }
+    else if(parc > 3) { /* Old style for backward compatability:*/
+      locargv[0] = parv[parc - 3];
+      locargv[1] = parv[parc - 2];
+      locargv[2] = parv[parc - 1];
+    }
+    if (locargv[0] && *locargv[0] && locargv[1] && *locargv[1] && locargv[2] && *locargv[2]) {
       cli_loc(cptr) = MyMalloc(sizeof(struct LOCInfo));
+      memset(cli_loc(cptr), 0, sizeof(struct LOCInfo));
+
       cli_loc(cptr)->cookie = 0;
-      ircd_strncpy(cli_loc(cptr)->service, parv[parc - 3], NICKLEN);
-      ircd_strncpy(cli_loc(cptr)->account, parv[parc - 2], ACCOUNTLEN);
-      ircd_strncpy(cli_loc(cptr)->password, parv[parc - 1], ACCPASSWDLEN);
+
+      ircd_strncpy(cli_loc(cptr)->service,  locargv[0], NICKLEN);
+      ircd_strncpy(cli_loc(cptr)->account,  locargv[1], ACCOUNTLEN);
+      ircd_strncpy(cli_loc(cptr)->password,  locargv[2], ACCPASSWDLEN);
     }
     
     /* handle retries */
     if ((cli_name(cptr))[0] && cli_cookie(cptr) == COOKIE_VERIFIED)
       return register_user(cptr, cptr, cli_name(cptr), cli_user(cptr)->username);
   }
-
   return 0;
 }
