@@ -123,7 +123,7 @@ static void unlink_auth_request(struct AuthRequest* request,
 void free_auth_request(struct AuthRequest* auth);
 
 
-static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
+void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
 {
   struct AuthRequest* auth = (struct AuthRequest*) vptr;
 

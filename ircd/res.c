@@ -28,6 +28,7 @@
 #include "s_bsd.h"
 #include "s_debug.h"
 #include "s_misc.h"
+#include "s_auth.h"
 #include "send.h"
 #include "ircd_struct.h"
 #include "support.h"
@@ -270,7 +271,6 @@ static  struct  resinfo {
   int  re_shortttl;
   int  re_unkrep;
 } reinfo;
-
 
 /*
  * From bind 8.3, these aren't declared in earlier versions of bind
@@ -1486,7 +1486,7 @@ static struct CacheEntry* add_to_cache(struct CacheEntry* ocp)
  * it already contains the correct expire time, if it is a new entry. Old
  * entries have the expirey time updated.
 */
-static void update_list(struct ResRequest* request, struct CacheEntry* cachep)
+static void update_list(struct ResRequest* request, struct CacheEntry* cachep, int is_rbl)
 {
   struct CacheEntry*  cp = cachep;
   char*    s;
@@ -1524,16 +1524,18 @@ static void update_list(struct ResRequest* request, struct CacheEntry* cachep)
   /*
    * Do the same again for IP#'s.
    */
-  *addrs = 0;
-  ap = addrs;
-  for (i = 0; (s = request->he.h.h_addr_list[i]); i++) {
-    for (j = 0; (t = cp->he.h.h_addr_list[j]); j++) {
-      if (!memcmp(t, s, sizeof(struct in_addr)))
-        break;
-    }
-    if (!t) {
-      *ap++ = s;
-      *ap = 0;
+  if(!is_rbl) { /* But not for RBL ips */
+    *addrs = 0;
+    ap = addrs;
+    for (i = 0; (s = request->he.h.h_addr_list[i]); i++) {
+      for (j = 0; (t = cp->he.h.h_addr_list[j]); j++) {
+        if (!memcmp(t, s, sizeof(struct in_addr)))
+          break;
+      }
+      if (!t) {
+        *ap++ = s;
+        *ap = 0;
+      }
     }
   }
   if (*addrs || *aliases)
@@ -1623,6 +1625,8 @@ static struct CacheEntry* find_cache_number(struct ResRequest* request,
   return NULL;
 }
 
+void auth_dnsbl_callback(void* vptr, struct DNSReply* reply);
+
 static struct CacheEntry* make_cache(struct ResRequest* request)
 {
   struct CacheEntry* cp;
@@ -1644,7 +1648,7 @@ static struct CacheEntry* make_cache(struct ResRequest* request)
    */
   for (i = 0; hp->h_addr_list[i]; ++i) {
     if ((cp = find_cache_number(request, hp->h_addr_list[i]))) {
-      update_list(request, cp);
+      update_list(request, cp, request->query.callback==auth_dnsbl_callback);
       return cp;
     }
   }
