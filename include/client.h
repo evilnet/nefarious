@@ -446,7 +446,7 @@ struct Client {
 #define IsAccountOnly(x)	HasFlag(x, FLAG_ACCOUNTONLY)
 #define IsRemoteOper(x)		HasFlag(x, FLAG_REMOTEOPER)
 #define IsBot(x)		HasFlag(x, FLAG_BOT)
-#define IsSSL(x)		HasFlag(x, FLAG_SSL)
+#define IsSSL(x)		(MyConnect(x) && HasFlag(x, FLAG_SSL))
 #define IsXtraOp(x)		HasFlag(x, FLAG_XTRAOP)
 #define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)

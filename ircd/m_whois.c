@@ -233,8 +233,8 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (IsChannelService(acptr))
       send_reply(sptr, RPL_WHOISSERVICE, name);
 
-    if (MyConnect(acptr) && IsSSL(acptr) && ((parc >= 3) ||
-	(acptr == sptr) || IsAnOper(sptr)))
+    if (IsSSL(acptr) && ((parc >= 3) || (acptr == sptr) ||
+	IsAnOper(sptr)))
       send_reply(sptr, RPL_WHOISSSL, name);
 
     if (IsAccountOnly(acptr))
