@@ -1,0 +1,284 @@
+dnl $Id$
+dnl ----------------------------------------------------------
+
+echo Configuring zBounce...
+echo
+
+AC_REVISION($Revision$)
+AC_INIT(Bounce.cpp)
+AM_INIT_AUTOMAKE(zbounce,0.0)
+AM_CONFIG_HEADER(defs.h)
+
+CFLAGS="-g -Wall -O0 -pipe"
+CXXFLAGS="-g -Wall -O0 -pipe"
+CXX="g++"
+LIBS=""
+
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CPP
+AC_LANG_CPLUSPLUS
+AC_ISC_POSIX
+
+AC_PROG_MAKE_SET(gmake)
+AC_DISABLE_SHARED
+
+AC_CHECK_PROG(UNAME,uname,uname)
+AC_CHECK_PROG(LN,ln,ln)
+AC_CHECK_PROG(RM,rm,rm)
+AC_CHECK_PROG(LD,ld,ld)
+AC_CHECK_PROG(MV,mv,mv)
+AC_CHECK_PROG(CP,cp,cp)
+AC_CHECK_PROG(GREP,grep,grep)
+AC_CHECK_PROG(AR,ar,ar)
+
+AC_MSG_CHECKING(if C++ compiler supports bool)
+AC_TRY_COMPILE(
+[
+],[
+   bool b=true;
+   bool b1=false;
+],[
+  ac_bool=yes
+  AC_MSG_RESULT([$ac_bool])
+],[
+  config_error=yes
+  AC_MSG_RESULT([$ac_bool])
+  AC_WARN(bool type is not supported by your compiler)   
+])
+
+AC_MSG_CHECKING([if C++ compiler supports static_cast<>])
+AC_TRY_COMPILE(
+[ 
+   class foo;
+],[
+   foo* c1 = 0 ;
+   void* c2 = static_cast< void* >( c1 ) ;
+],[
+  ac_static_cast=yes
+  AC_MSG_RESULT([$ac_static_cast])
+],[
+  AC_MSG_RESULT([$ac_static_cast])
+  AC_WARN(C++ compiler static_cast<> does not work)
+  config_error=yes
+])
+
+AC_MSG_CHECKING([if C++ compiler supports reinterpret_cast<>])
+AC_TRY_COMPILE(
+[ 
+   class foo;
+],[
+   char* blah = 0 ;
+   unsigned char* blah2 = reinterpret_cast< unsigned char* >( blah ) ;
+],[
+  ac_reinterpret_cast=yes
+  AC_MSG_RESULT([$ac_reinterpret_cast])
+],[
+  AC_MSG_RESULT([$ac_reinterpret_cast])
+  AC_WARN(C++ compiler reinterpret_cast<> does not work)
+  config_error=yes
+])
+
+# Member class templates   
+AC_MSG_CHECKING(if C++ compiler supports member class templates)   
+AC_TRY_COMPILE(
+[  
+struct S 
+{
+  template <class T> struct A {};
+  template <class T> struct B {};
+};
+],[
+],[
+   ac_member_class_templates=yes
+   AC_DEFINE(SIGC_CXX_MEMBER_CLASS_TEMPLATES)
+   AC_MSG_RESULT([$ac_member_class_templates])
+],[
+  ac_member_class_templates=no
+  AC_MSG_RESULT([$ac_member_class_templates])
+  AC_MSG_WARN([Test for member templates failed.])
+])
+
+# Partial Specialization
+AC_MSG_CHECKING([if C++ compiler supports partial specialization])
+AC_TRY_COMPILE(
+[ 
+template<class T, class K>
+class k {
+public:  
+};
+template<class T> class k<void,T> { };
+],[
+  k<float, float> b;
+  k<void,void> a;
+],[
+  ac_cxx_partial_specialization=yes
+  AC_MSG_RESULT([$ac_cxx_partial_specialization])
+  AC_DEFINE(SIGC_CXX_PARTIAL_SPEC)
+],[
+  config_error=yes  
+  ac_cxx_partial_specialization=no
+  AC_MSG_RESULT([$ac_cxx_partial_specialization])
+  AC_MSG_WARN([Partial specialization is needed for signal templates.])
+])
+
+AC_MSG_CHECKING(if C++ compiler supports name spaces)
+AC_TRY_COMPILE(
+[
+namespace Check
+  {
+   int i;
+  }
+],[
+  Check::i=1;
+],[
+  ac_cxx_namespaces=yes
+  AC_MSG_RESULT([$ac_cxx_namespaces])
+  AC_DEFINE(SIGC_CXX_NAMESPACES)
+],[
+  ac_cxx_namespaces=no
+  AC_MSG_RESULT([$ac_cxx_namespaces])
+  AC_MSG_WARN([Without namespaces all classes will be global.])
+]) 
+
+AC_MSG_CHECKING(if C++ environment provides all required features)
+if test "x$config_error" = xyes ; then
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Your compiler is not powerful enough to compile GNUWorld.])
+fi
+AC_MSG_RESULT([yes])
+
+dnl ----------------------------------------------------------
+dnl ----------------------------------------------------------
+dnl
+dnl System specific checks
+dnl
+dnl ----------------------------------------------------------
+dnl ----------------------------------------------------------
+
+AC_CHECK_LIB(z,deflate, [], AC_MSG_ERROR(libz required))
+AC_CHECK_LIB(socket,socket)
+AC_CHECK_LIB(nsl,gethostbyname)
+dnl AC_CHECK_LIB(pthread,pthread_create)
+dnl AC_CHECK_LIB(posix4,sem_init)
+
+dnl ----------------------------------------------------------
+dnl
+dnl Checking for headers, functions, and a type declarations
+dnl
+
+AC_CHECK_HEADERS(sys/file.h unistd.h sys/stat.h sys/ioctl.h sys/resource.h )
+AC_CHECK_HEADERS(sys/time.h asm/ioctls.h xti_inet.h sys/filio.h)
+AC_CHECK_HEADERS(sys/types.h sys/socket.h netinet/in.h sys/un.h pthread.h)
+
+echo "Checking for C++ standard header files..."
+
+AC_MSG_CHECKING(for new)
+AC_TRY_CPP(new, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for string)
+AC_TRY_CPP(string, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for iostream)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for fstream)
+AC_TRY_CPP(fstream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for vector)
+AC_TRY_CPP(vector, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for list)
+AC_TRY_CPP(list, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for map)
+AC_TRY_CPP(map, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for queue)
+AC_TRY_CPP(queue, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for strstream)
+AC_TRY_CPP(strstream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+echo "Checking for C header files..."
+
+AC_MSG_CHECKING(for cstring)
+AC_TRY_CPP(cstring, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cstdlib)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cerrno)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cassert)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for cstdarg)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_MSG_CHECKING(for ctime)
+AC_TRY_CPP(iostream, AC_MSG_RESULT([yes]), AC_MSG_ERROR([no]))
+
+AC_HEADER_STDC
+AC_HEADER_TIME
+AC_TYPE_SIGNAL
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
+
+found_socklen_t=no
+AC_EGREP_HEADER(socklen_t,sys/socket.h, AC_DEFINE(HAVE_SOCKLEN_T) found_socklen_t=yes)
+
+if test $found_socklen_t = yes; then
+  AC_EGREP_HEADER(socklen_t,bits/socket.h,AC_DEFINE(HAVE_SOCKLEN_T))
+fi
+
+if test $found_socklen_t = yes; then
+  AC_MSG_CHECKING(for socklen_t)
+  AC_MSG_RESULT(yes)
+else
+  AC_CHECK_TYPE(socklen_t,int)
+fi
+
+dnl AC_EGREP_CPP(socklen_t,
+dnl [ socklen_t len ;
+dnl ], AC_DEFINE(HAVE_SOCKLEN_T),AC_CHECK_TYPE(socklen_t,int))
+
+
+dnl ----------------------------------------------------------
+dnl
+dnl check for struct linger
+dnl
+
+AC_MSG_CHECKING(for struct linger)
+AC_EGREP_HEADER([struct( |	)*linger], sys/socket.h, AC_MSG_RESULT(yes), AC_DEFINE(NO_STRUCT_LINGER) AC_MSG_RESULT(no, ugh.))
+
+dnl ----------------------------------------------------------
+dnl
+dnl svr3's getpgrp() didnt take arguments.  BSD's did.
+dnl POSIX said that there wasnt any usefulness to giving arguments
+dnl to getpgrp(), so that was forbidden.  So svr4 made a new syscall
+dnl getpgid() to fill in this functionality gap (grrrr).  BSD still
+dnl doesnt have any way to do it, even though they were the ones that
+dnl originally wanted to have it around, but svr3 insisted not so. (grrr)
+dnl
+
+dnl AC_CHECK_FUNC(getpgid, AC_DEFINE(HAVE_GETPGID),)
+dnl AC_CHECK_FUNC(getpgrp, AC_FUNC_GETPGRP,)
+
+AC_SUBST(PGSQL_INCLUDE)
+AC_SUBST(PGSQL_LIB)
+
+AC_SUBST(LDFLAGS)
+
+AC_SUBST(CXXFLAGS)
+
+AC_OUTPUT(Makefile)
+
+echo
+echo Configuration has been finished, and everything seems to be allright
+echo Now you have the chance to modify config.h to set your
+echo preferred options...
+echo

@@ -1,0 +1,94 @@
+zBounce - Basic configuration.
+-----------------------------
+
+Example 1: Compressing the S<>S data between a hub and a leaf.
+
+* Hub : hubserver.nefarious.irc (192.168.1.1)
+* Leaf: leafy.nefarious.irc (10.1.1.1)
+
+Install bounce on both irc machines and set the configs as below.
+This configuration allows for the initialisation of a compressed connection
+from both sides.
+ 
+ 
+Hub Bounce Config
+-----------------
+
+P:192.168.1.1:8400:10.1.1.1:8500
+ 
+* This sets bounce to listen on the local interface 192.168.1.1 on port 8400 for 
+* uncompressed input (from IRCu) and to forward any connections recieved on this
+* to 10.1.1.1 on port 8500 in a compressed form.
+
+p:192.168.1.1:8500:192.168.1.1:4400
+ 
+* This sets bounce to listen on the local interface 192.168.1.1 on port 8500 for 
+* compressed input and to forward any connections recieved on this to 192.168.1.1
+* on port 4400 (to IRCu) in a uncompressed form.
+
+Hub IRCu:
+
+Add/Change a C: line for leafserver.linux-boxen.org with IP 192.168.1.1. Make this is
+the last C line in the config for the leaf, so that this IP will be used to connect to
+the bounce.
+
+Then to initiate a compressed connection, /connect leafser* 8400.
+
+---END OF HUB CONFIG---
+
+ 
+Leaf Bounce Config
+------------------
+
+P:10.1.1.1:8400:192.168.1.1:8500
+ 
+* This sets bounce to listen on the local interface 10.1.1.1 on port 8400 for
+* uncompressed input (from IRCu) and to forward any connections recieved on this
+* to 192.168.1.1 on port 8500 in a compressed form.
+
+p:10.1.1.1:8500:10.1.1.1:4400
+
+* This sets bounce to listen on the local interface 10.1.1.1 on port 8500 for
+* compressed input and to forward any connections recieved on this to 10.1.1.1
+* on port 8400 (to IRCu) in a uncompressed form.
+ 
+Leaf IRCu:
+
+Add/Change a C: line for hubserver.linux-boxen.org with IP 10.1.1.1. Make this is the
+last C line in the config for the hub, so that this IP will be used to connect to
+the bounce.
+
+Then to initiate a compressed connection, /connect hubser* 8400.
+
+---END OF LEAF CONFIG---
+
+Once a connection is established from either end, the flow of data goes compressed
+in both directions (hub->leaf, leaf->hub). 
+
+Overall topology map
+--------------------
+
+Hub Ircu <--uncompressed--> Hub Bounce <--compressed--> Leaf Bounce <--uncompressed--> Leaf Ircu
+
+ 
+Config File Format:
+-------------------
+
+# Format: P:<Local vhost>:<Local Port>:<Remote Address>:<Remote Port>
+#
+# Using a P means: Accept plain input, and send a compressed stream.
+# Using a p means: Accept compressed input, and send a plain stream.
+#
+
+# A Lines.
+# 'Allows' this IP to initiate a connection to a listening port.
+# Format:
+#
+# A:<IPv4 Dotted Quad IP>
+#
+# E.G:
+#
+# A:192.168.10.5
+ 
+--
+Greg Sikorski (greg@atomicrevs.net) 04/11/2000.

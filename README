@@ -1,74 +1,235 @@
+- nefarious IRCu ------------------------------------------------------
 
-	Welcome to ircu2.10.11, the Undernet IRC daemon
+Nefarious IRCu is a collection of modifications to the Undernet IRC 
+daemon known as IRCu. This version is based on Undernet-IRCu by
+Undernet's Coder Committee. The original code can be obtained from 
+their webpage, http://coder-com.undernet.org/ and the latest release of 
+nefarious IRCu can be obtained from http://sf.net/projects/evilnet/.
 
-Version u2.10.11 of the Undernet ircd incorporates many new features
-over its predecessor, and we feel that using it will make you very
-happy indeed.
+This version is based on modifications from:
+ * Auska http://www.quakenet.org
+ * Lain http://www.quakenet.org
+ * Undernet IRCu http://coder-com.undernet.org
+ * Universal IRCu http://www.sourceforge.net/projects/ircu
+ * IRCa http://www.asylum-net.org
+ * RaptorIRCd http://www.sourceforge.net/projects/raptorircd
+ * Ultimate IRCd http://www.shadow-realm.org
+ * Unreal IRCd http://www.unrealircd.com
+ * Bahamut http://bahamut.dal.net
+ * ScaryNet IRCd http://www.sourceforge.net/projects/scarynet
+ * NetGamers IRCd http://www.netgamers.org
+ * Hybrid IRCd http://www.hybrid-ircd.com
+ * IRCoderz IRCd http://sourceforge.net/projects/ircoderz
+ * zBounce http://sourceforge.net/projects/zbounce
+ * ThunderCity http://sourceforge.net/projects/thundercity
 
-New features include:
-  - A completely rewritten network event engine, which make full use
-    of the asynchronous event engines available in FreeBSD (kqueue)
-    and Solaris (/dev/poll), resulting in dramaticaly improved
-    performance.
-  - New F: (feature) lines in ircd.conf, and the GET/SET commands allow
-    many settings to be changed dynamically, rather than by with compile-
-    time configuration.
-  - The new "account" feature added to the P10 protocol, allows people to
-    remain logged in to service bots (i.e., gnuworld) during a netsplit.
-    This means people will not have to login again once the network rejoins.
+We apologise if we have missed an IRCd or tool in the list.
+If you see parts of your code being used in nefarious and do not see 
+your IRCd/tool above, please contact one of the developers of nefarious.
 
-INSTALLATION
+If you are running the development version of nefarious IRCu on a 
+production network, you are doing so at your own peril. We take NO 
+RESPONSIBILITY for ANYTHING it might do on your network. We strongly 
+recommend that you do NOT run the development version on a production 
+network! You have been warned.
 
-Please see the INSTALL file for installation instructions, for hints on how
-to best configure your OS for running ircu under high load, see the various
-README.<platform> files.
+- project coders ------------------------------------------------------
 
-COMPATIBILITY
+reed - Reed Loden - <reed@reedloden.com>
+SiRVulcaN - Neil Spierling - <sirvulcan@sirvulcan.org>
 
-This version of ircu will only work with servers that use the P10 protocol,
-some of the new features will only work between ircu2.10.11 servers.
+- documentation -------------------------------------------------------
 
-GENERAL PERFORMANCE HINTS
+README (this file)	- Credits, some feature lists, ssl notes
+READNE.cygwin		- Cygwin installation instructions
+doc/nefarious.features	- Nefarious IRCu specific features
+doc/readme.features	- Full list of ircd.conf F:lines with explanations
+doc/example.conf	- Example ircd.conf
+doc/ircd.conf.sample	- Example ircd.conf
+doc/p10.txt		- Documentation on the P10 protocol
+doc/readme.asll		- Documentation on AsLL
+doc/readme.chroot	- Information on using chroot with Nefarious IRCu
+doc/readme.gline	- Documentation on glines
 
-For platform-specific notes and hints, see the various README.<platform>
-files included in this distribution. The notes below apply to servers that
-will serve large numbers (thousands) of clients simultaneously. If your
-server serves a small amount of users, you will not really have to do much
-of anything about performance tuning.
+- *IMPORTANT NOTICE* --------------------------------------------------
 
- - Run an OS that supports an asynchronous network event engine; currently
-   these are FreeBSD (kqueue), and Solaris (/dev/poll); possibly other BSDs
-   will also support kqueue. This will have a dramatic effect on performance.
- - Make things as lean as possible: Make your server dedicated to ircu,
-   disable anything that is not neccesary, and build a custom kernel (where
-   possible). 
- - Tune kernel parameters; see the various README.<platform> files as well
-   as your OS documentation for more information.
- - With many clients connecting each second, ircu will be doing lots of DNS
-   lookups. Make sure that the DNS server(s) in your /etc/resolv.conf are as
-   close as possible, or run a local caching DNS server on your IRC server.
+Do NOT ask for support for Nefarious IRCu in #coder-com on Undernet.
+The official support channel for Nefarious IRCu is on the AfterNET IRC
+Network (irc.afternet.org) in #evilnet. #coder-com on Undernet is ONLY
+for normal IRCu and GNUWrld. If you have found bugs in Nefarious IRCu,
+do NOT submit them to coder-com@undernet.org or to the undernet-ircu
+SourceForge site. Send them to any of the Nefarious IRCu mailing lists
+or the Nefarious IRCu SourceForge project site. If you submit a bug
+and we find out it's a bug which affects undernet-ircu, then we will
+forward the report on.
 
-TIME SYNCHRONIZATION
+- ssl notes -----------------------------------------------------------
 
-Many things can and will go horribly wrong when the clocks on the servers
-on your network become (too far) out of sync. It is therefore highly
-recommended that all servers run a version of ntpd that will keep their
-clocks from going astray.
+If you have enabled SSL (--enable-ssl) then no doubt you will want to
+use port 994 for your SSL port, as it is standard. You should know that
+non-root users can't use ports under 1024 and the ircd wont run as root,
+so this becomes an issue. This can be fixed with the Bounce tool
+(tools/Bounce). You will need to have root access for this to work.
 
-INFORMATION HIDING
+cd tools/Bounce
+./build
+edit bounce.conf (you will see a ssl example at the bottom)
 
-As per undernet-admins CFV-165, this server contains code that will,
-by default, hide certain information from ordinary users. If you do
-not want this, please make sure you add -DINCLUDED_ircd_policy_h to
-CFLAGS prior to running ./configure, like in:
+P:192.168.10.5:994:192.168.10.1:8000
 
-> CFLAGS=-DINCLUDED_ircd_policy_h ./configure
+What this line will do is, bind port 994 to 192.168.10.5 and any
+connections received on it will be fowarded to 192.168.10.1 port 8000, 
+port 8000 being a ssl configured port on the ircd (E).
 
-MORE INFORMATION
+More Examples
 
-For more information on this software, see the included documentation
-in the doc/ directory, as well as http://coder-com.undernet.org.
+P:210.55.131.133:994:210.55.131.133:7000
+P:123.123.123.123:994:203.86.91.12:6665
 
-For general information on the Undernet, vist http://www.undernet.org
+after the bounce.conf is done run
+./bounce &
 
-Happy IRCing!
+If you wish to run bounce in another dir then either copy the Bounce 
+dir out or copy the bounce binary and bounce.conf to another directory 
+and run.
+
+- added ircd.conf lines -----------------------------------------------
+
+[R:lines]
+
+These are redirection lines, when a client connects and his/her host
+matches a R:line then a 010 reply is sent with the redir server and
+port. Currently only epic supports a autoredirection when it gets a
+010 reply (ie it will automatically connect to the server said in the
+010 reply. Other clients will get a nessage saying what server and
+port to connect to. Aswell as a unauthorised connection quit.
+
+Syntax:
+ R:<mask>:<redirection server>:<redirection port>
+
+Examples:
+ R:*.aol.com:irc.aol.com:6667
+ R:*.us:us.nefarious.irc:6667
+ R:*.nz:nz.nefarious.irc:6667
+
+
+[S:lines]
+
+Syntax:
+ S:<spoof host>:<password>:<*.host.cc|a.b.c.*|CIDR>:<ident>
+<spoof host>  A hostname to be spoofed
+<password>    A password for this spoof host. Used if SETHOST_USER is enabled.
+<hostmask>    A hostmask for matching against users that are to be auto
+              spoofed. Used if SETHOST_AUTO is enabled. Can be of form:
+              host.domain.cc, 127.0.0.1 or 127.0.0.0/24, supports wildcards
+              for non-CIDR.
+<ident>       A mask for matching against the user's ident reply.
+
+Examples:
+Oper sethost for 'moo.fish.moo'
+ S:moo.fish.moo:::
+User & Oper sethost for 'moo.fish.moo'
+ S:moo.fish.moo:elitepassword::
+Oper sethost for 'moo.fish.moo' with auto on 'ident@*.example.com"
+ S:moo.fish.moo::*.example.com:ident
+Oper sethost for 'moo.fish.moo' with auto on 'user*@*.example.com"
+ S:moo.fish.moo::*.example.com:user*
+
+
+[B:lines]
+These are lines intended to improve the generic irc users ability to
+use network services. Each line sets up a /<service> alias so that
+users may type that instead of a full /msg command.
+
+for example.. adding:
+ B:X:cservice@nefarious.irc:*
+would result in commands like this being possible
+ /X HELP
+
+Syntax:
+ B:<name of command/service>:<target>:<anything to prepend to message>
+
+Examples:
+ B:X:cservice@nefarious.irc:*
+ B:AUTH:AuthServ@nefarious.irc:"AUTH"
+
+
+[P:Lines]
+(Refer to example.conf or ircd.conf for full information on P:Lines)
+
+P:<hostmask>:<interface>:<[CS][E][H]>:<port number>
+C- Client
+S- Service
+E- SSL Port
+H- Hidden Port
+ 
+This is a Encrypted SSL Port
+P:::E:7000
+
+
+[F:Lines]
+(Refer to readme.features for more information and their default values)
+
+
+- installation ---------------------------------------------------------
+
+(see ./configure --help for a range of compile time options)
+./configure
+make
+make install
+(ircd.pem generation will be prompted if ircd.pem doesnt exist)
+
+Key Notes:
+- If you run a network of more than one client server and host hiding 
+  style 2, then your 3 cloak keys need to be the same on each server.
+  You can specify each key with configure
+  (--with-cloakone=num --with-cloaktwo=num --with-cloakthree=num).
+
+- cygwin installation --------------------------------------------------
+
+see README.cygwin
+
+- configuration --------------------------------------------------------
+
+cd /home/ircduser/lib
+pico example.conf (or vi, nano, etc. :)
+mv example.conf ircd.conf
+
+Note: to compile mkpasswd do this:
+cd tools
+make -f Makefile.crypt
+
+- running --------------------------------------------------------------
+
+cd /home/ircduser/bin
+./ircd
+
+If all goes well the ircd should run. If not, check your ircd.conf
+CAREFULLY for errors.
+
+- disclaimer -----------------------------------------------------------
+
+This software is provided "as is" with absolutely no warranties, either 
+express or implied. It's use is done so totally at the user's own risk.
+
+Please do not assume we coded everything here ourselves, as we did not.
+The whole point of nefarious is a combination of all good patches to
+Undernet IRCu. We try our best to give credits to code we've used, but
+from time to time we miss credits. See the top of this document for
+credits on IRCd's and other code we've used. Also, see doc/Authors.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 1, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+- evilnet development - 14.02.2004 -----------------------------------------

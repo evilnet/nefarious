@@ -1,0 +1,14 @@
+zBounce Changelog; Newest entries at the top.
+--
+
+04/11/2000: Greg Sikorski:
+	*	Added 'A' Lines to config format, to only allow specified IP's to
+		initiate a connection.
+	*	Cleaned up formatting, stupid editor messed with tabs. :)
+
+03/11/2000: Dan Karrels:
+	*	Cleanups, STL'ing old C from original version.
+	*	Added configure script and Makefile.
+
+< 01/11/2000: Greg Sikorski:
+	*	Initial version.
