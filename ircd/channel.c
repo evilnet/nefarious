@@ -3478,6 +3478,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     0x0, 0x0
   };
   int i, destroyed = 0;
+  int plusorminus = -1; /* feels ugly but 1 = + and 0 = - */
   int *flag_p;
   unsigned int t_mode;
   char *modestr;
@@ -3537,7 +3538,9 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       switch (*modestr) {
       case '+': /* switch direction to MODE_ADD */
+        plusorminus = 1;
       case '-': /* switch direction to MODE_DEL */
+        plusorminus = 0;
 	state.dir = flag_p[0];
 	break;
 
@@ -3670,9 +3673,9 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
         if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
            (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
           break;
-        else if (state.dir == '-')
+        else if (plusorminus == 0)
           destroyed = 1;
-        else if (state.dir == '+')
+        else if (plusorminus == 1)
           destroyed = 0;
         mode_parse_mode(&state, flag_p);
         break;
