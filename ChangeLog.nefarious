@@ -1,5 +1,21 @@
 2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
 
+	* include/handlers.h: Add copyright function declerations.
+
+	* include/msg.h Add COPYRIGHT fluff.
+
+	* include/version.h: Added copyrighttext char.
+
+	* ircd/Makefile.in: Added in m_copyright.c
+
+	* ircd/m_copyright.c: File containing nessecary code for copyright command.
+
+	* ircd/parse.c: Added in COPYRIGHT command fluff.
+
+	* ircd/version.c.SH: Added GPL/Copyright text.
+
+2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/msg.h: Added CREDITS fluff.
 
 	* ircd/parse.c: Added CREDITS command, simply calls the m_info etc

@@ -106,4 +106,29 @@ const char *infotext[] = {
     "[$sumhash] [$sumsmisc] [$sumircd]",
     0,
 };
+
+const char *copyrighttext[] =
+    {
+	"Nefarious IRCu is Copyright (C) 2004 by the past and present ircd coders,",
+	"and others. Refer to the documentation within doc/Authors and README for",
+	"full credits and copyrights. The archive containing this documentation aswell",
+	"as Nefarious IRCu can be obtained from http://sourceforge.net/projects/evilnet",
+	"",
+	"This program is free software; you can redistribute it and/or modify",
+	"it under the terms of the GNU General Public License as published by",
+	"the Free Software Foundation; either version 1, or (at your option)",
+	"any later version.",
+	"",
+	"This program is distributed in the hope that it will be useful,",
+	"but WITHOUT ANY WARRANTY; without even the implied warranty of",
+	"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the",
+	"GNU General Public License for more details.",
+	"",
+	"A copy of the GNU General Public License are distributed alongside all",
+	"official releases of Nefarious IRCu. It can also be obtained by writing to",
+	"Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,",
+	"MA  02111-1307 USA",
+         0,
+};
+
 !SUB!THIS!

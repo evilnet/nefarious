@@ -86,6 +86,7 @@ struct Client;
 
 extern int m_admin(struct Client*, struct Client*, int, char*[]);
 extern int m_away(struct Client*, struct Client*, int, char*[]);
+extern int m_copyright(struct Client*, struct Client*, int, char*[]);
 extern int m_cnotice(struct Client*, struct Client*, int, char*[]);
 extern int m_cprivmsg(struct Client*, struct Client*, int, char*[]);
 extern int m_gline(struct Client*, struct Client*, int, char*[]);
@@ -184,6 +185,7 @@ extern int ms_away(struct Client*, struct Client*, int, char*[]);
 extern int ms_burst(struct Client*, struct Client*, int, char*[]);
 extern int ms_clearmode(struct Client*, struct Client*, int, char*[]);
 extern int ms_connect(struct Client*, struct Client*, int, char*[]);
+extern int ms_copyright(struct Client*, struct Client*, int, char*[]);
 extern int ms_create(struct Client*, struct Client*, int, char*[]);
 extern int ms_destruct(struct Client*, struct Client*, int, char*[]);
 extern int ms_desynch(struct Client*, struct Client*, int, char*[]);
