@@ -51,11 +51,11 @@
 #include "sys.h"
 #include "whowas.h"
 
-#include <arpa/inet.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 struct Channel* GlobalChannelList = 0;
 
@@ -627,8 +627,8 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
           *pe = *ipe_start = 0;
           if (match(tmpe->value.except.exceptstr, ip_se) == 0) {
             if ((bitse > 0) && (bitse < 33)) {
-              *cidre_start = 0;
               in_addr_t except_addr=inet_addr(ipe_start + 1);
+              *cidre_start = 0;
               *cidre_start = '/';
               if ((NETMASK(bitse) & cli_addr) == except_addr) {
                 *pe = *ipe_start = '@';
@@ -758,8 +758,8 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
           *p = *ip_start = 0;
           if (match(tmp->value.ban.banstr, ip_s) == 0) {
             if ((bits > 0) && (bits < 33)) {
-              *cidr_start = 0;
               in_addr_t ban_addr=inet_addr(ip_start + 1);
+              *cidr_start = 0;
               *cidr_start = '/';
               if ((NETMASK(bits) & cli_addr) == ban_addr) {
                 *p = *ip_start = '@';
