@@ -648,15 +648,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
 			   NumNick(cptr) /* Two %'s */
 			   );
     IPcheck_connect_succeeded(sptr);
-
-    /*
-     * Set user's initial modes
-     */
-    parv[0] = (char*)nick;
-    parv[1] = (char*)nick;
-    parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
-    parv[3] = NULL; /* needed in case of +s */
-    set_user_mode(sptr, sptr, 3, parv);
   }
   else
     /* if (IsServer(cptr)) */
@@ -708,6 +699,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
   /* Send umode to client */
   if (MyUser(sptr))
   {
+    /*
+     * Set user's initial modes
+     */
+    parv[0] = (char*)nick;
+    parv[1] = (char*)nick;
+    parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
+    parv[3] = NULL; /* needed in case of +s */
+    set_user_mode(sptr, sptr, 3, parv);
+
     if (cli_snomask(sptr) != SNO_DEFAULT && HasFlag(sptr, FLAG_SERVNOTICE))
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
 

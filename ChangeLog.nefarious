@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+
+2004-08-19  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* ircd/s_user.c: Bug fix for with default umodes, the mode(s) were being sent
+	out to other servers before the nick was even sent out.
+
 2004-08-17  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/os_linux.c: Bug fix for fedora systems. This should fix the
