@@ -203,7 +203,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     chptr->mode.mode &= ~(MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET |
 			  MODE_MODERATED | MODE_TOPICLIMIT | MODE_INVITEONLY |
 			  MODE_NOPRIVMSGS | MODE_REGONLY | MODE_NOCTCP |
-			  MODE_NOCOLOUR | MODE_DELJOINS);
+			  MODE_NOCOLOUR);
 
     parse_flags |= (MODE_PARSE_SET | MODE_PARSE_WIPEOUT); /* wipeout keys */
 
@@ -297,13 +297,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       {
 	struct Client *acptr;
 	char *nicklist = parv[param], *p = 0, *nick, *ptr;
-	int default_mode, last_mode;
-	int base_mode = CHFL_DEOPPED | CHFL_BURST_JOINED;
-
-        if (chptr->mode.mode & MODE_DELJOINS)
-          base_mode |= CHFL_DELAYED;
-
-	default_mode=last_mode=base_mode;
+	int default_mode = CHFL_DEOPPED | CHFL_BURST_JOINED;
+	int last_mode = CHFL_DEOPPED | CHFL_BURST_JOINED;
 
 	for (nick = ircd_strtok(&p, nicklist, ","); nick;
 	     nick = ircd_strtok(&p, 0, ",")) {
@@ -312,12 +307,12 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    *ptr++ = '\0';
 
 	    if (parse_flags & MODE_PARSE_SET) {
-	      for (default_mode = base_mode ; *ptr;
+	      for (default_mode = CHFL_DEOPPED | CHFL_BURST_JOINED; *ptr;
 		   ptr++) {
 		if (*ptr == 'o') /* has oper status */
-		  default_mode = (default_mode & ~(CHFL_DEOPPED|CHFL_DELAYED)) | CHFL_CHANOP;
+		  default_mode = (default_mode & ~CHFL_DEOPPED) | CHFL_CHANOP;
 		else if (*ptr == 'v') /* has voice status */
-		  default_mode = (default_mode & ~CHFL_DELAYED) | CHFL_VOICE;
+		  default_mode |= CHFL_VOICE;
 		else /* I don't recognize that flag */
 		  break; /* so stop processing */
 	      }
@@ -345,8 +340,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	  }
 
 	  add_user_to_channel(chptr, acptr, default_mode);
-	  if (!(default_mode & CHFL_DELAYED))
-	    sendcmdto_channel_butserv_butone(acptr, CMD_JOIN, chptr, NULL, "%H", chptr);
+	  sendcmdto_channel_butserv_butone(acptr, CMD_JOIN, chptr, NULL, "%H", chptr);
 	}
       }
       param++;

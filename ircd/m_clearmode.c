@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_tmpl.c
+ * IRC - Internet Relay Chat, ircd/m_clearmode.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  * Copyright (C) 2000 Kevin L. Mitchell <klmitch@mit.edu>
@@ -126,7 +126,6 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
-    MODE_DELJOINS,	'D',
     0x0, 0x0
   };
   int *flag_p;

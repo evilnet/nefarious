@@ -69,7 +69,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
   /*
    * This first: Almost never a server/service
    */
-  if (!client_can_send_to_channel(sptr, chptr, 1)) {
+  if (!client_can_send_to_channel(sptr, chptr)) {
     send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
     return;
   }
@@ -109,7 +109,7 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
   /*
    * This first: Almost never a server/service
    */
-  if (!client_can_send_to_channel(sptr, chptr, 1))
+  if (!client_can_send_to_channel(sptr, chptr))
     return;
 
   if ((chptr->mode.mode & MODE_NOPRIVMSGS) &&
@@ -153,7 +153,7 @@ void server_relay_channel_message(struct Client* sptr, const char* name, const c
    * This first: Almost never a server/service
    * Servers may have channel services, need to check for it here
    */
-  if (client_can_send_to_channel(sptr, chptr, 1) || IsChannelService(sptr)) {
+  if (client_can_send_to_channel(sptr, chptr) || IsChannelService(sptr)) {
     sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
   }
@@ -174,7 +174,7 @@ void server_relay_channel_notice(struct Client* sptr, const char* name, const ch
    * This first: Almost never a server/service
    * Servers may have channel services, need to check for it here
    */
-  if (client_can_send_to_channel(sptr, chptr, 1) || IsChannelService(sptr)) {
+  if (client_can_send_to_channel(sptr, chptr) || IsChannelService(sptr)) {
     sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
 			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
   }

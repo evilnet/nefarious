@@ -58,7 +58,7 @@
 			feature_int(FEAT_MAXBANS), NICKLEN, TOPICLEN, \
 			AWAYLEN, TOPICLEN
 
-#define FEATURESVALUES2 "#&", "(ov)@+", "b,k,l,imnpstrRDcC", "rfc1459", \
+#define FEATURESVALUES2 "#&", "(ov)@+", "b,k,l,imnpstrRcC", "rfc1459", \
 			feature_str(FEAT_NETWORK)
 
 #endif /* INCLUDED_supported_h */

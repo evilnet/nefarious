@@ -2,6 +2,8 @@
 
 	* Synced to current u2_10_11_05.
 
+	* Removed ASUKA's delayedjoin.
+
 	* include/ircd_features.h, ircd/ircd_features.c: Added HIS_GLINE
 	(default off).
 
