@@ -113,6 +113,7 @@ extern const struct Numeric* get_error_numeric(int err);
 	RPL_STATSVLINE	     227	   unreal */
 #define RPL_STATSRLINE       227	/* evilnet extension */
 #define RPL_STATSQLINE       228        /* Undernet extension */
+#define RPL_STATSBLINE       229	/* evilnet extension */
 
 #define RPL_SERVICEINFO      231	/* unused */
 #define RPL_ENDOFSERVICES    232	/* unused */

@@ -74,7 +74,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
     else
       server = find_match_server(parv[1]);
 
-    if (!server || !ircd_strrcmp(cli_name(server), ".Services"))
+    if (!server || !ircd_strrcmp(cli_name(server), feature_str(FEAT_SERVICES_TLD)))
       return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
   }   
 
@@ -84,9 +84,9 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
     if (acptr->cli_user && !IsChannelService(acptr) && IsOper(acptr) &&
-	ircd_strrcmp(cli_name(acptr->cli_user->server), ".Services"))
+	ircd_strrcmp(cli_name(acptr->cli_user->server), feature_str(FEAT_SERVICES_TLD)))
     {
-      if ((parc > 1) && (ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)) == 0))
+      if ((parc > 1) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
 	ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
 			acptr->cli_name ? acptr->cli_name : "<Unknown>",
 			acptr->cli_user->away ? " (AWAY)" : "",

@@ -55,6 +55,7 @@ enum Feature {
   FEAT_REMOTE_OPER,
   FEAT_BOT_CLASS,
   FEAT_LOCAL_CHANNELS,
+  FEAT_SERVICES_TLD,
   FEAT_EVILNET,
 
   /* features that probably should not be touched */
@@ -145,6 +146,7 @@ enum Feature {
   FEAT_HIS_LINKS,
   FEAT_HIS_TRACE,
   FEAT_HIS_STATS_l,
+  FEAT_HIS_STATS_b,
   FEAT_HIS_STATS_c,
   FEAT_HIS_STATS_g,
   FEAT_HIS_STATS_h,

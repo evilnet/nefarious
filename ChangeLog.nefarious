@@ -1,3 +1,42 @@
+2003-10-31  Reed Loden  <reed@reedloden.com>
+
+	* doc/readme.features: Update documentation.
+
+	* doc/example.conf, doc/ircd.conf.sample: Update documentation.
+
+	* include/ircd_features.h: Add FEAT_SERVICES_TLD and
+	FEAT_HIS_STATS_b.
+
+	* include/numeric.h: Add RPL_STATSBLINE (229).
+
+	* ircd/gline.c: Fix issue where some g-lines were not getting
+	the "G-lined (<reason>)" prefix.
+
+	* ircd/ircd_features.c: Add FEAT_SERVICES_TLD and
+	FEAT_HIS_STATS_b.
+
+	* ircd/m_burst.c: Allow global opers to netride.
+
+	* ircd/m_clearmode.c: Add more modes to the default clearmode.
+
+	* ircd/m_ircops.c: Use FEAT_SERVICES_TLD instead of ".Services"
+	so that other networks using evilnet ircd can change it more
+	easily.
+
+	* ircd/m_trace.c: Remove excess lines at EOF.
+
+	* ircd/parse.c: Backport Dianora's complete rewrite of parse.c.
+
+	* ircd/s_conf.c: Formatting changes.
+
+	* ircd/s_err.c: Add RPL_STATSBLINE (229).
+
+	* ircd/s_stats.c: Add /stats B support.
+
+	* ircd/s_user.c: Remove unneeded code.
+
+	* ircd/version.c.SH: Add cnix's header line change.
+
 2003-10-27  Reed Loden  <reed@reedloden.com>
 
 	* include/ircd_string.h, ircd/ircd_string.c: Remove

@@ -223,7 +223,7 @@ do_mangle_gline(struct Client* cptr, struct Client* acptr,
   char* space;
 
   if (!feature_bool(FEAT_HIS_GLINE))
-    return exit_client_msg(cptr, acptr, &me, orig_reason);
+    return exit_client_msg(cptr, acptr, &me, "G-lined (%s)", orig_reason);
 
   endanglebracket = strchr(orig_reason, '>');
   space = strchr(orig_reason, ' ');
@@ -235,7 +235,7 @@ do_mangle_gline(struct Client* cptr, struct Client* acptr,
       strcpy(reason, "G-lined by ");
       strncat(reason, orig_reason + 1, endanglebracket - orig_reason - 1);
     } else {
-      strcpy(reason, orig_reason);
+      strcpy(reason, "G-lined (%s)", orig_reason);
     }
   } else {
     ircd_snprintf(0, reason, sizeof(reason), "G-lined (<%s> %s)",

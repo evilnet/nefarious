@@ -2139,35 +2139,9 @@ lsc(struct Client *cptr, char *target, const char *prepend,
        strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
   }
 
-#if 0
-  if (strcmp(prepend, "*")) {
-    strncpy(msg, prepend, sizeof(msg) - 1);
-    strcat(msg, " ");
-    for (x = 1; x != parc; x++)
-     if (x != parc - 1)
-       strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
-     else
-       strncat(msg, parv[x], sizeof(msg) - 1 - strlen(msg));
-  } else {
-   strcpy(msg, parv[parc - 1]);
-  }
-#endif
-  
   if (EmptyString(msg))
    return send_reply(cptr, ERR_NOTEXTTOSEND);
   
-#if 0
-   if ((tmp = strchr(target, '@')) && !FindServer(tmp + 1))
-	   return send_reply(cptr, ERR_SERVICEDOWN, cli_name(cptr),
-			     servicename, servicename);
-   else if (IsChannelPrefix(*target) && !FindChannel(target))
-	   return send_reply(cptr, ERR_SERVICEDOWN, cli_name(cptr),
-			     servicename, servicename);
-   else if (!FindUser(target))
-	   return send_reply(cptr, ERR_SERVICEDOWN, cli_name(cptr),
-			     servicename, servicename);
-#endif
-
    /*
     * B:X2:#supersecretchannel:*
     * -- technically should be valid, so we allow it.

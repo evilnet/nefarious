@@ -171,7 +171,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
         mode_invite_clear(chptr);
         for (member = chptr->members; member; member = nmember) {
           nmember=member->next_member;
-          if (!MyUser(member->user) || IsZombie(member))
+          if (!MyUser(member->user) || IsZombie(member) || IsOper(member->user))
             continue;
           sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Net Rider", chptr, member->user);
           sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Net Rider", chptr, member->user);

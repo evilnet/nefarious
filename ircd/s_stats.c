@@ -313,6 +313,15 @@ stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_configured_svcs(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct svcline *bline;
+  for (bline = GlobalServicesList; bline; bline = bline->next) {
+     send_reply(to, RPL_STATSBLINE, bline->cmd, bline->target, bline->prepend ? bline->prepend : "*");
+  }
+}
+
+static void
 stats_sline(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   int y = 1, i = 1;
@@ -430,6 +439,9 @@ stats_help(struct Client* to, struct StatDesc* sd, int stat, char* param)
  * stats.  Struct StatDesc is defined in s_stats.h.
  */
 struct StatDesc statsinfo[] = {
+  { 'b', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_b,
+    stats_configured_svcs, 0,
+    "Service mappings." },
   { 'c', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_c,
     stats_configured_links, CONF_SERVER,
     "Remote server connection lines." },

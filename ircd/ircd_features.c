@@ -262,6 +262,7 @@ static struct FeatureDesc {
   F_B(REMOTE_OPER, 0, 1, 0),
   F_I(BOT_CLASS, 0, 0, 0),
   F_B(LOCAL_CHANNELS, 0, 1, 0),
+  F_S(SERVICES_TLD, 0 ".Services", 0),
   F_B(EVILNET, FEAT_NODISP, 0, 0),
 
   /* features that probably should not be touched */
@@ -352,6 +353,7 @@ static struct FeatureDesc {
   F_B(HIS_LINKS, 0, 0, 0),
   F_B(HIS_TRACE, 0, 1, 0),
   F_B(HIS_STATS_l, 0, 1, 0),
+  F_B(HIS_STATS_b, 0, 1, 0),
   F_B(HIS_STATS_c, 0, 1, 0),
   F_B(HIS_STATS_g, 0, 1, 0),
   F_B(HIS_STATS_h, 0, 1, 0),

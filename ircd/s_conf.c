@@ -1747,23 +1747,19 @@ void conf_add_svcline(const char* const* fields, int count)
 
   new_svc->next = GlobalServicesList;
   GlobalServicesList = new_svc;
-
 }
  
 void clear_svclines(void)
 {
   struct svcline *svc;
-  
+
   while ((svc = GlobalServicesList)) {
-	  GlobalServicesList = svc->next;
-
-	  MyFree(svc->cmd);
-	  MyFree(svc->target);
-
-	  if (!EmptyString(svc->prepend))
-	    MyFree(svc->prepend);
-
-	  MyFree(svc);
+	 GlobalServicesList = svc->next;
+	 MyFree(svc->cmd);
+	 MyFree(svc->target);
+	 if (!EmptyString(svc->prepend))
+	   MyFree(svc->prepend);
+	 MyFree(svc);
   }
 }
 
@@ -1775,7 +1771,6 @@ struct svcline *find_svc(const char *cmd)
     if (confbot->cmd && !match(confbot->cmd, cmd)) 
       return confbot;
   }
-
   return NULL;
 }
 

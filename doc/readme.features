@@ -821,6 +821,12 @@ HIS_STATS_l
 
 As per UnderNet CFV-165, this removes /STATS l from users.
 
+HIS_STATS_b
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS b from users.
+
 HIS_STATS_c
  * Type: boolean
  * Default: TRUE
