@@ -446,6 +446,7 @@ static struct FeatureDesc {
   F_B(HIS_MAP_SCRAMBLED, 0, 1, 0),
   F_B(HIS_LINKS_SCRAMBLED, 0, 1, 0),
   F_I(HIS_SCRAMBLED_CACHE_TIME, 0, 604800, 0),
+  F_B(EXTENDED_CHECKCMD, 0, 1, 0),
 
 #undef F_S
 #undef F_B

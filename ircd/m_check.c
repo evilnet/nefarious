@@ -59,7 +59,7 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
    struct Channel *chptr;
    struct Client *acptr;
-   int showchan = 0;
+   int showchan = 0, showusers = 1, i;
 
    if (!feature_bool(FEAT_CHECK))
      return send_reply(sptr, ERR_DISABLED, "CHECK");
@@ -71,9 +71,13 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    }
 
    /* This checks to see if -c has been supplied for hostmask checking */
-   if (parc >= 3 && (!strcmp(parv[2],"-c")))
+   if (parc >= 3)
    {
-      showchan = 1;
+      for (i = 2; i < parc; ++i)
+      {
+         if (strncmp(parv[i], "-c", 2) == 0) showchan = 1;
+         if (strncmp(parv[i], "-u", 2) == 0) showusers = 0;
+      }
    }
 
    if (IsChannelName(parv[1]))  /* channel */
@@ -81,7 +85,7 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       if ((chptr = FindChannel(parv[1])))
       {
          checkChannel(sptr, chptr);
-         checkUsers(sptr, chptr);
+         checkUsers(sptr, chptr, showusers);
       }
       else
       {
@@ -134,17 +138,17 @@ static int checkClones(struct Channel *chptr, char *nick, char *host)
    return ((clones) ? clones + 1 : 0);
 }
 
-void checkUsers(struct Client *sptr, struct Channel *chptr)
+void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
 {
    struct Membership *lp;
    struct SLink *slp;
    struct Client *acptr;
 
    char outbuf[BUFSIZE], ustat[64];
-   int cntr = 0, opcntr = 0, hopcntr = 0, vcntr = 0, clones = 0, bans = 0, excepts = 0, c = 0;
+   int cntr = 0, opcntr = 0, hopcntr = 0, vcntr = 0, clones = 0, bans = 0, excepts = 0, c = 0, authed = 0;
 
    if (feature_bool(FEAT_HALFOPS))
-     send_reply(sptr, RPL_DATASTR, "Users (@ = op, % = half op, + = voice, * = clone)");
+     if (showusers) send_reply(sptr, RPL_DATASTR, "Users (@ = op, % = half op, + = voice, * = clone)");
    else
      send_reply(sptr, RPL_DATASTR, "Users (@ = op, + = voice, * = clone)");
 
@@ -169,7 +173,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
          opcntr++;
       }
 
-      if (chptr && IsHalfOp(lp))
+      else if (chptr && IsHalfOp(lp))
       {
          strcat(ustat, "%");
          hopcntr++;
@@ -185,9 +189,13 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
          strcat(ustat, " ");
       }
 
-      ircd_snprintf(0, outbuf, sizeof(outbuf), "%s%c", acptr->cli_info, COLOR_OFF);
-      send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->realusername,
-           acptr->cli_user->realhost, outbuf, (IsAccount(acptr) ? acptr->cli_user->account : ""));
+      if ((c = IsAccount(acptr)) != 0) ++authed;
+
+      if (showusers) {
+         ircd_snprintf(0, outbuf, sizeof(outbuf), "%s%c", acptr->cli_info, COLOR_OFF);
+         send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->username,
+              acptr->cli_user->realhost, outbuf, (c ? acptr->cli_user->account : ""));
+      }
 
       cntr++;
    }
@@ -196,16 +204,21 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
 
    if (feature_bool(FEAT_HALFOPS))
      ircd_snprintf(0, outbuf, sizeof(outbuf),
-        "Total users:: %d (%d ops, %d half ops, %d voiced, %d clones)",
-        cntr, opcntr, hopcntr, vcntr, clones);
+        "Total users:: %d (%d ops, %d half ops, %d voiced, %d clones, %d authed)",
+        cntr, opcntr, hopcntr, vcntr, clones, authed);
    else
      ircd_snprintf(0, outbuf, sizeof(outbuf),
-        "Total users:: %d (%d ops, %d voiced, %d clones)",
-        cntr, opcntr, vcntr, clones);
+        "Total users:: %d (%d ops, %d voiced, %d clones, %d authed)",
+        cntr, opcntr, vcntr, clones, authed);
 
    send_reply(sptr, RPL_DATASTR, outbuf);
 
    send_reply(sptr, RPL_DATASTR, " ");
+
+   if (!showusers) {
+     send_reply(sptr, RPL_ENDOFCHECK, " ");
+     return;
+   }
 
    /* Bans */
    send_reply(sptr, RPL_DATASTR, "Bans on channel::");
@@ -223,7 +236,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr)
    }
 
    /* Excepts */
-   if (feature_bool(FEAT_HALFOPS)) {
+   if (feature_bool(FEAT_EXCEPTS)) {
      send_reply(sptr, RPL_DATASTR, "Excepts on channel::");
 
      for (slp = chptr->exceptlist; slp; slp = slp->next)
@@ -449,6 +462,21 @@ void checkClient(struct Client *sptr, struct Client *acptr)
       ircd_snprintf(0, outbuf, sizeof(outbuf), "          Ports:: %d -> %d (client -> server)",
          cli_port(acptr), cli_listener(acptr)->port);
       send_reply(sptr, RPL_DATASTR, outbuf);
+      if (feature_bool(FEAT_EXTENDED_CHECKCMD)) {
+        /* Note: sendq = receiveq for a client (it makes sense really) */
+        ircd_snprintf(0, outbuf, sizeof(outbuf), "      Data sent:: %u.%0.3u Kb (%u protocol messages)",
+           cli_receiveK(acptr), cli_receiveB(acptr), cli_receiveM(acptr));
+        send_reply(sptr, RPL_DATASTR, outbuf);                          
+        ircd_snprintf(0, outbuf, sizeof(outbuf), "  Data received:: %u.%0.3u Kb (%u protocol messages)",
+           cli_sendK(acptr), cli_sendB(acptr), cli_sendM(acptr));                                       
+        send_reply(sptr, RPL_DATASTR, outbuf);
+        ircd_snprintf(0, outbuf, sizeof(outbuf), "  receiveQ size:: %d bytes (max. %d bytes)",
+           DBufLength(&(cli_recvQ(acptr))), feature_int(FEAT_CLIENT_FLOOD));
+        send_reply(sptr, RPL_DATASTR, outbuf);
+        ircd_snprintf(0, outbuf, sizeof(outbuf), "     sendQ size:: %d bytes (max. %d bytes)",
+           DBufLength(&(cli_sendQ(acptr))), get_sendq(acptr));                                
+        send_reply(sptr, RPL_DATASTR, outbuf);                
+      }
    }
    
    /* Send 'END OF CHECK' message */

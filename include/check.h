@@ -34,7 +34,7 @@
 #define COLOR_OFF  '\017'
 
 extern void checkChannel(struct Client *sptr, struct Channel *chptr);
-extern void checkUsers(struct Client *sptr, struct Channel *chptr);
+extern void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers);
 extern void checkClient(struct Client *sptr, struct Client *acptr);
 extern void checkServer(struct Client *sptr, struct Client *acptr);
 extern signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan);

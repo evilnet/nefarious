@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-26  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added new feature EXTENDED_CHECKCMD.
+
+	* include/check.h: Added new parm to checkusers.
+
+	* include/ircd_features.h: Added FEAT_EXTENDED_CHECKCMD.
+
+	* ircd/ircd_features.c: Added FEAT_EXTENDED_CHECKCMD (default TRUE).
+
+	* ircd/m_check.c: A few CHECK updates:
+	Extended information with FEAT_EXTENDED_CHECKCMD
+	An update for flags with CHECK.
+	Small F:Line tweak for EXCEPTS.
+	Small bug fix with displaying modes in CHECK output.
+
 2004-08-25  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/ssl.c: Generate an error message when a client connects to
