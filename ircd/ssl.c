@@ -104,6 +104,8 @@ static void ssl_sock_callback(struct Event* ev)
   case ET_WRITE:
     accept_ssl(data);
     break;
+  default:
+    break;
   }
 }
   
