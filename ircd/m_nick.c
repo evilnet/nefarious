@@ -191,7 +191,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;                        /* NICK message ignored */
   }
 
-  if (feature_bool(FEAT_ASUKA_SINGLELETTERNICK) && !IsAnOper(sptr)
+  if (feature_bool(FEAT_OPER_SINGLELETTERNICK) && !IsAnOper(sptr)
       && nick[1] == '\0') {
     send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
     return 0;

@@ -150,7 +150,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
 		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
 		      acptr->cli_user->away ? " (AWAY)" : "",
-		      (feature_bool(FEAT_ASUKA_HIDEIDLE) &&
+		      (feature_bool(FEAT_OPER_HIDEIDLE) &&
 		       IsNoIdle(acptr)) ? 0 :
 		       CurrentTime - acptr->cli_user->last);
 	ircops++;
@@ -160,7 +160,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
 		      acptr->cli_user->away ? " (AWAY)" : "",
 		      cli_name(acptr->cli_user->server),
-		      (feature_bool(FEAT_ASUKA_HIDEIDLE) &&
+		      (feature_bool(FEAT_OPER_HIDEIDLE) &&
 		       IsNoIdle(acptr)) ? 0 :
 		       CurrentTime - acptr->cli_user->last);
 	ircops++;

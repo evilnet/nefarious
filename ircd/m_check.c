@@ -61,7 +61,7 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    struct Client *acptr;
    int showchan = 0;
 
-   if (!feature_bool(FEAT_ASUKA_CHECK))
+   if (!feature_bool(FEAT_CHECK))
      return send_reply(sptr, ERR_DISABLED, "CHECK");
 
    if (parc < 2)
@@ -405,7 +405,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
          {
             if (IsChanOp(lp))
                *(chntext + len++) = '@';
-           else if (is_half_op(acptr, chptr))
+           else if (IsHalfOp(lp))
                *(chntext + len++) = '%';
             else if (HasVoice(lp))
                *(chntext + len++) = '+';

@@ -2,7 +2,7 @@
  * IRC - Internet Relay Chat, include/ircd_struct.h
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
- * Copyright (C) 1996 -1997 Carlo Wood
+ * Copyright (C) 1996-1997 Carlo Wood
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

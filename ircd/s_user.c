@@ -1779,13 +1779,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      * ASUKA: Allow opers to set +k.  Also, restrict +XnI to
      * opers only also.
      */
-    if (!FlagHas(&setflags, FLAG_CHSERV) && !(feature_bool(FEAT_ASUKA_XTRAOP) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_CHSERV) && !(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr)))
       ClearChannelService(acptr);
-    if (!FlagHas(&setflags, FLAG_XTRAOP) && !(feature_bool(FEAT_ASUKA_XTRAOP) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_XTRAOP) && !(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr)))
       ClearXtraOp(acptr);
-    if (!FlagHas(&setflags, FLAG_NOCHAN) && !(feature_bool(FEAT_ASUKA_HIDECHANS) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_NOCHAN) && !(feature_bool(FEAT_OPER_HIDECHANS) && IsOper(acptr)))
       ClearNoChan(acptr);
-    if (!FlagHas(&setflags, FLAG_NOIDLE) && !(feature_bool(FEAT_ASUKA_HIDEIDLE) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_NOIDLE) && !(feature_bool(FEAT_OPER_HIDEIDLE) && IsOper(acptr)))
       ClearNoIdle(acptr);
     
     /*

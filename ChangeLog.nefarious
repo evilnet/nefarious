@@ -1,34 +1,77 @@
-/*
-2004-07-012  Neil Spierling  <vulcan@linux-boxen.org>
+/***********************************************************************
+ Nefarious IRCu ChangeLog
+
+2004-07-11  Reed Loden  <reed@reedloden.com>
+
+	* ChangeLog: Added entry from Vampire- that we forgot.
+
+	* ChangeLog.nefarious: Added some fluff.
+
+	* Doxyfile: Removed "Daemon" from Nefarious IRCu name.
+
+	* README: Updated list of IRCds we borrowed code from.
+
+	* include/channel.h: Removed unneeded prototypes.
+
+	* include/ircd_features.h: Changed ASUKA_* to OPER_* with the
+	exception of CHECK which was changed to just "CHECK".
+	Removed SPAMBOT_CHECKS and added STATS_C_IPS.
+
+	* include/ircd_struct.h, include/version.h: Miscellaneous 
+	whitespace/placement changes.
+
+	* ircd/Makefile.in: Ran "make depend".
+
+	* ircd/ircd_features.c: Changed ASUKA_* to OPER_* with the
+	exception of CHECK, which was changed to just "CHECK".
+	Removed SPAMBOT_CHECKS and added STATS_C_IPS.
+
+	* ircd/m_check.c, ircd/m_ircops.c, ircd/m_nick.c,
+	ircd/s_user.c: Changed ASUKA_* to OPER_* with the exception of
+	CHECK, which was changed to just "CHECK".
+
+	* ircd/m_check.c, ircd/m_topic.c: Optimized several halfop 
+	related checks.
+
+	* ircd/s_debug.c: Added characters for NICKGLINES and SSL.
+
+	* ircd/s_stats.c: Added FEAT_STATS_C_IPS (default: FALSE) to let
+	opers see the IPs in C:lines.
+
+	* ircd/version.c.SH: Used a cleaner way to get cvs_version.
+
+2004-07-12  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* include/numeric.h: Removed CVS_VERSION.
 
 	* include/version.c: Added char cvs_version.
 
 	* ircd/m_version.c: Removed CVS_VERSION reply.
-			    Send out the CVS version with RPL_VERSION.
+	Send out the CVS version with RPL_VERSION.
 
-	* ircd/version.c.SH: Used some cat grep n awk action to get the CVS version
-	out of ChangeLog.nefarious and throw it into a char like creation, version
-	etc.
+	* ircd/version.c.SH: Used some cat grep n awk action to get the
+	CVS version out of ChangeLog.nefarious and throw it into a char
+	like creation, version, etc.
 
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Added feature BADUSER_URL, gives the user a url to
-	go to when they get an invalid username error upon connect.
+	* doc/example.conf: Added feature BADUSER_URL, gives the user a url
+	to go to when they get an invalid username error upon connect.
 
 	* include/ircd_features.h: Added fluff for BADUSER_URL.
 
-	* include/numeric.h: Added new numeric for CVS version reply RPL_CVS_VERSION.
+	* include/numeric.h: Added new numeric for CVS version reply
+	RPL_CVS_VERSION.
 
 	* ircd/ircd_features.c: Added fluff for BADUSER_URL.
 
-	* ircd/m_version.c: Send out the cvs version of CVS_VERSION to a user.
+	* ircd/m_version.c: Send out the cvs version of CVS_VERSION to a
+	user.
 
 	* ircd/s_err.c: fluff for RPL_CVS_VERSION.
 
-	* ircd/s_user.c: Do something with BADUSER_URL, send it out with a invalid
-	username error.
+	* ircd/s_user.c: Do something with BADUSER_URL, send it out with
+	an invalid username error.
 
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
@@ -39,10 +82,10 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Bumped up the max excepts to 45.
-			    Adjust various HIS lines to TRUE.
+	Adjust various HIS lines to TRUE.
 
 	* ircd/ircd_features.c: Bumped up the max excepts to 45.
-				Adjust various HIS lines to TRUE.
+	Adjust various HIS lines to TRUE.
 
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
@@ -1521,6 +1564,6 @@
 
 	* Imported u2_10_11_04 into CVS.
 
-*/
+***********************************************************************/
 
 #define CVS_VERSION "$Revision$"

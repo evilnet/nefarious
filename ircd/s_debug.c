@@ -129,6 +129,10 @@ const char* debug_serveropts(void)
   if (feature_bool(FEAT_IDLE_FROM_MSG))
     AddC('M');
 
+#ifdef NICKGLINES
+  AddC('N');
+#endif /* NICKGLINES */
+
   if (feature_bool(FEAT_NO_OPER_DEOP_LCHAN))
     AddC('o');
 
@@ -150,6 +154,10 @@ const char* debug_serveropts(void)
 
   if (feature_bool(FEAT_VIRTUAL_HOST))
     AddC('v');
+
+#ifdef USE_SSL
+  AddC('z');
+#endif /* USE_SSL */
 
   serveropts[i] = '\0';
 

@@ -337,11 +337,6 @@ const char* StripColour(const char* text);
 extern void clean_channelname(char* name);
 extern void channel_modes(struct Client *cptr, char *mbuf, char *pbuf,
                           int buflen, struct Channel *chptr);
-extern int set_mode(struct Client* cptr, struct Client* sptr,
-                    struct Channel* chptr, int parc, char* parv[],
-                    char* mbuf, char* pbuf, char* npbuf, int* badop);
-extern void send_hack_notice(struct Client *cptr, struct Client *sptr,
-                             int parc, char *parv[], int badop, int mtype);
 extern struct Channel *get_channel(struct Client *cptr,
                                    char *chname, ChannelGetType flag);
 extern struct Membership* find_member_link(struct Channel * chptr,
@@ -350,18 +345,12 @@ extern int sub1_from_channel(struct Channel* chptr);
 extern int can_join(struct Client *sptr, struct Channel *chptr, char *key);
 extern void add_user_to_channel(struct Channel* chptr, struct Client* who,
                                 unsigned int flags);
-extern void cancel_mode(struct Client *sptr, struct Channel *chptr, char m,
-                        const char *param, int *count);
-extern void add_token_to_sendbuf(char *token, size_t *sblenp, int *firstp,
-                                 int *send_itp, char is_a_ban, char is_a_except, int mode);
 extern int add_banid(struct Client *cptr, struct Channel *chptr, char *banid,
                      int change, int firsttime);
 extern struct SLink *next_removed_overlapped_ban(void);
 extern int add_exceptid(struct Client *cptr, struct Channel *chptr, char *exceptid,
                      int change, int firsttime);
 extern struct SLink *next_removed_overlapped_except(void);
-extern void cancel_mode(struct Client *sptr, struct Channel *chptr, char m,
-                        const char *param, int *count);
 extern void make_zombie(struct Membership* member, struct Client* who,
                         struct Client* cptr, struct Client* sptr,
                         struct Channel* chptr);

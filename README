@@ -7,22 +7,23 @@ their webpage, http://coder-com.undernet.org/ and the latest release of
 Nefarious IRCu can be obtained from http://sf.net/projects/evilnet/.
 
 This version is based on modifications from:
- * Asuka http://www.quakenet.org
- * Lain http://www.quakenet.org
- * Undernet IRCu http://coder-com.undernet.org
- * Universal IRCu http://sourceforge.net/projects/ircu
- * IRCa http://www.asylum-net.org
- * RaptorIRCd http://sourceforge.net/projects/raptorircd
- * Ultimate IRCd http://www.shadow-realm.org
- * Unreal IRCd http://www.unrealircd.com
- * Bahamut http://bahamut.dal.net
- * ScaryNet IRCd http://sourceforge.net/projects/scarynet
- * NetGamers IRCd http://www.netgamers.org
- * Hybrid IRCd http://www.hybrid-ircd.com
- * IRCoderz IRCd http://sourceforge.net/projects/ircoderz
- * zBounce http://sourceforge.net/projects/zbounce
- * ThunderCity http://sourceforge.net/projects/thundercity
- * WhatIRCd http://coder-com.whatnet.org
+ * Asuka - http://dev-com.quakenet.org
+ * Bahamut - http://bahamut.dal.net
+ * GameSurge - http://www.gamesurge.net
+ * Hybrid IRCd - http://www.ircd-hybrid.org
+ * IRCa - http://www.asylum-net.org
+ * IRCoderz IRCd - http://ircoderz.sourceforge.net
+ * Lain - http://dev-com.b2irc.net
+ * NetGamers IRCd - http://www.netgamers.org
+ * RaptorIRCd - http://www.raptorircd.org
+ * ScaryNet IRCd - http://sourceforge.net/projects/scarynet
+ * Undernet IRCu - http://coder-com.undernet.org
+ * Universal IRCu - http://ircu.sourceforge.net
+ * Unreal IRCd - http://www.unrealircd.com
+ * Ultimate IRCd - http://www.shadow-realm.org
+ * ThunderCity - http://sourceforge.net/projects/thundercity
+ * WhatIRCd - http://coder-com.whatnet.org
+ * zBounce - http://sourceforge.net/projects/zbounce
 
 We apologize if we have missed an IRCd or tool in the list.
 If you see parts of your code being used in Nefarious and do not see 
@@ -233,4 +234,4 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-- evilnet development - 17.06.2004 -----------------------------------------
+- evilnet development - 11.07.2004 -----------------------------------------

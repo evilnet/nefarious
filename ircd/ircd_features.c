@@ -403,11 +403,11 @@ static struct FeatureDesc {
   F_I(BOT_CLASS, 0, 0, 0),
   F_B(LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_LOCAL_CHANNELS, 0, 1, 0),
-  F_B(ASUKA_XTRAOP, 0, 0, 0),
-  F_B(ASUKA_HIDECHANS, 0, 0, 0),
-  F_B(ASUKA_HIDEIDLE, 0, 0, 0),
-  F_B(ASUKA_CHECK, 0, 0, 0),
-  F_B(ASUKA_SINGLELETTERNICK, 0, 0, 0),
+  F_B(OPER_XTRAOP, 0, 0, 0),
+  F_B(OPER_HIDECHANS, 0, 0, 0),
+  F_B(OPER_HIDEIDLE, 0, 0, 0),
+  F_B(CHECK, 0, 1, 0),
+  F_B(OPER_SINGLELETTERNICK, 0, 0, 0),
   F_B(SETHOST, 0, 1, 0),
   F_B(SETHOST_FREEFORM, 0, 0, 0),
   F_B(SETHOST_USER, 0, 1, 0),
@@ -430,7 +430,6 @@ static struct FeatureDesc {
   F_B(OPERMOTD, 0, 0, 0),
   F_S(GEO_LOCATION, FEAT_NULL, 0, 0),
   F_B(MOTD_LAST_CHANGED, 0, 0, 0),
-  F_B(SPAMBOT_CHECKS, 0, 0, 0),
   F_B(HOST_IN_TOPIC, 0, 1, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
   F_B(HALFOPS, 0, 0, 0),
@@ -441,6 +440,7 @@ static struct FeatureDesc {
   F_B(HIS_EXCEPTWHO, 0, 1, 0),
   F_B(TARGET_LIMITING, 0, 1, 0),
   F_S(BADUSER_URL, 0, "http://www.mirc.co.uk/help/servererrors.html", 0),
+  F_B(STATS_C_IPS, 0, 0, 0),
 
 #undef F_S
 #undef F_B
