@@ -17,7 +17,7 @@ Then remake your services according as to how they should be made.
 
 Patch			Version For 		Description					Requires
 -----------------------------------------------------------------------------------------------------------------------
-banexempts.srvx2.diff	0.1	Afternet SRVX2	Adds in support so that SRVX2 will not die	Nefarious IRCu 0.3.0+
+banexempts.srvx2.diff	0.2	Afternet SRVX2	Adds in support so that SRVX2 will not die	Nefarious IRCu 0.3.0+
 						when it recieves a burst containing ban
 						exempts.
 halfops.srvx2.diff	0.1	Afternet SRVX2	Adds in support so that SRVX2 can handle	Nefarious IRCu 0.3.0+
