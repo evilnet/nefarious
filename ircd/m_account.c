@@ -193,10 +193,9 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 
     assert(0 == cli_user(acptr)->account[0]);
 
-    if (strlen(parv[3]) > ACCOUNTLEN) {
+    if (strlen(parv[3]) > ACCOUNTLEN)
       return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.",
                                 parv[3], ACCOUNTLEN, cli_name(acptr));
-    }
 
     if (parc > 4) {
       cli_user(acptr)->acc_create = atoi(parv[4]);

@@ -1,3 +1,25 @@
+2004-10-16  Michael Poole <mdpoole@troilus.org>
+
+	* ircd/numeric.h: Remove the unused RPL_STATMEM and
+	RPL_STATMEMTOT.  Move the RPL_BOUNCE comment to its current
+	value (the former RPL_STATMEM).
+
+	* ircd/s_err.c: Remove format strings for RPL_STATMEM and
+	RPL_STATMEMTOT.
+
+2004-10-12  Michael Poole <mdpoole@troilus.org>
+
+	* ircd/m_burst.c: Mask off channel modes in a wiped-out channel by
+	default rather than by listing which should be wiped out.
+
+2004-09-11  Michael Poole <mdpoole@troilus.org>
+
+	* include/numeric.h, ircd/s_err.c: Remove RPL_TRACEPING, and
+	replace with RPL_TRACEEND.
+
+	* ircd/s_trace.c: Move all the duplicated code in m*_trace() to
+	do_trace().  Implement RPL_TRACEEND, per RFE#830291.
+
 2004-09-17  Kevin L Mitchell  <klmitch@mit.edu>
 
 	* include/patchlevel.h (PATCHLEVEL): Release the sucker.

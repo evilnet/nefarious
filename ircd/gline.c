@@ -905,7 +905,7 @@ gline_find(char *userhost, unsigned int flags)
     } else {
 #ifdef NICKGLINES
       if ((nick == NULL) && (host == NULL)) {
-        if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0)
+        if (((gline->gl_host && host && match(gline->gl_host,host) == 0)
   	   ||(!gline->gl_host && !host)) &&
 		 ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
 		 (user && match(gline->gl_user, user) == 0)) &&
@@ -913,14 +913,14 @@ gline_find(char *userhost, unsigned int flags)
 		 (nick && (match(gline->gl_nick, nick) == 0))))
            break;
       } else {
-        if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0) ||
+        if (((gline->gl_host && host && match(gline->gl_host,host) == 0) ||
            (!gline->gl_host && !host)) &&
            ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
            (user && match(gline->gl_user, user) == 0)))
           break;
       }
 #else
-      if (((gline->gl_host && host && ircd_strcmp(gline->gl_host,host) == 0)
+      if (((gline->gl_host && host && match(gline->gl_host,host) == 0)
 	 ||(!gline->gl_host && !host)) &&
 	  ((!user && ircd_strcmp(gline->gl_user, "*") == 0) ||
 	   match(gline->gl_user, user) == 0))

@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-18  Reed Loden  <reed@reedloden.com>
+
+	* include/ircd_reply.h: Removed MAXLEN as it is no longer used.
+
+	* ircd/ircd_reply.c: Replaced MAXLEN with BUFSIZE.
+
+	* ircd/m_account.c: Couple of changes for optimization.
+
+	* ircd/m_invite.c: Miscellaneous whitespacing changes.
+
+	* ircd/s_auth.c: Removed unneeded initialization.
+
+	* ircd/s_conf.c: Replaced RPL_REDIR with RPL_BOUNCE.
+
+	* ircd/s_user.c: Miscellaneous whitespacing changes, replaced
+	sptr with acptr (causes a core otherwise), and attempted to fix 
+	problem with exit_client_msg() with DNSBL.
+
+	* ircd/support.c: Updated header.
+
+	* include/numeric.h, ircd/gline.c, ircd/m_burst.c,
+	ircd/m_trace.c, ircd/s_err.c: Couple of backports of .12 code
+	(and fixes).
+
 2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* README: Added BOPM to list.
@@ -44,8 +68,8 @@
 
 	* ircd/m_account.c: modded LOC code to resolve some bugs with it.
 
-	* patches/loc.srvx2.diff: The changes necessary to our srvx2 to support
-	this. Probably very similar for srvx.
+	* patches/loc.srvx2.diff: The changes necessary to our srvx2 to
+	support this. Probably very similar for srvx.
 
 2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
 
@@ -68,6 +92,8 @@
 	* ircd/channel.c: Removed redundant code.
 
 	* ircd/m_mkpasswd.c: Replaced &me with sptr in error reply.
+
+	* ircd/m_oper.c: Miscellaneous whitespacing change.
 
 	* ircd/s_conf.c: Changed 'O' to "O" to fix warning.
 

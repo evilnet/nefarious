@@ -160,7 +160,7 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   static char hname[HOSTLEN + 1] = "";
   struct blline *blline;
   struct DNSQuery query;
-  int pass = 0, i = 0;
+  int i, pass = 0;
 
   if (!feature_bool(FEAT_DNSBL_CHECKS))
     return 0;

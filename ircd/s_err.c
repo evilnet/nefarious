@@ -46,15 +46,11 @@ static Numeric replyTable[] = {
 /* 008 */
   { RPL_SNOMASK, "%d :: Server notice mask (%#x)", "008" },
 /* 009 */
-  { RPL_STATMEMTOT, "%u %u :Bytes Blocks", "009" },
+  { 0 },
 /* 010 */
   { RPL_REDIR, "%s %s :Please use this Server/Port instead", "010" },
 /* 011 */
-#ifdef MEMSIZESTATS
-  { RPL_STATMEM, "%u %u %s %u", "011" },
-#else
-  { RPL_STATMEM, "%u %u %s", "011" },
-#endif
+  { 0 },
 /* 012 */
   { 0 },
 /* 013 */
@@ -560,7 +556,7 @@ static Numeric replyTable[] = {
 /* 261 */
   { RPL_TRACELOG, "File %s %d", "261" },
 /* 262 */
-  { RPL_TRACEPING, "Ping %s %s", "262" },
+  { RPL_TRACEEND, ":End of TRACE", "262" },
 /* 263 */
   { 0 },
 /* 264 */

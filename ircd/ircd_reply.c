@@ -39,7 +39,7 @@
 #include <string.h>
 
 
-char message[MAXLEN];  /* OUTPUT */
+char message[BUFSIZE + 1];  /* OUTPUT */
 
 /* Report a protocol violation warning to anyone listening.  This can be
  * easily used to cleanup the last couple of parts of the code up.
@@ -129,7 +129,7 @@ extern char *format_dnsbl_msg(char *dnsblip, char *dnsblhost, char *dnsbluser,
     * Copy format to message character by character, inserting any matching
     * data after %.
     */
-   while(format[pos] != '\0' && len < (MAXLEN - 2))
+   while(format[pos] != '\0' && len < (BUFSIZE - 1))
    {
       switch(format[pos])
       {
@@ -158,7 +158,7 @@ extern char *format_dnsbl_msg(char *dnsblip, char *dnsblhost, char *dnsbluser,
                         size = strlen( (char *) table[i].data);
 
                         /* Check if the new string can fit! */
-                        if( (size + len) > (MAXLEN - 1) )
+                        if( (size + len) > BUFSIZE )
                            break;
                         else
                         {

@@ -40,7 +40,5 @@ extern int send_reply(struct Client* to, int reply, ...);
 
 #define SND_EXPLICIT	0x40000000	/* first arg is a pattern to use */
 #define FORMATTYPE_STRING 1
-#define MAXLEN 512 + 1
 
 #endif /* INCLUDED_ircd_reply_h */
-

@@ -884,7 +884,7 @@ int find_csline(struct Client* sptr, const char* mask)
 
   for (csline = GlobalConnStopList; csline; csline = csline->next) {
     if (!match(csline->mask, mask)) {
-      send_reply(sptr, RPL_REDIR, csline->server, csline->port);
+      send_reply(sptr, RPL_BOUNCE, csline->server, csline->port);
       return 1;
     }
   }

@@ -639,12 +639,13 @@ int register_user(struct Client *cptr, struct Client *sptr,
     if (feature_bool(FEAT_DNSBL_CHECKS)) {
       release_dnsbl_reply(sptr);
 
-      if (IsDNSBL(sptr) && (get_client_class(sptr) != feature_int(FEAT_DNSBL_EXEMPT_CLASS)))
-        return exit_client_msg(cptr, sptr, &me, "%s",
-                               format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-                                                cli_user(sptr)->host, cli_username(sptr), 
-                                                cli_name(sptr), cli_dnsblformat(sptr))
-                               );
+      if (IsDNSBL(sptr) &&
+	  (get_client_class(sptr) != feature_int(FEAT_DNSBL_EXEMPT_CLASS)))
+        return exit_client_msg(cptr, cptr, &me, "%s",
+			       format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+						cli_user(sptr)->host, cli_username(sptr), 
+						cli_name(sptr), cli_dnsblformat(sptr))
+			       );
 
 
     }
@@ -1335,7 +1336,7 @@ int hide_hostmask(struct Client *cptr)
   /* Invalidate all bans against the user so we check them again */
   for (chan = (cli_user(cptr))->channel; chan;
        chan = chan->next_channel)
-     ClearBanValid(chan);
+    ClearBanValid(chan);
 
   /* Invalidate all excepts against the user so we check them again */
   for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
@@ -1711,9 +1712,9 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         break;
       case 'A':
         if (what == MODE_ADD)
-          SetAdmin(sptr);
+          SetAdmin(acptr);
         else
-          ClrFlag(sptr, FLAG_ADMIN);
+          ClrAdmin(acptr);
         break;
       case 'o':
         if (what == MODE_ADD) {
@@ -1722,13 +1723,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           SetOper(acptr);
         }
         else {
-          ClrFlag(sptr, FLAG_ADMIN);
+          ClrFlag(acptr, FLAG_ADMIN);
           ClrFlag(acptr, FLAG_OPER);
           ClrFlag(acptr, FLAG_LOCOP);
           if (MyConnect(acptr)) {
             tmpmask = cli_snomask(acptr) & ~SNO_OPER;
             cli_handler(acptr) = CLIENT_HANDLER;
-            cli_oflags(sptr) = 0;
+            cli_oflags(acptr) = NULL;
           }
         }
         break;
@@ -1848,7 +1849,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * Stop users making themselves operators too easily:
    */
   if (!IsServer(cptr)) {
-    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAdmin(sptr)) || !feature_bool(FEAT_OPERFLAGS))
+    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAdmin(acptr)) || !feature_bool(FEAT_OPERFLAGS))
       ClearAdmin(sptr);
     if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
       ClearOper(acptr);
@@ -1905,9 +1906,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
   if (MyConnect(acptr)) {
     if ((FlagHas(&setflags, FLAG_OPER) || FlagHas(&setflags, FLAG_LOCOP)) &&
-        !IsAnOper(acptr)) {
+        !IsAnOper(acptr))
       det_confs_butmask(acptr, CONF_CLIENT & ~CONF_OPS);
-    }
 
     if (SendServNotice(acptr)) {
       if (tmpmask != cli_snomask(acptr))

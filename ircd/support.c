@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, common/support.c
+ * IRC - Internet Relay Chat, ircd/support.c
  * Copyright (C) 1990, 1991 Armin Gruner
  *
  * This program is free software; you can redistribute it and/or modify

@@ -145,7 +145,7 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   /* bad channel name */
-  if ((!IsChannelName(parv[2])) || (HasCntrl(parv[2]))) {
+  if (!IsChannelName(parv[2]) || HasCntrl(parv[2])) {
     send_reply(sptr, ERR_NOSUCHCHANNEL, parv[2]);
     return 0;
   }
@@ -267,6 +267,7 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_reply(sptr, ERR_NOTONCHANNEL, chptr->chname);
     return 0;
   }
+
   if (find_channel_member(acptr, chptr)) {
     send_reply(sptr, ERR_USERONCHANNEL, cli_name(acptr), chptr->chname);
     return 0;
@@ -276,7 +277,7 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   if (MyConnect(acptr))
-      add_invite(acptr, chptr);
+    add_invite(acptr, chptr);
 
   if (feature_bool(FEAT_ANNOUNCE_INVITES)) {
     sendcmdto_channel_butserv_butone(&me, get_error_numeric(RPL_ISSUEDINVITE)->str,
