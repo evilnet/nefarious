@@ -4,6 +4,8 @@
 
 	* ircd/m_ircops.c: Formatting changes.
 
+	* ircd/ircd_relay.c: Oops... block NOTICES, not PRIVMSGS. :p
+
 2003-09-29  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_user.c: Send out a connexit notice for the

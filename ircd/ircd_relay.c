@@ -77,11 +77,6 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
       check_target_limit(sptr, chptr, chptr->chname, 0))
     return;
 
-  if ((chptr->mode.mode & MODE_NONOTICE)) { 
-    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname); 
-    return; 
-  } 
-
   /* +cC checks */
   if (chptr->mode.mode & MODE_NOCOLOUR)
     for (ch=text;*ch;ch++)
@@ -121,6 +116,11 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
   if ((chptr->mode.mode & MODE_NOPRIVMSGS) &&
       check_target_limit(sptr, chptr, chptr->chname, 0))
     return;  
+
+  if ((chptr->mode.mode & MODE_NONOTICE)) {
+    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+    return;
+  }
 
   /* +cC checks */
   if (chptr->mode.mode & MODE_NOCOLOUR)
