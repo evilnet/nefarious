@@ -51,6 +51,7 @@
 #include "sys.h"
 #include "whowas.h"
 
+#include <arpa/inet.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
