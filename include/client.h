@@ -109,7 +109,7 @@ enum Priv {
 #define _PRIV_NBITS		(8 * sizeof(unsigned long))
 
 #define _PRIV_IDX(priv)		((priv) / _PRIV_NBITS)
-#define _PRIV_BIT(priv)		(1 << ((priv) % _PRIV_NBITS))
+#define _PRIV_BIT(priv)		(1UL << ((priv) % _PRIV_NBITS))
 
 struct Privs {
   unsigned long priv_mask[(PRIV_LAST_PRIV + _PRIV_NBITS - 1) / _PRIV_NBITS];

@@ -3,6 +3,8 @@
 
 2004-11-14  Neil Spierling  <sirvulcan@gmail.com>
 
+	* include/client.h: Fix for 64bit systems, from QuakeNet.
+
 	* ircd/channel.c: Fixed a reply issue with ACCCHAN (+M).
 
 2004-11-01  Neil Spierling  <sirvulcan@gmail.com>
