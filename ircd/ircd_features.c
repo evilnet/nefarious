@@ -234,7 +234,7 @@ static struct FeatureDesc {
   /* Misc. features */
   F_N(LOG, FEAT_MYOPER, feature_log_set, feature_log_reset, feature_log_get,
       0, log_feature_unmark, log_feature_mark, log_feature_report),
-  F_S(DOMAINNAME, 0, "ChatterNet.Org", 0),
+  F_S(DOMAINNAME, 0, "AbleNET.org", 0),
   F_B(RELIABLE_CLOCK, 0, 0, 0),
   F_I(BUFFERPOOL, 0, 27000000, 0),
   F_B(HAS_FERGUSON_FLUSHER, 0, 0, 0),
@@ -253,7 +253,7 @@ static struct FeatureDesc {
   F_S(DEFAULT_LIST_PARAM, FEAT_NULL, 0, list_set_default),
   F_I(NICKNAMEHISTORYLENGTH, 0, 800, whowas_realloc),
   F_B(HOST_HIDING, 0, 1, 0),
-  F_S(HIDDEN_HOST, FEAT_CASE, "Users.ChatterNet.Org", 0),
+  F_S(HIDDEN_HOST, FEAT_CASE, "Users.AbleNET.org", 0),
   F_S(HIDDEN_IP, 0, "127.0.0.1", 0),
   F_B(AUTOHIDE, 0, 1, 0),
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
@@ -376,13 +376,13 @@ static struct FeatureDesc {
   F_B(HIS_REWRITE, 0, 1, 0),
   F_I(HIS_REMOTE, 0, 1, 0),
   F_B(HIS_NETSPLIT, 0, 1, 0),
-  F_S(HIS_SERVERNAME, 0, "*.ChatterNet.Org", 0),
-  F_S(HIS_SERVERINFO, 0, "The ChatterNet ChatterWorld", 0),
-  F_S(HIS_URLSERVERS, 0, "http://www.ChatterNet.Org/servers.php", 0),
+  F_S(HIS_SERVERNAME, 0, "*.AbleNET.org", 0),
+  F_S(HIS_SERVERINFO, 0, "The AbleNET AbleWorld", 0),
+  F_S(HIS_URLSERVERS, 0, "http://www.AbleNET.org/servers.php", 0),
 
   /* Misc. random stuff */
-  F_S(NETWORK, 0, "ChatterNet", 0),
-  F_S(URL_CLIENTS, 0, "http://www.ChatterNet.Org/clients.php", 0),
+  F_S(NETWORK, 0, "AbleNET", 0),
+  F_S(URL_CLIENTS, 0, "http://www.AbleNET.org/clients.php", 0),
 
 #undef F_S
 #undef F_B

@@ -82,7 +82,7 @@ const char *infotext[] = {
     "The current head developer of the u2.10 source tree is:",
     "Bleep        Thomas Helvey            <tomh@inxpress.net>",
     "",
-    "Modifications for evilnet (IRC.ChatterNet.Org):",
+    "Modifications for evilnet (IRC.AbleNET.org):",
     "reed	  Reed Loden		   <reed@reedloden.com>",
     "Math	  Mathieu Rene		   <math@rootservices.net>",
     "",
