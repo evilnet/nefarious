@@ -96,6 +96,7 @@
 #include "s_misc.h"
 #include "s_user.h"
 #include "send.h"
+#include "gline.h"
 #include "sys.h"
 
 #include <assert.h>
@@ -181,6 +182,13 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_reply(sptr, ERR_ERRONEUSNICKNAME, arg);
     return 0;
   }
+
+#ifdef NICKGLINES
+  if (IsRegistered(sptr) && !IsAnOper(sptr) && IsNickGlined(sptr, nick)) {
+    send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+    return 0;
+  }
+#endif
 
   /* 
    * Check if this is a LOCAL user trying to use a reserved (Juped)

@@ -1,4 +1,4 @@
-GLINE documentation, last updated on 18 Mar 2000
+GLINE documentation, last updated on 8 April 2004
 
 For an ordinary user, the syntax is:
 
@@ -10,7 +10,7 @@ an error is returned.
 
 For an operator, the syntax is:
 
-  GLINE [[!][+|-]<mask> [[<target>] <expiration> :<reason>]]
+  GLINE [[!][+|-][$<type>]<mask> [[<target>] <expiration> :<reason>]]
 
 If <mask> is not given, or if it is not prefixed by "+" or "-", the
 operation is exactly the same as if it were issued by an ordinary
@@ -26,7 +26,12 @@ attempt is made to modify a G-line set by a U-lined service such as
 Uworld, the change will be forced to be local.  If the mask would not
 be permitted due to it being too wide or affecting too many users
 (governed by the GLINEMAXUSERCOUNT feature), the "!" prefix may be
-used to force the G-line to be set anyway.
+used to force the G-line to be set anyway. The <type> argument can
+be used to G-line user Realnames by using $R. For example
+
+  GLINE +$R*sub7* local.server 123456 :infected with sub7
+
+This would G-line all users that have "sub7" in their realnames.
 
 If the G-line does not already exist, it is created. The <target>
 parameter is used to select whether the G-line is only to apply to a
@@ -36,16 +41,16 @@ server.  This could be useful if a single particular link is having
 problems, for instance.  The <expiration> parameter is a number of
 seconds, not to exceed 7 days, for the G-line to exist.  The <reason>
 argument is mandatory and should describe why this particular G-line
-was placed.  The <mask> parameter must be a user@host mask; the host
-component must contain at least 2 non-wildcarded subdomains or, if it
-is an IP address, at least 16 bits.  Normally, the host component may
-not contain *any* wildcards, but that can be overridden with the "!"
-prefix, as indicated above, if the operator has the WIDE_GLINE
-privilege.
+was placed.  The <mask> parameter must be a nick!user@host mask. The
+nick part is optional, a user@host mask will work. The host component
+must contain at least 2 non-wildcarded subdomains or, if it is an IP
+address, at least 16 bits.  Normally, the host component may not contain
+*any* wildcards, but that can be overridden with the "!" prefix, as
+indicated above, if the operator has the WIDE_GLINE privilege.
 
 For a server, the syntax is:
 
-  <prefix> GL <target> (+|-)<mask> <expiration> <lastmod> :<reason>
+  <prefix> GL <target> (+|-)[$<type>]<mask> <expiration> <lastmod> :<reason>
 
 The <target> may be a server numeric or the character "*", for a
 globally scoped G-line.  The <mask> argument is a server name, and
@@ -56,7 +61,9 @@ used for versioning.  Since GLINEs are propagated during netbursts,
 there must be some way of resolving conflicting states, which is the
 reason for this argument, and is also the reason G-lines cannot be
 deleted, only deactivated.  The <reason> parameter indicates the
-reason the G-line was placed.
+reason the G-line was placed. The <type> arguement is the same as
+a normal G-line done by a opers (See second paragraph from top). Nicks
+can also be G-lined via the mask just like norml G-Lines done by opers
 
 If a GLINE is received with a <target> of "*", any G-lines with local
 scope are deleted, in preference for the globally scoped version.  If

@@ -1,3 +1,43 @@
+2004-06-06  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* configure.in: Added --disable/enable-nickglines, Used through out the ircd
+			 in ifdef's.
+
+	* configure: Reran autoconf.
+
+	* config.h.in: Added NICKGLINES.
+
+	* doc/example.conf: Added F:Line for BADCHAN_REASON.
+
+	* doc/readme.gline: Nickgline documentation included.
+
+	* include/gline.h: Added nessecary declarations etc for
+	  Nick Glines.
+
+	* include/ircd_features.h: Added FEAT_BADCHAN_REASON.
+
+	* ircd/gline.c: Added Nick Glines.
+			Stats G will now display Badchans, Realname
+			 glines aswell as normal glines (just like GLINE
+			 (with no parameters).
+			Added FEAT_BADCHAN_REASON, allows admins to specify
+			 the reason given in a kick message on users when a channel
+			 badchanneled.
+                         Eg user was kicked by server (This Channel Is Banned (oper reason)
+                         The "This Channel Is Banned" bit is customizable via FEAT_BADCHAN_REASON.
+
+	* include/ircd_features.c: Added FEAT_BADCHAN_REASON.
+
+	* ircd/m_nick.c: Nickgline stuff added- dont let normal users
+	  use glined nicks.
+
+	* ircd/s_users.c: Nickgline stuff added- dont let normal users use
+	 glined nicks.
+
+	* ircd/whocmds.c: Nickgline stuff added.
+
+	* ircd/m_sethost.c: Fixed a small bug in sethost (fix from asuka cvs).
+
 2004-06-04  Reed Loden  <reed@reedloden.com>
 
 	* Corrected all warnings.

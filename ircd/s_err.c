@@ -526,7 +526,11 @@ static Numeric replyTable[] = {
 /* 246 */
   { RPL_STATSTLINE, "%c %s %s", "246" },
 /* 247 */
+#ifdef NICKGLINES
+  { RPL_STATSGLINE, "%c %s%s%s%s%s %Tu :%s", "247" },
+#else
   { RPL_STATSGLINE, "%c %s%s%s %Tu :%s", "247" },
+#endif
 /* 248 */
   { RPL_STATSULINE, "%c %s %s %s %d %d", "248" },
 /* 249 */
@@ -592,7 +596,11 @@ static Numeric replyTable[] = {
 /* 279 */
   { 0 },
 /* 280 */
+#ifdef NICKGLINES
+  { RPL_GLIST, "%s%s%s%s%s %Tu %s %c :%s", "280" },
+#else
   { RPL_GLIST, "%s%s%s %Tu %s %c :%s", "280" },
+#endif
 /* 281 */
   { RPL_ENDOFGLIST, ":End of G-line List", "281" },
 /* 282 */

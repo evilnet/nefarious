@@ -91,6 +91,9 @@
 /* Define to be the maximum number of network connections */
 #undef MAXCONNECTIONS
 
+/* Define for nickname glines to be enabled */
+#undef NICKGLINES
+
 /* Key 1 used for crypting hostnames under host hiding syle 2. */ 
 #undef KEY
 

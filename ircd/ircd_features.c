@@ -425,6 +425,7 @@ static struct FeatureDesc {
   F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #Nefarious", 0),
   F_B(QUOTES, 0, 0, 0),
   F_B(POLICY_NOTICE, 0, 1, 0),
+  F_S(BADCHAN_REASON, 0, "This Channel Has Been Banned", 0),
   F_B(RULES, 0, 0, 0),
   F_B(OPERMOTD, 0, 0, 0),
 

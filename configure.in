@@ -325,6 +325,19 @@ if test x"$unet_cv_enable_inlines" = xyes; then
     AC_DEFINE([FORCEINLINE], , [Force inlining for a few critical functions])
 fi
 
+dnl Now check for --enable-nickglines
+AC_MSG_CHECKING([whether to enable nickname glines])
+AC_ARG_ENABLE([nickglines],
+[  --enable-nickglines     Enable nickglines],
+[unet_cv_enable_nickglines=$enable_nickglines],
+[AC_CACHE_VAL(unet_cv_enable_nickglines,
+[unet_cv_enable_nickglines=no])])
+AC_MSG_RESULT([$unet_cv_enable_nickglines])
+
+if test x"$unet_cv_enable_nickglines" = xyes; then
+    AC_DEFINE([NICKGLINES], , [Nickname glines.])
+fi
+
 dnl Now check for --with-cloakone
 AC_MSG_CHECKING([for custom cloak key one])
 AC_ARG_WITH([cloakone],
@@ -362,6 +375,7 @@ AC_ARG_WITH([cloakthree],
 AC_MSG_RESULT([$unet_cv_with_cloakthree (random if unspecified)])
 AC_DEFINE_UNQUOTED(KEY3, $unet_cv_with_cloakthree,
 [Third key used for crypting hostnames under host hiding syle 2 (random if not given).])
+
 
 
 dnl **
