@@ -27,6 +27,7 @@
 #include <sys/uio.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>  
 
 #include "config.h" 

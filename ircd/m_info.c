@@ -83,7 +83,6 @@
 
 #include "client.h"
 #include "ircd.h"
-#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
@@ -110,9 +109,6 @@ int m_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (hunt_server_cmd(sptr, CMD_INFO, cptr, 1, ":%C", 1, parc, parv) !=
       HUNTED_ISME)
 	return 0;
-
-  if (feature_bool(FEAT_HIS_STATS_u) && !IsAnOper(sptr))
-      return 0;
 
   while (text[2])
   {
@@ -144,9 +140,6 @@ int ms_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (hunt_server_cmd(sptr, CMD_INFO, cptr, 1, ":%C", 1, parc, parv) !=
       HUNTED_ISME)
     return 0;
-
-  if (feature_bool(FEAT_HIS_STATS_u) && !IsAnOper(sptr))
-      return 0;
 
   while (text[2])
   {
@@ -201,4 +194,3 @@ int mo_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   }
   return 0;
 }
-
