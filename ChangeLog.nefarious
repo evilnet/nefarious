@@ -1492,5 +1492,5 @@
 
 */
 
-#define CVS_VERSION "$Id$"
+#define CVS_VERSION "$Revision$"
 
