@@ -53,6 +53,9 @@
  */
 int m_rules(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  if (!feature_bool(FEAT_CMD_RULES))
+    return 0;
+
   if (hunt_server_cmd(sptr, CMD_RULES, cptr, feature_int(FEAT_HIS_REMOTE),
 		      "%C", 1, parc, parv) != HUNTED_ISME)
     return 0;

@@ -53,6 +53,9 @@
  */
 int m_opermotd(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  if (!feature_bool(FEAT_CMD_OPERMOTD))
+    return 0;
+
   if (!IsAnOper(sptr)) {
       send_reply(sptr, ERR_NOPRIVILEGES);
       return 0;

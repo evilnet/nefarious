@@ -223,7 +223,8 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr),
 			 IsOper(sptr) ? 'O' : 'o');
 
-    opermotd_send(sptr);
+    if (feature_bool(FEAT_CMD_OPERMOTD))
+      opermotd_send(sptr);
 
     log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#R)", name, sptr);
   return 0;

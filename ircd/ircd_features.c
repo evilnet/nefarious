@@ -391,9 +391,9 @@ static struct FeatureDesc {
 
   /* Nefarious features */
   F_B(NEFARIOUS, FEAT_NODISP, 0, 0),
-  F_S(OMPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.opermotd", 0),
-  F_S(QPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.quotes", 0),
-  F_S(EPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.rules", 0),
+  F_S(OMPATH, FEAT_CASE | FEAT_MYOPER, "ircd.opermotd", 0),
+  F_S(QPATH, FEAT_CASE | FEAT_MYOPER, "ircd.quotes", 0),
+  F_S(EPATH, FEAT_CASE | FEAT_MYOPER, "ircd.rules", 0),
   F_B(OPERHOST_HIDING, 0, 1, 0),
   F_S(HIDDEN_OPERHOST, FEAT_CASE, "Staff.Nefarious", 0),
   F_B(TOPIC_BURST, 0, 1, 0),
@@ -420,6 +420,10 @@ static struct FeatureDesc {
   F_B(AUTOJOIN, 0, 0, 0),
   F_B(AUTOJOIN_NOTICE, 0, 1, 0),
   F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #Nefarious", 0),
+  F_B(QUOTES, 0, 1, 0),
+  F_B(POLICY_NOTICE, 0, 1, 0),
+  F_B(CMD_RULES, 0, 1, 0),
+  F_B(CMD_OPERMOTD, 0, 1, 0),
 
 #undef F_S
 #undef F_B

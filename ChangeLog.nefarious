@@ -1,3 +1,21 @@
+2004-02-16  Neil Spierling  <sirvulcan@sirvulcan.org>
+
+	* doc/example.conf: Updated with new F:Lines.
+
+	* include/ircd_features.c: Updated with new F:Line (see below).
+
+        * ircd/ircd_features.c: Added FEAT_QUOTES, FEAT_POLICY_NOTICE,
+       				  FEAT_CMD_RULES, and FEAT_CMD_OPERMOTD.
+				Took read only status off a new path F:Lines.
+
+	* ircd/m_oper: FEAT_CMD_OPERMOTD support added.
+
+	* ircd/m_opermotd: FEAT_CMD_OPERMOTD support added.
+
+	* ircd/m_rules.c: FEAT_CMD_RULES support added.
+
+	* ircd/s_user.c FEAT_QUOTES and FEAT_POLICY_NOTICE support added.
+
 2004-02-15  Reed Loden  <reed@reedloden.com>
 
 	* More work on merging BoxenIRCu and evilnet IRCu including 

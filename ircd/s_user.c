@@ -596,7 +596,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
     send_reply(sptr, RPL_MYINFO, cli_name(&me), version, infousermodes,
 	       infochanmodes, infochanmodeswithparams);
     send_supported(sptr);
-    m_randquote(sptr, sptr, 1, parv);
+    if (feature_bool(FEAT_QUOTES))
+      m_randquote(sptr, sptr, 1, parv);
+
     m_lusers(sptr, sptr, 1, parv);
     update_load();
     motd_signon(sptr);
@@ -668,7 +670,12 @@ int register_user(struct Client *cptr, struct Client *sptr,
     if (cli_snomask(sptr) != SNO_DEFAULT && HasFlag(sptr, FLAG_SERVNOTICE))
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
 
-    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2 and \2/RULES\2", sptr, feature_str(FEAT_NETWORK));
+    if (feature_bool(FEAT_POLICY_NOTICE)) {
+      if (feature_bool(FEAT_CMD_RULES))
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2 and \2/RULES\2", sptr, feature_str(FEAT_NETWORK));
+      else
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2", sptr, feature_str(FEAT_NETWORK));
+    }
 
     if (feature_bool(FEAT_AUTOJOIN)) {
       if (feature_bool(FEAT_AUTOJOIN_NOTICE)) {
