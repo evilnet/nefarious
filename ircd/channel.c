@@ -713,6 +713,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
   if (chptr->mode.mode & MODE_NOPRIVMSGS)
     *mbuf++ = 'n';
   if (chptr->mode.mode & MODE_REGONLY)
+    *mbuf++ = 'R';
+  if (chptr->mode.mode & MODE_REGISTERED)
     *mbuf++ = 'r';
   if (chptr->mode.mode & MODE_NOCOLOUR)
     *mbuf++ = 'c';
@@ -1358,13 +1360,14 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_TOPICLIMIT,	't',
     MODE_INVITEONLY,	'i',
     MODE_NOPRIVMSGS,	'n',
-    MODE_REGONLY,	'r',
-    MODE_DELJOINS,       'D',
+    MODE_REGONLY,	'R',
+    MODE_REGISTERED,	'r',
+    MODE_DELJOINS,	'D',
 /*  MODE_KEY,		'k', */
 /*  MODE_BAN,		'b', */
 /*  MODE_LIMIT,		'l', */
-    MODE_NOCOLOUR,      'c',
-    MODE_NOCTCP,        'C',
+    MODE_NOCOLOUR,	'c',
+    MODE_NOCTCP,	'C',
     0x0, 0x0
   };
   int i;
@@ -1723,7 +1726,7 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
 
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
-	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_DELJOINS );
+	   MODE_REGISTERED | MODE_NOCOLOUR | MODE_NOCTCP | MODE_DELJOINS);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1826,10 +1829,11 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_KEY,		'k',
 /*  MODE_BAN,		'b', */
     MODE_LIMIT,		'l',
-    MODE_REGONLY,	'r',
-    MODE_NOCOLOUR,      'c',
-    MODE_NOCTCP,        'C',
-    MODE_DELJOINS,      'D',
+    MODE_REGONLY,	'R',
+    MODE_REGISTERED,	'r',
+    MODE_NOCOLOUR,	'c',
+    MODE_NOCTCP,	'C',
+    MODE_DELJOINS,	'D',
     0x0, 0x0
   };
   unsigned int add;
@@ -2487,10 +2491,11 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_KEY,		'k',
     MODE_BAN,		'b',
     MODE_LIMIT,		'l',
-    MODE_REGONLY,	'r',
-    MODE_NOCOLOUR,      'c',
-    MODE_NOCTCP,        'C',
-    MODE_DELJOINS,      'D',
+    MODE_REGONLY,	'R',
+    MODE_REGISTERED,	'r',
+    MODE_NOCOLOUR,	'c',
+    MODE_NOCTCP,	'C',
+    MODE_DELJOINS,	'D',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0

@@ -158,7 +158,7 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /* Does the channel exist */
     if (!IsChannelName(name) || !(chptr = FindChannel(name)))
     {
-    	send_reply(sptr,ERR_NOSUCHCHANNEL,name);
+    	send_reply(sptr, ERR_NOSUCHCHANNEL, name);
     	continue;
     }
     member=find_channel_member(sptr, chptr);
@@ -228,14 +228,14 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /* Does the channel exist */
     if (!IsChannelName(name) || !(chptr = FindChannel(name)))
     {
-    	send_reply(sptr,ERR_NOSUCHCHANNEL,name);
+    	send_reply(sptr, ERR_NOSUCHCHANNEL, name);
     	continue;
     }
 
     /* Ignore requests for local channel topics from remote servers */
     if (IsLocalChannel(name) && !MyUser(sptr))
     {
-      protocol_violation(sptr,"Topic request");
+      protocol_violation(sptr, "Topic request");
       continue;
     }
 

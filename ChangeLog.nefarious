@@ -7,8 +7,16 @@
 
 	* ircd/m_oper.c: Changed "No O: Lines" to "No O:line".
 
-	* Add an edited version of OUTsider's botservice patch for use
-	on Bots.*.
+	* Added an edited version of OUTsider's botservice patch for
+	use on Bots.*.
+
+	* Renamed +r (REGONLY) to +R.
+
+	* Added MODE_REGISTERED (+r) for when services are moved off
+	of channels.
+
+	* Removed SVSNICK since it's not what I have in mind. The
+	new cloaking system will be started on soon.
 
 2003-01-14  Mathieu Rene  <math@rootservices.net>
 

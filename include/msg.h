@@ -355,10 +355,6 @@ struct Client;
 #define TOK_PRIVS		"PRIVS"
 #define CMD_PRIVS		MSG_PRIVS, TOK_PRIVS
 
-#define MSG_SVSNICK		"SVSNICK"	/* SVSN */
-#define TOK_SVSNICK		"SN"
-#define CMD_SVSNICK		MSG_SVSNICK, TOK_SVSNICK
-
 /*
  * Constants
  */

@@ -213,7 +213,6 @@ extern int ms_set(struct Client*, struct Client*, int, char*[]);
 extern int ms_silence(struct Client*, struct Client*, int, char*[]);
 extern int ms_squit(struct Client*, struct Client*, int, char*[]);
 extern int ms_stats(struct Client*, struct Client*, int, char*[]);
-extern int ms_svsnick(struct Client*, struct Client*, int, char*[]);
 extern int ms_topic(struct Client*, struct Client*, int, char*[]);
 extern int ms_trace(struct Client*, struct Client*, int, char*[]);
 extern int ms_uping(struct Client*, struct Client*, int, char*[]);
