@@ -3,6 +3,12 @@
 
 2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: typo fix.
+
+	* ircd/ircd_features.c: typo fix.
+
+2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Added FEAT_MAX_CHECK_OUTPUT.
 
 	* include/ircd_features.h: Added FEAT_MAX_CHECK_OUTPUT.
