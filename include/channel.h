@@ -111,6 +111,7 @@ struct Client;
 #define MODE_FREE		0x1000000 /* string needs to be passed to MyFree() */
 #define MODE_BURSTADDED		0x2000000 /* channel was created by a BURST */
 #define MODE_EXCEPT		0x4000000
+#define MODE_ADMINONLY		0x8000000 /* admin only */
 
 /*
  * mode flags which take another parameter (With PARAmeterS)

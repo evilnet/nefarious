@@ -421,6 +421,7 @@ extern const struct Numeric* get_error_numeric(int err);
 
 #define ERR_BADCHANNAME      479        /* EFNet extension */
                                         /* 479 Undernet extension badchan */
+#define ERR_ADMINONLYCHAN    480	/* Nefarious extension */
 /*	ERR_CANNOTKNOCK	     480	unreal */
 /*	ERR_NOULINE	     480	austnet */
 #define ERR_NOPRIVILEGES     481

@@ -3,6 +3,23 @@
 
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
+	* include/channel.h: Added MODE_ADMINONLY.
+
+	* include/numeric.h: Added ERR_ADMINONLYCHAN.
+
+	* include/supported.h: Added A to channel mode string.
+
+	* ircd/channel.c: Added MODE_ADMINONLY, only allow admins to
+	set it and admins can only join +A channels.
+
+	* ircd/m_burst.c: MODE_ADMINONLY added for net rider checks.
+
+	* ircd/m_join.c: Small addition for MODE_ADMINONLY.
+
+	* ircd/s_err.c: See supported.h entry.
+
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/m_whois.c: Small bug fix, display +s channels for opers
 	now in WHOIS's (prefixed with *).
 

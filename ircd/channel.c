@@ -942,6 +942,7 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
     if ((chptr->mode.mode & (MODE_NOPRIVMSGS|MODE_MODERATED)) ||
 	((chptr->mode.mode & MODE_REGONLY) && !IsAccount(cptr)) ||
 	((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(cptr)) ||
+	((chptr->mode.mode & MODE_ADMINONLY) && !IsAnAdmin(cptr)) ||
 	((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(cptr)))
       return 0;
     else
@@ -1017,6 +1018,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'N';
   if (chptr->mode.mode & MODE_OPERONLY)
     *mbuf++ = 'O';
+  if (chptr->mode.mode & MODE_OPERONLY)
+    *mbuf++ = 'A';
   if (chptr->mode.mode & MODE_NOQUITPARTS)
     *mbuf++ = 'Q';
   if (chptr->mode.mode & MODE_SSLONLY)
@@ -1419,6 +1422,10 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
      (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_OPERONLYCHAN; 
 
+  if ((chptr->mode.mode & MODE_ADMINONLY) && !IsAnAdmin(sptr) && ((keyv == 0) ||
+     (!feature_bool(FEAT_FLEXABLEKEYS))))
+        return overrideJoin + ERR_ADMINONLYCHAN;
+
   if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
 	return overrideJoin + ERR_SSLONLYCHAN;
 
@@ -1764,6 +1771,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
+    MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'z',
     MODE_NOAMSG,	'T',
@@ -2148,7 +2156,7 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
 	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
 	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
-	   MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES);
+	   MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES | MODE_ADMINONLY);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -2265,6 +2273,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
+    MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'z',
     MODE_NOAMSG,	'T',
@@ -3233,6 +3242,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
+    MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'z',
     MODE_NOAMSG,	'T',
@@ -3348,6 +3358,15 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	}
 	break;
+
+      case 'A': /* deal with admin only */
+        /* If they're not an oper, they can't +/- MODE_OPERONLY. */
+        if ((IsAnAdmin(sptr) && feature_bool(FEAT_OPERLEVELS)) || IsServer(sptr)) {
+          mode_parse_mode(&state, flag_p);
+        } else {
+          send_reply(sptr, ERR_NOPRIVILEGES);
+        }
+        break;
 
       case 'z': /* deal with SSL only */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */

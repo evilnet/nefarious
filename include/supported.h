@@ -68,7 +68,7 @@
 			"(ohv)@%+", "@%+", "b,e,k,l,cimnprstzCLMNOQST", \
 			"rfc1459", feature_str(FEAT_NETWORK)
 
-#define infochanmodes "bcehiklmnoprstvzCLMNOQST"
+#define infochanmodes "AbcehiklmnoprstvzCLMNOQST"
 #define clearchanmodes "bcehiklmoprsvzCLMNOQST" /* ditto except for +nt */
 #define infochanmodeswithparams "behklov"
 #define infousermodes "AdfghiknoswxBIRX"

@@ -261,6 +261,10 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    i = 'O';
 	    break;
 
+	  case ERR_ADMINONLYCHAN:
+	    i = 'A';
+	    break;
+
 	  case ERR_SSLONLYCHAN:
 	    i = 'z';
 	    break;

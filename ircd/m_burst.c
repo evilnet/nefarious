@@ -133,6 +133,9 @@ netride_modes(int parc, char **parv, const char *curr_key)
     case 'O':
       result |= MODE_OPERONLY;
       break;
+    case 'A':
+      result |= MODE_ADMINONLY;
+      break;
     }
   }
   return result;
@@ -219,7 +222,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
               && (!(check_modes & MODE_INVITEONLY) || IsAnOper(member->user))
               && (!(check_modes & MODE_REGONLY) || IsAccount(member->user))
               && (!(check_modes & MODE_SSLONLY) || IsSSL(member->user))
-              && (!(check_modes & MODE_OPERONLY) || IsAnOper(member->user)))
+              && (!(check_modes & MODE_OPERONLY) || IsAnOper(member->user))
+              && (!(check_modes & MODE_ADMINONLY) || IsAnAdmin(member->user)))
             continue;
           sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Net Rider", chptr, member->user);
           sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, 0, "%H %C :Net Rider", chptr, member->user);
@@ -253,7 +257,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 			  MODE_NOPRIVMSGS | MODE_REGONLY | MODE_NOCOLOUR |
 			  MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
 			  MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
-			  MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES);
+			  MODE_STRIP | MODE_NOAMSG | MODE_NOLISTMODES |
+			  MODE_ADMINONLY);
 
     parse_flags |= (MODE_PARSE_SET | MODE_PARSE_WIPEOUT); /* wipeout keys */
 
