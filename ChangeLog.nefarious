@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* ircd/m_oper.c: Bug fix, allow an oper to "remote oper" on the server
+	he/she is on (user on irc.abc.com, /oper irc.abc.com user pass).
 
 2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
 
