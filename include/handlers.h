@@ -224,6 +224,7 @@ extern int ms_silence(struct Client*, struct Client*, int, char*[]);
 extern int ms_squit(struct Client*, struct Client*, int, char*[]);
 extern int ms_stats(struct Client*, struct Client*, int, char*[]);
 extern int ms_svsjoin(struct Client*, struct Client*, int, char*[]);
+extern int ms_svsnoop(struct Client*, struct Client*, int, char*[]);
 extern int ms_svspart(struct Client*, struct Client*, int, char*[]);
 extern int ms_topic(struct Client*, struct Client*, int, char*[]);
 extern int ms_trace(struct Client*, struct Client*, int, char*[]);

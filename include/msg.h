@@ -386,6 +386,10 @@ struct Client;
 #define TOK_RULES		"RL"
 #define CMD_RULES		MSG_RULES, TOK_RULES
 
+#define MSG_SVSNOOP             "SVSNOOP"
+#define TOK_SVSNOOP             "SO"
+#define CMD_SVSNOOP             MSG_SVSNOOP, TOK_SVSNOOP
+
 /*
  * Constants
  */

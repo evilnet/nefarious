@@ -14,7 +14,9 @@
 
 	* ircd/m_rules.c: FEAT_CMD_RULES support added.
 
-	* ircd/s_user.c FEAT_QUOTES and FEAT_POLICY_NOTICE support added.
+	* ircd/m_svsnoop.c: Services only command, can completly disable all O:Lines.
+
+	* ircd/s_user.c: FEAT_QUOTES and FEAT_POLICY_NOTICE support added.
 
 2004-02-15  Reed Loden  <reed@reedloden.com>
 
