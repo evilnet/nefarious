@@ -359,14 +359,15 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
 
   listener = make_listener(port, vaddr);
 
+  set_listener_mask(listener, mask);
+  listener->hidden = is_hidden;
+  listener->server = is_server;
+#ifdef USE_SSL
+  listener->ssl = is_ssl;
+#endif /* USE_SSL */
+
   if (inetport(listener)) {
     listener->active = 1;
-    set_listener_mask(listener, mask);
-    listener->hidden = is_hidden;
-    listener->server = is_server;
-#ifdef USE_SSL
-    listener->ssl = is_ssl;
-#endif /* USE_SSL */
     listener->next   = ListenerPollList;
     ListenerPollList = listener; 
   }

@@ -3,6 +3,10 @@
 
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
+	* Undernet sync.
+
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/channel.h: Added MODE_ADMINONLY.
 
 	* include/numeric.h: Added ERR_ADMINONLYCHAN.
