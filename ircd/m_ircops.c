@@ -113,7 +113,6 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
 
   ircd_snprintf(0, buf, sizeof(buf), "Total: %d IRCop%s connected",
 		ircops, (ircops != 1) ? "s" : "");
-  send_reply(sptr, SND_EXPLICIT | RPL_IRCOPSHEADER, buf);
-  send_reply(sptr, RPL_ENDOFIRCOPS);
+  send_reply(sptr, RPL_ENDOFIRCOPS, buf);
   return 0;
 }

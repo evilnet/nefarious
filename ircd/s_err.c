@@ -808,7 +808,7 @@ static Numeric replyTable[] = {
 /* 387 */
   { RPL_IRCOPS, ":%s", "387" },
 /* 388 */
-  { RPL_ENDOFIRCOPS, ":End of /IRCOPS list.", "388" },
+  { RPL_ENDOFIRCOPS, ":%s", "388" },
 /* 389 */
   { 0 },
 /* 390 */
