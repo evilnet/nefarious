@@ -14,6 +14,8 @@
 
 	* tools/linesync/linesync.conf: Add 'F' to ALLOWED_LINES.
 
+	* Sync with u2.10.11.07(pre1) as per 2004-06-08.
+
 2004-06-07  Reed Loden  <reed@reedloden.com>
 
 	* ChangeLog.nefarious: Correct a couple of things.
