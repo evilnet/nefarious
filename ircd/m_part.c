@@ -85,6 +85,7 @@
 #include "client.h"
 #include "hash.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "numeric.h"
@@ -137,6 +138,9 @@ int m_part(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     }
 
     assert(!IsZombie(member)); /* Local users should never zombie */
+
+    if (!IsOper(sptr) && feature_bool(FEAT_SPAMBOT_CHECKS))
+      check_spambot_warning(sptr, NULL);
 
     joinbuf_join(&parts, chptr, /* part client from channel */
 		 member_can_send_to_channel(member) ? 0 : CHFL_BANNED);

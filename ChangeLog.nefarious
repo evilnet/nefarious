@@ -1,3 +1,28 @@
+2004-06-17  Neil Spierling <vulcan@linux-boxen.org>
+
+	* README: Updated my email address + bumped date.
+
+	* doc/example.conf: Added feature SPAMBOT_CHECKS, defaults to TRUE.
+
+	* include/channel.h: Added spambot check settings, will look into making
+	some of these F:Lines at some point.
+
+	* include/client.h: Stuff for spambot checks added into the Client structure.
+
+	* include/ircd_features.h: Added feature SPAMBOT_CHECKS.
+
+	* ircd/channel.c: Added main function for the spam bot checks. RFE 972232. Note,
+	this patch was written by Diane Bruce <db@db.net>.
+
+	* ircd/ircd_features.c: Added feature SPAMBOT_CHECKS, defaults to TRUE.
+
+	* ircd/m_join.c: Bump up the counts for the spambot checks.
+
+	* ircd/m_nick.c: Unrelated change, remove a var not in use.
+
+	* ircd/m_part.c: If SPAMBOT_CHECKS is TRUE and the client isnt an oper then
+	check for spambot warnings.
+
 2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/s_user.c: Only send the cipher notice to SSL users only!

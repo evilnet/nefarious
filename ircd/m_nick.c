@@ -148,7 +148,6 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char*          arg;
   char*          s;
   const char*    client_name;
-  char*          n;
 
   assert(0 != cptr);
   assert(cptr == sptr);

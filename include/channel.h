@@ -400,4 +400,41 @@ extern void joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan,
 			 unsigned int flags);
 extern int joinbuf_flush(struct JoinBuf *jbuf);
 
+/* ANTISPAM join/part bot code.
+ *
+ * You might want to make these tweakable with an oper command
+ * Or move them into config.h
+ *
+ * - Dianora
+ */
+/* Minimum length of time on a channel that a client has to be on
+ * before its not considered a possible spam bot.
+ */
+#define MIN_JOIN_LEAVE_TIME  60
+/* So opers don't get overly spammed about spambots, only warn
+ * every OPER_SPAM_COUNTDOWN times. You could remove this code.
+ */
+#define OPER_SPAM_COUNTDOWN   5
+/* After a client leaves, we zero the counters after this length
+ * of time. i.e. if a client is well behaved, we simply zero.
+ */
+#define JOIN_LEAVE_COUNT_EXPIRE_TIME 120
+
+/* These are leftovers from hybrids /quote set, for now I have
+ * left them in. You can remove as you wish.
+ */
+#define MIN_SPAM_NUM 5
+#define MIN_SPAM_TIME 60
+/* This is a leftover from hybrids /quote set system.
+ */
+#define MAX_JOIN_LEAVE_COUNT  25
+
+/* You will really want to tweak these, but these aren't bad if
+ * they have to be statically defined.
+ */
+#define SPAM_TIME MIN_JOIN_LEAVE_TIME
+#define SPAM_NUM  MIN_SPAM_NUM
+
+extern void check_spambot_warning(struct Client *source_p, const char *name);
+
 #endif /* INCLUDED_channel_h */
