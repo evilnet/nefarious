@@ -185,7 +185,7 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       /* if +t and not @'d, return an error and ignore the topic */
       /* Note that "member" must be non-NULL here due to the checks above */
       if ((chptr->mode.mode & MODE_TOPICLIMIT) && !IsChanOp(member) &&
-	  !IsChannelService(member))
+	  !IsChannelService(sptr))
       {
         send_reply(sptr, ERR_CHANOPRIVSNEEDED, chptr->chname);
         return 0;

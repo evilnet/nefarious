@@ -1,3 +1,12 @@
+2003-01-21  Reed Loden  <reed@reedloden.com>
+
+	* ircd/gline.c: Fixed nasty error due to missing ending bracket.
+
+	* ircd/m_topic.: member should have been sptr.
+
+	* ircd/s_user.c: Forgot to change a FEAT_BOTSERVICE_CLASS to
+	FEAT_BOT_CLASS.
+
 2003-01-15  Reed Loden  <reed@reedloden.com>
 
 	* Added several ASUKA patches: delayedjoin, cC, accountonly,

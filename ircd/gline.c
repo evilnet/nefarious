@@ -235,10 +235,11 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	if ((tval = exit_client_msg(cptr, acptr, &me, "G-lined (%s)",
 	    gline->gl_reason)))
 	  retval = tval; /* retain killed status */
-      }
-    }
-    return retval;
-}
+       }
+     }
+   }
+   return retval;
+  }
 
 /*
  * This routine implements the mask checking applied to local
