@@ -249,6 +249,8 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 		    NumNick(acptr), cli_info(acptr));
       if (cli_user(acptr)->away)
         sendcmdto_one(acptr, CMD_AWAY, cptr, ":%s", cli_user(acptr)->away);
+      if (cli_user(acptr)->swhois)
+        sendcmdto_one(acptr, CMD_SWHOIS, cptr, ":%s", cli_user(acptr)->swhois);
     }
   }
   /*
