@@ -12,6 +12,11 @@
 
 	* ircd/ircd_features.c: Added DNSBL_LOC_EXEMPT (Default FALSE).
 
+	* ircd/m_join.c: Commented out the auto voice code for flexable
+	keys for now. Its broken somewhat and im still working on a fix.
+	Flexable keys work fine without it, people getting into a chan
+	using a it just wont get a auto voice if its +m.
+
 	* ircd/s_user.c: If DNSBL_LOC_EXEMPT is TRUE then if a user who
 	gets a positive match on a DNSBL check logs in using LOC they
 	will get past the DNSBL rejection. Also adjusted the format
