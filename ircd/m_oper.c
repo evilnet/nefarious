@@ -120,13 +120,13 @@ int oper_password_match(const char* to_match, const char* passwd)
   return (0 == strcmp(to_match, passwd));
 }
 
-int can_oper(struct Client *cptr, struct Client *sptr, char *name, char *password, struct ConfItem **_aconf) {
+int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **_aconf) {
   struct ConfItem *aconf;
 
   aconf = find_conf_exact(name, cli_username(sptr), cli_sockhost(sptr), CONF_OPS);
   if (!aconf) 
     aconf = find_conf_exact(name, cli_username(sptr),
-                            ircd_ntoa((const char*) &(cli_ip(cptr))), CONF_OPS);
+                            ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
   if (!aconf || IsIllegal(aconf))
     return ERR_NOOPERHOST;
    assert(0 != (aconf->status & CONF_OPS));
@@ -156,13 +156,23 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   assert(0 != cptr);
   assert(cptr == sptr);
 
+  if (parc > 3) { /* This is a remote OPER Request */
+	 struct Client *srv = find_match_server(parv[1]);
+	 if (!srv) {
+		 send_reply(sptr, ERR_NOOPERHOST);
+		 return 0;
+	 }
+	 sendcmdto_one(sptr, CMD_OPER, srv, "%C %s %s", srv, parv[2], parv[3]);
+	 return 0;
+  }
+
   name     = parc > 1 ? parv[1] : 0;
   password = parc > 2 ? parv[2] : 0;
 
   if (EmptyString(name) || EmptyString(password))
     return need_more_params(sptr, "OPER");
 
-    switch (can_oper(cptr, sptr, name, password, &aconf)) {
+    switch (can_oper(sptr, name, password, &aconf)) {
     case ERR_NOOPERHOST:
      sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O: Lines)",
 			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
@@ -214,24 +224,63 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
  */
 int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  struct ConfItem *aconf;
   assert(0 != cptr);
   assert(IsServer(cptr));
   /*
    * if message arrived from server, trust it, and set to oper
    */
+#if 0
   if (!IsServer(sptr) && !IsOper(sptr)) {
     ++UserStats.opers;
     SetFlag(sptr, FLAG_OPER);
     sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s :+o", parv[0]);
-  } else if (IsServer(cptr)) {
+  } else 
+#endif
+  if (IsServer(cptr)) {
      struct Client *acptr;
      if (parc < 4) {
        send_reply(sptr, ERR_NOOPERHOST);
        return 0;
      }
-     if(!(acptr = find_match_server(parv[1]))) {
+     if(!(acptr = FindNServer(parv[1]))) {
       return send_reply(sptr, ERR_NOOPERHOST);
+     } else if (!IsMe(acptr)) {
+	     sendcmdto_one(sptr, CMD_OPER, acptr, "%C %s %s", 
+			     acptr, parv[2], parv[3]);
      }
+     /* Check login */
+     switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
+	     case ERR_NOOPERHOST:
+		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
+		    "Failed OPER attempt by %s (%s@%s) (No O: Lines)", 
+		    parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+		     return 0;
+		     break;
+	     case ERR_PASSWDMISMATCH:
+		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+	             "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
+		     parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+		     return 0;
+		     break;
+	     case 0: /* Authentication successful */
+		     sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
+				     "+oiwsg");
+		     sendcmdto_one(&me, CMD_PRIVS, sptr, "%C %s", sptr,
+		     "CHAN_LIMIT,MODE_LCHAN,SHOW_INVIS,SHOW_ALL_INVIS,KILL,LOCAL_KILL,REHASH,RESTART,DIE,GLINE,LOCAL_GLINE,JUPE,LOCAL_JUPE,OPMODE,LOCAL_OPMODE,WHOX,SEE_CHAN,PROPAGATE,DISPLAY,SEE_OPERS,WIDE_GLINE,FORCE_OPMODE,FORCE_LOCAL_OPMODE");
+		     send_reply(sptr, RPL_YOUREOPER);
+		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
+		         "%s (%s@%s) is now operator (%c)",
+                         parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
+                         IsOper(sptr) ? 'O' : 'o');
+		     return 0;
+		     break;
+	     default:
+		     return 0; /* This shall never happen */
+		     break;
+     }
+     
+     
   }
   return 0;
 }
