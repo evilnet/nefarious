@@ -1,3 +1,7 @@
+2003-10-12  Jochen Meesters  <spike@undernet.org>
+
+	* ircd/m_rehash.c: Small fix.
+
 2003-10-07  Reed Loden  <reed@reedloden.com>
 
 	* ircd/gline.c: New way of doing gline quit reasons as

@@ -109,10 +109,10 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!HasPriv(sptr, PRIV_REHASH))
     return send_reply(sptr, ERR_NOPRIVILEGES);
 
-  if ((parc > 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%c %C", 2, parc, parv) != HUNTED_ISME))
+  if ((parc == 3) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%c %C", 2, parc, parv) != HUNTED_ISME))
     return 0;
 
-  if (parc == 1) { /* special processing */
+  if (parc == 2) { /* special processing */
     if (*parv[1] == 'm') {
       send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
       motd_recache(); /* flush MOTD cache */
