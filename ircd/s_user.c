@@ -1029,6 +1029,11 @@ int check_target_limit(struct Client *sptr, void *target, const char *name,
   assert(0 != sptr);
   assert(cli_local(sptr));
   targets = cli_targets(sptr);
+
+  /* Is target limiting even enabled? */
+  if (!feature_bool(FEAT_TARGET_LIMITING))
+    return 0;
+
   /* If user is invited to channel, give him/her a free target */
   if (IsChannelName(name) && IsInvited(sptr, target))
     return 0;

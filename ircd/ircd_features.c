@@ -439,6 +439,7 @@ static struct FeatureDesc {
   F_I(AVEXCEPTLEN, 0, 40, 0),
   F_I(MAXEXCEPTS, 0, 30, 0),
   F_B(HIS_EXCEPTWHO, 0, 0, 0),
+  F_B(TARGET_LIMITING, 0, 1, 0),
 
 #undef F_S
 #undef F_B

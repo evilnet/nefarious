@@ -1,5 +1,15 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* include/ircd_features.h: Added feature to disable target limiting.
+
+	* include/patchlevel.h: Bumped patchlevel.
+
+	* ircd/ircd_features.c: Added feature to disable target limiting.
+
+	* ircd/s_user.c: Added feature to disable target limiting.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* ircd/m_topic.c: Possibly fixed that crash with HOST_IN_TOPIC.
 
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
