@@ -550,7 +550,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
     Count_newremoteclient(UserStats, user->server);
   }
 
-  if(MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
+  if (MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
     if (conf_check_slines(sptr)) {
       send_reply(sptr, RPL_USINGSLINE);
       SetSetHost(sptr);
@@ -1829,9 +1829,14 @@ char *umode_str(struct Client *cptr)
   }
 
   if (IsSetHost(cptr)) {
-    *m++ = ' ';
-    ircd_snprintf(0, m, USERLEN + HOSTLEN + 2, "%s@%s",
+    char* t;
+    char nbuf[USERLEN + HOSTLEN + 2];
+    ircd_snprintf(0, t = nbuf, sizeof(nbuf), "%s@%s",
 		  cli_user(cptr)->username, cli_user(cptr)->host);
+
+    *m++ = ' ';
+    while ((*m++ = *t++))
+      ; /* Empty loop */
     m--; /* back up over previous nul-termination */
   }
 

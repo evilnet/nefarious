@@ -1,3 +1,12 @@
+2004-06-10  Reed Loden  <reed@reedloden.com>
+
+	* include/patchlevel.h: Bump patchlevel (0.1.0).
+
+	* ircd/m_ircops.c: Allow opers to view all opers including 
+	services.
+
+	* ircd/s_user.c: Fix bug with sethost not being sent in burst.
+
 2004-06-08  Reed Loden  <reed@reedloden.com>
 
 	* ircd/m_check.c, ircd/m_userhost.c, ircd/m_userip.c, 
