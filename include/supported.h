@@ -65,7 +65,7 @@
 
 #define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, CHANNELLEN, \
 			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
-			"(ohv)@%+", "@%+", "b,e,k,l,cimnprstzCLMNOQST", \
+			"(ohv)@%+", "@%+", "be,k,l,cimnprstzCLMNOQST", \
 			"rfc1459", feature_str(FEAT_NETWORK)
 
 #define infochanmodes "AbcehiklmnoprstvzCLMNOQST"

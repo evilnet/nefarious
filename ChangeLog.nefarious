@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-27  Neil Spierling <vulcan@linux-boxen.org>
+
+	* include/supported.h: Fixed a client parsing issue.
+
 2004-09-20  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/channel.c: Only use flexable keys if its enabled and the
