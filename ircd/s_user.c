@@ -1316,6 +1316,11 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
   else
     SetSetHost(cptr);
 
+  /* Invalidate all bans against the user so we check them again */
+  for (chan = (cli_user(cptr))->channel; chan;
+       chan = chan->next_channel)
+     ClearBanValid(chan);
+
   if (MyConnect(cptr)) {
     ircd_snprintf(0, hiddenhost, HOSTLEN + USERLEN + 2, "%s@%s",
       cli_user(cptr)->username, cli_user(cptr)->host);

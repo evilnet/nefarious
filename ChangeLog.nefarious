@@ -25,7 +25,8 @@
 
 	* ircd/numnicks.c: Remove excess lines at EOF.
 
-	* ircd/s_user.c: Redo some various stuff and add a missing '}'.
+	* ircd/s_user.c: Redo some various stuff, add a missing '}',
+	and don't let sethost'ed users walk through bans.
 
 2003-11-02  Reed Loden  <reed@reedloden.com>
 
