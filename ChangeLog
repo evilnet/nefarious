@@ -1,4 +1,8 @@
-2002-01-05  Perry Lorier <isomer@undernet.org>
+2003-01-08  Fredrik Soderblom <froo@quakenet.org> 
+	* ircd/s_err.c, ircd/s_user.c (hide_hostmask): Simplify 
+	RPL_HOSTHIDDEN and the use of it. 
+
+2003-01-05  Perry Lorier <isomer@undernet.org>
 	* include/patchlevel.h: Release this sucker
 
 2003-01-04  Kevin L Mitchell  <klmitch@mit.edu>
@@ -7,7 +11,7 @@
 	could be destroyed by net rider kicks, causing a crash in
 	mode_invite_clear()--moved it to before the net rider kick loop
 
-2002-01-05  Perry Lorier <isomer@undernet.org>
+2003-01-05  Perry Lorier <isomer@undernet.org>
 	* include/patchlevel.h: Bump PL
 
 2003-01-04  Kevin L Mitchell  <klmitch@mit.edu>
