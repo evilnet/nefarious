@@ -20,6 +20,9 @@
 	* Add FEAT_OPER_LOCAL_CHANNELS so when local channels are
 	disabled, opers can still join.
 
+	* ircd/m_clearmode.c, ircd/m_opmode.c: Use
+	cli_user(tmp->user)->server instead.
+
 2003-11-04  Reed Loden  <reed@reedloden.com>
 
 	* Sync with u2.10.11.05 release.

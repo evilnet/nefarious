@@ -317,7 +317,7 @@ mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return send_reply(sptr, ERR_QUARANTINED, chptr->chname, qreason);
 
     for (tmp = chptr->members; tmp; tmp = tmp->next_member)
-      if (IsService(tmp->user->server) && IsChannelService(tmp->user)) {
+      if (IsService(cli_user(tmp->user)->server) && IsChannelService(tmp->user)) {
 	/* Impersonate the abuser */
 	sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 				"Failed CLEARMODE for registered channel %s by %s",
