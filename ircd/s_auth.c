@@ -503,7 +503,7 @@ static void auth_dns_callback(void* vptr, struct DNSReply* reply)
     if (IsUserPort(auth->client))
       sendheader(auth->client, REPORT_FAIL_DNS);
   }
-  if ((feature_bool(FEAT_DNSBL_CHECKS) && !IsDNSBLPending(auth)) && !IsDoingAuth(auth)) {
+  if ((feature_bool(FEAT_DNSBL_CHECKS) && !IsDNSBLPending(auth)) && !IsDoingAuth(auth) && !IsDNSPending(auth)) {
     Debug((DEBUG_DEBUG, "Freeing auth after dns %s@%s [%s]", cli_username(auth->client),
 	 cli_sockhost(auth->client), cli_sock_ip(auth->client)));
     release_auth_client(auth->client);
