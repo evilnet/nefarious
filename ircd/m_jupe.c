@@ -213,7 +213,7 @@ int mo_jupe(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (is_timestamp(parv[2])) {
       expire_off = atoi(parv[2]);
     } else {
-      expire_off = ParseInterval(parv[3]);
+      expire_off = ParseInterval(parv[2]);
     }
     reason = parv[3];
     flags |= JUPE_LOCAL;

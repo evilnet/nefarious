@@ -21,7 +21,7 @@ int dgets(int, char*, int);
   
 extern int check_if_ipmask(const char *mask);
 extern void write_log(const char *filename, const char *pattern, ...);
-extern unsigned long ParseInterval(const unsigned char *interval);
+extern unsigned long ParseInterval(const char *interval);
 extern int is_timestamp(char *str);
 
 #endif /* INCLUDED_support_h */

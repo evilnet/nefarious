@@ -25,6 +25,7 @@
 
 #include "config.h"
 
+#include "class.h"
 #include "client.h"
 #include "handlers.h"
 #include "ircd.h"
@@ -36,7 +37,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "s_conf.h"
-#include "class.h"
+#include "s_serv.h"
 #include "s_user.h"
 #include "send.h"
 

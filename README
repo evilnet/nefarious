@@ -1,39 +1,39 @@
-- nefarious IRCu ------------------------------------------------------
+- Nefarious IRCu ------------------------------------------------------
 
 Nefarious IRCu is a collection of modifications to the Undernet IRC 
-daemon known as IRCu. This version is based on Undernet-IRCu by
-Undernet's Coder Committee. The original code can be obtained from 
+daemon known as IRCu. This version is based on Undernet IRCu by the
+Undernet Coder Committee. The original code can be obtained from 
 their webpage, http://coder-com.undernet.org/ and the latest release of 
-nefarious IRCu can be obtained from http://sf.net/projects/evilnet/.
+Nefarious IRCu can be obtained from http://sf.net/projects/evilnet/.
 
 This version is based on modifications from:
- * Auska http://www.quakenet.org
+ * Asuka http://www.quakenet.org
  * Lain http://www.quakenet.org
  * Undernet IRCu http://coder-com.undernet.org
- * Universal IRCu http://www.sourceforge.net/projects/ircu
+ * Universal IRCu http://sourceforge.net/projects/ircu
  * IRCa http://www.asylum-net.org
- * RaptorIRCd http://www.sourceforge.net/projects/raptorircd
+ * RaptorIRCd http://sourceforge.net/projects/raptorircd
  * Ultimate IRCd http://www.shadow-realm.org
  * Unreal IRCd http://www.unrealircd.com
  * Bahamut http://bahamut.dal.net
- * ScaryNet IRCd http://www.sourceforge.net/projects/scarynet
+ * ScaryNet IRCd http://sourceforge.net/projects/scarynet
  * NetGamers IRCd http://www.netgamers.org
  * Hybrid IRCd http://www.hybrid-ircd.com
  * IRCoderz IRCd http://sourceforge.net/projects/ircoderz
  * zBounce http://sourceforge.net/projects/zbounce
  * ThunderCity http://sourceforge.net/projects/thundercity
 
-We apologise if we have missed an IRCd or tool in the list.
-If you see parts of your code being used in nefarious and do not see 
-your IRCd/tool above, please contact one of the developers of nefarious.
+We apologize if we have missed an IRCd or tool in the list.
+If you see parts of your code being used in Nefarious and do not see 
+your IRCd/tool above, please contact one of the developers of Nefarious.
 
-If you are running the development version of nefarious IRCu on a 
+If you are running the development version of Nefarious IRCu on a 
 production network, you are doing so at your own peril. We take NO 
 RESPONSIBILITY for ANYTHING it might do on your network. We strongly 
 recommend that you do NOT run the development version on a production 
 network! You have been warned.
 
-- project coders ------------------------------------------------------
+- Nefarious coders --------------------------------------------------
 
 reed - Reed Loden - <reed@reedloden.com>
 SiRVulcaN - Neil Spierling - <sirvulcan@sirvulcan.org>
@@ -56,7 +56,7 @@ doc/readme.gline	- Documentation on glines
 Do NOT ask for support for Nefarious IRCu in #coder-com on Undernet.
 The official support channel for Nefarious IRCu is on the AfterNET IRC
 Network (irc.afternet.org) in #evilnet. #coder-com on Undernet is ONLY
-for normal IRCu and GNUWrld. If you have found bugs in Nefarious IRCu,
+for normal IRCu and GNUWorld. If you have found bugs in Nefarious IRCu,
 do NOT submit them to coder-com@undernet.org or to the undernet-ircu
 SourceForge site. Send them to any of the Nefarious IRCu mailing lists
 or the Nefarious IRCu SourceForge project site. If you submit a bug
@@ -213,7 +213,7 @@ This software is provided "as is" with absolutely no warranties, either
 express or implied. It's use is done so totally at the user's own risk.
 
 Please do not assume we coded everything here ourselves, as we did not.
-The whole point of nefarious is a combination of all good patches to
+The whole point of Nefarious is a combination of all good patches to
 Undernet IRCu. We try our best to give credits to code we've used, but
 from time to time we miss credits. See the top of this document for
 credits on IRCd's and other code we've used. Also, see doc/Authors.

@@ -234,7 +234,7 @@ static struct FeatureDesc {
   /* Misc. features */
   F_N(LOG, FEAT_MYOPER, feature_log_set, feature_log_reset, feature_log_get,
       0, log_feature_unmark, log_feature_mark, log_feature_report),
-  F_S(DOMAINNAME, 0, "nefarious.irc", 0),
+  F_S(DOMAINNAME, 0, "Nefarious.IRC", 0),
   F_B(RELIABLE_CLOCK, 0, 0, 0),
   F_I(BUFFERPOOL, 0, 27000000, 0),
   F_B(HAS_FERGUSON_FLUSHER, 0, 0, 0),
@@ -252,7 +252,7 @@ static struct FeatureDesc {
   F_S(DEFAULT_LIST_PARAM, FEAT_NULL, 0, list_set_default),
   F_I(NICKNAMEHISTORYLENGTH, 0, 800, whowas_realloc),
   F_B(HOST_HIDING, 0, 1, 0),
-  F_S(HIDDEN_HOST, FEAT_CASE, "users.nefarious", 0),
+  F_S(HIDDEN_HOST, FEAT_CASE, "Users.Nefarious", 0),
   F_S(HIDDEN_IP, 0, "127.0.0.1", 0),
   F_B(AUTOHIDE, 0, 0, 0),
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
@@ -381,28 +381,28 @@ static struct FeatureDesc {
   F_B(HIS_REWRITE, 0, 0, 0),
   F_I(HIS_REMOTE, 0, 0, 0),
   F_B(HIS_NETSPLIT, 0, 0, 0),
-  F_S(HIS_SERVERNAME, 0, "*.nefarious", 0),
+  F_S(HIS_SERVERNAME, 0, "*.Nefarious", 0),
   F_S(HIS_SERVERINFO, 0, "evilnet development", 0),
   F_S(HIS_URLSERVERS, 0, "http://sourceforge.net/projects/evilnet/", 0),
 
   /* Misc. random stuff */
-  F_S(NETWORK, 0, "nefarious", 0),
+  F_S(NETWORK, 0, "Nefarious", 0),
   F_S(URL_CLIENTS, 0, "http://www.ircreviews.org/clients/", 0),
 
-  /* nefarious features */
+  /* Nefarious features */
   F_B(NEFARIOUS, FEAT_NODISP, 0, 0),
   F_S(OMPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.opermotd", 0),
   F_S(QPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.quotes", 0),
   F_S(EPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.rules", 0),
   F_B(OPERHOST_HIDING, 0, 1, 0),
-  F_S(HIDDEN_OPERHOST, FEAT_CASE, "staff.nefarious", 0),
+  F_S(HIDDEN_OPERHOST, FEAT_CASE, "Staff.Nefarious", 0),
   F_B(TOPIC_BURST, 0, 1, 0),
   F_B(REMOTE_OPER, 0, 1, 0),
   F_B(REMOTE_MOTD, 0, 0, 0),
   F_I(BOT_CLASS, 0, 0, 0),
   F_B(LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_LOCAL_CHANNELS, 0, 1, 0),
-  F_S(SERVICES_TLD, 0, ".services", 0),
+  F_S(SERVICES_TLD, 0, ".Services", 0),
   F_B(ASUKA_XTRAOP, 0, 0, 0),
   F_B(ASUKA_HIDECHANS, 0, 0, 0),
   F_B(ASUKA_HIDEIDLE, 0, 0, 0),
@@ -419,7 +419,7 @@ static struct FeatureDesc {
   F_B(HIS_GLINE, 0, 1, 0),
   F_B(AUTOJOIN, 0, 0, 0),
   F_B(AUTOJOIN_NOTICE, 0, 1, 0),
-  F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #nefarious", 0),
+  F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #Nefarious", 0),
 
 #undef F_S
 #undef F_B

@@ -95,8 +95,9 @@
 #include "querycmds.h"
 #include "s_conf.h"
 #include "s_debug.h"
-#include "s_user.h"
 #include "s_misc.h"
+#include "s_serv.h"
+#include "s_user.h"
 #include "send.h"
 #include "support.h"
 

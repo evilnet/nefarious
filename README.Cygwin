@@ -1,0 +1,56 @@
+--------------------------------------------
+Compiling Nefarious IRCu in Cygwin
+By Neil Spierling <sirvulcan@sirvulcan.org>
+--------------------------------------------
+
+pre-requirements:
+- windows username with NO spaces in it (spaces play hell in cygwin with various key steps in the configuring and 
+compiling process)
+- about 1.2gb of space, cygwin download is 200mb in total, after extraction its about 1gb
+
+1. download cygwin_stuff.zip from http://sourceforge.net/projects/evilnet
+2. create a temp dir
+3. extract cygwin_stuff.zip into the temp dir
+4. run setup.exe
+  4.1 select Install from Internet, click next
+  4.2 choose your options here for the path, then click next
+  4.3 choose your package dir (leave default), click next
+  4.4 change your options to suit the way you download off the internet, click next
+  4.5 http://cygwin.get-software.com should be selected, click next
+  4.6 a package list should come up now, look around if you want add packages.. just dont remove any, click next
+  4.7 setup.exe will download and install the packages, please note this will be a 200mb download so get a book
+5. open up cygwin
+6. in cygwin_stuff.zip there is bind497+cygwin-pkg.tar.gz, copy it to your cygwin home dir (if you left the path 
+default then drive:\cygwin\home\USERNAME)
+7. untar bind497+cygwin-pkg.tar.gz into /
+8. cd /etc and create resolv.conf
+9. place this in resolv.conf (replace stuff in BOLD, you can have as many nameserver entries as you want, i reccomend 2 
+or more)
+
+search DOMAIN
+nameserver NAMESERVER_IP
+nameserver NAMESERVER_IP
+
+10. wget Nefarious IRCu from http://sf.net/projects/evilnet and untar it
+11. cd ircu2.10 ; ./configure --with-maxcon=50
+12. cd ircd and open up Makefile
+13. find "${CHMOD} ${IRCDMODE} ircd" (line 244 ish)
+14. change "ircd" on that line to "ircd.exe"
+15. type make (at the end of make you should get a auto-import "error", dont worry)
+16. make install
+17. proceed with normal ircd configuration and execution
+
+notes:
+
+- i do realise that you dont need all of the stuff in the cygwin installation... i only included my setup that i used 
+so that  the libs/apps etc that you do need are there (alot arnt in the default installation options)
+- yes this is an old version of bind, its the only one ive tested it with.. it works fine with boxen ircu as far as i 
+can tell. i tried to compile bind 9 with cygwin patches with no luck
+- i cant distribute binaries due to the way the ircd configures its paths and the stuff it depends on in cygwin
+- maxcon is set to 50 due to cygwin defaults FD_SETSIZE to 64
+- this howto should work with the normal undernet-ircu and other people's undernet-ircu mods
+
+credits:
+
+working cygwin bind binaries- http://ircd.botbay.net/pub/hybrid/5-Tools/cygwin/ (couldnt find a name to directly 
+credit)

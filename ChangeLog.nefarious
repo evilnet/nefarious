@@ -1,3 +1,8 @@
+2004-02-15  Reed Loden  <reed@reedloden.com>
+
+	* More work on merging BoxenIRCu and evilnet IRCu including 
+	fixing bugs. If I have time, I'll add a full ChangeLog later.
+
 2004-02-15  Neil Spierling  <sirvulcan@sirvulcan.org>
 
 	* configure.in: Added in some humor.
@@ -15,8 +20,6 @@
 	* doc/ircd.rules: RULES template.
 
 	* doc/ircd.motd: MOTD template.
-
-	* include/nefarious.h: Added file for new declarations, etc.
 
 	* ircd/Makefile.in: Run makepem at the end of make,
 	makepem will exit if SSL is disabled.

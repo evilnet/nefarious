@@ -206,7 +206,7 @@ TypeLength(char type)
 
 
 unsigned long
-ParseInterval(const unsigned char *interval)
+ParseInterval(const char *interval)
 {
     unsigned long seconds = 0;
     int partial = 0;
@@ -214,7 +214,7 @@ ParseInterval(const unsigned char *interval)
 
     /* process the string, resetting the count if we find a unit character */
     while ((c = *interval++)) {
-        if (isdigit((int)c)) {
+        if (IsDigit((int)c)) {
             partial = partial*10 + c - '0';
         } else {
             seconds += TypeLength(c) * partial;
@@ -229,7 +229,7 @@ ParseInterval(const unsigned char *interval)
 int is_timestamp(char *str)
 {
 
-  while ( isdigit(*str) || *str == '.' )
+  while ( IsDigit(*str) || *str == '.' )
     ++str;
 
   return *str == '\0';
