@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-11  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* patches: Added new directory for services patches
+
+	* patches/README: General patches readme plus listings of all
+	patches and what they do.
+
+	* patches/banexempts.srvx2.diff: Afternet SRVX2 banexempts patch.
+
+	* patches/halfops.srvx2.diff: Afternet SRVX2 halfops patch.
+
 2004-07-12  Reed Loden  <reed@reedloden.com>
 
 	* include/patchlevel.h: Bumped for release (0.3.0).

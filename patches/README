@@ -1,0 +1,39 @@
+- Patches -------------------------------------------------------------------------------------------------------------
+
+This directory contains patches that add functionality into other services so that Nefarious IRCu will work with them
+better. Patches can be submitted and requested on http://sourceforge.net/tracker/?atid=533683&group_id=72192&func=browse
+Please submit patches in unified format (-puN) and optionally include a diffstat output at the top of the patch. We 
+will usually generate one if one doesnt exist. If you have any problems with any of the patches listed below then 
+contact the Author (see the author table). If you get no joy out of them then contact us on irc.afternet.org #evilnet 
+or the support tracker (http://sourceforge.net/tracker/?atid=533682&group_id=72192&func=browse).
+
+- Applying Patches ----------------------------------------------------------------------------------------------------
+
+cd services.source.dir
+patch -p0 < /path/to/nefarious/patches/patch.diff
+
+Then remake your services according as to how they should be made.
+
+
+Patch			Version For 		Description					Requires
+-----------------------------------------------------------------------------------------------------------------------
+banexempts.srvx2.diff	0.1	Afternet SRVX2	Adds in support so that SRVX2 will not die	Nefarious IRCu 0.3.0+
+						when it recieves a burst containing ban
+						exempts.
+halfops.srvx2.diff	0.1	Afternet SRVX2	Adds in support so that SRVX2 can handle	Nefarious IRCu 0.3.0+
+						halfops.
+
+
+Author					Patch
+-----------------------------------------------------------------------------------------------------------------------
+SiRVulcaN <vulcan@linux-boxen.org>	banexempts.srvx2.diff
+SiRVulcaN <vulcan@linux-boxen.org>	halfops.srvx2.diff
+
+
+Service		Location					Notes
+-----------------------------------------------------------------------------------------------------------------------
+Afternet SRVX2	http://sourceforge.net/projects/x2serv		Only avaliable on CVS (srvx2 module).
+
+
+- evilnet development - 11/08/2004 ------------------------------------------------------------------------------------
+
