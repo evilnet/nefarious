@@ -16,6 +16,10 @@
 	* include/ssl.h: Added base for what will later become options 
 	for different SSL programs (OpenSSL/gnuTLS/etc.).
 
+	* ircd/channel.c: Fixed a bug in the ban code in which halfops
+	could not set bans and fixed a bug in +z/+O/+A code in which
+	services (+k) could not set +z/+O/+A (thanks Maximus@Protium).
+
 	* ircd/ircd_features.c: Added FEAT_AUTOINVISIBLE
 	(default: FALSE) from QuakeNet.
 

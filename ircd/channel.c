@@ -2820,7 +2820,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   state->max_args--;
 
   /* If they're not an oper, they can't change modes */
-  if (state->flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) {
+  if ((state->flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER))
+      && !(state.flags & MODE_PARSE_ISHALFOP)) {
     send_notoper(state);
     return;
   }
@@ -3468,7 +3469,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'O': /* deal with oper only */
 	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
-	if (IsOper(sptr) || IsServer(sptr)) {
+	if (IsOper(sptr) || IsServer(sptr) || IsChannelService(sptr)) {
 	  mode_parse_mode(&state, flag_p);
 	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);
@@ -3477,7 +3478,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'A': /* deal with admin only */
 	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
-	if (IsAdmin(sptr) || IsServer(sptr)) {
+	if (IsAdmin(sptr) || IsServer(sptr) || IsChannelService(sptr)) {
 	  mode_parse_mode(&state, flag_p);
 	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);
@@ -3486,7 +3487,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'z': /* deal with SSL only */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
-        if (IsSSL(sptr) || IsServer(sptr)) {
+        if (IsSSL(sptr) || IsServer(sptr) || IsChannelService(sptr)) {
           mode_parse_mode(&state, flag_p);
 	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);
@@ -3532,7 +3533,9 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
    * the rest of the function finishes building resultant MODEs; if the
    * origin isn't a member or an oper, skip it.
    */
-  if (!state.mbuf || ((state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) && !(state.flags & MODE_PARSE_ISHALFOP)))
+  if (!state.mbuf ||
+      ((state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER))
+       && !(state.flags & MODE_PARSE_ISHALFOP)))
     return state.args_used; /* tell our parent how many args we gobbled */
 
   t_mode = state.chptr->mode.mode;
