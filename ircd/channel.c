@@ -3372,7 +3372,6 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   int *flag_p;
   unsigned int t_mode;
   char *modestr;
-  char cur_chmode[14];
   struct ParseState state;
 
   assert(0 != cptr);
@@ -3451,11 +3450,10 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
         break;
 
       case 'v': /* deal with voices */
-	if (member && IsHalfOp(member) && !IsChanOp(member)) {
+	if (member && IsHalfOp(member) && !IsChanOp(member))
 	  mode_parse_client_voice(&state, flag_p);
-	} else {
+	else
 	  mode_parse_client(&state, flag_p);
-	}
 	break;
 
       case 'o': /* deal with ops */
@@ -3463,58 +3461,100 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	break;
 
       case 'h': /* deal with halfops */
-	if (feature_bool(FEAT_HALFOPS) || IsServer(sptr)) {
+	if (feature_bool(FEAT_HALFOPS) || IsServer(sptr))
 	  mode_parse_client(&state, flag_p);
-	}
 	break;
 
-      case 'O': /* deal with oper only */
-	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
-	if ((feature_bool(FEAT_CHMODE_O) && IsOper(sptr)) || 
-	    IsServer(sptr) || IsChannelService(sptr)) {
-	  mode_parse_mode(&state, flag_p);
-	} else {
+      case 'c': /* MODE_NOCOLOUR */
+        if (feature_bool(FEAT_CHMODE_c) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
 	  send_reply(sptr, ERR_NOPRIVILEGES);
-	}
-	break;
-
-      case 'A': /* deal with admin only */
-	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
-	if ((feature_bool(FEAT_CHMODE_A) && IsAdmin(sptr)) || 
-	    IsServer(sptr) || IsChannelService(sptr)) {
-	  mode_parse_mode(&state, flag_p);
-	} else {
-	  send_reply(sptr, ERR_NOPRIVILEGES);
-	}
 	break;
 
       case 'z': /* deal with SSL only */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
         if (((feature_bool(FEAT_CHMODE_z) && MyConnect(sptr) &&
 	      IsSSL(sptr)) || !MyConnect(sptr)) ||
-	    IsServer(sptr) || IsChannelService(sptr)) {
+	    IsServer(sptr) || IsChannelService(sptr))
           mode_parse_mode(&state, flag_p);
-	} else {
+	else
 	  send_reply(sptr, ERR_NOPRIVILEGES);
-	}
 	break;
 
-      case 'c': /* MODE_NOCOLOUR */
-      case 'C': /* MODE_NOCTCP */
-      case 'L': /* MODE_NOLISTMODES */
-      case 'M': /* MODE_ACCONLY */
-      case 'N': /* MODE_NONOTICE */
-      case 'Q': /* MODE_NOQUITPARTS */
-      case 'S': /* MODE_STRIP */
-      case 'T': /* MODE_NOAMSG */
-/*	strcpy(cur_chmode, "FEAT_CHMODE_");
-	strcat(cur_chmode, modestr);
-        if (feature_bool((enum Feature)cur_chmode) || IsServer(sptr) ||
-	    IsOper(sptr)) {*/
-          mode_parse_mode(&state, flag_p);
-/*	} else {
+      case 'A': /* deal with admin only */
+	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
+	if ((feature_bool(FEAT_CHMODE_A) && IsAdmin(sptr)) || 
+	    IsServer(sptr) || IsChannelService(sptr))
+	  mode_parse_mode(&state, flag_p);
+	else
 	  send_reply(sptr, ERR_NOPRIVILEGES);
-	}*/
+	break;
+
+      case 'C': /* MODE_NOCTCP */
+        if (feature_bool(FEAT_CHMODE_C) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'L': /* MODE_NOLISTMODES */
+        if (feature_bool(FEAT_CHMODE_L) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'M': /* MODE_ACCONLY */
+        if (feature_bool(FEAT_CHMODE_M) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'N': /* MODE_NONOTICE */
+        if (feature_bool(FEAT_CHMODE_N) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'O': /* MODE_OPERONLY */
+	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
+	if ((feature_bool(FEAT_CHMODE_O) && IsOper(sptr)) || 
+	    IsServer(sptr) || IsChannelService(sptr))
+	  mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'Q': /* MODE_NOQUITPARTS */
+        if (feature_bool(FEAT_CHMODE_Q) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'S': /* MODE_STRIP */
+        if (feature_bool(FEAT_CHMODE_S) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'T': /* MODE_NOAMSG */
+        if (feature_bool(FEAT_CHMODE_T) || IsServer(sptr) ||
+	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
 	break;
 
       default: /* deal with other modes */

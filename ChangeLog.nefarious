@@ -3,6 +3,11 @@
 
 2005-01-28  Reed Loden  <reed@reedloden.com>
 
+	* ircd/channel.c: Removed broken code and replaced it with
+	boring, but working!, code. Cleaned up whitespacing.
+
+2005-01-28  Reed Loden  <reed@reedloden.com>
+
 	* include/ircd_features.h: Added FEAT_HIS_USERIP.
 
 	* ircd/channel.c: Commented out broken code (I'll fix it
