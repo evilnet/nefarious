@@ -3,6 +3,10 @@
 
 2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/s_serv.c: Burst AWAY messages on links.
+
+2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* Last 2 commits removed (one with no changelog).
 
 2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
