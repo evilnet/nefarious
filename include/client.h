@@ -146,6 +146,7 @@ enum Flag {
     FLAG_ACCOUNT,                   /* account name has been set */
     FLAG_HIDDENHOST,                /* user's host is hidden */
     FLAG_SLINE,                     /* user is S:Lined */
+    FLAG_REMOTEOPER,
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */

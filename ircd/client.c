@@ -26,6 +26,7 @@
 #include "ircd_features.h"
 #include "ircd_reply.h"
 #include "list.h"
+#include "msg.h"
 #include "msgq.h"
 #include "numeric.h"
 #include "s_conf.h"
@@ -167,6 +168,23 @@ static struct {
   { PRIV_LAST_PRIV, FEAT_LAST_F, 0 }
 };
 
+static struct {
+  char        *name;
+  unsigned int priv;
+} privtab[] = {
+#define P(priv)		{ #priv, PRIV_ ## priv }
+  P(CHAN_LIMIT),     P(MODE_LCHAN),     P(WALK_LCHAN),    P(DEOP_LCHAN),
+  P(SHOW_INVIS),     P(SHOW_ALL_INVIS), P(UNLIMIT_QUERY), P(KILL),
+  P(LOCAL_KILL),     P(REHASH),         P(RESTART),       P(DIE),
+  P(GLINE),          P(LOCAL_GLINE),    P(JUPE),          P(LOCAL_JUPE),
+  P(OPMODE),         P(LOCAL_OPMODE),   P(SET),           P(WHOX),
+  P(BADCHAN),        P(LOCAL_BADCHAN),  P(SEE_CHAN),      P(PROPAGATE),
+  P(DISPLAY),        P(SEE_OPERS),      P(WIDE_GLINE),    P(FORCE_OPMODE),
+  P(FORCE_LOCAL_OPMODE),
+#undef P
+  { 0, 0 }
+};
+
 /* client_set_privs(struct Client* client)
  *
  * Sets the privileges for opers.
@@ -184,7 +202,7 @@ client_set_privs(struct Client* client)
   if (!IsAnOper(client)) { /* clear privilege mask */
     memset(&(cli_privs(client)), 0, sizeof(struct Privs));
     return;
-  } else if (!MyConnect(client)) {
+  } else if (!MyConnect(client) && !FlagHas(&cli_flags(client), FLAG_REMOTEOPER)) {
     memset(&(cli_privs(client)), 255, sizeof(struct Privs));
     PrivClr(&(cli_privs(client)), PRIV_SET);
     return;
@@ -228,24 +246,25 @@ client_set_privs(struct Client* client)
     privs.priv_mask[i] &= ~antiprivs.priv_mask[i];
 
   cli_privs(client) = privs;
+  if (FlagHas(&cli_flags(client), FLAG_REMOTEOPER)) {
+	  char privbuf[512] = "";
+	  int i;
+	  /* Send privileges */
+	    for (i = 0; privtab[i].name; i++)
+		        if (HasPriv(client, privtab[i].priv)) {
+				strcat(privbuf, privtab[i].name);
+				strcat(privbuf, ",");
+			}
+	    privbuf[strlen(privbuf)] = 0;
+	    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
+	    FlagClr(&cli_flags(client), FLAG_REMOTEOPER);
+	    client_set_privs(client); /* Call this function recursively so
+	    				that privileges are set for a remote user 
+					rather than like any oper */
+  }
 }
 
-static struct {
-  char        *name;
-  unsigned int priv;
-} privtab[] = {
-#define P(priv)		{ #priv, PRIV_ ## priv }
-  P(CHAN_LIMIT),     P(MODE_LCHAN),     P(WALK_LCHAN),    P(DEOP_LCHAN),
-  P(SHOW_INVIS),     P(SHOW_ALL_INVIS), P(UNLIMIT_QUERY), P(KILL),
-  P(LOCAL_KILL),     P(REHASH),         P(RESTART),       P(DIE),
-  P(GLINE),          P(LOCAL_GLINE),    P(JUPE),          P(LOCAL_JUPE),
-  P(OPMODE),         P(LOCAL_OPMODE),   P(SET),           P(WHOX),
-  P(BADCHAN),        P(LOCAL_BADCHAN),  P(SEE_CHAN),      P(PROPAGATE),
-  P(DISPLAY),        P(SEE_OPERS),      P(WIDE_GLINE),    P(FORCE_OPMODE),
-  P(FORCE_LOCAL_OPMODE),
-#undef P
-  { 0, 0 }
-};
+
 
 /* client_report_privs(struct Client *to, struct Client *client)
  *

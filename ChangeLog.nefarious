@@ -1,9 +1,23 @@
 2003-01-14  Mathieu Rene <math@rootservices.net>
 	* ircd/m_oper.c: Added remote OPER capability
 
+	* ircd/client.c: Send privileges according to the defaults
+			 rather than using a hardcoded list.
+
+        * ircd/ircd_features.c: Added a new feature: REMOTE_OPER, default
+           to TRUE
+	
+	* include/client.h: Added FLAG_REMOTEOPER
+
+	* include/ircd_features.h: Added a new feature: REMOTE_OPER, default
+	   to TRUE
+
+
 2003-01-13  Mathieu Rene <math@rootservices.net>
 	* ircd/m_oper.c: Isolated OPER Authentication procedure
+	
 	* ircd/m_svsnick.c: Fixed stuff that didnt compile
+	
 	* ircd/s_conf.c: Fixed stuff that didnt compile
 
 2003-01-11  Reed Loden  <reed@reedloden.com>

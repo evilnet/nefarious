@@ -49,6 +49,7 @@ enum Feature {
   FEAT_HIDDEN_IP,
   FEAT_AUTOHIDE,
   FEAT_CONNEXIT_NOTICES,
+  FEAT_REMOTE_OPER,
   FEAT_EVILNET,
 
   /* features that probably should not be touched */

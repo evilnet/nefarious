@@ -132,7 +132,8 @@ int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **
    assert(0 != (aconf->status & CONF_OPS));
 
   if (oper_password_match(password, aconf->passwd)) {
-    if (ACR_OK != attach_conf(sptr, aconf)) {
+    int attach_result = attach_conf(sptr, aconf);
+    if ((ACR_OK != attach_result) && (ACR_ALREADY_AUTHORIZED != attach_result)) {
       return ERR_NOOPERHOST;
     } 
   } else {
@@ -249,34 +250,43 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	     sendcmdto_one(sptr, CMD_OPER, acptr, "%C %s %s", 
 			     acptr, parv[2], parv[3]);
      }
+     if (!feature_bool(FEAT_REMOTE_OPER))
+	     return send_reply(sptr, ERR_NOOPERHOST);
      /* Check login */
      switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
 	     case ERR_NOOPERHOST:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		    "Failed OPER attempt by %s (%s@%s) (No O: Lines)", 
-		    parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+		    parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
 		     return 0;
 		     break;
 	     case ERR_PASSWDMISMATCH:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 	             "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
-		     parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+		     parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
 		     return 0;
 		     break;
 	     case 0: /* Authentication successful */
+		     if (aconf->status == CONF_LOCOP) {
+			     send_reply(sptr, ERR_NOOPERHOST);
+		             sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+			     "Failed OPER attempt by %s (%s@%s) (Local Oper)",
+			     parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
+			     return 0;
+		     }
+		     FlagSet(&cli_flags(sptr), FLAG_REMOTEOPER); /* Tell client_set_privs to
+								    send privileges to the user*/
+		     client_set_privs(sptr);
 		     sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
 				     "+oiwsg");
-		     sendcmdto_one(&me, CMD_PRIVS, sptr, "%C %s", sptr,
-		     "CHAN_LIMIT,MODE_LCHAN,SHOW_INVIS,SHOW_ALL_INVIS,KILL,LOCAL_KILL,REHASH,RESTART,DIE,GLINE,LOCAL_GLINE,JUPE,LOCAL_JUPE,OPMODE,LOCAL_OPMODE,WHOX,SEE_CHAN,PROPAGATE,DISPLAY,SEE_OPERS,WIDE_GLINE,FORCE_OPMODE,FORCE_LOCAL_OPMODE");
 		     send_reply(sptr, RPL_YOUREOPER);
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
-		         "%s (%s@%s) is now operator (%c)",
-                         parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
-                         IsOper(sptr) ? 'O' : 'o');
+		         "%s (%s@%s) is now operator (O)",
+                         parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
 		     return 0;
 		     break;
 	     default:
-		     return 0; /* This shall never happen */
+		     return 0; /* This should never happen */
 		     break;
      }
      
