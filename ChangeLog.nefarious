@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-11-14  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Fixed a reply issue with ACCCHAN (+M).
+
 2004-11-01  Neil Spierling  <sirvulcan@gmail.com>
 
 	README.Cygwin: Updated instructions.

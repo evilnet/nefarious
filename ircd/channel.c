@@ -1011,7 +1011,7 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
   */
   if ((member->channel->mode.mode & MODE_ACCONLY) && !IsVoicedOrOpped(member))
     if (!IsAccount(cptr)) {
-	send_reply(cptr, ERR_NEEDACCCHAN, member->channel);
+	send_reply(cptr, ERR_NEEDACCCHAN, member->channel->chname);
 	return 0;
     }
 
