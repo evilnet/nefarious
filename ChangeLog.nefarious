@@ -3,7 +3,7 @@
 
 2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
 
-	* ircd/m_wallvoices.c: Couple of fixes with displaying "%".
+	* ircd/m_wallhops.c: Couple of fixes with displaying "%".
 	% was being duplicated on each server the msg went to.
 
 2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
