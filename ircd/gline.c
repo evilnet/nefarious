@@ -663,9 +663,11 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
   /* make the gline */
   agline = make_gline(nick, user, host, reason, expire, lastmod, flags);
 #else
-	    "%#C adding %s %s for %s, expiring at %Tu: %s", sptr,
+	    "%#C adding %s %s for %s%s%s, expiring at %Tu: %s", sptr,
 	    flags & GLINE_LOCAL ? "local" : "global",
-	    flags & GLINE_BADCHAN ? "BADCHAN" : "GLINE", userhost,
+	    flags & GLINE_BADCHAN ? "BADCHAN" : "GLINE", user,
+	    flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : "@",
+	    flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : host,
 	    expire + TSoffset, reason);
 
   /* make the gline */
