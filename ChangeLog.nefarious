@@ -1,7 +1,8 @@
 2003-10-19  Reed Loden  <reed@reedloden.com>
 
 	* ircd/gline.c: Incorporate IK's complete rewrite of the gline
-	quit reason parser.
+	quit reason parser and add consideration for when a service
+	does the gline but the reason does not start with a '<'.
 
 2003-10-18  Reed Loden  <reed@reedloden.com>
 
