@@ -1,9 +1,15 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2004-10-18  Neil Spierling <sirvulcan@gmail.com>
+2004-10-17  Reed Loden  <reed@reedloden.com>
 
-	* Note login on connect code by Alex Badea  <decampos@users.sourceforge.net>
+	* Finally committed my work...
+	Look down a bit in ChangeLog to see changes.
+
+2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Note login on connect code by Alex Badea
+	<decampos@users.sourceforge.net>
 
 	* doc/readme.login-on-connect: Readme file describing how things
 	work with login on connect.
@@ -44,25 +50,24 @@
 	* ircd/s_misc.c (tstats): report login-on-connect counter
 	from ServerStats.
 
-
-2004-10-18  Neil Spierling <sirvulcan@gmail.com>
+2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Applied a small fix posted on sourceforge for
 	CIDR bans and freebsd (also applied to exempts).
 
-2004-10-17  Neil Spierling <sirvulcan@gmail.com>
+2004-10-17  Neil Spierling  <sirvulcan@gmail.com>
 
         * ircd/ircd_relay.c: Dont block bold and underline for +c, as +c
 	is only for blocking colours.
 
-2004-10-16  Neil Spierling <sirvulcan@gmail.com>
+2004-10-16  Neil Spierling  <sirvulcan@gmail.com>
 
         * doc/readme.features: Major update, file should be up to date with
 	current features now. Im sure theres spelling or grammar mistakes in
 	there probably. Ill give it a decent read on Monday on my day off. Im
 	sure reed will get all pedantic before then tho :P
 
-2004-10-15  Neil Spierling <sirvulcan@gmail.com>
+2004-10-15  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added features AUTOCHANMODES and
 	AUTOCHANMODES_LIST, (Quakenet)
@@ -71,10 +76,11 @@
 
 	* include/s_conf.h: Declare find_conf_cidr. (Quakenet)
 
-	* ircd/channel.c: Don't hide QUIT messages from channel services. (Quakenet)
-			  Added SetAutoChanModes function plus call it if the 
-			    nessecary lines are enabled on a first time JOIN. (Quakenet)
-			  Added support for CIDR channel bans and exempts. (Quakenet)
+	* ircd/channel.c: Don't hide QUIT messages from channel 
+	services. (Quakenet)
+	Added SetAutoChanModes function plus call it if the necessary
+	lines are enabled on a first time JOIN. (Quakenet)
+	Added support for CIDR channel bans and exempts. (Quakenet)
 
 	* ircd/m_create.c: Dont allow a client to rejoin if its already
 	in the channel.
@@ -87,7 +93,7 @@
 
 	* ircd/s_conf.c: find_conf_cidr Function etc. (Quakenet).
 
-2004-10-03  Neil Spierling <sirvulcan@gmail.com>
+2004-10-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ChangeLog.nefarious: Updated my email address.
 
@@ -105,7 +111,7 @@
 
 	* patches/README: Updated my email address.
 
-2004-09-29  Neil Spierling <sirvulcan@gmail.com>
+2004-09-29  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: Reran autoconf again.
 
@@ -115,7 +121,7 @@
 
 	* config.h.in: Regenerated (header added back in after).
 
-2004-09-29  Neil Spierling <sirvulcan@gmail.com>
+2004-09-29  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: Reran autoconf.
 
@@ -123,7 +129,7 @@
 	this everytime we run autoheader (unless i actually read the man
 	page properly as there may be a way of preserving it).
 
-2004-09-29  Neil Spierling <sirvulcan@gmail.com>
+2004-09-29  Neil Spierling  <sirvulcan@gmail.com>
 
 	* acinclude.m4: Cleaned up some AC_DEFINE's, dont need acconfig.h now.
 
@@ -131,20 +137,60 @@
 
 	* config.h.in: Regenerated (autoheader).
 
-2004-09-27  Neil Spierling <sirvulcan@gmail.com>
+2004-09-27  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/supported.h: Fixed a client parsing issue.
 
-2004-09-20  Neil Spierling <sirvulcan@gmail.com>
+2004-09-20  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Only use flexable keys if its enabled and the
 	key is set and valid on a join.
 
 	* ircd/m_join.c: Send out CMD_MODE to other servers.
 
-2004-09-16  Neil Spierling <sirvulcan@gmail.com>
+2004-09-25  Reed Loden  <reed@reedloden.com>
 
-	* Include feature from WhatNet's IRCd 
+	* doc/example.conf, include/ircd_features.h, ircd/channel.c,
+	ircd/client.c, ircd/ircd_features.c, ircd/m_oper.c,
+	ircd/s_user.c: Renamed FEAT_OPERLEVELS to FEAT_OPERFLAGS.
+
+	* include/client.h, ircd/channel.c, ircd/m_burst.c,
+	ircd/m_oper.c, ircd/m_whois.c, ircd/s_user.c:
+	Renamed IsAnAdmin() to IsAdmin().
+
+	* ircd/m_whois.c: Optimizations.
+
+	* ircd/s_conf.c: Changed "O" to 'O'.
+
+2004-09-16  Reed Loden  <reed@reedloden.com>
+
+	* ChangeLog.nefarious: Added some info I had forgotten
+	(and removed stuff that is now in Undernet's repository).
+
+	* include/client.h: Added comment to CHFL_HALFOP.
+
+	* ircd/iauth.c: Updated file location.
+
+	* ircd/ircd_alloc.c, ircd/os_bsd.c, ircd/os_generic.c,
+	ircd/os_linux.c, ircd/os_openbsd.c, ircd/os_solaris.c:
+	Removed excess lines after EOF.
+
+	* ircd/m_topic.c: Optimized some code.
+
+	* ircd/s_auth.c: Optimized some code and moved around stuff.
+
+	* ircd/s_conf.c: Miscellaneous whitespacing changes and 
+	optimization of some code.
+
+	* ircd/s_user.c: Miscellaneous text/whitespace changes and
+	support for automatic changing of hidden hosts if
+	FEAT_OPERHOST_HIDING is TRUE.
+
+	* Synched with u2.10.11.07(pre4) as per 2004-09-15.
+
+2004-09-16  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Include feature from WhatNET's IRCd (WhatIRCd)
 	(http://coder-com.whatnet.org).
 
 	* doc/example.conf: Added includes section.
@@ -152,11 +198,11 @@
 	* ircd/s_user.c: Modified read configuration file functions
 	to handle includes.
 
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
+2004-09-13  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Undernet sync.
 
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
+2004-09-13  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/channel.h: Added MODE_ADMINONLY.
 
@@ -173,12 +219,10 @@
 
 	* ircd/s_err.c: See supported.h entry.
 
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
+2004-09-13  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_whois.c: Small bug fix, display +s channels for opers
 	now in WHOIS's (prefixed with *).
-
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Renamed OPLEVELS to OPERLEVELS.
 
@@ -190,8 +234,6 @@
 	* ircd/m_oper.c: See above.
 
 	* ircd/s_user.c: See above.
-
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: New F:lines added OPLEVELS, WHOIS_OPER,
 	WHOIS_ADMIN, and WHOIS_SERVICE.
@@ -227,33 +269,23 @@
 	* ircd/s_user.c: Clear the admin flag if OPLEVELS is disabled.
 	This is also done in m_oper.c.
 
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
-
 	* configure: Reran autoconf.
 
 	* configure.in: Add -Wno-long-long to CFLAGS on BSD systems.
-
-2004-09-13  Neil Spierling <sirvulcan@gmail.com>
 
 	* ircd/ircd_relay.c: Minor fix, thought i had put it in the
 	place originally. Fixed now.
 
 	* ircd/m_join.c: Small bug fix.
 
-2004-09-12  Neil Spierling <sirvulcan@gmail.com>
+2004-09-12  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/Makefile.in: Remove version.c on a make install, makes
 	life easier for keeping track of CVS version when coding.
 	
-2004-09-12  Neil Spierling <sirvulcan@gmail.com>
-
 	* More bug fixes, see ChangeLog.
 
-2004-09-12  Neil Spierling <sirvulcan@gmail.com>
-
 	* ircd/gline.c: Bug fix (see ChangeLog).
-
-2004-09-12  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added ANNOUNCE_INVITES.
 
@@ -285,21 +317,15 @@
 
 	* ircd/send.c: sendcmdto_channel_butserv_butone updates.
 
-2004-09-12  Neil Spierling <sirvulcan@gmail.com>
-
 	* include/supported.h: Added STATUSMSG (isupport), and
 	CHANNELLEN.
 
-2004-09-11  Neil Spierling <sirvulcan@gmail.com>
+2004-09-11  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Small bug fix, was sending the wrong header.
 
-2004-09-11  Neil Spierling <sirvulcan@gmail.com>
-
 	* ircd/parse.c: Fixed bug with commands like /1 or /2 being
 	accepted, which had wierd sideaffects. Fix by Entrope.
-
-2004-09-11  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added X:Lines stuff.
 			    Added features, DNSBL_CHECKS.
@@ -345,6 +371,9 @@
 
 	* doc/example.conf: Added FEAT_RESTARTPASS and FEAT_DIEPASS.
 
+	* include/client.h: Fixed +z (problem was that SSL is local to
+	each server, not global).
+
 	* include/ircd_features.h: Added FEAT_RESTARTPASS,
 	FEAT_DIEPASS, and FEAT_XTRAOP_CLASS.
 
@@ -368,9 +397,8 @@
 
 	* ircd/Makefile.in: Ran "make depend".
 
-	* ircd/channel.c: Corrected spelling errors, did some
-	miscellaneous whitespacing changes, and fixed +z (problem was
-	that SSL is local to each server, not global)
+	* ircd/channel.c: Corrected spelling errors, and did some
+	miscellaneous whitespacing changes.
 
 	* ircd/fda.c, ircd/fda_t.c, ircd/filoio.c, ircd/gline.c, 
 	ircd/m_proto.c, ircd/table_gen.c, ircd/uping.c, ircd/whowas.c:
@@ -419,6 +447,8 @@
 
 	* ircd/m_wallhops.c: Used a better way of displaying '%'.
 
+	* ircd/m_whois.c: Removed redundant MyConnect() check.
+
 	* ircd/querycmds.c: Added tunefile stuff (moved from s_serv.c).
 
 	* ircd/s_conf.c: Changed find_csline() from a char* to an
@@ -453,12 +483,12 @@
 	* ircd/s_user.c: Update the tune file when user counts go up
 	above the highest known count.
 
-2004-09-02  Neil Spierling <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_wallhops.c: Couple of fixes with displaying "%".
 	% was being duplicated on each server the msg went to.
 
-2004-09-02  Neil Spierling <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_burst.c: Warning cleanup.
 
@@ -472,13 +502,13 @@
 
 	* ircd/ssl.c: Warning cleanup.
 
-2004-09-02  Neil Spierling <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: typo fix.
 
 	* ircd/ircd_features.c: typo fix.
 
-2004-09-02  Neil Spierling <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added FEAT_MAX_CHECK_OUTPUT.
 
@@ -488,7 +518,7 @@
 
 	* ircd/m_check.c: Actually use FEAT_MAX_CHECK_OUTPUT.
 
-2004-09-02  Neil Spierling <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Sync with u2.10.11.07(pre1) as per 2004-08-31 (2 Commits).
 
@@ -505,7 +535,7 @@
 
 	* ircd/m_account.c: Re added verified accounts.
 	
-2004-08-31  Neil Spierling <sirvulcan@gmail.com>
+2004-08-31  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/s_user.h: do_nick_name can be called outside of
 	m_nick.c now.
@@ -1635,7 +1665,7 @@
 	* Renamed everything to nefarious as per merger between 
 	BoxenIRCu and evilnet IRCu.
 
-	* Synced with u2.10.11.07(pre1).
+	* Synched with u2.10.11.07(pre1).
 
 	* config.guess, config.sub: Updated to latest svn version
 	from savannah.gnu.org.
@@ -1683,7 +1713,7 @@
 	stuff.
 
 	* ircd/whocmds.c: Fixed bug where a channel of +n user is
-	leaked via WHO (synced from QuakeNet repository).
+	leaked via WHO (synched from QuakeNet repository).
 
 	* Sync with u2.10.11.06.(pre3).
 
@@ -1939,26 +1969,6 @@
 	ircd/m_join.c: Don't allow users to use color codes with
 	/invite and move color dection to a function for further use.
 
-2003-08-20  David Mansell  <splidge@quakenet.org>
-
-	* ircd/s_user.c (hide_hostmask): When rejoining a user to
-	channels, don't send joins to channels where the user is a
-	zombie.
-
-2003-08-20  David Mansell  <splidge@quakenet.org>
-
-	* ircd/m_nick.c: Fix problem where collide kills are not sent
-	to all servers.
-
-2003-07-18  Patrick N.  <smash@web.de>
-
-	* ircd/s_user.c: added sending of ERR_UMODEUNKNOWNFLAG
-
-2003-07-16  Thomas Sader  <thommey@laxin.de>
-
-	* ircd/m_kick.c: We need to check if the user being kicked is
-	actually on the channel before saying you can't kick he/she/it.
-
 2003-07-15  Mathieu Rene  <math@rootservices.net>
 
 	* include/s_user.h, ircd/s_user.c: Fixed a warning by removing
@@ -2067,7 +2077,7 @@
 
 	* Oops, forgot to commit makepem.
 
-	* Synced Kev's fix of m_settime.c.
+	* Synched Kev's fix of m_settime.c.
 
 	* Fix bugs.
 
@@ -2113,29 +2123,9 @@
 	* Added several of my own patches that are still waiting to be
 	committed to main IRCu CVS repository.
 
-2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
-
-	* ircd/gline.c: fixed the counting bug in gline_memory_count
-
-	* ircd/jupe.c: fixed the counting bug in jupe_memory_count
-
-2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
-
-	* doc/ircd.conf.sample: default value for
-	FEAT_HIS_WHOIS_LOCALCHAN
-
-	* doc/readme.features: documented FEAT_HIS_WHOIS_LOCALCHAN
-
-	* include/ircd_features.h: new feature FEAT_HIS_WHOIS_LOCALCHAN
-
-	* ircd/ircd_features.c: new feature FEAT_HIS_WHOIS_LOCALCHAN
-
-	* ircd/m_whois.c: hide local channels in local WHOIS, this
-	breaks HEAD_IN_SAND.
-
 2003-05-10  Reed Loden  <reed@reedloden.com>
 
-	* Synced to current u2_10_11_05.
+	* Synched to current u2_10_11_05.
 
 	* Removed ASUKA's delayedjoin.
 
@@ -2272,11 +2262,6 @@
 	* ircd/m_whois.c: Forgot an ending ')', again.
 
 2002-11-23  Aaron Catella  <acatella@users.sourceforge.net>
-
-	* include/channel.h: create new IsGlobalChannel()
-
-	* ircd/m_clearmode.c, ircd/m_invite.c, m_mode.c, m_opmode.c:
-	clean-up
 
 	* ircd/channel.c: allow non-member channel services to PRIVMSG,
 	NOTICE, WALLCHOPS, and WALLVOICE.

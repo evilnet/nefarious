@@ -1246,16 +1246,18 @@ read_actual_config(const char *cfile)
   FBFILE *file;
 
   Debug((DEBUG_DEBUG, "read_actual_config: ircd.conf = %s", cfile));
-  sendto_opmask_butone(0, SNO_OLDSNO, "Reading configuration file: %s", cfile);
+  sendto_opmask_butone(0, SNO_OLDSNO, "Reading configuration file: %s",
+		       cfile);
 
   if (0 == (file = fbopen(cfile, "r"))) {
-    sendto_opmask_butone(0, SNO_OLDSNO, "Unable to open configuration file: %s", cfile);
+    sendto_opmask_butone(0, SNO_OLDSNO,
+			 "Unable to open configuration file: %s",
+			 cfile);
     return 0;
   }
   feature_unmark(); /* unmark all features for resetting later */
 
-  while (fbgets(line, sizeof(line) - 1, file))
-  {
+  while (fbgets(line, sizeof(line) - 1, file)) {
     int is_include = 0;
     /* Skip comments and whitespaces */
     if ('#' == *line || IsSpace(*line))
@@ -1264,7 +1266,7 @@ read_actual_config(const char *cfile)
     if ((src = strchr(line, '\n')))
       *src = '\0';
     
-    if((asrc = strstr(line, "include")))
+    if ((asrc = strstr(line, "include")))
       is_include = 1; 
 
     if (':' != line[1] && !is_include) {
@@ -1287,76 +1289,74 @@ read_actual_config(const char *cfile)
     field_count = 1;
     quoted = 0;
 
-    for (src = line, dest = line; *src; )
-    {
-      switch (*src)
-      {
-        case '\\':
-          ++src;
+    for (src = line, dest = line; *src; ) {
+      switch (*src) {
+	case '\\':
+	  ++src;
           switch (*src) {
-            case 'b':
-              *dest++ = '\b';
-              ++src;
-              break;
-            case 'f':
-              *dest++ = '\f';
-              ++src;
-              break;
-            case 'n':
-              *dest++ = '\n';
-              ++src;
-              break;
-            case 'r':
-              *dest++ = '\r';
-              ++src;
-              break;
-            case 't':
-              *dest++ = '\t';
-              ++src;
-              break;
-            case 'v':
-              *dest++ = '\v';
-              ++src;
-              break;
-           case '\\':
-              *dest++ = '\\';
-              ++src;
-              break;
-           case '\0':
-              break;
-           default:
-             *dest++ = *src++;
-             break;
-          }
-          break;
-        case '"':
-          if (quoted)
-            quoted = 0;
-          else
-            quoted = 1;
-          /*
-           * strip quotes
-           */
-          ++src;
-          break;
-        case ':':
-          if (quoted)
-            *dest++ = *src++;
-          else {
-            *dest++ = '\0';
-            field_vector[field_count++] = dest;
-            if (field_count > MAX_FIELDS)
-              *src = '\0';
-            else
-               ++src;
-          }
-          break;
-        case '#':
-          *src = '\0';
-          break;
-        default:
-          *dest++ = *src++;
-           break;
+	    case 'b':
+	      *dest++ = '\b';
+	      ++src;
+	      break;
+	    case 'f':
+	      *dest++ = '\f';
+	      ++src;
+	      break;
+	    case 'n':
+	      *dest++ = '\n';
+	      ++src;
+	      break;
+	    case 'r':
+	      *dest++ = '\r';
+	      ++src;
+	      break;
+	    case 't':
+	      *dest++ = '\t';
+	      ++src;
+	      break;
+	    case 'v':
+	      *dest++ = '\v';
+	      ++src;
+	      break;
+	    case '\\':
+	      *dest++ = '\\';
+	      ++src;
+	      break;
+	    case '\0':
+	      break;
+	    default:
+	     *dest++ = *src++;
+	     break;
+	  }
+	  break;
+	case '"':
+	  if (quoted)
+	    quoted = 0;
+	  else
+	    quoted = 1;
+	  /*
+	   * strip quotes
+	   */
+	  ++src;
+	  break;
+	case ':':
+	  if (quoted)
+	    *dest++ = *src++;
+	  else {
+	    *dest++ = '\0';
+	    field_vector[field_count++] = dest;
+	    if (field_count > MAX_FIELDS)
+	      *src = '\0';
+	    else
+	       ++src;
+	  }
+	  break;
+	case '#':
+	  *src = '\0';
+	  break;
+	default:
+	  *dest++ = *src++;
+	   break;
       }
     }
     *dest = '\0';
@@ -1367,7 +1367,7 @@ read_actual_config(const char *cfile)
     if (aconf)
       free_conf(aconf);
 
-    if(0 == ircd_strcmp(field_vector[0], "include")) {
+    if (0 == ircd_strcmp(field_vector[0], "include")) {
       read_actual_config(field_vector[1]);
       continue;
     }
@@ -1502,17 +1502,18 @@ read_actual_config(const char *cfile)
 
     if (field_count > 4 && !EmptyString(field_vector[4])) {
       if (aconf->status & CONF_OPERATOR) {
-        int* i;
-        int flag;
-        char *m = "O";
-        if(*field_vector[4]) DupString(m, field_vector[4]);
-        for (; *m; m++) {
-          for (i = oper_access; (flag = *i); i += 2)
-            if (*m == (char)(*(i + 1))) {
-              aconf->port |= flag;
-              break;
-            }
-        }
+	int* i;
+	int flag;
+	char *m = 'O';
+	if (*field_vector[4])
+	  DupString(m, field_vector[4]);
+	for (; *m; m++) {
+	  for (i = oper_access; (flag = *i); i += 2)
+	    if (*m == (char)(*(i + 1))) {
+	      aconf->port |= flag;
+	      break;
+	    }
+	}
       } else
         aconf->port = atoi(field_vector[4]);
     }
@@ -1524,13 +1525,11 @@ read_actual_config(const char *cfile)
      * Associate each conf line with a class by using a pointer
      * to the correct class record. -avalon
      */
-    if (aconf->status & CONF_CLIENT_MASK)
-    {
+    if (aconf->status & CONF_CLIENT_MASK) {
       if (aconf->conn_class == 0)
         aconf->conn_class = find_class(0);
     }
-     if (aconf->status & CONF_CLIENT)
-    {
+    if (aconf->status & CONF_CLIENT) {
       struct ConfItem *bconf;
 
       if ((bconf = find_conf_entry(aconf, aconf->status))) {
@@ -1554,17 +1553,13 @@ read_actual_config(const char *cfile)
       }
     }
        
-    if (aconf->status & CONF_SERVER)
-    {
+    if (aconf->status & CONF_SERVER) {
       if (ccount > MAXCONFLINKS || !aconf->host || strchr(aconf->host, '*') ||
           strchr(aconf->host, '?') || !aconf->name)
-      {
         continue;
-      }
     }
 
-    if (aconf->status & (CONF_LOCOP | CONF_OPERATOR))
-    {
+    if (aconf->status & (CONF_LOCOP | CONF_OPERATOR)) {
       if (!strchr(aconf->host, '@')) {
         char* newhost;
         int len = 3;                /* *@\0 = 3 */
@@ -1578,11 +1573,9 @@ read_actual_config(const char *cfile)
       }
     }
 
-    if (aconf->status & CONF_SERVER)
-    {
+    if (aconf->status & CONF_SERVER) {
       if (EmptyString(aconf->passwd))
         continue;
-
       lookup_confhost(aconf);
     }
 
@@ -1599,8 +1592,8 @@ read_actual_config(const char *cfile)
     collapse(aconf->name);
        
     Debug((DEBUG_NOTICE, "Read Init: (%d) (%s) (%s) (%s) (%u) (%p)",
-          aconf->status, aconf->host, aconf->passwd,
-          aconf->name, aconf->port, aconf->conn_class));
+ 	  aconf->status, aconf->host, aconf->passwd,
+	  aconf->name, aconf->port, aconf->conn_class));
  
     aconf->next = GlobalConfList;
     GlobalConfList = aconf;
@@ -1608,7 +1601,7 @@ read_actual_config(const char *cfile)
   }
 
   if (aconf)
-    free_conf(aconf); 
+    free_conf(aconf);
 
   fbclose(file);
 
@@ -1630,11 +1623,9 @@ read_configuration_file(void)
   /* unmark all features for resetting later */
   feature_unmark();
 
-  if(!read_actual_config(configfile))
-  {
+  /* try reading the actual ircd.conf */
+  if (!read_actual_config(configfile))
     return 0;
-  }
-
 
   /* reset unmarked features */
   feature_mark();
@@ -1642,11 +1633,10 @@ read_configuration_file(void)
   /*
    * Set our local FLAG_HUB if necessary.
    */
-  if(feature_bool(FEAT_HUB)) {
+  if (feature_bool(FEAT_HUB))
     SetFlag(&me, FLAG_HUB);
-  } else {
+  else
     ClrFlag(&me, FLAG_HUB);
-  }
 
   return 1;
 }
@@ -1753,7 +1743,7 @@ int rehash(struct Client *cptr, int sig)
         sendto_opmask_butone(0, found_g == -2 ? SNO_GLINE : SNO_OPERKILL,
                              found_g == -2 ? "G-line active for %s%s" :
                              "K-line active for %s%s",
-                             IsUnknown(acptr) ? "Unregistered Client ":"",                     
+                             IsUnknown(acptr) ? "Unregistered Client ":"",
                              get_client_name(acptr, SHOW_IP));
         if (exit_client(cptr, acptr, &me, found_g == -2 ? "G-lined" :
             "K-lined") == CPTR_KILLED)

@@ -1,5 +1,5 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, src/listener.c
+ *   IRC - Internet Relay Chat, ircd/iauth.c
  *   Copyright (C) 2001 Perry Lorier <isomer@coders.net>
  *
  *   This program is free software; you can redistribute it and/or modify

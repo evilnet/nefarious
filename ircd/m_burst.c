@@ -223,7 +223,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
               && (!(check_modes & MODE_REGONLY) || IsAccount(member->user))
               && (!(check_modes & MODE_SSLONLY) || IsSSL(member->user))
               && (!(check_modes & MODE_OPERONLY) || IsAnOper(member->user))
-              && (!(check_modes & MODE_ADMINONLY) || IsAnAdmin(member->user)))
+              && (!(check_modes & MODE_ADMINONLY) || IsAdmin(member->user)))
             continue;
           sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Net Rider", chptr, member->user);
           sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, 0, "%H %C :Net Rider", chptr, member->user);

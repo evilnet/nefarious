@@ -387,5 +387,3 @@ int os_set_listen(int fd, int backlog)
 {
   return (0 == listen(fd, backlog));
 }
-
-

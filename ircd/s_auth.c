@@ -41,6 +41,7 @@
 #include "ircd_osdep.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "ircd_struct.h"
 #include "list.h"
 #include "numeric.h"
 #include "querycmds.h"
@@ -53,20 +54,19 @@
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
-#include "ircd_struct.h"
 #include "sys.h"               /* TRUE bleah */
 
 #include <arpa/inet.h>         /* inet_netof */
-#include <netdb.h>             /* struct hostent */
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <assert.h>
-#include <sys/socket.h>
+#include <netdb.h>             /* struct hostent */
+#include <stdlib.h>
+#include <string.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 /*
  * a bit different approach
@@ -77,12 +77,6 @@ static struct {
   unsigned int length;
 } HeaderMessages [] = {
   /* 123456789012345678901234567890123456789012345678901234567890 */
-  { "NOTICE AUTH :*** Checking your IP against DNS ban " \
-    "lists\r\n",                                           58 },
-  { "NOTICE AUTH :*** IP passed DNS ban list check\r\n",   47 },
-  { "NOTICE AUTH :*** IP passed DNS ban list check (cached)\r\n", 56 },
-  { "NOTICE AUTH :*** IP found on DNS ban list\r\n",       43 },
-  { "NOTICE AUTH :*** IP found on DNS ban list (cached)\r\n", 52 },
   { "NOTICE AUTH :*** Looking up your hostname\r\n",       43 },
   { "NOTICE AUTH :*** Found your hostname\r\n",            38 },
   { "NOTICE AUTH :*** Found your hostname, cached\r\n",    46 },
@@ -92,15 +86,16 @@ static struct {
   { "NOTICE AUTH :*** No ident response\r\n",              36 },
   { "NOTICE AUTH :*** Your forward and reverse DNS do not match, " \
     "ignoring hostname.\r\n",                              80 },
-  { "NOTICE AUTH :*** Invalid hostname\r\n",               35 }
+  { "NOTICE AUTH :*** Invalid hostname\r\n",               35 },
+  { "NOTICE AUTH :*** Checking your IP against DNS ban " \
+    "lists\r\n",                                           58 },
+  { "NOTICE AUTH :*** IP passed DNS ban list check\r\n",   47 },
+  { "NOTICE AUTH :*** IP passed DNS ban list check (cached)\r\n", 56 },
+  { "NOTICE AUTH :*** IP found on DNS ban list\r\n",       43 },
+  { "NOTICE AUTH :*** IP found on DNS ban list (cached)\r\n", 52 }
 };
 
 typedef enum {
-  REPORT_DO_DNSBL,
-  REPORT_FIN_DNSBL,
-  REPORT_FIN_DNSBLC,
-  REPORT_FAIL_DNSBL,
-  REPORT_FAIL_DNSBLC,
   REPORT_DO_DNS,
   REPORT_FIN_DNS,
   REPORT_FIN_DNSC,
@@ -109,7 +104,12 @@ typedef enum {
   REPORT_FIN_ID,
   REPORT_FAIL_ID,
   REPORT_IP_MISMATCH,
-  REPORT_INVAL_DNS
+  REPORT_INVAL_DNS,
+  REPORT_DO_DNSBL,
+  REPORT_FIN_DNSBL,
+  REPORT_FIN_DNSBLC,
+  REPORT_FAIL_DNSBL,
+  REPORT_FAIL_DNSBLC
 } ReportType;
 
 #ifdef USE_SSL
@@ -131,7 +131,6 @@ void free_auth_request(struct AuthRequest* auth);
 
 static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
 {
-
   struct AuthRequest* auth = (struct AuthRequest*) vptr;
 
   assert(0 != auth);
@@ -144,45 +143,39 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
 
   if (reply) {
     const struct hostent* hp = reply->hp;
-
-    int pass = 0;
-    int i;
+    int i, pass = 0;
 
     assert(0 != hp);
 
     for (i = 0; hp->h_addr_list[i]; ++i) {
-        if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name))
-          pass = 1;
-        else {
-          pass = 0;
-          break;
-        }
+      if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name))
+	pass = 1;
+      else {
+	pass = 0;
+	break;
+      }
     }
 
-    if (!pass) {
-      if (IsUserPort(auth->client))
+    if (IsUserPort(auth->client)) {
+      if (!pass)
         sendheader(auth->client, REPORT_FAIL_DNSBL);
-    } else {
-      if (IsUserPort(auth->client))
+      else
         sendheader(auth->client, REPORT_FIN_DNSBL);
     }
-  } else {
+  } else
     if (IsUserPort(auth->client))
       sendheader(auth->client, REPORT_FIN_DNSBL);
-  }
-}
 
+  return;
+}
 
 static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
 {
   u_long ip;
   u_char *ipo = (u_char *) &ip;
-
   static char hname[HOSTLEN + 1] = "";
-
   struct blline *blline;
   struct DNSQuery query;
-
   int pass = 0, i = 0;
 
   if (!feature_bool(FEAT_DNSBL_CHECKS))
@@ -205,20 +198,20 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
     if (cli_dnsbl_reply(client)) {
       ++(cli_dnsbl_reply(client))->ref_count;
       for (i = 0; cli_dnsbl_reply(client)->hp->h_addr_list[i]; ++i) {
-          if (!find_blline(auth->client, ircd_ntoa((char*)
-               cli_dnsbl_reply(client)->hp->h_addr_list[i]), cli_dnsbl_reply(client)->hp->h_name))
-            pass = 1;
-          else {
-            pass = 0;
-            break;
-          }
+        if (!find_blline(auth->client, ircd_ntoa((char*)
+	    cli_dnsbl_reply(client)->hp->h_addr_list[i]),
+	    cli_dnsbl_reply(client)->hp->h_name))
+	  pass = 1;
+	else {
+	  pass = 0;
+	  break;
+	}
       }
-  
-      if (pass == 1) {
-        if (IsUserPort(auth->client))
+
+      if (IsUserPort(auth->client)) {
+	if (pass == 1)
           sendheader(client, REPORT_FIN_DNSBLC);
-      } else {
-        if (IsUserPort(auth->client))
+        else
           sendheader(client, REPORT_FAIL_DNSBLC);
       }
     } else
@@ -227,8 +220,6 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
 
   return 0;
 }
-
-
 
 /*
  * auth_timeout - timeout a given auth request
@@ -864,4 +855,3 @@ void read_auth_reply(struct AuthRequest* auth)
     free_auth_request(auth);
   }
 }
-

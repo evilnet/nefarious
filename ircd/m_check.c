@@ -196,7 +196,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
 
       if (showusers) {
          ircd_snprintf(0, outbuf, sizeof(outbuf), "%s%c", acptr->cli_info, COLOR_OFF);
-         send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->username,
+         send_reply(sptr, RPL_CHANUSER, ustat, acptr->cli_name, acptr->cli_user->realusername,
               acptr->cli_user->realhost, outbuf, (c ? acptr->cli_user->account : ""));
       }
 

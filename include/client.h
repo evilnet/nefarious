@@ -61,23 +61,6 @@ struct LOCInfo;
 
 
 /*
- * Oper Flags
- */
-
-#define OFLAG_ADMIN      0x008
-#define OFLAG_GLOBAL     0x010
-
-#define OSetGlobal(x)           (cli_oflags(x) |= OFLAG_GLOBAL)
-#define OSetAdmin(x)            (cli_oflags(x) |= OFLAG_ADMIN)
-
-#define OpIsGlobal(x)           (cli_oflags(x) & OFLAG_GLOBAL)
-#define OpIsAdmin(x)            (cli_oflags(x) & OFLAG_ADMIN)
-
-#define OClearGlobal(x)         (cli_oflags(x) &= ~OFLAG_GLOBAL)
-#define OClearAdmin(x)          (cli_oflags(x) &= ~OFLAG_ADMIN)
-
-
-/*
  * Structures
  *
  * Only put structures here that are being used in a very large number of
@@ -483,8 +466,8 @@ struct Client {
 #define IsXtraOp(x)		HasFlag(x, FLAG_XTRAOP)
 #define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
-#define IsDNSBL(x)              HasFlag(x, FLAG_DNSBL)
-#define IsAnAdmin(x)            HasFlag(x, FLAG_ADMIN)
+#define IsDNSBL(x)		HasFlag(x, FLAG_DNSBL)
+#define IsAdmin(x)		(HasFlag(x, FLAG_ADMIN) && feature_bool(FEAT_OPERFLAGS))
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -516,8 +499,8 @@ struct Client {
 #define SetXtraOp(x)		SetFlag(x, FLAG_XTRAOP)
 #define SetNoChan(x)		SetFlag(x, FLAG_NOCHAN)
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
-#define SetDNSBL(x)             SetFlag(x, FLAG_DNSBL)
-#define SetAdmin(x)             SetFlag(x, FLAG_ADMIN)
+#define SetDNSBL(x)		SetFlag(x, FLAG_DNSBL)
+#define SetAdmin(x)		SetFlag(x, FLAG_ADMIN)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)
@@ -542,10 +525,23 @@ struct Client {
 #define ClearXtraOp(x)		ClrFlag(x, FLAG_XTRAOP)
 #define ClearNoChan(x)		ClrFlag(x, FLAG_NOCHAN)
 #define ClearNoIdle(x)		ClrFlag(x, FLAG_NOIDLE)
-#define ClearAdmin(x)           ClrFlag(x, FLAG_ADMIN)
+#define ClearAdmin(x)		ClrFlag(x, FLAG_ADMIN)
 
 #define SeeOper(sptr,acptr) (IsAnOper(acptr) && (HasPriv(acptr, PRIV_DISPLAY) \
                             || HasPriv(sptr, PRIV_SEE_OPERS)))
+
+/* Oper Flags */
+#define OFLAG_ADMIN	0x008
+#define OFLAG_GLOBAL	0x010
+
+#define OpIsGlobal(x)		(cli_oflags(x) & OFLAG_GLOBAL)
+#define OpIsAdmin(x)		(cli_oflags(x) & OFLAG_ADMIN)
+
+#define OSetGlobal(x)		(cli_oflags(x) |= OFLAG_GLOBAL)
+#define OSetAdmin(x)		(cli_oflags(x) |= OFLAG_ADMIN)
+
+#define OClearGlobal(x)		(cli_oflags(x) &= ~OFLAG_GLOBAL)
+#define OClearAdmin(x)		(cli_oflags(x) &= ~OFLAG_ADMIN)
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/* socket needs to be freed */
@@ -577,8 +573,8 @@ struct Client {
 #define SNO_DEBUG       0x10000  /* debugging messages (DEBUGMODE only) */
 
 #ifdef DEBUGMODE
-# define SNO_ALL        0x1ffff  /* Don't make it larger than significant,
-                                 * that looks nicer */
+# define SNO_ALL        0x1ffff  /* Don't make it larger than
+				  * significant, that looks nicer */
 #else
 # define SNO_ALL        0xffff
 #endif

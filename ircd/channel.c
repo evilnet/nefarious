@@ -999,7 +999,7 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
     if ((chptr->mode.mode & (MODE_NOPRIVMSGS|MODE_MODERATED)) ||
 	((chptr->mode.mode & MODE_REGONLY) && !IsAccount(cptr)) ||
 	((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(cptr)) ||
-	((chptr->mode.mode & MODE_ADMINONLY) && !IsAnAdmin(cptr)) ||
+	((chptr->mode.mode & MODE_ADMINONLY) && !IsAdmin(cptr)) ||
 	((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(cptr)))
       return 0;
     else
@@ -1480,7 +1480,7 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
      (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_OPERONLYCHAN; 
 
-  if ((chptr->mode.mode & MODE_ADMINONLY) && !IsAnAdmin(sptr) && ((keyv == 0) ||
+  if ((chptr->mode.mode & MODE_ADMINONLY) && !IsAdmin(sptr) && ((keyv == 0) ||
      (!feature_bool(FEAT_FLEXABLEKEYS))))
         return overrideJoin + ERR_ADMINONLYCHAN;
 
@@ -3474,13 +3474,13 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	break;
 
       case 'A': /* deal with admin only */
-        /* If they're not an oper, they can't +/- MODE_OPERONLY. */
-        if ((IsAnAdmin(sptr) && feature_bool(FEAT_OPERLEVELS)) || IsServer(sptr)) {
-          mode_parse_mode(&state, flag_p);
-        } else {
-          send_reply(sptr, ERR_NOPRIVILEGES);
-        }
-        break;
+	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
+	if ((IsAdmin(sptr) && feature_bool(FEAT_OPERFLAGS)) || IsServer(sptr)) {
+	  mode_parse_mode(&state, flag_p);
+	} else {
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	}
+	break;
 
       case 'z': /* deal with SSL only */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */

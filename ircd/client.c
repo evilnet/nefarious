@@ -133,7 +133,7 @@ static struct {
   { PRIV_BADCHAN, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
 
   /* 
-   * if OPERLEVELS is disabled then any priv below will be given to global
+   * if OPERFLAGS is disabled then any priv below will be given to global
    * opers (assuming the feature for the priv is enabled)
    */
   { PRIV_RESTART, FEAT_OPER_RESTART, FEATFLAG_ADMIN_OPERS },
@@ -230,8 +230,8 @@ client_set_privs(struct Client* client)
 	if (IsOper(client))
 	  PrivSet(&privs, feattab[i].priv);
       } else if (feattab[i].flag == FEATFLAG_ADMIN_OPERS) {
-        if (feature_bool(FEAT_OPERLEVELS)) {
-          if (IsAnAdmin(client))
+        if (feature_bool(FEAT_OPERFLAGS)) {
+          if (IsAdmin(client))
             PrivSet(&privs, feattab[i].priv);
         } else {
           if (IsOper(client))

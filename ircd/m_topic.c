@@ -194,10 +194,8 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         send_reply(sptr, ERR_CHANOPRIVSNEEDED, chptr->chname);
         continue;
       }
-      /* if chan +m and user not service/+v/+o, return error and ignore */
-      if (!client_can_send_to_channel(sptr, chptr)
-          && !IsChannelService(sptr) && !IsVoicedOrOpped(chptr->members))
-      {
+      /* if chan +m and user not an exception, return error and ignore */
+      if (!client_can_send_to_channel(sptr, chptr)) {
         send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
         continue;
       }

@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, tools/Bounce/Bounce.cpp
+ * IRC - Internet Relay Chat
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  *

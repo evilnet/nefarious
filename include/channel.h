@@ -67,7 +67,7 @@ struct Client;
 #define CHFL_BANNED             0x1000  /* Channel member is banned */
 #define CHFL_SILENCE_IPMASK     0x2000  /* silence mask is an IP-number mask */
 #define CHFL_USER_PARTING       0x4000  /* User is already parting that channel */
-#define CHFL_HALFOP		0x8000
+#define CHFL_HALFOP		0x8000  /* Half operator */
 #define CHFL_EXCEPT             0x10000  /* ban channel flag */
 #define CHFL_EXCEPT_IPMASK      0x20000  /* ban mask is an IP-number mask */
 #define CHFL_EXCEPT_OVERLAPPED     0x40000  /* ban overlapped, need bounce */

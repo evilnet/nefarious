@@ -1844,7 +1844,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * Stop users making themselves operators too easily:
    */
   if (!IsServer(cptr)) {
-    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAnAdmin(sptr)) || !feature_bool(FEAT_OPERLEVELS))
+    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAdmin(sptr)) || !feature_bool(FEAT_OPERFLAGS))
       ClearAdmin(sptr);
     if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
       ClearOper(acptr);
@@ -1874,7 +1874,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
     /*
      * We have to deal with +B first before getting to +s or else we'll
-     * run into problems (+s checks if the user is +B). -reed
+     * run into problems (interference with +s if user is +B). -reed
      */
     if (!(FlagHas(&setflags, FLAG_BOT)) &&
 	(get_client_class(acptr) != feature_int(FEAT_BOT_CLASS)))
@@ -1901,8 +1901,15 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
   if (MyConnect(acptr)) {
     if ((FlagHas(&setflags, FLAG_OPER) || FlagHas(&setflags, FLAG_LOCOP)) &&
-        !IsAnOper(acptr))
+        !IsAnOper(acptr)) {
       det_confs_butmask(acptr, CONF_CLIENT & ~CONF_OPS);
+      if (feature_bool(FEAT_OPERHOST_HIDING))
+	hide_hostmask(acptr);
+    } else if ((!FlagHas(&setflags, FLAG_OPER) ||
+	     !FlagHas(&setflags, FLAG_LOCOP)) && IsAnOper(acptr)) {
+      if (feature_bool(FEAT_OPERHOST_HIDING))
+	hide_hostmask(acptr);
+    }
 
     if (SendServNotice(acptr)) {
       if (tmpmask != cli_snomask(acptr))

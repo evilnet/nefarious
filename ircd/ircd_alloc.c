@@ -160,4 +160,3 @@ void set_nomem_handler(OutOfMemoryHandler handler)
 }
 
 #endif /* defined(MDEBUG) */
-

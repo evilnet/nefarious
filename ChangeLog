@@ -1,7 +1,113 @@
+2004-09-17  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* include/patchlevel.h (PATCHLEVEL): Release the sucker.
+
 2004-09-13  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* doc/readme.features: update feature name--forgotten in a prior
+	commit
+
+	* doc/ircd.conf.sample: update feature name--forgotten in a prior
+	commit
+
+	* doc/example.conf: update feature name--forgotten in a prior
+	commit
+
+	* include/patchlevel.h (PATCHLEVEL): bump patchlevel (again!),
+	just so we know who's runnin' what...
 
 	* ircd/listener.c (add_listener): a listener needs to be listed as
 	a server port listener BEFORE we open the listening port!
+
+2004-09-11  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* ircd/m_topic.c (do_settopic): oh, bah, stupid bug...
+
+2004-06-17  Fredrik Soderblom <froo@quakenet.org>
+
+	* ircd/s_conf.c (rehash): added restart_resolver()
+
+2003-07-04  Bas Steendijk <steendijk@xs4all.nl>
+
+	* include/client.h, ircd/m_userhost.c, ircd/m_userip.c, ircd/m_who.c,
+	ircd/m_whois.c, ircd/whocmds.c: the same code, for "can user A see user
+	B is an oper", appeared in a lot of places. made it a define SeeOper. 
+
+2004-09-11  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* ircd/m_topic.c (do_settopic): Don't allow banned users to set a
+	topic in a channel (adapted from patch by Alexander Maassen
+	<outsider@key2peace.org>)
+
+	* tools/Bounce/Bounce.h: drop file location
+
+	* tools/Bounce/Bounce.cpp: drop file location
+
+	* tools/crypter: drop file location; do some minor fixup; does
+	anyone actually use this script?
+
+	* tools/Makefile.crypt: drop file location
+
+	* ircd/test/ircd_chattr.0.dat (IsChannelPrefix): drop + from
+	channel prefix list
+
+	* ircd/s_user.c (hide_hostmask): use the already calculated hidden
+	host
+
+	* ircd/s_err.c: use the already calculated hidden host
+
+	* ircd/m_version.c (mo_version): fix up a comment
+
+	* ircd/m_topic.c (ms_topic): fix up a couple of comments
+
+	* ircd/m_quit.c: drop the "template" moniker
+
+	* ircd/m_privmsg.c: drop the "template" moniker
+
+	* ircd/m_pong.c: drop the "template" moniker
+
+	* ircd/m_ping.c: drop the "template" moniker
+
+	* ircd/m_opmode.c: update file location
+
+	* ircd/m_notice.c: drop the "template" moniker
+
+	* ircd/m_kill.c: drop the "template" moniker
+
+	* ircd/m_clearmode.c: update file location
+
+	* ircd/m_away.c: drop the "template" moniker
+
+	* ircd/ircd_relay.c (relay_directed_message): X does say it's a
+	service, now...
+
+	* config.h.in: drop file location
+
+	* acconfig.h: drop file location
+
+	* ircd/m_whois.c (do_whois): rename FEAT_HIS_LOCAL_CHAN_WHOIS to
+	satisfy reed :P
+
+	* ircd/ircd_features.c: rename FEAT_HIS_LOCAL_CHAN_WHOIS to
+	satisfy reed :P
+
+	* include/ircd_features.h: rename FEAT_HIS_LOCAL_CHAN_WHOIS to
+	satisfy reed :P
+
+	* include/patchlevel.h (PATCHLEVEL): bump patch level
+
+	* ircd/channel.c (is_banned): apply patch #888640
+
+2003-06-08 Matthias Crauwels <ultimate_@wol.be>
+	* include/ircd_features.h: new feature FEAT_HIS_LOCAL_CHAN_WHOIS
+
+	* ircd/ircd_features.c: new feature FEAT_HIS_LOCAL_CHAN_WHOIS
+
+	* ircd/m_whois.c: hide local channels in local WHOIS, this breaks HIS
+
+	* doc/readme.features: documented FEAT_HIS_LOCAL_CHAN_WHOIS
+
+	* doc/ircd.conf.sample: default value for FEAT_HIS_LOCAL_CHAN_WHOIS
 
 2004-09-11  Kevin L Mitchell  <klmitch@mit.edu>
 
@@ -367,22 +473,6 @@
 
 	* ircd/parse.c: Fixed typo
 
-2003-07-04  Bas Steendijk <steendijk@xs4all.nl>
-
-	* include/client.h, ircd/m_userhost.c, ircd/m_userip.c,
-	ircd/m_who.c, ircd/m_whois.c, ircd/whocmds.c: the same code,
-	for "can user A see user B is an oper", appeared in a lot of
-	places. made it a define SeeOper.
-
-2003-06-29  Bas Steendijk  <steendijk@xs4all.nl>
-
-        * ircd/channel.c: don't ever send mode changes for local
-	channels to servers.
-
-2003-06-25  Bas Steendijk  <steendijk@xs4all.nl>
-
-	* ircd/m_burst.c: Clear topic set by netrider on burst.
-
 2003-07-13 hikari <shadow@undernet.org>
 	* ircd/IPcheck.c: Fixed (another) overflow problem in
 	ip_registry_check_local()
@@ -394,7 +484,7 @@
 	* ircd/s_nick.c: Add user@host information to client exiting notices
 
 2003-07-01 Isomer <isomer@undernet.org>
- 	* ircd/s_user.c: Add realname information to client connect notices
+	* ircd/s_user.c: Add realname information to client connect notices
 
 2003-06-29 hikari <shadow@undernet.org>
 	* ircd/IPcheck,c: Fixed overflow problem in
