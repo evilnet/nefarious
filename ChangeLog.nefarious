@@ -1,4 +1,18 @@
 2004-07-03  Reed Loden  <reed@reedloden.com>
+
+	* include/channel.h, include/client.h, ircd/channel.c,
+	ircd/m_join.c, ircd/m_part.c: Rip out Dianora's anti spambot
+	code. This works better when used as a service.
+
+	* include/numeric.h: Change nefarious to Nefarious.
+
+	* ircd/m_whois.c: Modify how RPL_WHOISVERIFIED is sent.
+
+	* ircd/s_err.c: Modify what RPL_WHOISVERIFIED says.
+
+	* ircd/version.c.SH: Fix whitespacing and copyright text.
+
+2004-07-03  Reed Loden  <reed@reedloden.com>
 	    Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/channel.c: Actually fixed the problem with MODE_OPERONLY 
@@ -54,7 +68,8 @@
 
 2004-06-23  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Changed spambot check feature to FALSE.
+	* include/ircd_features.h: Changed spambot check feature to
+	FALSE.
 
 	* include/patchlevel.h: Bumped patchlevel (0.2.0).
 

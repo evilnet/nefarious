@@ -718,7 +718,7 @@ static Numeric replyTable[] = {
 /* 338 */
   { RPL_WHOISACTUALLY, "%s %s@%s %s :Actual user@host, Actual IP", "338" },
 /* 339 */
-  { RPL_WHOISVERIFIED, "%s :is using an %s account", "339" },
+  { RPL_WHOISVERIFIED, "%s :is using a verified account", "339" },
 /* 340 */
   { RPL_USERIP, ":", "340" },
 /* 341 */

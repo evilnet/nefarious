@@ -175,7 +175,6 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char *chanlist;
   char *name;
   char *keys;
-  int successful_join_count = 0; /* Number of channels successfully joined */
 
   if (parc < 2 || *parv[1] == '\0')
     return need_more_params(sptr, "JOIN");
@@ -281,10 +280,10 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	  send_reply(sptr, i, chptr->chname);
 	  continue;
 	}
+
       } /* else if ((i = can_join(sptr, chptr, keys))) { */
 
       joinbuf_join(&join, chptr, flags);
-      ++successful_join_count;
     } else if (!(chptr = get_channel(sptr, name, CGT_CREATE)))
       continue; /* couldn't get channel */
     else if (check_target_limit(sptr, chptr, chptr->chname, 1)) {
@@ -301,9 +300,6 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       send_reply(sptr, RPL_TOPICWHOTIME, chptr->chname, chptr->topic_nick,
 		 chptr->topic_time);
     }
-
-    if (successful_join_count != 0)
-      cli_last_join_time(sptr) = CurrentTime;
 
     do_names(sptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
   }

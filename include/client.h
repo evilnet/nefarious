@@ -252,16 +252,6 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
-
-  /* Anti flooding part, all because of lamers... */
-  time_t            last_join_time;   /* when this client last
-                                         joined a channel */
-  time_t            last_leave_time;  /* when this client last
-                                       * left a channel */
-  int               join_leave_count; /* count of JOIN/LEAVE in less than
-                                         MIN_JOIN_LEAVE_TIME seconds */
-  int               oper_warn_count_down; /* warn opers of this possible
-                                          spambot every time this gets to 0 */
 };
 
 #define CLIENT_MAGIC 0x4ca08286
@@ -592,13 +582,5 @@ extern void client_add_sendq(struct Connection* con,
 extern void client_set_privs(struct Client* client);
 extern int client_report_privs(struct Client* to, struct Client* client);
 extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
-
-/* ANTISPAM bot patch
- * - Dianora
- */
-#define cli_last_join_time(cli)		((cli)->last_join_time)
-#define cli_last_leave_time(cli)	((cli)->last_leave_time)
-#define cli_join_leave_count(cli)	((cli)->join_leave_count)
-#define cli_oper_warn_count_down(cli)	((cli)->oper_warn_count_down)
 
 #endif /* INCLUDED_client_h */

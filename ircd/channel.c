@@ -2981,69 +2981,6 @@ int IsInvited(struct Client* cptr, struct Channel* chptr)
   return 0;
 }
 
-/* check_spambot_warning()
- *
- * inputs       - Client to check, channel name or NULL if this is a part.
- * output       - NONE
- * side effects - Updates the client's oper_warn_count_down, warns the
- *                IRC operators if necessary, and updates
- *                join_leave_countdown as needed.
- */
-void
-check_spambot_warning(struct Client *source_p, const char *name)
-{
-  time_t t_delta;
-  int decrement_count;
-
-  if (source_p->join_leave_count >= SPAM_NUM)
-  {
-    if (source_p->oper_warn_count_down > 0)
-      source_p->oper_warn_count_down--;
-    else
-      source_p->oper_warn_count_down = 0;
-    if (source_p->oper_warn_count_down == 0)
-    {
-      /* Its already known as a possible spambot */
-      if (name != NULL)
-        sendto_opmask_butone(0, SNO_OLDSNO,
-                             "User %s (%s@%s) trying to join %s is a possible spambot",
-                             cli_name(source_p), cli_username(source_p),
-                             cli_sockhost(source_p), name);
-      else
-        sendto_opmask_butone(0, SNO_OLDSNO,
-                             "User %s (%s@%s) is a possible spambot",
-                             cli_name(source_p), cli_username(source_p),
-                             cli_sockhost(source_p));
-
-      cli_oper_warn_count_down(source_p) = OPER_SPAM_COUNTDOWN;
-    }
-  }
-  else
-  {
-    if ((t_delta = (CurrentTime - source_p->last_leave_time)) >
-         JOIN_LEAVE_COUNT_EXPIRE_TIME)
-    {
-      decrement_count = (t_delta / JOIN_LEAVE_COUNT_EXPIRE_TIME);
-      if (decrement_count > source_p->join_leave_count)
-        source_p->join_leave_count = 0;
-      else
-        source_p->join_leave_count -= decrement_count;
-    }
-    else
-    {
-      if ((CurrentTime - (source_p->last_join_time)) < SPAM_TIME)
-      {
-        /* oh, its a possible spambot */
-        source_p->join_leave_count++;
-      }
-    }
-    if (name != NULL)
-      cli_last_join_time(source_p) = CurrentTime;
-    else
-      cli_last_leave_time(source_p) = CurrentTime;
-  }
-}
-
 int HasCntrl(char *text)
 {
 	int j, found = 0;
