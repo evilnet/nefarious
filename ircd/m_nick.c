@@ -189,6 +189,22 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;                        /* NICK message ignored */
   }
 
+  /*
+   * - ASUKA ---------------------------------------------------------------
+   * Check if this is a local user trying to use a single character nick.
+   * Since these are usually reserved for services, we just don't let
+   * them use it.
+   *
+   * qoreQ (qoreQ@quakenet.org) - 08/14/2002
+   * -----------------------------------------------------------------------
+   */
+ 
+   if(!IsAnOper(sptr) && nick[1] == '\0')
+   {
+     send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+     return 0;
+   }
+
   if (!(acptr = FindClient(nick))) {
     /*
      * No collisions, all clear...

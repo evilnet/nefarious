@@ -378,7 +378,7 @@ static struct FeatureDesc {
   F_S(HIS_URLSERVERS, 0, "http://www.ChatterNet.Org/servers.php", 0),
 
   /* Misc. random stuff */
-  F_S(NETWORK, 0, "ChatterNetNet", 0),
+  F_S(NETWORK, 0, "ChatterNet", 0),
   F_S(URL_CLIENTS, 0, "ftp://ftp.undernet.org/pub/irc/clients", 0),
 
 #undef F_S
