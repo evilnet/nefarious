@@ -1,3 +1,9 @@
+2003-06-19  Reed Loden  <reed@reedloden.com>
+
+	* Fixed the annoying assignment from incompatible pointer type 
+	warning bug.
+	(thanks IceKarma)
+
 2003-06-15  Reed Loden  <reed@reedloden.com>
 
 	* Fix more bugs.

@@ -285,7 +285,7 @@ static RSA *tmp_rsa_cb(SSL *s, int export, int keylen)
 	return RSA_generate_key(keylen, RSA_F4, NULL, NULL);
 } 
 
-static void info_callback(SSL *s, int where, int ret)
+static void info_callback(const SSL *s, int where, int ret)
 {
 	if (where & SSL_CB_LOOP)
 	  Debug((DEBUG_DEBUG, "SSL state (%s): %s",
