@@ -81,15 +81,16 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
   if (chptr->mode.mode & MODE_NOCOLOUR)
     for (ch=text;*ch;ch++)
       if (*ch==3 || *ch==27) {
-        send_reply(sptr, ERR_NOCOLORSONCHAN, chptr->chname);
-        return;
+	send_reply(sptr, ERR_NOCOLORSONCHAN, chptr->chname);
+	send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+	return;
       }
   
   if ((chptr->mode.mode & MODE_NOCTCP) && ircd_strncmp(text,"\001ACTION ",8))
     for (ch=text;*ch;)
       if (*ch++==1) { 
-        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
-        return;
+	send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+	return;
       }
 
   sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),

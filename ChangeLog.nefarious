@@ -4,6 +4,8 @@
 
 2003-07-03  Reed Loden  <reed@reedloden.com>
 
+	* Fix bugs in m_mkpasswd.c and m_ircops.c.
+
 	* Removed login-on-connect.
 
 	* Modified operhost patch to use "? :" construct rather than if

@@ -118,7 +118,7 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
 
    /* if chan +m and user not service/+v/+o, return error and ignore */
    if (!client_can_send_to_channel(sptr, chptr)
-       && !IsChannelService(sptr) && !IsVoicedOrOpped(member))
+       && !IsChannelService(sptr) && !IsVoicedOrOpped(chptr->members))
    {
       send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
       return;

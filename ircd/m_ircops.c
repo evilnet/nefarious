@@ -74,12 +74,14 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
   send_reply(sptr, RPL_IRCOPS, buf);
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
-        if (!IsService(acptr) && IsAnOper(acptr))
+        if (!IsChannelService(acptr) && IsAnOper(acptr))
         {
           if (!acptr->cli_user) continue;
-          ircd_snprintf(0, buf, sizeof(buf), "\2%-30s\2  %s  %-8s  %s", acptr->cli_name ? acptr->cli_name : "<Desconhecido>",
-                                IsOper(acptr) ? "Global" : "Local",
-acptr->cli_user->away ? "(AWAY)" : "", cli_name(acptr->cli_user->server));
+          ircd_snprintf(0, buf, sizeof(buf), "\2%-30s\2  %s  %-8s  %s",
+			acptr->cli_name ? acptr->cli_name : "<Desconhecido>",
+			IsOper(acptr) ? "Global" : "Local",
+			acptr->cli_user->away ? "(AWAY)" : "",
+			cli_name(acptr->cli_user->server));
           send_reply(sptr, RPL_IRCOPS, buf);
           send_reply(sptr, RPL_IRCOPS, "-");
           if (IsOper(acptr)) globals++;
