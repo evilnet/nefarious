@@ -115,6 +115,7 @@ int m_version(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else {
     send_reply(sptr, RPL_VERSION, version, debugmode, cli_name(&me),
 	       debug_serveropts());
+    send_reply(sptr, RPL_CVS_VERSION, CVS_VERSION);
     send_supported(sptr);
   }
 

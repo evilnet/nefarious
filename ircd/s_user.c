@@ -542,6 +542,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
       send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
                  ":If your mail address were foo@bar.com, your username "
                  "would be foo.");
+      send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
+                 ":See %s for further information.", feature_str(FEAT_BADUSER_URL));
       return exit_client(cptr, sptr, &me, "USER: Bad username");
     }
     Count_unknownbecomesclient(sptr, UserStats);

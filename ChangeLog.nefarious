@@ -1,6 +1,24 @@
 /*
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Added feature BADUSER_URL, gives the user a url to
+	go to when they get an invalid username error upon connect.
+
+	* include/ircd_features.h: Added fluff for BADUSER_URL.
+
+	* include/numeric.h: Added new numeric for CVS version reply RPL_CVS_VERSION.
+
+	* ircd/ircd_features.c: Added fluff for BADUSER_URL.
+
+	* ircd/m_version.c: Send out the cvs version of CVS_VERSION to a user.
+
+	* ircd/s_err.c: fluff for RPL_CVS_VERSION.
+
+	* ircd/s_user.c: Do something with BADUSER_URL, send it out with a invalid
+	username error.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* ircd/ircd_features.c: Fixed up bug in HIS_NETSPLIT.
 
         * ircd/m_version.c: Added nessecary include for CVS_VERSION.
@@ -1493,4 +1511,3 @@
 */
 
 #define CVS_VERSION "$Revision$"
-

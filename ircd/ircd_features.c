@@ -440,6 +440,7 @@ static struct FeatureDesc {
   F_I(MAXEXCEPTS, 0, 45, 0),
   F_B(HIS_EXCEPTWHO, 0, 1, 0),
   F_B(TARGET_LIMITING, 0, 1, 0),
+  F_S(BADUSER_URL, 0, "http://www.mirc.co.uk/help/servererrors.html", 0),
 
 #undef F_S
 #undef F_B
