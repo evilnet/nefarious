@@ -148,22 +148,24 @@ static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
     }
   }
 
-  if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && !IsDoingAuth(auth)) {
-    ClearDNSBLPending(auth);
-    if (IsUserPort(auth->client))
-      sendheader(auth->client, REPORT_FIN_DNSBL);
-    Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]", cli_username(auth->client),
-         cli_sockhost(auth->client), cli_sock_ip(auth->client)));
-    release_auth_client(auth->client);
-    unlink_auth_request(auth, &AuthIncompleteList);
-    free_auth_request(auth);
-  } else if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) && IsDoingAuth(auth)) {
-    if (IsUserPort(auth->client))
-      sendheader(auth->client, REPORT_FIN_DNSBL);
-    ClearDNSBLPending(auth);
+  /* If were using DNSBL, and we've processed the last reply, mark stuff done & cleanup */
+  if ((feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)))
+  {
+    if(!IsDoingAuth(auth) && !IsDNSPending(auth)) {
+      ClearDNSBLPending(auth);
+      if (IsUserPort(auth->client))
+        sendheader(auth->client, REPORT_FIN_DNSBL);
+      Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]", cli_username(auth->client),
+           cli_sockhost(auth->client), cli_sock_ip(auth->client)));
+      release_auth_client(auth->client);
+      unlink_auth_request(auth, &AuthIncompleteList);
+      free_auth_request(auth);
+    } else {
+      if (IsUserPort(auth->client))
+        sendheader(auth->client, REPORT_FIN_DNSBL);
+      ClearDNSBLPending(auth);
+    }
   }
-
-
   return;
 }
 
@@ -503,7 +505,7 @@ static void auth_dns_callback(void* vptr, struct DNSReply* reply)
     if (IsUserPort(auth->client))
       sendheader(auth->client, REPORT_FAIL_DNS);
   }
-  if ((feature_bool(FEAT_DNSBL_CHECKS) && !IsDNSBLPending(auth)) && !IsDoingAuth(auth) && !IsDNSPending(auth)) {
+  if ((feature_bool(FEAT_DNSBL_CHECKS) && !IsDNSBLPending(auth)) && !IsDoingAuth(auth)) {
     Debug((DEBUG_DEBUG, "Freeing auth after dns %s@%s [%s]", cli_username(auth->client),
 	 cli_sockhost(auth->client), cli_sock_ip(auth->client)));
     release_auth_client(auth->client);
