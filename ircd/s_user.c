@@ -1420,7 +1420,8 @@ int hide_hostmask(struct Client *cptr)
   make_hidden_hostmask(cli_user(cptr)->host, cptr);
 
   /* ok, the client is now fully hidden, so let them know -- hikari */
-  if (MyConnect(cptr) && IsRegistered(cptr))
+  if (MyConnect(cptr) && IsRegistered(cptr) &&
+      (0 != ircd_strcmp(cli_user(cptr)->host, cli_user(cptr)->dnsblhost)))
    send_reply(cptr, RPL_HOSTHIDDEN, cli_user(cptr)->host);
 
   /*

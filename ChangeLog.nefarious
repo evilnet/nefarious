@@ -3,6 +3,11 @@
 
 2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/s_user.c: Dont display RPL_HOSTHIDDEN if we are setting the
+	dnsblhost.
+
+2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_fakehost.c: Allow any server to set a fakehost.
 
 	* ircd/m_mark.c: Search for a nick now, also send a nickname now.
