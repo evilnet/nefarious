@@ -484,6 +484,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_info, ms_info, mo_info, m_ignore }
   },
   {
+    MSG_CREDITS,
+    TOK_CREDITS,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_info, ms_info, mo_info, m_ignore }
+  },
+  {
     MSG_MOTD,
     TOK_MOTD,
     0, MAXPARA, MFLG_SLOW, 0,

@@ -1,3 +1,10 @@
+2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+
+	* include/msg.h: Added CREDITS fluff.
+
+	* ircd/parse.c: Added CREDITS command, simply calls the m_info etc
+	functions.
+
 2004-06-15  Neil Spierling <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added in feature MOTD_LAST_CHANGED (default FALSE).
