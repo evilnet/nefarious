@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-27  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/s_bsd.c: Applied a connection fix from .12 may help ssl
+
+	* ircd/ssl.c: Save errno before Debug() calls.
+
 2005-03-28  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/querycmds.c: Fixed the reading of the tune file, LUSERS will
