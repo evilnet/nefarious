@@ -229,7 +229,7 @@ do_mangle_gline(struct Client* cptr, struct Client* acptr,
   {
     strcpy(reason, "G-lined by ");
     strncpy(reason, orig_reason+1, endanglebracket - orig_reason + 1);
-  } else if (IsService(sptr) {
+  } else if (IsService(sptr)) {
     strcpy(reason, orig_reason);
   } else {
     ircd_snprintf(0, reason, len, "G-lined (<%s> %s)", sptr->cli_name,
