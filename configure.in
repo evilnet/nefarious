@@ -186,6 +186,7 @@ case "$host" in
 
     *-*bsd*)
 	AC_MSG_RESULT([Generic BSD ($host) found.])
+	CFLAGS="-Wno-long-long $CFLAGS"
 	if test x"$ac_cv_header_poll_h" = xyes; then
 	    unet_poll_syscall=yes
 	else

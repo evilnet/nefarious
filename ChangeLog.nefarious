@@ -3,6 +3,12 @@
 
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
+	* configure: Reran autoconf.
+
+	* configure.in: Add -Wno-long-long to CFLAGS on BSD systems.
+
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/ircd_relay.c: Minor fix, thought i had put it in the
 	place originally. Fixed now.
 
