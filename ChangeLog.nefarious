@@ -29,7 +29,8 @@
 	* ircd/m_ircops.c: Revert to version in which opers cannot see
 	services (works better for now until I figure out another way).
 
-	* ircd/motd.c: Correct indent/spacing.
+	* ircd/motd.c: Correct indent/spacing and add
+	#include <stdio.h>.
 
 	* ircd/s_user.c: Correct indent/spacing.
 

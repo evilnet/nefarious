@@ -143,7 +143,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
     if (acptr->cli_user && IsOper(acptr) && !IsChannelService(acptr)
-	&& !IsService(acptr->cli_user->server)))
+	&& !IsService(acptr->cli_user->server))
     {
       if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
       {
