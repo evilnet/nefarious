@@ -106,7 +106,7 @@ extern unsigned int umode_make_snomask(unsigned int oldmask, char *arg,
                                        int what);
 extern int send_supported(struct Client *cptr);
 extern int is_hostmask(char *word);
-extern int lsc(struct Client *cptr, const char *target, const char *prepend,
+extern int lsc(struct Client *cptr, char *target, const char *prepend,
 	       const char *servicename, int parc, char* parv[]);
 
 #define NAMES_ALL 1 /* List all users in channel */
