@@ -73,13 +73,12 @@ int add_exempt(struct Client* sptr, char* host, char* netburst)
 
   if ((dhost = find_dnsblexempt(host))) {
     if ((0 != ircd_strcmp(netburst, "nb")) && MyConnect(sptr))
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :DNSBL Exemption %s already exists", sptr, host);
-
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :DNSBL Exemption for %s already exists", sptr, host);
     return 0;
   }
 
   if (!IsServer(sptr) && (0 != ircd_strcmp(netburst, "nb")))
-    sendto_opmask_butone(0, SNO_GLINE, "%C Adding DNSBL Exemption on %s", sptr, host);
+    sendto_opmask_butone(0, SNO_GLINE, "%C adding DNSBL Exemption for %s", sptr, host);
 
   dnsblexempts = (struct dnsblexempts *)MyMalloc(sizeof(struct dnsblexempts));
 
@@ -101,14 +100,13 @@ int del_exempt(struct Client* sptr, char* host)
 
   if (!(dhost = find_dnsblexempt(host))) {
     if (MyConnect(sptr))
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :DNSBL Exemption %s does not exist", sptr, host);
-
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :DNSBL Exemption for %s does not exist", sptr, host);
     return 0;
   }
 
   for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next) {
     if (!match(dnsblexempts->host, host)) {
-      sendto_opmask_butone(0, SNO_GLINE, "%C Removing DNSBL Exemption on %s", sptr, host);
+      sendto_opmask_butone(0, SNO_GLINE, "%C Removing DNSBL Exemption for %s", sptr, host);
 
      *dnsblexempts->prev = dnsblexempts->next;
 
@@ -121,20 +119,18 @@ int del_exempt(struct Client* sptr, char* host)
     }
   }
 
-      
   return 0;
 }
 
 int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  char           c;
-  char*          cp;
+  char	c;
+  char*	cp;
 
   struct dnsblexempts *dnsblexempts;
 
   if (!feature_bool(FEAT_DNSBL_CHECKS))
     return send_reply(sptr, ERR_DISABLED, "EXEMPT");
-
 
   if (parc < 2 || EmptyString(parv[1]) || (strlen(parv[1]) <= 4)) {
     for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next)
@@ -163,8 +159,8 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
 int ms_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  char           c;
-  char*          cp;
+  char	c;
+  char*	cp;
 
   cp = parv[2];
   c = *cp;

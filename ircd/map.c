@@ -247,4 +247,3 @@ void map_dump(struct Client *cptr, struct Client *server, char *mask, int prompt
   if (prompt_length > 0)
     p[-1] = '-';
 }
-

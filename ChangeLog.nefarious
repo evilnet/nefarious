@@ -1,6 +1,47 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-23  Reed Loden  <reed@reedloden.com>
+
+	* .cvsignore: Revert inadvertent addition of configure to 
+	the cvsignore list.
+
+	* include/ircd_features.h: Renamed FEAT_CHMODE_A to
+	FEAT_CHMODE_a.
+
+	* ircd/channel.c: Renamed MODE_ADMINONLY from +A to +a.
+	Performed some miscellaneous whitespacing and
+	grammatical changes.
+
+	* ircd/ircd_features.c: Renamed FEAT_CHMODE_A to
+	FEAT_CHMODE_a.
+
+	* ircd/ircd_signal.c: Removed excess lines at EOF.
+
+	* ircd/m_account.c: Fixed a bug where if the account name began 
+	with 'M' or 'U', bad things would happen (only if 
+	sending service does not support LOC).
+
+	* ircd/m_burst.c: Renamed MODE_ADMINONLY from +A to +a.
+
+	* ircd/m_clearmode.c: Added MODE_ADMINONLY to the list of modes 
+	to be cleared.
+
+	* ircd/m_exempt.c: Miscellaneous whitespacing and grammatical
+	changes.
+
+	* ircd/m_join.c: Renamed MODE_ADMINONLY from +A to +a.
+
+	* ircd/m_mark.c: Miscellaneous whitespacing and grammatical
+	changes.
+
+	* ircd/map.c: Removed excess lines at EOF.
+
+	* ircd/s_stats.c: Fixed a bug that was causing FEAT_STATS_C_IPS
+	not to work.
+
+	* ircd/s_user.c: Renamed MODE_ADMINONLY from +A to +a.
+
 2005-03-22  Alex Schumann   <rubin@afternet.org>
 
 	* ircd/s_user.c: Dont send null host in mark, send "notmarked" to 
@@ -74,6 +115,9 @@
 	CVS.
 
 	* ircd/Makefile.in: Ran "make depend".
+
+	* ircd/ircd_relay.c: Swapped a strlen() check for the
+	EmptyString() macro.
 
 	* ircd/m_account.c: Added UserStats.authed incrementer
 	(moved from s_user.c).

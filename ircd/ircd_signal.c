@@ -105,4 +105,3 @@ void setup_signals(void)
   siginterrupt(SIGALRM, 1);
 #endif
 }
-

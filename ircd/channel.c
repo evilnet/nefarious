@@ -1179,7 +1179,7 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
   if (chptr->mode.mode & MODE_OPERONLY)
     *mbuf++ = 'O';
   if (chptr->mode.mode & MODE_ADMINONLY)
-    *mbuf++ = 'A';
+    *mbuf++ = 'a';
   if (chptr->mode.mode & MODE_NOQUITPARTS)
     *mbuf++ = 'Q';
   if (chptr->mode.mode & MODE_SSLONLY)
@@ -1647,7 +1647,7 @@ int SetAutoChanModes(struct Channel *chptr)
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
-    MODE_ADMINONLY,     'A',
+    MODE_ADMINONLY,     'a',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
@@ -1993,7 +1993,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
-    MODE_ADMINONLY,     'A',
+    MODE_ADMINONLY,     'a',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
@@ -2496,7 +2496,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
-    MODE_ADMINONLY,     'A',
+    MODE_ADMINONLY,     'a',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
@@ -3467,7 +3467,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
-    MODE_ADMINONLY,     'A',
+    MODE_ADMINONLY,     'a',
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
@@ -3585,9 +3585,9 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	break;
 
-      case 'A': /* deal with admin only */
+      case 'a': /* deal with admin only */
 	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
-	if ((feature_bool(FEAT_CHMODE_A) && IsAdmin(sptr)) || 
+	if ((feature_bool(FEAT_CHMODE_a) && IsAdmin(sptr)) || 
 	    IsServer(sptr) || IsChannelService(sptr))
 	  mode_parse_mode(&state, flag_p);
 	else
@@ -3670,15 +3670,15 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	break;
 
       case 'z': /* deal with persistant (MODE_PERSIST) channels */
-        if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
-           (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
-          break;
-        else if (plusorminus == 0)
-          destroyed = 1;
-        else if (plusorminus == 1)
-          destroyed = 0;
-        mode_parse_mode(&state, flag_p);
-        break;
+	if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
+	   (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
+	  break;
+	else if (plusorminus == 0)
+	  destroyed = 1;
+	else if (plusorminus == 1)
+	  destroyed = 0;
+	mode_parse_mode(&state, flag_p);
+	break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);
@@ -3766,7 +3766,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
   if (destroyed) {
     if (state.flags & MODE_PARSE_BURST)
-      protocol_violation(&me,"Recieved -z during netburst (%H)", chptr);
+      protocol_violation(&me, "Received -z during netburst (%H)", chptr);
     else
       destroy_unregistered_channel(chptr);
   }

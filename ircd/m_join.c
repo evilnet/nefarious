@@ -258,7 +258,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    break;
 
 	  case ERR_ADMINONLYCHAN:
-	    i = 'A';
+	    i = 'a';
 	    break;
 
 	  case ERR_OPERONLYCHAN:

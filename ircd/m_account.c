@@ -173,7 +173,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     return protocol_violation(cptr, "ACCOUNT from non-server %s",
 			      cli_name(sptr));
 
-  if (parv[2][0] != 'U' && parv[2][0] != 'M') {
+  if (parv[2][1] == '\0' && *parv[2] != 'U' && *parv[2] != 'M') {
     if (parc < 4) {
       /* old-school message, remap it to 'R' */
       parv[4] = NULL;

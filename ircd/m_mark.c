@@ -117,9 +117,9 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     struct Client* acptr;
 
     if(parc < 7)
-        return protocol_violation(sptr, "MARK recieved too few paramiters (%u)", parc);;
+        return protocol_violation(sptr, "MARK received too few parameters (%u)", parc);;
 
-    Debug((DEBUG_DEBUG, "Recieving Mark"));
+    Debug((DEBUG_DEBUG, "Receiving MARK"));
     if ((acptr = FindUser(parv[1]))) {
       Debug((DEBUG_DEBUG, "Marking: %s d: %s flags: %s host: %s reason: %s", cli_name(acptr), parv[3], parv[4], parv[5], parv[6]));
 
@@ -143,10 +143,11 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
       sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s %s :%s", cli_name(acptr), MARK_DNSBL,
                             cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
     } else
-      Debug((DEBUG_DEBUG, "Mark Cant Find user %s", parv[1]));
+      Debug((DEBUG_DEBUG, "MARK cannot find user %s", parv[1]));
 
     return 0;
   } else
-    return protocol_violation(sptr, "Unknown MARK recieved [%s]", parv[2]);
+    return protocol_violation(sptr, "Unknown MARK received [%s]", parv[2]);
+
   return 0;
 }

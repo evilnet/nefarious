@@ -902,7 +902,7 @@ static const struct UserMode {
   { FLAG_XTRAOP,      'X' },
   { FLAG_NOCHAN,      'n' },
   { FLAG_NOIDLE,      'I' },
-  { FLAG_ADMIN,       'A' },
+  { FLAG_ADMIN,       'a' },
   { FLAG_WHOIS,       'W' }
 };
 
@@ -1855,7 +1855,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         else
           ClearWallops(acptr);
         break;
-      case 'A':
+      case 'a':
         if (what == MODE_ADD)
           SetAdmin(acptr);
         else
