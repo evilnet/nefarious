@@ -149,7 +149,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
       return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.", parv[2], ACCOUNTLEN, cli_name(acptr));
 
     ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
-    hide_hostmask(acptr, FLAGS_ACCOUNT);
+    hide_hostmask(acptr, FLAG_ACCOUNT);
 
     sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C R %s", acptr,
 			  cli_user(acptr)->account);
@@ -179,7 +179,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     
     if (type == 'A') {
       ircd_strncpy(cli_user(acptr)->account, acptr->cli_cs_user, ACCOUNTLEN);
-      hide_hostmask(acptr, FLAGS_ACCOUNT | FLAGS_HIDDENHOST);
+      hide_hostmask(acptr, FLAG_ACCOUNT | FLAG_HIDDENHOST);
     }
     
     sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :AUTHENTICATION %s as %s", acptr,
