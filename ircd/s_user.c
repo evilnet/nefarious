@@ -596,8 +596,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
   if (MyConnect(sptr) && feature_bool(FEAT_DNSBL_CHECKS)) {
     char *dhost = NULL;
-    char chkhosti[USERLEN+HOSTLEN+2];
-    char chkhosth[USERLEN+HOSTLEN+2];
+    char chkhosti[NICKLEN+USERLEN+SOCKIPLEN+3];
+    char chkhosth[NICKLEN+USERLEN+HOSTLEN+3];
 
     release_dnsbl_reply(sptr);
 
