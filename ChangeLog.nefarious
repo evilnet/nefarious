@@ -1,5 +1,18 @@
 2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: Added feature DEFAULT_UMODE.
+
+	* doc/readme.features: Documented new feature.
+
+	* include/ircd_features.h: Replaced feature AUTOHIDE with DEFAULT_UMODE.
+
+	* ircd/ircd_features.c: Replaced feature AUTOHIDE with DEFAULT_UMODE (default "+").
+
+	* ircd/s_user.c: Took out the AUTOHIDE stuff and put in some code to handle
+	DEFAULT_UMODE.
+
+2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/channel.h: Added MODE_NOLISTMODES (+L).
 
 	* include/supported.h: Added new mode into the string of channel modes.

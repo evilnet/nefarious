@@ -352,7 +352,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
                   const char *nick, char *username)
 {
   struct ConfItem* aconf;
-  char*            parv[3];
+  char*            parv[4];
   char*            tmpstr;
   char*            tmpstr2;
   char             c = 0;    /* not alphanum */
@@ -588,14 +588,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
     cli_handler(sptr) = CLIENT_HANDLER;
     release_dns_reply(sptr);
 
-  if (feature_bool(FEAT_AUTOHIDE)) {
-    SetHiddenHost(sptr);
-    if (feature_int(FEAT_HOST_HIDING_STYLE) == 2)
-      make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-		    cli_user(sptr)->host, cli_user(sptr)->host,
-		    cli_user(sptr)->virthost);
-  }
-
   /*
    * even though a client isnt auto +x'ing we still do a virtual 
    * ip of the client so we dont have to do it each time the client +x's 
@@ -654,6 +646,17 @@ int register_user(struct Client *cptr, struct Client *sptr,
 			   NumNick(cptr) /* Two %'s */
 			   );
     IPcheck_connect_succeeded(sptr);
+
+    /*
+     * Set user's initial modes
+     */
+    parv[0] = (char*)nick;
+    parv[1] = (char*)nick;
+    parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
+    parv[3] = NULL; /* needed in case of +s */
+    set_user_mode(sptr, sptr, 3, parv);
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
+      ClearHiddenHost(sptr);
   }
   else
     /* if (IsServer(cptr)) */
@@ -705,8 +708,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
   /* Send umode to client */
   if (MyUser(sptr))
   {
-    static struct Flags flags; /* automatically initialized to zeros */
-    send_umode(cptr, sptr, &flags, ALL_UMODES);
     if (cli_snomask(sptr) != SNO_DEFAULT && HasFlag(sptr, FLAG_SERVNOTICE))
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
 

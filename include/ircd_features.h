@@ -47,7 +47,7 @@ enum Feature {
   FEAT_HOST_HIDING,
   FEAT_HIDDEN_HOST,
   FEAT_HIDDEN_IP,
-  FEAT_AUTOHIDE,
+  FEAT_DEFAULT_UMODE,
   FEAT_CONNEXIT_NOTICES,
 
   /* features that probably should not be touched */

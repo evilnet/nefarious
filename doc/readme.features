@@ -273,6 +273,14 @@ This feature controls the generation of server notices when a user
 connects to or disconnects from the server.  Enabling this feature may
 have a performance impact.
 
+DEFAULT_UMODE
+ * Type: string
+ * Default: "+"
+
+This defines the user modes set when a local user connects.  +x must
+not be included in this setting if using host hiding style 1, since
+users cannot later remove that flag.
+
 KILLCHASETIMELIMIT
  * Type: integer
  * Default: 30
