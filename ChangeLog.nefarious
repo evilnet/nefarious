@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-16  Neil Spierling <sirvulcan@gmail.com>
+
+        * doc/readme.features: Major update, file should be up to date with
+	current features now. Im sure theres spelling or grammar mistakes in
+	there probably. Ill give it a decent read on Monday on my day off. Im
+	sure reed will get all pedantic before then tho :P
+
 2004-10-15  Neil Spierling <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added features AUTOCHANMODES and

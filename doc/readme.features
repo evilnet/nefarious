@@ -128,6 +128,11 @@ MOTD_BANNER
 If you enable NODEFAULTMOTD, this specifies a one-line banner to be sent
 to the client in addition to the instructions mentioned above.
 
+REMOTE_MOTD
+ * Type: boolean
+ * Default: FALSE
+
+Controls the use of remote message of the day's.
 PROVIDER
  * Type: string
  * Default: NULL
@@ -245,18 +250,32 @@ This selects whether local users can set umode +x, thus allowing them
 to hide their hostname if they have also registered with a channel
 service (i.e. they have the ACCOUNT flag set).
 
+OPERHOST_HIDING
+ * Type: boolean
+ * Default: TRUE
+
+When TRUE any oper setting +x will get the hidden host set via
+HIDDEN_OPERHOST instead of the host set in HIDDEN_HOST.
+
 HOST_HIDING_STYLE
  * Type: integer
- * Default: 2
+ * Default: 1
 
 Value 1 will give u hidden hosts of ie users.network.tld, Value 2 will
 give you Ultimate IRCd style hosts a43sd.a3523f.isp.tld.
 
 HIDDEN_HOST
  * Type: string
- * Default: users.undernet.org
+ * Default: Users.Nefarious
 
 This selects the suffix for the hidden hostmask (see HOST_HIDING).
+
+HIDDEN_OPERHOST
+ * Type: string
+ * Default: Staff.Nefarious
+
+This selects the suffix for the hidden hostmask for IRC Operators
+(see OPERHOST_HIDING).
 
 HIDDEN_IP
  * Type: string
@@ -271,7 +290,8 @@ CONNEXIT_NOTICES
 
 This feature controls the generation of server notices when a user
 connects to or disconnects from the server.  Enabling this feature may
-have a performance impact.
+have a performance impact. If using this features make sure you take
+a look at snomask.html in this directory.
 
 DEFAULT_UMODE
  * Type: string
@@ -308,6 +328,18 @@ fact that the "GUI" clients tend to stay on every channel they join
 your bandwidth however to send all those messages for 10 different
 channels to all your users.
 
+AVEXCEPTLEN
+ * Type: integer
+ * Default: 40
+
+This is the expected average except mask length.  Leave it at 40.
+
+MAXEXCEPTS
+ * Type: integer
+ * Default: 30
+
+This is the maximum number of excepts a user may set on a given channel.
+
 AVBANLEN
  * Type: integer
  * Default: 40
@@ -329,6 +361,14 @@ silence command allows users to filter messages directed at them from
 certain users or domains, at the source server.  Increasing this
 number allows users to use up more memory with inefficient use of the
 command.  If you're not sure, don't change this.
+
+HALFOPS
+ * Type: boolean
+ * Default: FALSE
+
+This controls the use of half ops (+h). The server will still accept
+half ops from other servers if its set to FALSE (to prevent desyncs)
+just not from users.
 
 HANGONGOODLINK
  * Type: integer
@@ -423,6 +463,29 @@ MPATH is the filename (relative to DPATH) or the full path of the
 "Message of the Day" file.  The contents of this file will be sent to
 every client that connects to the server, after registration.
 
+QPATH
+ * Type: string
+ * Default: "ircd.quotes"
+
+QPATH is the filename (relative to DPATH) or the full path of the random
+quotes file. These quotes will only display if the QUOTES feature is enabled.
+
+EPATH
+ * Type: string
+ * Default: "ircd.rules"
+
+EPATH is the filename (relative to DPATH) or the full path of the rules file.
+Users can see these using the rules command which will need to be enabled if you
+wish to use RULES. See the RULES feature.
+
+QMPATH
+ * Type: string
+ * Default: "ircd.opermotd"
+
+QMPATH is the filename (relative to DPATH) or the full path of the oper message of
+the day file. Opers can see the motd via OPERMOTD. OPERMOTD will need to be enabled
+if you wish to use it. See the OPERMOTD feature.
+
 RPATH
  * Type: string
  * Default: "remote.motd"
@@ -440,6 +503,14 @@ PPATH
 PPATH is the filename (relative to DPATH) or the full path of the
 "PID" file.  It is used for storing the server's process ID so that a
 ps(1) isn't necessary.
+
+TPATH
+ * Type: string
+ * Default: "ircd.tune"
+
+TPATH is the filename (relative to DPATH) or the full path of the tune data file.
+The file contains user count information for LUSERS so that if the server has to
+restart etc for any reason they will not loose their max local/global user counts.
 
 VIRTUAL_HOST
  * Type: boolean
@@ -485,7 +556,7 @@ IRCD_RES_RETRIES
 This is the number of attempts the irc daemon's resolver will have at 
 trying to solicit a response from the DNS server.
 
-IRCD_RES_TIMEOUT
+IRCD_RES_TIMEOUTS
  * Type: integer
  * Default: 4
 
@@ -502,6 +573,115 @@ This is the maximum number of seconds to wait for the ident lookup and
 the DNS query to succeed.  On older (pre 2.10.11.06) servers this was
 hard coded to 60 seconds.
 
+ANNOUNCE_INVITES
+ * Type: boolean
+ * Default: TRUE
+
+When a channel operator invites a user to their channel, all other opers
+will be notified of the invite.
+
+AUTOJOIN
+ * Type: boolean
+ * Default: FALSE
+
+Users can be auto joined into a channel on connect. The autojoin channel
+is located in ircd_defs.h in the include dir. You WILL HAVE TO recompile
+and restart if you change the channel.
+
+AUTOJOIN_NOTICE
+ * Type: boolean
+ * Default: TRUE
+
+This will display a "warning" message telling the user they are being
+autojoined.
+
+AUTOJOIN_NOTICE_VALUE
+ * Type: string
+ * Default: *** Notice -- You are now being autojoined into \#nefarious
+
+This is the notice that will be displayed to users if AUTOJOIN_NOTICE is
+enabled. ALWAYS use a \ before a #!
+
+BADCHAN_REASON
+ * Type: string
+ * Default: This Channel Has Been Banned
+
+This is the kick reason for users being autokicked from a channel when
+it has been bad channel glined.
+
+MOTD_LAST_CHANGED
+ * Type: boolean
+ * Default: FALSE
+
+A noticed will be displayed to connecting users stating when the message
+of the day was last changed.
+
+VERIFIED_ACCOUNTS
+ * Type: boolean
+ * Default: FALSE
+
+This enables verified accounts which relies on services support. This feature
+is still under development and is very minimal at the moment. If you wish to
+add verified account support to your services contact sirvulcan@gmail.com on
+how to send back a verified reply or view m_account.c
+
+OPERLEVELS
+ * Type: boolean
+ * Default: FALSE
+
+Extended oper levels can be enabled. Currently this just adds support for
+an IRC Administrator oper level. See example.conf for enabling it on your
+O:Line if using this feature.
+
+WHOIS_OPER
+ * Type: string
+ * Default: is an IRC Operator"
+
+Default whois reply for the is an oper line.
+
+WHOIS_ADMIN
+ * Type: string
+ * Default: is an IRC Administrator
+
+Default whois reply for is an irc administrator line.
+
+WHOIS_SERVICE
+ * Type: string
+ * Default: is a Network Service
+
+Default whois reply for is a network service line.
+
+UNVERIFIED
+ * Type: string
+ * Default: Your account is unverified, please verify it, reconnect and login again.
+
+Reply given for users trying to set +x when Verfied accounts are
+enabled and the user is not verified.
+
+QUOTES
+ * Type: boolean
+ * Default: TRUE
+
+Controls random quote display for connecting users.
+
+POLICY_NOTICE
+ * Type: boolean
+ * Default: TRUE
+
+Controls the display of the policy notice for connecting users.
+
+LOCAL_CHANNELS
+ * Type: boolean
+ * Default: TRUE
+
+When enabled local channels (& perfix) can be used.
+
+OPER_LOCAL_CHANNELS
+ * Type: boolean
+ * Default: TRUE
+
+Only opers can create local channels if LOCAL_CHANNELS is enabled.
+
 CRYPT_OPER_PASSWORD
  * Type: boolean
  * Default: TRUE
@@ -515,6 +695,33 @@ Since compromises of the "ircd.conf" file have happened in the past,
 you are highly encouraged to use this option.  You can find a program
 called "mkpasswd" in the tools directory that will allow you to
 generate crypted passwords.
+
+OPER_XTRAOP
+ * Type: boolean
+ * Default: FALSE
+
+Controls the use of the Xtra Op oper mode (+X).
+
+XTRAOP_CLASS
+ * Type: integer
+ * Default: 0
+
+This is the class an oper must be in to use the Xtra Op mode if it
+is enabled.
+
+OPER_HIDECHANS
+ * Type: boolean
+ * Default: FALSE
+
+Controls the use of the oper mode for hiding their channels in their
+WHOIS output.
+
+OPER_HIDEIDLE
+ * Type: boolean
+ * Default: FALSE
+
+Controls the use of the oper mode for hiding their idle time in their
+WHOIS output.
 
 OPER_NO_CHAN_LIMIT
  * Type: boolean
@@ -587,6 +794,31 @@ KILL clients directly connected to this server.  Operators will not be
 able to issue KILLs for clients on other servers.  Some networks may
 require that this be turned on for newly linking servers.
 
+CHECK
+ * Type: boolean
+ * Default: TRUE
+
+When enabled an oper is allowed to use the CHECK command.
+
+CHECK_EXTENDED
+ * Type: boolean
+ * Default: TRUE
+
+When enabled extra information will be displayed for opers who are
+using CHECK on local clients. Extra information like traffic counts.
+
+OPER_SINGLELETTERNICK
+ * Type: boolean
+ * Default: FALSE
+
+This limits single letter nicknames to IRC operators only.
+
+MAX_CHECK_OUTPUT
+ * Type: integer
+ * Default: 1000
+
+Maximum amount of records displayed in any CHECK query.
+
 CONFIG_OPERCMDS
  * Type: boolean
  * Default: FALSE
@@ -598,6 +830,141 @@ This configuration option provides a single switch to prevent the use
 of these features until the entire network has been upgraded.  It is
 not required that all servers set this to "TRUE" in order for the
 features to be used.
+
+TOPIC_BURST
+ * Type: boolean
+ * Default: TRUE
+
+This will burst channel topics on netjoins.
+
+HOST_IN_TOPIC
+ * Type: boolean
+ * Default: FALSE
+
+When an channel operator changes the channel topic their full
+nick!ident@host will be displayed for the person who set the topic.
+This can eliminate people faking other people when setting the topic.
+
+TIME_IN_TIMEOUT
+ * Type: boolean
+ * Default: FALSE
+
+This will display the amount of seconds it took for the user to timeout
+in their Ping Timeout quit message.
+
+AUTOCHANMODES
+ * Type: boolean
+ * Default: FALSE
+
+When a user joins a new channel the modes in AUTOCHANMODES_LIST will
+be automatically set
+
+AUTOCHANMODES_LIST
+ * Type: string
+ * Default: (no default)
+
+If AUTOCHANMODES is enabled then any modes in here will be the modes
+set for new channels upon join. Modes should be added in this format
+"ntmn" etc.
+
+FAKEHOST
+ * Type: boolean
+ * Default: TRUE
+
+This enables the FAKEHOST command used for fake hosts (duh).
+
+DEFAULT_FAKEHOST
+ * Type: string
+ * Default: (empty)
+
+This is the default fakehost given to users who are connecting to the server. If
+it is empty or not set then no hostname is set.
+
+SETHOST
+ * Type: boolean
+ * Default: TRUE
+
+ This enables the /sethost command and user mode +h for opers activating Sethosts.
+
+SETHOST_USER
+ * Type: boolean
+ * Default: TRUE
+
+ This enabled the /sethost command and user mode +h for users activating Sethosts
+ with passwords.
+
+SETHOST_AUTO
+ * Type: boolean
+ * Default: TRUE
+
+ This enables the automatic application of Sethosts on matching idents and hosts.
+
+SETHOST_FREEFORM
+ * Type: boolean
+ * Default: TRUE
+
+ This enables opers to set new hostnames that do not have a corresponding S: line
+ in the configuration file, as long as the hostname supplied is reasonably valid.
+ The usage if this is logged via SNOTICE.
+
+REMOTE_OPER
+ * Type: boolean
+ * Default: TRUE
+
+Allows remote users to oper up remotly witthout requiring an O:Line on the server
+they are on.
+
+BOT_CLASS
+ * Type: integer
+ * Default: 0
+
+Defines the class a bot must be on to be able to use +B bot mode.
+
+RULES
+ * Type: boolean
+ * Default: FALSE
+
+Controls the use of the RULES command.
+
+OPERMOTD
+ * Type: boolean
+ * Default: FALSE
+
+Controls the use of the OPERMOTD command.
+
+EXCEPTS
+ * Type: boolean
+ * Default: FALSE
+
+Allows the use of channel ban exemptions. THIS WILL BREAK SERVICES THAT ARE
+UNPATCHED TO HANDLE THE NEW BURST LINE WE USE! To also use this feature you
+MUST enable BREAK_P10.
+
+BREAK_P10
+ * Type: boolean
+ * Default: FALSE
+
+If enabled and EXCEPTS is enabled then channel ban exemptions will be allowed
+to be used.
+
+FLEXABLEKEYS
+ * Type: boolean
+ * Default: FALSE
+
+Channel key rules over all modes. Eg a user can join a channel with the correct
+key and be able to get around modes like limit and invite.
+
+NOTHROTTLE
+ * Type: boolean
+ * Default: FALSE
+
+Completly disables connection throttling.
+
+CREATE_CHAN_OPER_ONLY
+ * Type: boolean
+ * Default: FALSE
+
+Only IRC Operators will be able to create new channels.
 
 OPER_KILL
  * Type: boolean
@@ -813,11 +1180,72 @@ This selects whether local IRC operators are permitted to use the
 /GLINE command with the ! flag to force slightly wide G-lines to be
 set.
 
+RESTARTPASS
+ * Type: string
+ * Default: (empty)
+
+This is the password required for a server to actually restart when
+the RESTART command is used. The if the password is empty then no
+password is required.
+
+DIEPASS
+ * Type: string
+ * Default: (empty)
+
+This is the password required for a server to actually die when
+the DIE command is used. The if the password is empty then no
+password is required.
+
+TARGET_LIMITING
+ * Type: boolean
+ * Default: TRUE
+
+Limits users to a certain amount of targets in the a certain
+amount of time.
+
+DNSBL_CHECKS
+ * Type: boolean
+ * Default: FALSE
+
+Enables DNS blacklist checks controlled via X:Lines. THIS FEATURE
+IS HIGHLY BETA! Do not use it in a production enviroment yet.
+
+DNSBL_EXEMPT_CLASS
+ * Type: integer
+ * Default: 0
+
+Anyone in this class is immune to DNSBL checks if they are enabled.
+
+STATS_C_IPS
+ * Type: boolean
+ * Default: FALSE
+
+Hides IP addresses in STATS C output for users.
+
+HIS_IRCOPS
+ * Type: boolean
+ * Default: TRUE
+
+This removes IRCOPS from users.
+
+HIS_IRCOPS_SERVERS
+ * Type: boolean
+ * Default: TRUE
+
+This removes server names in the IRCOPS output from users.
+
 HIS_MAP
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /MAP from users.
+
+HIS_MAP_SCRAMBLED
+ * Type: boolean
+ * Default: TRUE
+
+Scrambles the MAP output for normal users, removing hubs and 
+U:lined servers.
 
 HIS_SNOTICES
  * Type: boolean
@@ -854,6 +1282,13 @@ HIS_LINKS
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /LINKS from users.
+
+HIS_LINKS_SCRAMBLED
+ * Type: boolean
+ * Default: TRUE
+
+Scrambles the LINKS output for users, removing hubs and U:Lined
+servers.
 
 HIS_TRACE
  * Type: boolean
@@ -1017,6 +1452,12 @@ HIS_STATS_x
 
 As per UnderNet CFV-165, this removes /STATS x from users.
 
+HIS_STATS_X
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS X from users.
+
 HIS_STATS_y
  * Type: boolean
  * Default: TRUE
@@ -1065,6 +1506,12 @@ HIS_BANWHO
 
 As per UnderNet CFV-165, this doesn't show which server set a ban.
 
+HIS_EXCEPTWHO
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this doesn't show which server set a except.
+
 HIS_KILLWHO
  * Type: boolean
  * Default: TRUE
@@ -1079,11 +1526,31 @@ HIS_REWRITE
 As per UnderNet CFV-165, this remaps remote numerics to come from the local
 server.
 
+HIS_GLINE
+ * Type: boolean
+ * Default: TRUE
+
+This will hide the user who done the gline in the gline message when enabled.
+
+HIS_USERGLINE
+ * Type: boolean
+ * Default: TRUE
+
+This will disable users using the gline command. (If the nessecary options are
+enabled, users can query the gline list using the gline command).
+
 HIS_REMOTE
  * Type: integer
  * Default: 1
 
 As per UnderNet CFV-165, this disallows remote queries. (*sob!*)
+
+HIS_SCRAMBLED_CACHE_TIME
+ * Type: integer
+ * Default: 604800
+
+Amount of seconds a split server is cached for before dissapearing off MAPS
+and LINKS for normal users.
 
 HIS_NETSPLIT
  * Type: boolean
@@ -1093,34 +1560,41 @@ As per UnderNet CFV-165, this removes server names in net break sign-offs.
 
 HIS_SERVERNAME
  * Type: string
- * Default: "*.undernet.org"
+ * Default: "*.Nefarious"
 
 As per UnderNet CFV-165, this is the "name" of the server shown to users on a
 /WHOIS of another user.
 
 HIS_SERVERINFO
  * Type: string
- * Default: "The Undernet Underworld"
+ * Default: "evilnet development"
 
 As per UnderNet CFV-165, this is the "info" of the server shown to users on a
 /WHOIS of another user.
 
 HIS_URLSERVERS        
  * Type: string 
- * Default: "http://www.undernet.org/servers.php"
+ * Default: "http://sourceforge.net/projects/evilnet/""
  
 As per UnderNet CFV-165, this is the URL shown to users when they do a /MAP or 
 /LINKS.
 
 NETWORK
  * Type: string
- * Default: "UnderNet"
+ * Default: "Nefarious"
 
 This defines the network name as reported in the 005 "supported features"
 numeric, and as used by the "Failed to deliver" message.
 
 URL_CLIENTS
  * Type: string
- * Default: "ftp://ftp.undernet.org/pub/irc/clients"
+ * Default: "http://www.ircreviews.org/clients/"
 
 This defines a URL that users may visit to find compatible IRC clients.
+
+BADUSER_URL
+ * Type: string
+ * Default: "http://www.mirc.co.uk/help/servererrors.html"
+
+This defines a URL that users may visit to fix their username/ident when
+it is invalid.
