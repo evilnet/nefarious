@@ -195,6 +195,20 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
 }
 
 static int
+do_badchanneled(struct Client *chptr, struct Gline *gline) {
+  struct Membership *member,*nmember;
+  for (member=chptr->members;member;member=nmember,nmember=member->next_member) {
+    if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
+      continue;
+    sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+    sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+    make_zombie(member, member->user, &me, &me, chptr);
+    return 1;
+  }
+  return 0;
+}
+
+static int
 do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 {
   struct Client *acptr;
@@ -228,27 +242,11 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	    nchptr=chptr->next;
 	    if (match(gline->gl_user, chptr->chname))
 	      continue;
-	    for (member=chptr->members;member;member=nmember) {
-	      nmember=member->next_member;
-	      if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
-		continue;
-	      sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	      sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	      make_zombie(member, member->user, &me, &me, chptr);
-	      retval=1;
-	    }
+	    retval = do_badchanneled(chptr, gline);
 	  }
 	} else { 
 	  if ((chptr=FindChannel(gline->gl_user))) { 
-	    for (member=chptr->members;member;member=nmember) { 
-	      nmember=member->next_member;
-	      if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user)) 
-	        continue; 
-	      sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	      sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	      make_zombie(member, member->user, &me, &me, chptr); 
-	      retval=1;
-	    } 
+	    retval = do_badchanneled(chptr, gline);
 	  }
         } 
       } else { /* Host/IP gline */

@@ -1,6 +1,13 @@
 2003-10-18  Reed Loden  <reed@reedloden.com>
 
-	* ircd/gline.c: Tidy up clsk's fix.
+	* include/ircd_string.h: Add an ircd_strrcmp() macro.
+
+	* ircd/gline.c: Tidy up clsk's fix and remove redundancy by
+	using refactoring.
+	(thanks IK!)
+
+	* ircd/m_ircops.c: Completely hide any opers on servers ending
+	in ".Services".
 
 2003-10-18  Alan Alvarez  <nirvana_alan@hotmail.com>
 
@@ -189,7 +196,7 @@
 
 	* Fixed the annoying assignment from incompatible pointer type 
 	warning bug.
-	(thanks IceKarma)
+	(thanks IK)
 
 2003-06-15  Reed Loden  <reed@reedloden.com>
 
@@ -240,7 +247,7 @@
 	* Added asuka's topicburst (which in turn was made by Vampire-).
 
 	* Added badnicks for X<numerics here> and then fixed it.
-	(thanks IceKarma and Rubin)
+	(thanks IK and Rubin)
 
 	* Added support for FEAT_HIS_STATS_u and FEAT_HIS_STATS_w.
 

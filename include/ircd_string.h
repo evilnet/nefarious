@@ -13,6 +13,7 @@
  * Macros
  */
 #define EmptyString(x) (!(x) || !(*x))
+#define ircd_strrcmp(s1, s2) ircd_strcmp((s1), (s2)+strlen((s2))-1-strlen((s1)))
 
 /*
  * initialize recognizers

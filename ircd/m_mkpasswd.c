@@ -86,9 +86,9 @@ int mo_mkpasswd(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
   int is_md5 = 0;
 
   if (parc == 3) {
-    if (!strcasecmp(parv[2], "MD5")) {
+    if (!ircd_strcmp(parv[2], "MD5")) {
       is_md5 = 1;
-    } else if (!strcasecmp(parv[2], "DES")) {
+    } else if (!ircd_strcmp(parv[2], "DES")) {
       is_md5 = 0;
     } else {
       sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :MKPASSWD syntax error:  MKPASSWD pass [DES|MD5]", &me);
