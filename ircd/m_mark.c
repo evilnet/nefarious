@@ -134,7 +134,10 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
       /* not used yet so no real need to fuss around with parv/parv */
       ircd_strncpy(cli_dnsblformat(acptr), "reason", BUFSIZE);
 
-      ircd_snprintf(0, cli_user(acptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(acptr), cli_sockhost(acptr));
+      ircd_snprintf(0, cli_user(acptr)->dnsblhost, HOSTLEN, "%s", parv[5]);
+
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s :%s", acptr, MARK_DNSBL,
+                            cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
     }
 
     return 0;
