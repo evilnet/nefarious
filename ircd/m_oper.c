@@ -171,7 +171,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return send_reply(sptr, ERR_NOOPERHOST);
     }
 
-    if (0 != ircd_strcmp(cli_name(srv), cli_name(&me))) {
+    if (!IsMe(srv)) {
       sendcmdto_one(sptr, CMD_OPER, srv, "%C %s %s", srv, parv[2], parv[3]);
       return 0;
     } else {

@@ -157,23 +157,15 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	  ircops++;
 	  send_reply(sptr, RPL_IRCOPS, buf);
         } else if (parc == 1) {
-	  if (IsAnOper(sptr))
-  	    ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
-		          acptr->cli_name ? acptr->cli_name : "<Unknown>",
-		          acptr->cli_user->away ? " (AWAY)" : "",
-			  cli_name(acptr->cli_user->server),
-		          (feature_bool(FEAT_OPER_HIDEIDLE) &&
-		           IsNoIdle(acptr)) ? 0 :
-		           CurrentTime - acptr->cli_user->last);
-	  else
-  	    ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
-		          acptr->cli_name ? acptr->cli_name : "<Unknown>",
-		          acptr->cli_user->away ? " (AWAY)" : "",
-		          feature_bool(FEAT_HIS_IRCOPS_SERVERS) ? feature_str(FEAT_HIS_SERVERNAME) :
-			  cli_name(acptr->cli_user->server),
-		          (feature_bool(FEAT_OPER_HIDEIDLE) &&
-		           IsNoIdle(acptr)) ? 0 :
-		           CurrentTime - acptr->cli_user->last);
+	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
+		        acptr->cli_name ? acptr->cli_name : "<Unknown>",
+		        acptr->cli_user->away ? " (AWAY)" : "",
+		        (feature_bool(FEAT_HIS_IRCOPS_SERVERS) && !IsAnOper(sptr)) ?
+			 feature_str(FEAT_HIS_SERVERNAME) :
+			 cli_name(acptr->cli_user->server),
+		        (feature_bool(FEAT_OPER_HIDEIDLE) &&
+		         IsNoIdle(acptr)) ? 0 :
+		         CurrentTime - acptr->cli_user->last);
 	  ircops++;
 	  send_reply(sptr, RPL_IRCOPS, buf);
         }
