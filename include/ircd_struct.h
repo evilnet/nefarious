@@ -84,7 +84,7 @@ struct User {
   time_t	     acc_create;
   char               virtip[SOCKIPLEN + 30];
   char               virthost[HOSTLEN + 1];
-  char               dnsblformat[MAXLEN + 1];
+  char               dnsblformat[BUFSIZE + 2];
 };
 
 struct LOCInfo {

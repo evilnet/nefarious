@@ -5,6 +5,8 @@
 
 	* include/ircd_reply.h: Removed MAXLEN as it is no longer used.
 
+	* include/ircd_struct.h: Replaced MAXLEN with BUFSIZE.
+
 	* ircd/ircd_reply.c: Replaced MAXLEN with BUFSIZE.
 
 	* ircd/m_account.c: Couple of changes for optimization.
