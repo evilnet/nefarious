@@ -1614,7 +1614,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      * ASUKA: Allow opers to set +k.  Also, restrict +XnI to
      * opers only also.
      */
-    if (!FlagHas(&setflags, FLAG_CHSERV) && !IsOper(acptr))
+    if (!FlagHas(&setflags, FLAG_CHSERV) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_XTRAOP)))
       ClearChannelService(acptr);
     if (!FlagHas(&setflags, FLAG_XTRAOP) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_XTRAOP)))
       ClearXtraOp(acptr);
@@ -2195,7 +2195,7 @@ lsc(struct Client *cptr, char *target, const char *prepend,
     */
 
    if (IsChannelPrefix(*target))
-     relay_channel_message(cptr, target, msg); 
+     relay_channel_message(cptr, target, msg, 1);
    else if ((tmp = strchr(target, '@')))
      relay_directed_message(cptr, target, tmp, msg);
    else

@@ -165,7 +165,7 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return send_reply(sptr, ERR_NOSUCHCHANNEL, chname);
 
   if (!force) {
-    if (qreason = find_quarantine(chptr->chname))
+    if ((qreason = find_quarantine(chptr->chname)))
       return send_reply(sptr, ERR_QUARANTINED, chptr->chname, qreason);
 
     for (tmp = chptr->members; tmp; tmp = tmp->next_member)

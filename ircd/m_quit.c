@@ -119,7 +119,7 @@ int m_quit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	  if (chan->channel->mode.mode & MODE_NOCOLOUR)
 	    return exit_client(cptr, sptr, sptr, "Quit");
 	  else if (chan->channel->mode.mode & MODE_STRIP) {
-	    if (!quitnocolour) quitnocolour = (char*)StripColour(parv[parc - 1], 0);
+	    if (!quitnocolour) quitnocolour = (char*)StripColour(parv[parc - 1]);
 	    return exit_client_msg(cptr, sptr, sptr, "Quit: %s", quitnocolour);
 	  }
 	}

@@ -205,7 +205,7 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       else if (chptr->mode.mode & MODE_STRIP) {
 	if (hascolour == -1) hascolour = HasColour(topic);
 	if (hascolour) {
-	  if (!topicnocolour) topicnocolour = (char*)StripColour(topic, 0);
+	  if (!topicnocolour) topicnocolour = (char*)StripColour(topic);
 	  do_settopic(sptr,cptr,chptr,topicnocolour,0);
 	  continue;
 	}

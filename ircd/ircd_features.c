@@ -399,6 +399,7 @@ static struct FeatureDesc {
   F_B(ASUKA_HIDECHANS, 0, 0, 0),
   F_B(ASUKA_HIDEIDLE, 0, 0, 0),
   F_B(ASUKA_CHECK, 0, 0, 0),
+  F_B(ASUKA_SINGLELETTERNICK, 0, 0, 0),
   F_B(SETHOST, 0, 1, 0),
   F_B(SETHOST_FREEFORM, 0, 0, 0),
   F_B(SETHOST_USER, 0, 1, 0),

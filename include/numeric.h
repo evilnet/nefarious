@@ -341,7 +341,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_NOCOLORSONCHAN   408  Dalnet */
 #define ERR_NOCOLORSONCHAN   408	/* evilnet extension */
 #define ERR_NOORIGIN         409
-#define EFF_NOMULTITARGET    410	/* evilnet extension */
+#define ERR_NOMULTITARGET    410	/* evilnet extension */
 
 #define ERR_NORECIPIENT      411
 #define ERR_NOTEXTTOSEND     412

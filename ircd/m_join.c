@@ -218,7 +218,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     /* disallow creating local channels */
     if (IsLocalChannel(name) && !chptr &&
 	(!feature_bool(FEAT_LOCAL_CHANNELS) ||
-	(feature_bool(FEAT_OPER_LOCAL_CHANNELS) && !IsAnOper(sptr))) {
+	(feature_bool(FEAT_OPER_LOCAL_CHANNELS) && !IsAnOper(sptr)))) {
 	send_reply(sptr, ERR_NOSUCHCHANNEL, name);
 	continue;
     }

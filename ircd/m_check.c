@@ -39,8 +39,9 @@
 #include "numnicks.h"
 #include "querycmds.h"
 #include "send.h"
-#include "s_user.h"
 #include "s_debug.h"
+#include "s_misc.h"
+#include "s_user.h"
 
 #include <string.h>
 
@@ -58,7 +59,6 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
    struct Channel *chptr;
    struct Client *acptr;
-   char *param;
    int showchan = 0;
 
    if (!feature_bool(FEAT_ASUKA_CHECK))
@@ -463,14 +463,14 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan)
    }
    else
    {
-      if (p = strchr(hoststr, '@'))
+      if ((p = strchr(hoststr, '@')))
       {
          *p++ = '\0';
          if (*p) ircd_strncpy(hostm,p, HOSTLEN);
       }
 
       /* Get the nick!user mask */
-      if (p = strchr(hoststr, '!')) 
+      if ((p = strchr(hoststr, '!')))
       {
          *p++ = '\0';
          if (*p) ircd_strncpy(userm,p,USERLEN);

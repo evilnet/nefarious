@@ -199,15 +199,15 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    * qoreQ (qoreQ@quakenet.org) - 08/14/2002
    * -----------------------------------------------------------------------
    */
- 
-   if (!IsAnOper(sptr) && nick[1] == '\0')
-   {
+   if (feature_bool(FEAT_ASUKA_SINGLELETTERNICK) && !IsAnOper(sptr)
+       && nick[1] == '\0') {
      send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
      return 0;
    }
 
    /* Don't let users use X<numerics here> so they can't fake X2 -reed */
-   if (!IsAnOper(sptr) && nick[0] == 'X') {
+   if (!ircd_strcmp(feature_str(FEAT_NETWORK), "AfterNET")
+       && !IsAnOper(sptr) && nick[0] == 'X') {
      for(n = nick+1;n;n++) {
        if (!IsDigit(*n))
          return 0;
