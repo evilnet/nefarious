@@ -98,6 +98,7 @@
 #include "s_conf.h"
 #include "send.h"
 #include "support.h"
+#include "supported.h"
 
 #include <assert.h>
 
@@ -237,10 +238,10 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
 	member->status &= ~CHFL_CHANOP;
       }
 
-          /* Drop halfop */
+      /* Drop halfop status */
       if (IsHalfOp(member) && del_mode & MODE_HALFOP) {
-                modebuf_mode_client(&mbuf, MODE_DEL | MODE_HALFOP, member->user);
-                member->status &= ~CHFL_HALFOP;
+	modebuf_mode_client(&mbuf, MODE_DEL | MODE_HALFOP, member->user);
+	member->status &= ~CHFL_HALFOP;
       }
 
       /* Drop voice */
@@ -292,7 +293,7 @@ ms_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return need_more_params(sptr, "CLEARMODE");
 
   if (!IsPrivileged(sptr)) {
-    protocol_violation(sptr,"No priviledges on source for CLEARMODE, desync?");
+    protocol_violation(sptr, "No privileges on source for CLEARMODE, desync?");
     return send_reply(sptr, ERR_NOPRIVILEGES);
   }
 
@@ -313,7 +314,7 @@ int
 mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Channel *chptr;
-  char *control = "ovpsmikblrcCLMNOQSTz"; /* default control string */
+  char *control = clearchanmodes; /* default control string (supported.h) */
   char *chname, *qreason;
   struct Membership *tmp;
   int force = 0;
@@ -351,7 +352,7 @@ mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	/* Impersonate the abuser */
 	sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 				"Failed CLEARMODE for registered channel %s by %s",
-				chptr->chname, sptr->cli_name);
+				chptr->chname, cli_name(sptr));
 	return send_reply(sptr, ERR_QUARANTINED, chptr->chname,
 			  "This channel is registered.");
       }

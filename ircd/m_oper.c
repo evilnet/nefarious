@@ -82,6 +82,7 @@
 #include "config.h"
 
 #include "client.h"
+#include "handlers.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_features.h"
@@ -230,7 +231,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			 IsOper(sptr) ? 'O' : 'o');
 
     if (feature_bool(FEAT_OPERMOTD))
-      opermotd_send(sptr);
+      m_opermotd(sptr, sptr, 1, parv);
 
     log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#R)", name, sptr);
   return 0;

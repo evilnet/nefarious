@@ -82,16 +82,8 @@
 #include "config.h"
 
 #include "client.h"
-#include "hash.h"
 #include "ircd.h"
 #include "ircd_features.h"
-#include "ircd_reply.h"
-#include "ircd_string.h"
-#include "numeric.h"
-#include "numnicks.h"
-#include "send.h"
-
-#include <assert.h>
 
 /*
  * mo_get - oper message handler

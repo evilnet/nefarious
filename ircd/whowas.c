@@ -417,4 +417,3 @@ unsigned int hash_whowas_name(const char *name)
   return ((hash & WW_MAX_INITIAL_MASK) << BITS_PER_COL) +
       (hash2 & BITS_PER_COL_MASK);
 }
-

@@ -83,22 +83,30 @@
 
 #include "client.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "numeric.h"
 #include "numnicks.h"
-#include "send.h"
-
-#include <assert.h>
+#include "opercmds.h"
 
 /*
  * mo_restart - oper message handler
  */
 int mo_restart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  char* password;
+  char *restartpass = (char *)feature_str(FEAT_RESTARTPASS);
+
   if (!HasPriv(sptr, PRIV_RESTART))
     return send_reply(sptr, ERR_NOPRIVILEGES);
+
+  if (!EmptyString(restartpass)) {
+    password = parc > 1 ? parv[1] : 0;
+    if (!oper_password_match(password, restartpass))
+      return send_reply(sptr, ERR_PASSWDMISMATCH);
+  }
 
   log_write(LS_SYSTEM, L_NOTICE, 0, "Server RESTART by %#C", sptr);
   server_restart("received RESTART");

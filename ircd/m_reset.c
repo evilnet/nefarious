@@ -91,8 +91,6 @@
 #include "numnicks.h"
 #include "send.h"
 
-#include <assert.h>
-
 /*
  * mo_reset - oper message handler
  */

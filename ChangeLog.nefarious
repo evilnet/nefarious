@@ -1,7 +1,103 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2004-09-03  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-08  Reed Loden  <reed@reedloden.com>
+
+	* configure: Ran autoconf.
+
+	* doc/example.conf: Added FEAT_RESETPASS and FEAT_DIEPASS.
+
+	* include/ircd_features.h: Added FEAT_RESETPASS, FEAT_DIEPASS,
+	and FEAT_XTRAOP_CLASS.
+
+	* include/msg.h: Changed from spaces to tabs like everything 
+	else.
+
+	* include/opercmds.h: Added oper_password_match() prototype.
+
+	* include/querycmds.h: Added tunefile prototypes.
+
+	* include/s_conf.h: Changed find_csline() from a char* to an
+	int.
+
+	* include/s_misc.h: Removed tunefile prototypes.
+
+	* include/s_serv.h: Removed rules_send() and opermotd_send()
+	prototypes.
+
+	* include/supported.h: Added #define clearchanmodes for
+	CLEARMODE's default modes.
+
+	* ircd/Makefile.in: Ran "make depend".
+
+	* ircd/channel.c: Corrected spelling errors and did some 
+	miscellaneous whitespacing changes.
+
+	* ircd/fda.c, ircd/fda_t.c, ircd/filoio.c, ircd/gline.c, 
+	ircd/m_proto.c, ircd/table_gen.c, ircd/uping.c, ircd/whowas.c:
+	Removed excess lines after EOF.
+
+	* ircd/hosthiding.c: Miscellaneous changed in whitespace.
+
+	* ircd/ircd.c: Added header for querycmds.h and removed excess 
+	line(s) after EOF.
+
+	* ircd/ircd_features.c: Added FEAT_XTRAOP_CLASS (default: 0),
+	FEAT_RESTARTPASS (default: NULL), and FEAT_DIEPASS (default:
+	NULL).
+
+	* ircd/ircd_relay.c: Allowed non-+R people to talk to
+	themselves and removed excess line(s) after EOF.
+
+	* ircd/m_clearmode.c: Added header for supported.h,
+	miscellaneous changes, spelling corrections, changed char 
+	*control to use #define clearchanmodes.
+
+	* ircd/m_defaults.c, ircd/m_get.c, ircd/m_gline.c, 
+	ircd/m_reset.c, ircd/m_settime.c, ircd/map.c: Removed unneeded
+	headers.
+
+	* ircd/m_die.c: Added FEAT_DIEPASS and removed unneeded headers.
+
+	* ircd/m_invite.c, ircd/m_set.c: Removed unneeded headers and
+	excess line at EOF.
+
+	* ircd/m_oper.c: Changed from opermotd_send() to m_opermotd().
+
+	* ircd/m_opermotd.c: Added opermotd_send() (moved from 
+	s_serv.c).
+
+	* ircd/m_opmode.c: Used cli_name(sptr) instead of
+	sptr->cli_name.
+
+	* ircd/m_restart.c: Added FEAT_RESETPASS and removed unneeded
+	headers.
+
+	* ircd/m_rules.c: Added rules_send() (moved from s_serv.c).
+
+	* ircd/m_svsnick.c: Removed unneeded function (still in 
+	m_nick()).
+
+	* ircd/m_wallhops.c: Used a better way of displaying '%'.
+
+	* ircd/querycmds.c: Added tunefile stuff (moved from s_serv.c).
+
+	* ircd/s_conf.c: Changed find_csline() from a char* to an
+	int and changed what it returns (0 -> 1).
+
+	* ircd/s_serv.c: Miscellaneous changes, removed rules_send(),
+	opermotd_send(), and tunefile stuff (moved to their respective
+	files), and changed from [s]rand() to [s]random().
+
+	* ircd/s_user.c: Fixed find_csline(), changed some whitespacing 
+	issues, allowed non-+R people to talk to themselves, added 
+	XTRAOP_CLASS (default: 0), and fixed problem with +B letting
+	a user set +s.
+
+	* ircd/version.c.SH: Moved some stuff around and added a list of 
+	very helpful testers.
+
+2004-09-03 Neil Spierling <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added feature TPATH (default "ircd.tune").
 

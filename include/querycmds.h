@@ -87,5 +87,7 @@ extern struct UserStatistics UserStats;
  * Prototypes
  */
 
+void load_tunefile(void);
+void save_tunefile(void);
 
 #endif /* INCLUDED_querycmds_h */

@@ -487,5 +487,3 @@ void uping_cancel(struct Client *sptr, struct Client* acptr)
   }
   ClearUPing(sptr);
 }
-
-

@@ -92,8 +92,6 @@
 #include "numnicks.h"
 #include "send.h"
 
-#include <assert.h>
-
 /*
  * mo_set - oper message handler
  */
@@ -116,4 +114,3 @@ int ms_set(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	}
 	return feature_set(sptr, (const char* const*)parv + 2, parc - 2);
 }
-

@@ -404,6 +404,7 @@ static struct FeatureDesc {
   F_B(LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_XTRAOP, 0, 0, 0),
+  F_I(XTRAOP_CLASS, 0, 0, 0),
   F_B(OPER_HIDECHANS, 0, 0, 0),
   F_B(OPER_HIDEIDLE, 0, 0, 0),
   F_B(CHECK, 0, 1, 0),
@@ -454,6 +455,8 @@ static struct FeatureDesc {
   F_B(VERIFIED_ACCOUNTS, 0, 0, 0),
   F_S(UNVERIFIED, 0, "Your account is unverified, please verify it, reconnect and login again.", 0),
   F_I(MAX_CHECK_OUTPUT, 0, 1000, 0),
+  F_S(RESTARTPASS, FEAT_NULL | FEAT_CASE | FEAT_NODISP | FEAT_READ, 0, 0),
+  F_S(DIEPASS, FEAT_NULL | FEAT_CASE | FEAT_NODISP | FEAT_READ, 0, 0),
 
 #undef F_S
 #undef F_B

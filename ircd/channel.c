@@ -908,7 +908,7 @@ int member_can_send_to_channel(struct Membership* member)
   if (IsVoicedOrOpped(member))
     return 1;
   /*
-   * If it's moderated, and you aren't a priviledged user, you can't
+   * If it's moderated, and you aren't a privileged user, you can't
    * speak.  
    */
   if (member->channel->mode.mode & MODE_MODERATED)
@@ -3317,27 +3317,25 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
           mode_parse_except(&state, flag_p);
         break;
 
-      case 'v':
-                if(member && IsHalfOp(member) && !IsChanOp(member))
-                {
-                        mode_parse_client_voice(&state, flag_p);
-                }
-                else {
-                        mode_parse_client(&state, flag_p);
-                }
-	break;
-
-      case 'o': /* deal with ops/voice */
-       mode_parse_client(&state, flag_p);
-       break;
-
-      case 'h':
-        if (feature_bool(FEAT_HALFOPS) || IsServer(sptr)) {
-          mode_parse_client(&state, flag_p);
+      case 'v': /* deal with voices */
+	if (member && IsHalfOp(member) && !IsChanOp(member)) {
+	  mode_parse_client_voice(&state, flag_p);
+	} else {
+	  mode_parse_client(&state, flag_p);
 	}
 	break;
 
-      case 'O': /* deal with operonly */
+      case 'o': /* deal with ops */
+	mode_parse_client(&state, flag_p);
+	break;
+
+      case 'h': /* deal with halfops */
+	if (feature_bool(FEAT_HALFOPS) || IsServer(sptr)) {
+	  mode_parse_client(&state, flag_p);
+	}
+	break;
+
+      case 'O': /* deal with oper only */
 	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
 	if (IsOper(sptr) || IsServer(sptr)) {
 	  mode_parse_mode(&state, flag_p);
@@ -3346,7 +3344,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	}
 	break;
 
-      case 'z': /* deal with sslonly */
+      case 'z': /* deal with SSL only */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
         if (IsSSL(sptr) || IsServer(sptr)) {
           mode_parse_mode(&state, flag_p);

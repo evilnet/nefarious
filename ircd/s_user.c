@@ -421,21 +421,26 @@ int register_user(struct Client *cptr, struct Client *sptr,
         IPcheck_connect_fail(cli_ip(sptr));
         return exit_client(cptr, sptr, &me, "Unknown error -- Try again");
     }
+
+    /* Check for any Redirect (use another server) lines */
+    if (find_csline(sptr, cli_sockhost(sptr)))
+      return exit_client(cptr, sptr, &me,
+			 "No Authorization - use another server");
+
     ircd_strncpy(user->host, cli_sockhost(sptr), HOSTLEN);
     ircd_strncpy(user->realhost, cli_sockhost(sptr), HOSTLEN);
+
     if (feature_bool(FEAT_FAKEHOST) && feature_str(FEAT_DEFAULT_FAKEHOST)) {
       /* If the server-wide default fakehost has been set, give
 	 all users connecting to this server only a fakehost.
 	 This does prevent them from using their account-based
 	 hidden host permanently. */
-      ircd_strncpy(user->fakehost, feature_str(FEAT_DEFAULT_FAKEHOST), HOSTLEN);
+      ircd_strncpy(user->fakehost, feature_str(FEAT_DEFAULT_FAKEHOST),
+		   HOSTLEN);
       SetFakeHost(sptr);
     }
-    aconf = cli_confs(sptr)->value.aconf;
 
-    if ((find_csline(sptr, cli_sockhost(sptr)) != NULL)) {
-      return exit_client(cptr, sptr, &me, "No Authorization - use another server");
-    }
+    aconf = cli_confs(sptr)->value.aconf;
 
     clean_user_id(user->username,
         HasFlag(sptr, FLAG_GOTID) ? cli_username(sptr) : username,
@@ -543,7 +548,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
                  ":If your mail address were foo@bar.com, your username "
                  "would be foo.");
       send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
-                 ":See %s for further information.", feature_str(FEAT_BADUSER_URL));
+                 ":See %s for further information.",
+		 feature_str(FEAT_BADUSER_URL));
       return exit_client(cptr, sptr, &me, "USER: Bad username");
     }
     Count_unknownbecomesclient(sptr, UserStats);
@@ -1150,13 +1156,15 @@ int whisper(struct Client* source, const char* nick, const char* channel,
     send_reply(source, RPL_AWAY, cli_name(dest), cli_user(dest)->away);
 
   if (is_notice) {
-    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source))
+    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source) &&
+	(dest != source))
       send_reply(source, ERR_ACCOUNTONLY, cli_name(source), "CNOTICE",
 		 cli_name(dest));
     else
       sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);
   } else {
-    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source))
+    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source) &&
+	(dest != source))
       send_reply(source, ERR_ACCOUNTONLY, cli_name(source), "CPRIVMSG",
                  cli_name(dest));
     else
@@ -1788,15 +1796,29 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      * ASUKA: Allow opers to set +k.  Also, restrict +XnI to
      * opers only also.
      */
-    if (!FlagHas(&setflags, FLAG_CHSERV) && !(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_CHSERV) &&
+	!(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr) &&
+	((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
+	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS)))))
       ClearChannelService(acptr);
-    if (!FlagHas(&setflags, FLAG_XTRAOP) && !(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_XTRAOP) &&
+	!(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr) &&
+	((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
+	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS)))))
       ClearXtraOp(acptr);
     if (!FlagHas(&setflags, FLAG_NOCHAN) && !(feature_bool(FEAT_OPER_HIDECHANS) && IsOper(acptr)))
       ClearNoChan(acptr);
     if (!FlagHas(&setflags, FLAG_NOIDLE) && !(feature_bool(FEAT_OPER_HIDEIDLE) && IsOper(acptr)))
       ClearNoIdle(acptr);
-    
+
+    /*
+     * We have to deal with +B first before getting to +s or else we'll
+     * run into problems (+s checks if the user is +B). -reed
+     */
+    if (!(FlagHas(&setflags, FLAG_BOT)) &&
+	(get_client_class(acptr) != feature_int(FEAT_BOT_CLASS)))
+      ClearBot(acptr);
+
     /*
      * only send wallops to opers
      */
@@ -1805,8 +1827,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearWallops(acptr);
 
     if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(acptr) && 
-	!IsAnOper(acptr) && !FlagHas(&setflags, FLAG_SERVNOTICE) &&
-	!IsBot(acptr)) {
+	!IsAnOper(acptr) && !IsBot(acptr) &&
+	!FlagHas(&setflags, FLAG_SERVNOTICE)) {
       ClearServNotice(acptr);
       set_snomask(acptr, 0, SNO_SET);
     }
@@ -1814,11 +1836,6 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     if (feature_bool(FEAT_HIS_DEBUG_OPER_ONLY) && !IsAnOper(acptr) && 
 	!FlagHas(&setflags, FLAG_DEBUG))
       ClearDebug(acptr);
-
-    if (!(FlagHas(&setflags, FLAG_BOT))
-	&& (get_client_class(acptr) != feature_int(FEAT_BOT_CLASS)))
-      ClearBot(acptr);
-
   }
 
   if (MyConnect(acptr)) {

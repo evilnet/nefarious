@@ -43,6 +43,7 @@
 #include "numnicks.h"
 #include "opercmds.h"
 #include "parse.h"
+#include "querycmds.h"
 #include "res.h"
 #include "s_auth.h"
 #include "s_bsd.h"
@@ -718,5 +719,3 @@ int main(int argc, char **argv) {
 
   return 0;
 }
-
-

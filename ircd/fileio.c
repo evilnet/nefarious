@@ -193,4 +193,3 @@ int fbstat(struct stat *sb, FBFILE * fb)
   assert(fb);
   return fstat(fb->fd, sb);
 }
-

@@ -759,14 +759,14 @@ void clear_quarantines(void)
   }
 }
 
-char* find_csline(struct Client* sptr, const char* mask)
+int find_csline(struct Client* sptr, const char* mask)
 {
   struct csline *csline;
 
   for (csline = GlobalConnStopList; csline; csline = csline->next) {
     if (!match(csline->mask, mask)) {
       send_reply(sptr, RPL_REDIR, csline->server, csline->port);
-      return 0;
+      return 1;
     }
   }
   return 0;

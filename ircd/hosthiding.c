@@ -314,6 +314,6 @@ make_virtip (char *curr, char *host, char *new)
 
 int cloakrand()
 {
-    srandom(CurrentTime); /* may not be the BEST salt, but its close */
-    return (unsigned int)(random() / 65536) % 32768;
+  srandom(CurrentTime); /* may not be the BEST salt, but its close */
+  return (unsigned int)(random() / 65536) % 32768;
 }

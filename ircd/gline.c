@@ -1253,4 +1253,3 @@ IsNickGlined(struct Client *cptr, char *nick)
   return 0;
 }
 #endif
-

@@ -77,8 +77,6 @@ extern int vexit_client_msg(struct Client *cptr, struct Client *bcptr,
     struct Client *sptr, const char *pattern, va_list vl);
 extern void tstats(struct Client *cptr, struct StatDesc *sd, int stat,
 		   char *param);
-void load_tunefile(void);
-void save_tunefile(void);
 
 extern struct ServerStatistics* ServerStats;
 

@@ -88,15 +88,14 @@
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "ircd_struct.h"
 #include "list.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
 #include "s_user.h"
 #include "send.h"
-#include "ircd_struct.h"
 
-#include <assert.h>
 #include <stdlib.h>
 
 /*

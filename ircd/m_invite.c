@@ -95,8 +95,6 @@
 #include "send.h"
 #include "ircd_struct.h"
 
-#include <assert.h>
-
 /*
  * m_invite - generic message handler
  *
@@ -274,4 +272,3 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   sendcmdto_one(sptr, CMD_INVITE, acptr, "%s :%H", cli_name(acptr), chptr);
   return 0;
 }
-

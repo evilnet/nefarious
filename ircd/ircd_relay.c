@@ -321,7 +321,8 @@ void relay_private_message(struct Client* sptr, const char* name, const char* te
    * +R check, if target is +R and we're not +r (or opered) then
    * deny the message.
    */
-  if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr)) {
+  if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr) &&
+      (acptr != sptr)) {
     send_reply(sptr, ERR_ACCOUNTONLY, cli_name(sptr), "PRIVMSG",
 	       cli_name(acptr));
     return;
@@ -359,7 +360,8 @@ void relay_private_notice(struct Client* sptr, const char* name, const char* tex
    * +R check, if target is +R and we're not +r (or opered) then
    * deny the message.
    */
-  if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr)) {
+  if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr) &&
+      (acptr != sptr)) {
     send_reply(sptr, ERR_ACCOUNTONLY, cli_name(sptr), "NOTICE",
 	       cli_name(acptr));
     return;
@@ -524,4 +526,3 @@ void server_relay_masked_notice(struct Client* sptr, const char* mask, const cha
 			 host_mask ? MATCH_HOST : MATCH_SERVER,
 			 "%s :%s", mask, text);
 }
-

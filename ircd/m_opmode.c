@@ -173,7 +173,7 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	/* Impersonate the abuser */
 	sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 				"Failed OPMODE for registered channel %s by %s",
-				chptr->chname, sptr->cli_name);
+				chptr->chname, cli_name(sptr));
 	return send_reply(sptr, ERR_QUARANTINED, chptr->chname,
 			  "This channel is registered.");
       }

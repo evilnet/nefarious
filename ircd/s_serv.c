@@ -59,7 +59,6 @@
 
 #include <assert.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -266,174 +265,59 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 }
 
 /*
- * m_randquote - ported from Ultimate IRCd
+ * m_randquote
+ * - Ported from Ultimate IRCd
  */
 int m_randquote(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
-    int fd, linenum=0, randnum;
-    char line[300];
-    char *tmp;
-    char qfile[1024];
+  int fd, linenum=0, randnum;
+  char line[300];
+  char *tmp;
+  char qfile[1024];
 
-    ircd_snprintf(0, qfile, sizeof(qfile), "%s/%s", DPATH, feature_str(FEAT_QPATH));
+  ircd_snprintf(0, qfile, sizeof(qfile), "%s/%s", DPATH,
+		feature_str(FEAT_QPATH));
+  fd = open(qfile, O_RDONLY);
 
-    srand(time(NULL)+getpid()+rand() % 9999);
-    fd = open(qfile, O_RDONLY);
-
-    if (fd == -1) {
-      return 0;
-    }
-
-    dgets(-1, NULL, 0);
-    while (dgets(fd, line, sizeof(line)-1) > 0) {
-      if ((tmp = (char *)index(line,'\n')))
-        *tmp = '\0';
-      if ((tmp = (char *)index(line,'\r')))
-        *tmp = '\0';
-      linenum++;
-    }
-
-    /* We have an empty file.. bail */
-    if (linenum == 0) {
-      return 0;
-
-    }
-
-    randnum = (rand() % linenum)-1;
-
-    close(fd);
-    alarm(3);
-    fd = open(qfile, O_RDONLY);
-    linenum = 0;
-
-    while (dgets(fd, line, sizeof(line)-1) > 0) {
-      if ((tmp = (char *)index(line,'\n')))
-        *tmp = '\0';
-      if ((tmp = (char *)index(line,'\r')))
-        *tmp = '\0';
-      linenum++;
-      if (linenum==randnum)
-        break;
-    }
-
-    if (line != NULL) {
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C \2Quote:\2 %s", sptr, line);
-    }
-    close(fd);
-
-    return close(fd);
-}
-
-
-/*
- * rules_send ported from Ultimate IRCd
- */
-
-int rules_send(struct Client* cptr) {
-  int fd, nr;
-  char line[100], s_rules[1024], *tmp;
-
-  alarm(3);
-  ircd_snprintf(0, s_rules, sizeof(s_rules), "%s/%s", DPATH, feature_str(FEAT_EPATH));
-  fd = open (s_rules, O_RDONLY);
-  alarm(0);
-
-  if (fd == -1) {
-    send_reply(cptr, ERR_NORULES);
+  if (fd == -1)
     return 0;
-  }
-
-  send_reply(cptr, RPL_RULESSTART, feature_str(FEAT_NETWORK));
 
   dgets(-1, NULL, 0);
-  while ((nr = dgets (fd, line, sizeof (line) - 1)) > 0)
-    {
-      line[nr] = '\0';
-      if ((tmp = (char *) index (line, '\n')))
-        *tmp = '\0';
-      if ((tmp = (char *) index (line, '\r')))
-        *tmp = '\0';
-      send_reply(cptr, RPL_RULES, line);
-    }
-  dgets (-1, NULL, 0);
-  send_reply(cptr, RPL_ENDOFRULES);
+  while (dgets(fd, line, sizeof(line)-1) > 0) {
+    if ((tmp = (char *)index(line,'\n')))
+      *tmp = '\0';
+    if ((tmp = (char *)index(line,'\r')))
+      *tmp = '\0';
+    linenum++;
+  }
+
+  /* We have an empty file.. bail */
+  if (linenum == 0)
+    return 0;
+
+  /* srand(CurrentTime+getpid()+rand() % 9999); */
+  srandom(CurrentTime); /* may not be the BEST salt, but its close */
+
+  randnum = (random() % linenum)-1;
+
   close(fd);
-  return 0;
-}
-
-
-/*
- * opermotd_send()
- *  - Ported From Ultimate IRCd
- *
- *      parv[0] = sender prefix
- *      parv[1] = servername
- */
-int opermotd_send(struct Client* cptr) {
-  int fd, nr;
-  char line[80], omotd[1024], *tmp;
-
   alarm(3);
-  ircd_snprintf(0, omotd, sizeof(omotd), "%s/%s", DPATH, feature_str(FEAT_OMPATH));
-  fd = open(omotd, O_RDONLY);
-  alarm(0);
-  if (fd == -1)
-     return 0;
+  fd = open(qfile, O_RDONLY);
+  linenum = 0;
 
-  send_reply(cptr, RPL_OMOTDSTART, cli_name(&me));
+  while (dgets(fd, line, sizeof(line)-1) > 0) {
+    if ((tmp = (char *)index(line,'\n')))
+      *tmp = '\0';
+    if ((tmp = (char *)index(line,'\r')))
+      *tmp = '\0';
+    linenum++;
+    if (linenum==randnum)
+      break;
+  }
 
-  dgets (-1, NULL, 0);
-  while ((nr = dgets (fd, line, sizeof (line) - 1)) > 0)
-    {
-      line[nr] = '\0';
-      if ((tmp = (char *) index (line, '\n')))
-        *tmp = '\0';
-      if ((tmp = (char *) index (line, '\r')))
-        *tmp = '\0';
-      send_reply(cptr, RPL_OMOTD, line);
-    }
+  if (line != NULL)
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C \2Quote:\2 %s", sptr, line);
 
-  dgets (-1, NULL, 0);
-
-  send_reply(cptr, RPL_ENDOFOMOTD);
   close(fd);
 
-  return 0;
+  return close(fd);
 }
-
-
-void save_tunefile(void)
-{
-        FILE *tunefile;
-        char tfile[1024];
-
-        ircd_snprintf(0, tfile, sizeof(tfile), "%s/%s", DPATH, feature_str(FEAT_TPATH));
-        tunefile = fopen(tfile, "w");
-        if (!tunefile)
-        {
-                sendto_opmask_butone(0, SNO_OLDSNO, "Unable to write tunefile..");
-                return;
-        }
-        fprintf(tunefile, "%d\n", UserStats.localclients);
-        fprintf(tunefile, "%d\n", UserStats.globalclients);
-        fclose(tunefile);
-}
-
-void load_tunefile(void)
-{
-        FILE *tunefile;
-        char buf[1024];
-
-        char tfile[1024];
-        ircd_snprintf(0, tfile, sizeof(tfile), "%s/%s", DPATH, feature_str(FEAT_TPATH));
-        tunefile = fopen(tfile, "r");
-        if (!tunefile)
-                return;
-        Debug((DEBUG_DEBUG, "Reading tune file"));
-
-        fgets(buf, 1023, tunefile);
-        UserStats.globalclients = atol(buf);
-        fgets(buf, 1023, tunefile);
-        UserStats.localclients = atol(buf);
-        fclose(tunefile);
-}
-

@@ -80,8 +80,6 @@
  *
  *            note:   it is guaranteed that parv[0]..parv[parc-1] are all
  *                    non-NULL pointers.
- *
- * $Id$
  */
 #include "config.h"
 
@@ -114,7 +112,6 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   struct Client* acptr2 = NULL;
   char		 nick[NICKLEN + 2];
   char*		 arg;
-  char*		 s;
 
   if (parc < 3)
     return need_more_params(sptr, "SVSNICK"); 
@@ -133,9 +130,6 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   arg = parv[2];
   if (strlen(arg) > IRCD_MIN(NICKLEN, feature_int(FEAT_NICKLEN)))
     arg[IRCD_MIN(NICKLEN, feature_int(FEAT_NICKLEN))] = '\0';
-
-  if ((s = strchr(arg, '~')))
-    *s = '\0';
 
   strcpy(nick, arg);
 

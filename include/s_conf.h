@@ -244,7 +244,7 @@ extern void conf_add_sline(const char* const* fields, int count);
 extern int conf_check_slines(struct Client *cptr);
 extern void clear_slines(void);
 extern int str2prefix(char *s, struct prefix *p);
-extern char* find_csline(struct Client* sptr, const char* mask);
+extern int find_csline(struct Client* sptr, const char* mask);
 extern void conf_add_csline(const char* const* fields, int count);
 extern void clear_cslines(void);
 extern void conf_add_svcline(const char * const* fields, int count); 

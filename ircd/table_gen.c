@@ -343,4 +343,3 @@ static void dumphw(int *tbl, int beg)
     printf("\n");
   }
 }
-

@@ -83,16 +83,15 @@
 
 #include "client.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
+#include "opercmds.h"
 #include "s_bsd.h"
 #include "send.h"
-
-#include <assert.h>
-
 
 /*
  * mo_die - oper message handler
@@ -101,9 +100,17 @@ int mo_die(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client *acptr;
   int i;
+  char* password;
+  char *diepass = (char *)feature_str(FEAT_DIEPASS);
 
   if (!HasPriv(sptr, PRIV_DIE))
     return send_reply(sptr, ERR_NOPRIVILEGES);
+
+  if (!EmptyString(diepass)) {
+    password = parc > 1 ? parv[1] : 0;
+    if (!oper_password_match(password, diepass))
+      return send_reply(sptr, ERR_PASSWDMISMATCH);
+  }
 
   for (i = 0; i <= HighestFd; i++)
   {

@@ -67,6 +67,7 @@
 			"rfc1459", feature_str(FEAT_NETWORK)
 
 #define infochanmodes "bcehiklmnoprstvzCLMNOQST"
+#define clearchanmodes "bcehiklmoprsvzCLMNOQST" /* ditto except for +nt */
 #define infochanmodeswithparams "behklov"
 #define infousermodes "dfghiknoswxBIRX"
 

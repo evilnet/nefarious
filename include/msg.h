@@ -90,9 +90,9 @@ struct Client;
 #define TOK_INVITE              "I"
 #define CMD_INVITE		MSG_INVITE, TOK_INVITE
 
-#define MSG_IRCOPS             "IRCOPS"
-#define TOK_IRCOPS             "IR"
-#define CMD_IRCOPS             MSG_IRCOPS, TOK_IRCOPS
+#define MSG_IRCOPS		"IRCOPS"	/* IRCO */
+#define TOK_IRCOPS		"IR"
+#define CMD_IRCOPS		MSG_IRCOPS, TOK_IRCOPS
 
 #define MSG_VERSION             "VERSION"       /* VERS */
 #define TOK_VERSION             "V"
@@ -214,13 +214,13 @@ struct Client;
 #define TOK_WALLCHOPS           "WC"
 #define CMD_WALLCHOPS		MSG_WALLCHOPS, TOK_WALLCHOPS
 
-#define MSG_WALLVOICES           "WALLVOICES"     /* WV */
-#define TOK_WALLVOICES           "WV"
-#define CMD_WALLVOICES           MSG_WALLVOICES, TOK_WALLVOICES
+#define MSG_WALLVOICES		"WALLVOICES"	/* WV */
+#define TOK_WALLVOICES		"WV"
+#define CMD_WALLVOICES		MSG_WALLVOICES, TOK_WALLVOICES
 
-#define MSG_WALLHOPS           "WALLHOPS"     /* WH */
-#define TOK_WALLHOPS           "WH"
-#define CMD_WALLHOPS           MSG_WALLHOPS, TOK_WALLHOPS
+#define MSG_WALLHOPS		"WALLHOPS"	/* WH */
+#define TOK_WALLHOPS		"WH"
+#define CMD_WALLHOPS		MSG_WALLHOPS, TOK_WALLHOPS
 
 #define MSG_CPRIVMSG            "CPRIVMSG"      /* CPRI */
 #define TOK_CPRIVMSG            "CP"
@@ -302,7 +302,7 @@ struct Client;
 #define TOK_CLOSE               "CLOSE"
 #define CMD_CLOSE		MSG_CLOSE, TOK_CLOSE
 
-#define MSG_DIE                 "DIE"           /* DIE  */
+#define MSG_DIE                 "DIE"           /* DIE */
 #define TOK_DIE                 "DIE"
 #define CMD_DIE			MSG_DIE, TOK_DIE
 
@@ -366,9 +366,9 @@ struct Client;
 #define TOK_ACCOUNT		"AC"
 #define CMD_ACCOUNT		MSG_ACCOUNT, TOK_ACCOUNT
 
-#define MSG_MKPASSWD           "MKPASSWD"
-#define TOK_MKPASSWD           "MKPASSWD"
-#define CMD_MKPASSWD           MSG_MKPASSWD, TOK_MKPASSWD
+#define MSG_MKPASSWD		"MKPASSWD"	/* MKPA */
+#define TOK_MKPASSWD		"MKPASSWD"
+#define CMD_MKPASSWD		MSG_MKPASSWD, TOK_MKPASSWD
 
 #define MSG_ASLL		"ASLL"		/* ASLL */
 #define TOK_ASLL		"LL"
@@ -407,7 +407,7 @@ struct Client;
 #define TOK_RULES		"RL"
 #define CMD_RULES		MSG_RULES, TOK_RULES
 
-#define MSG_SVSNOOP             "SVSNOOP"
+#define MSG_SVSNOOP             "SVSNOOP"	/* SVNO */
 #define TOK_SVSNOOP             "SO"
 #define CMD_SVSNOOP             MSG_SVSNOOP, TOK_SVSNOOP
 

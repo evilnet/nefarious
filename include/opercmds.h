@@ -26,4 +26,6 @@ struct Client;
 extern char *militime(char* sec, char* usec);
 extern char *militime_float(char* start);
 
+extern int oper_password_match(const char* to_match, const char* passwd);
+
 #endif /* INCLUDED_opercmds_h */

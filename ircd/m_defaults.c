@@ -30,10 +30,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "send.h"
-#include "supported.h"
 #include "version.h"
-
-#include <assert.h>
 
 /*
  * m_functions execute protocol messages on this server:
