@@ -3,6 +3,9 @@
 
 2004-09-16  Neil Spierling <vulcan@linux-boxen.org>
 
+	* Include feature from WhatNet's IRCd 
+	(http://coder-com.whatnet.org).
+
 	* doc/example.conf: Added includes section.
 
 	* ircd/s_user.c: Modified read configuration file functions
