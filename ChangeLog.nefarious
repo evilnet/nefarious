@@ -1,3 +1,13 @@
+2003-10-27  Reed Loden  <reed@reedloden.com>
+
+	* include/ircd_string.h, ircd/ircd_string.c: Remove
+	ircd_strrcmp() macro and use an ircd_strrcmp() function instead.
+
+	* ircd/m_ircops.c: Redo .Services stuff yet again.
+
+	* ircd/s_user.c: Fixed a very annoying core by changing several
+	sptr's to acptr's.
+
 2003-10-26  Reed Loden  <reed@reedloden.com>
 
 	* ircd/m_ircops.c: Fix .Services stuff.

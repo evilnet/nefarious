@@ -230,6 +230,23 @@ int ircd_strcmp(const char *a, const char *b)
 }
 
 /*
+ * ircd_strrcmp - case insensitive reverse comparison of 2 strings
+ * NOTE: see ircd_chattr.h for notes on case mapping.
+ */
+int ircd_strrcmp(const char *a, const char *b)
+{
+  const char* ra = a + strlen(a) - strlen(b);
+  const char* rb = b;
+  while (ToLower(*ra) == ToLower(*rb)) {
+    if (!*ra++)
+      return 0;
+    else
+      ++rb;
+  }
+  return (*ra - *rb);
+}
+
+/*
  * ircd_strncmp - counted case insensitive comparison of 2 strings
  * NOTE: see ircd_chattr.h for notes on case mapping.
  */

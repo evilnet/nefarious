@@ -13,7 +13,6 @@
  * Macros
  */
 #define EmptyString(x) (!(x) || !(*x))
-#define ircd_strrcmp(s1, s2) ircd_strcmp((s1), (s2)+strlen((s2))-1-strlen((s1)))
 
 /*
  * initialize recognizers
@@ -26,6 +25,7 @@ extern int string_has_wildcards(const char* str);
 
 extern char*       ircd_strncpy(char* dest, const char* src, size_t len);
 extern int         ircd_strcmp(const char *a, const char *b);
+extern int         ircd_strrcmp(const char *a, const char *b);
 extern int         ircd_strncmp(const char *a, const char *b, size_t n);
 extern int         unique_name_vector(char* names, char token, char** vector, int size);
 extern int         token_vector(char* names, char token, char** vector, int size);

@@ -1476,7 +1476,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           ClrFlag(acptr, FLAG_LOCOP);
           if (MyConnect(acptr)) {
             tmpmask = cli_snomask(acptr) & ~SNO_OPER;
-            cli_handler(sptr) = CLIENT_HANDLER;
+            cli_handler(acptr) = CLIENT_HANDLER;
           }
         }
         break;
@@ -1535,9 +1535,9 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
               password = NULL;
           } else {
             if (!*(p+1))     
-              send_reply(sptr, ERR_NEEDMOREPARAMS, "SETHOST");
+              send_reply(acptr, ERR_NEEDMOREPARAMS, "SETHOST");
             else {
-              send_reply(sptr, ERR_BADHOSTMASK, *(p+1));
+              send_reply(acptr, ERR_BADHOSTMASK, *(p+1));
               p++; /* Swallow the arg anyway */
             }
           }
@@ -1562,7 +1562,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	  ClearBot(acptr);
 	break;
       default:
-	send_reply(sptr, ERR_UMODEUNKNOWNFLAG, parv[0]);
+	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, parv[0]);
         break;
       }
     }
@@ -1591,7 +1591,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
     if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(acptr) && 
 	!IsAnOper(acptr) && !FlagHas(&setflags, FLAG_SERVNOTICE) &&
-	(get_client_class(sptr) != feature_int(FEAT_BOT_CLASS))) {
+	(get_client_class(acptr) != feature_int(FEAT_BOT_CLASS))) {
       ClearServNotice(acptr);
       set_snomask(acptr, 0, SNO_SET);
     }
@@ -1637,7 +1637,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
   if (do_set_host) {
     /* We clear the flag in the old mask, so that the +h will be sent */
     /* Only do this if we're SETTING +h and it succeeded */
-    if (set_hostmask(sptr, hostmask, password) && hostmask)
+    if (set_hostmask(acptr, hostmask, password) && hostmask)
       FlagClr(&setflags, FLAG_SETHOST);
   }
   send_umode_out(cptr, acptr, &setflags, prop);
