@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-17  Neil Spierling <sirvulcan@gmail.com>
+
+        * ircd/ircd_relay.c: Dont block bold and underline for +c, as +c
+	is only for blocking colours.
+
 2004-10-16  Neil Spierling <sirvulcan@gmail.com>
 
         * doc/readme.features: Major update, file should be up to date with
