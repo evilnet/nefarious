@@ -47,7 +47,6 @@
 #include "s_user.h"
 #include "s_debug.h"
 #include "userload.h"
-#include "patchlevel.h"
 
 #include <string.h>
 #include <ctype.h>
