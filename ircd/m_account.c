@@ -172,11 +172,16 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
   if (!hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
     hide_hostmask(acptr);
 
-  sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
-            cli_user(acptr)->acc_create ? "%C %s %Tu %s" : "%C %s %s",
-            acptr, cli_user(acptr)->account,
-            cli_user(acptr)->acc_create,
-            feature_bool(FEAT_VERIFIED_ACCOUNTS) ? parv[4] : "");
+
+  if (cli_user(acptr)->acc_create)
+    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C %s %Tu %s",
+              acptr, cli_user(acptr)->account, cli_user(acptr)->acc_create,
+              feature_bool(FEAT_VERIFIED_ACCOUNTS) ? parv[4] : "0");
+  else
+    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C %s %s",
+              acptr, cli_user(acptr)->account,
+              feature_bool(FEAT_VERIFIED_ACCOUNTS) ? parv[4] : "");
+
 
   return 0;
 }

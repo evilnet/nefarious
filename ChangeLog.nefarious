@@ -18,7 +18,8 @@
 	* ircd/m_create.c: Dont allow a client to rejoin if its already
 	in the channel.
 
-	* ircd/m_account.c: Added needed %s.
+	* ircd/m_account.c: Added needed %s, plus fixed a bug with b0rked
+	ACCOUNT messages being sent out.
 
 	* ircd/m_oper.c: Call find_conf_cidr if the other methods to
 	check the conf fail etc. (Quakenet).
