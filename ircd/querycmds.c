@@ -83,8 +83,8 @@ void load_tunefile(void)
   Debug((DEBUG_DEBUG, "Reading tune file"));
 
   fgets(buf, 1023, tunefile);
-  UserStats.globalclients = atol(buf);
-  fgets(buf, 1023, tunefile);
   UserStats.localclients = atol(buf);
+  fgets(buf, 1023, tunefile);
+  UserStats.globalclients = atol(buf);
   fclose(tunefile);
 }
