@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+
+2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added new feature DNSBL_LOC_EXEMPT.
+
+	* doc/readme.features: Documented DNSBL_LOC_EXEMPT.
+
+	* include/ircd_features.h: Added FEAT_DNSBL_LOC_EXEMPT.
+
+	* ircd/ircd_features.c: Added DNSBL_LOC_EXEMPT (Default FALSE).
+
+	* ircd/s_user.c: If DNSBL_LOC_EXEMPT is TRUE then if a user who
+	gets a positive match on a DNSBL check logs in using LOC they
+	will get past the DNSBL rejection. Also adjusted the format
+	message to use realhost instead of host.
+
 2004-10-18  Reed Loden  <reed@reedloden.com>
 
 	* include/ircd_reply.h: Removed MAXLEN as it is no longer used.

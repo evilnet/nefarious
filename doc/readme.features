@@ -300,6 +300,14 @@ LOGIN_ON_CONNECT
 This selects whether local clients can specify a service bot login in
 the connection phase. Read doc/readme.login-on-connect for details.
 
+DNSBL_LOC_EXEMPT
+ * Type: boolean
+ * Default: FALSE
+
+This allows a user who has successfully authed to a service using login
+on connect (above) to bypass a DNSBL rejection if they got a positive
+result from the earlier check.
+
 DEFAULT_UMODE
  * Type: string
  * Default: "+"

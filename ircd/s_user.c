@@ -639,15 +639,26 @@ int register_user(struct Client *cptr, struct Client *sptr,
     if (feature_bool(FEAT_DNSBL_CHECKS)) {
       release_dnsbl_reply(sptr);
 
-      if (IsDNSBL(sptr) &&
-	  (get_client_class(sptr) != feature_int(FEAT_DNSBL_EXEMPT_CLASS)))
-        return exit_client_msg(cptr, cptr, &me, "%s",
-			       format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-						cli_user(sptr)->host, cli_username(sptr), 
-						cli_name(sptr), cli_dnsblformat(sptr))
-			       );
+      if (IsDNSBL(sptr)) {
+        int class_exempt = 0, loc_exempt = 0;
 
+        if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
+           (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0))
+          class_exempt = 1;
 
+        if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+          loc_exempt = 1;
+
+        if ((class_exempt == 1) || (loc_exempt == 1)) {
+          loc_exempt = 0;
+          class_exempt = 0;
+        } else
+          return exit_client_msg(cptr, cptr, &me, "%s",
+                                 format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+                                                  cli_user(sptr)->realhost, cli_username(sptr), 
+                                                  cli_name(sptr), cli_dnsblformat(sptr))
+                                 );
+      }
     }
 
   /*
