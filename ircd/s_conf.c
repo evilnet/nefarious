@@ -2202,7 +2202,7 @@ void conf_add_sline(const char* const* fields, int count)
              sline->address, sline->bits, NETMASK(sline->bits)));
         sline->flags = SLINE_FLAGS_IP; 
       } else {
-        Debug((DEBUG_FATAL, "S-Line: \"%s\" appears not to be a valid IP address, might be wildcarded."));
+        Debug((DEBUG_FATAL, "S-Line: \"%s\" appears not to be a valid IP address, might be wildcarded.", sline->realhost));
         sline->flags = SLINE_FLAGS_HOSTNAME;
       }
     } else

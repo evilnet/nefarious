@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_auth.c: Turned a static char into a normal char.
+
+	* ircd/s_conf.c: Bug fix with S:Lines.
+
+	* ircd/s_err.c: Bug fix with S:Lines (reeds fault).
+
+	* ircd/ssl.c: Couple of lines moved so it will compile.
+
 2005-03-28  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_conf.c: Several conf line clear_* functions were freeing

@@ -518,7 +518,7 @@ static Numeric replyTable[] = {
 /* 244 */
   { RPL_STATSHLINE, "%c %s * %s %d %d", "244" },
 /* 245 */
-  { 0 },
+  { RPL_STATSSLINE, "%d %s %s %s %s", "245" },
 /* 246 */
   { RPL_STATSTLINE, "%c %s %s", "246" },
 /* 247 */
@@ -832,7 +832,7 @@ static Numeric replyTable[] = {
 /* 397 */
   { 0 },
 /* 398 */
-  { RPL_STATSSLINE, "%d %s %s %s %s", "398" },
+  { 0 },
 /* 399 */
   { RPL_USINGSLINE, ":Using S-line privilege", "399" },
 /* 400 */

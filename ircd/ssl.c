@@ -206,6 +206,9 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
   int openssl_err = 0;
   char err_buff[120];
 
+  extern int errno;
+  int errno_sv;
+
   assert(0 != socket);
   assert(0 != buf);
   assert(0 != count_in);
@@ -213,8 +216,6 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
 
   *count_in = 0;
   *count_out = 0;
-  extern int errno;
-  int errno_sv;
 
   count = msgq_mapiov(buf, iov, IOV_MAX, count_in);
   for (k = 0; k < count; k++) {
