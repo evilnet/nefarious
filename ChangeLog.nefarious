@@ -3,6 +3,9 @@
 
 2004-08-25  Reed Loden  <reed@reedloden.com>
 
+	* doc/example.conf: Renamed FEAT_EXTENDED_CHECKCMD to
+	FEAT_CHECK_EXTENDED and added FEAT_NOTHROTTLE.
+
 	* include/ircd_features.h: Renamed FEAT_EXTENDED_CHECKCMD to
 	FEAT_CHECK_EXTENDED, moved FEAT_DEFAULT_UMODE, and added
 	FEAT_NOTHROTTLE.
