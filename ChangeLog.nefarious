@@ -1,4 +1,17 @@
 /*
+2004-07-012  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* include/numeric.h: Removed CVS_VERSION.
+
+	* include/version.c: Added char cvs_version.
+
+	* ircd/m_version.c: Removed CVS_VERSION reply.
+			    Send out the CVS version with RPL_VERSION.
+
+	* ircd/version.c.SH: Used some cat grep n awk action to get the CVS version
+	out of ChangeLog.nefarious and throw it into a char like creation, version
+	etc.
+
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added feature BADUSER_URL, gives the user a url to

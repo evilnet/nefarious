@@ -80,7 +80,6 @@
  *                    non-NULL pointers.
  */
 #include "config.h"
-#include "ChangeLog.nefarious"
 
 #include "client.h"
 #include "hash.h"
@@ -113,9 +112,8 @@ int m_version(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (parc > 1 && (!(acptr = find_match_server(parv[1])) || !IsMe(acptr)))
     send_reply(sptr, ERR_NOPRIVILEGES);
   else {
-    send_reply(sptr, RPL_VERSION, version, debugmode, cli_name(&me),
+    send_reply(sptr, RPL_VERSION, version, cvs_version, debugmode, cli_name(&me),
 	       debug_serveropts());
-    send_reply(sptr, RPL_CVS_VERSION, CVS_VERSION);
     send_supported(sptr);
   }
 
@@ -145,7 +143,7 @@ int mo_version(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (hunt_server_cmd(sptr, CMD_VERSION, cptr, feature_int(FEAT_HIS_REMOTE),
 		      ":%C", 1, parc, parv) == HUNTED_ISME)
   {
-    send_reply(sptr, RPL_VERSION, version, debugmode, cli_name(&me),
+    send_reply(sptr, RPL_VERSION, version, cvs_version, debugmode, cli_name(&me),
 	       debug_serveropts());
     send_supported(sptr);
   }
@@ -176,7 +174,7 @@ int ms_version(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (hunt_server_cmd(sptr, CMD_VERSION, cptr, 0, ":%C", 1, parc, parv) ==
       HUNTED_ISME)
   {
-    send_reply(sptr, RPL_VERSION, version, debugmode, cli_name(&me),
+    send_reply(sptr, RPL_VERSION, version, cvs_version, debugmode, cli_name(&me),
 	       debug_serveropts());
   }
 

@@ -30,6 +30,9 @@ awk '{if (NF == 6) \
 else \
 	 { print $1 " " $2 " " $3 " " $7 " at " $4 " " $5 " " $6 }}'`
 
+cvs_version=`cat ../ChangeLog.nefarious | grep define | grep Revision | \
+awk '{ print $4 }'`
+
 /bin/cat >version.c <<!SUB!THIS!
 /*
  * IRC - Internet Relay Chat, ircd/version.c
@@ -59,6 +62,7 @@ else \
 
 const char *generation = "$generation";
 const char *creation = "$creation";
+const char *cvs_version = "$cvs_version";
 const char *version = BASE_VERSION RELEASE PATCHLEVEL;
 
 const char *infotext[] = {

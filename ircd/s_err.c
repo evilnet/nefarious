@@ -742,7 +742,7 @@ static Numeric replyTable[] = {
 /* 350 */
   { 0 },
 /* 351 */
-  { RPL_VERSION, "%s.%s %s :%s", "351" },
+  { RPL_VERSION, "%s+[%s].%s %s :%s", "351" },
 /* 352 */
   { RPL_WHOREPLY, "%s", "352" },
 /* 353 */
@@ -750,7 +750,7 @@ static Numeric replyTable[] = {
 /* 354 */
   { RPL_WHOSPCRPL, "%s", "354" },
 /* 355 */
-  { RPL_CVS_VERSION, "CVS %s", "355" },
+  { 0 },
 /* 356 */
   { 0 },
 /* 357 */
