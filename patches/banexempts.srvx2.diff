@@ -13,10 +13,10 @@ Index: src/chanserv.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/chanserv.c,v
 retrieving revision 1.6
-diff -p -u -r1.6 chanserv.c
+diff -u -r1.6 chanserv.c
 --- src/chanserv.c	28 Jun 2004 22:45:20 -0000	1.6
-+++ src/chanserv.c	8 Aug 2004 15:14:25 -0000
-@@ -1740,7 +1740,7 @@ static CHANSERV_FUNC(cmd_register)
++++ src/chanserv.c	11 Aug 2004 17:01:52 -0000
+@@ -1740,7 +1740,7 @@
      }
  
      if(new_channel)
@@ -25,7 +25,7 @@ diff -p -u -r1.6 chanserv.c
  
      cData = register_channel(channel, user->handle_info->handle);
      scan_user_presence(add_channel_user(cData, handle, UL_OWNER, 0, NULL), NULL);
-@@ -1878,7 +1878,7 @@ static CHANSERV_FUNC(cmd_move)
+@@ -1878,7 +1878,7 @@
  
      if(!(target = GetChannel(argv[1])))
      {
@@ -34,7 +34,7 @@ diff -p -u -r1.6 chanserv.c
          if(!IsSuspended(channel->channel_info))
              AddChannelUser(chanserv, target);
      }
-@@ -6337,7 +6337,7 @@ chanserv_conf_read(void)
+@@ -6337,7 +6337,7 @@
              const char *str2 = database_get_data(conf_node, KEY_SUPPORT_CHANNEL_MODES, RECDB_QSTRING);
              if(!str2)
                  str2 = "+nt";
@@ -43,7 +43,7 @@ diff -p -u -r1.6 chanserv.c
              LockChannel(chan);
              channelList_append(&chanserv_conf.support_channels, chan);
          }
-@@ -6348,7 +6348,7 @@ chanserv_conf_read(void)
+@@ -6348,7 +6348,7 @@
          str2 = database_get_data(conf_node, KEY_SUPPORT_CHANNEL_MODES, RECDB_QSTRING);
          if(!str2)
              str2 = "+nt";
@@ -52,7 +52,7 @@ diff -p -u -r1.6 chanserv.c
          LockChannel(chan);
          channelList_append(&chanserv_conf.support_channels, chan);
      }
-@@ -6623,7 +6623,7 @@ chanserv_channel_read(const char *key, s
+@@ -6623,7 +6623,7 @@
      str = database_get_data(channel, KEY_REGISTRAR, RECDB_QSTRING);
      if(!str)
          str = "<unknown>";
@@ -65,10 +65,10 @@ Index: src/common.h
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/common.h,v
 retrieving revision 1.1.1.1
-diff -p -u -r1.1.1.1 common.h
+diff -u -r1.1.1.1 common.h
 --- src/common.h	3 Jun 2004 17:13:59 -0000	1.1.1.1
-+++ src/common.h	8 Aug 2004 15:14:25 -0000
-@@ -96,6 +96,7 @@ typedef void (*exit_func_t)(void);
++++ src/common.h	11 Aug 2004 17:01:52 -0000
+@@ -96,6 +96,7 @@
  void reg_exit_func(exit_func_t handler);
  void call_exit_funcs(void);
  
@@ -80,10 +80,10 @@ Index: src/hash.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/hash.c,v
 retrieving revision 1.1.1.1
-diff -p -u -r1.1.1.1 hash.c
+diff -u -r1.1.1.1 hash.c
 --- src/hash.c	3 Jun 2004 17:13:59 -0000	1.1.1.1
-+++ src/hash.c	8 Aug 2004 15:14:26 -0000
-@@ -309,6 +309,11 @@ wipeout_channel(struct chanNode *cNode, 
++++ src/hash.c	11 Aug 2004 17:01:53 -0000
+@@ -309,6 +309,11 @@
          free(cNode->banlist.list[nn]);
      cNode->banlist.used = 0;
  
@@ -95,7 +95,7 @@ diff -p -u -r1.1.1.1 hash.c
      /* deop anybody in the channel now, but count services to reop */
      for (nn=argc=0; nn<cNode->members.used; nn++) {
          struct modeNode *mn = cNode->members.list[nn];
-@@ -339,7 +344,7 @@ wipeout_channel(struct chanNode *cNode, 
+@@ -339,7 +344,7 @@
  }
  
  struct chanNode *
@@ -104,7 +104,7 @@ diff -p -u -r1.1.1.1 hash.c
  {
      struct chanNode *cNode;
      char new_modes[MAXLEN], *argv[MAXNUMPARAMS];
-@@ -358,6 +363,7 @@ AddChannel(const char *name, time_t time
+@@ -358,6 +363,7 @@
          cNode = calloc(1, sizeof(*cNode) + strlen(name));
          strcpy(cNode->name, name);
          banList_init(&cNode->banlist);
@@ -112,7 +112,7 @@ diff -p -u -r1.1.1.1 hash.c
          modeList_init(&cNode->members);
          mod_chanmode(NULL, cNode, argv, nn, 0);
          dict_insert(channels, cNode->name, cNode);
-@@ -399,6 +405,23 @@ AddChannel(const char *name, time_t time
+@@ -399,6 +405,23 @@
          }
      }
  
@@ -136,7 +136,7 @@ diff -p -u -r1.1.1.1 hash.c
      return cNode;
  }
  
-@@ -440,11 +463,17 @@ DelChannel(struct chanNode *channel)
+@@ -440,11 +463,17 @@
          free(channel->banlist.list[--n]);
      channel->banlist.used = 0;
  
@@ -154,7 +154,7 @@ diff -p -u -r1.1.1.1 hash.c
      free(channel);
  }
  
-@@ -632,6 +661,16 @@ int ChannelBanExists(struct chanNode *ch
+@@ -632,6 +661,16 @@
      return 0;
  }
  
@@ -171,7 +171,7 @@ diff -p -u -r1.1.1.1 hash.c
  static topic_func_t *tf_list;
  static unsigned int tf_size = 0, tf_used = 0;
  
-@@ -712,6 +751,7 @@ GetUserMode(struct chanNode *channel, st
+@@ -712,6 +751,7 @@
  DEFINE_LIST(userList, struct userNode*)
  DEFINE_LIST(modeList, struct modeNode*)
  DEFINE_LIST(banList, struct banNode*)
@@ -183,9 +183,9 @@ Index: src/hash.h
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/hash.h,v
 retrieving revision 1.3
-diff -p -u -r1.3 hash.h
+diff -u -r1.3 hash.h
 --- src/hash.h	14 Jun 2004 07:32:05 -0000	1.3
-+++ src/hash.h	8 Aug 2004 15:14:26 -0000
++++ src/hash.h	11 Aug 2004 17:01:53 -0000
 @@ -48,6 +48,7 @@
  #define MODE_NOQUITMSGS         0x00100000 /* +Q suppress messages from quit notices */
  #define MODE_NOAMSG             0x00200000 /* +T no multi-target messages */
@@ -210,7 +210,7 @@ diff -p -u -r1.3 hash.h
  DECLARE_LIST(channelList, struct chanNode*);
  DECLARE_LIST(serverList, struct server*);
  
-@@ -151,6 +154,7 @@ struct chanNode {
+@@ -151,6 +154,7 @@
  
      struct modeList members;
      struct banList banlist;
@@ -218,7 +218,7 @@ diff -p -u -r1.3 hash.h
      struct policer join_policer;
      unsigned int join_flooded : 1;
      unsigned int bad_channel : 1;
-@@ -166,6 +170,12 @@ struct banNode {
+@@ -166,6 +170,12 @@
      time_t set; /* time ban was set */
  };
  
@@ -231,7 +231,7 @@ diff -p -u -r1.3 hash.h
  struct modeNode {
      struct chanNode *channel;
      struct userNode *user;
-@@ -235,7 +245,7 @@ void reg_join_func(join_func_t handler);
+@@ -235,7 +245,7 @@
  typedef void (*del_channel_func_t) (struct chanNode *chan);
  void reg_del_channel_func(del_channel_func_t handler);
  
@@ -240,7 +240,7 @@ diff -p -u -r1.3 hash.h
  void LockChannel(struct chanNode *channel);
  void UnlockChannel(struct chanNode *channel);
  
-@@ -252,6 +262,7 @@ void reg_kick_func(kick_func_t handler);
+@@ -252,6 +262,7 @@
  void ChannelUserKicked(struct userNode* kicker, struct userNode* victim, struct chanNode* channel);
  
  int ChannelBanExists(struct chanNode *channel, const char *ban);
@@ -252,9 +252,9 @@ Index: src/modules-list.h
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/modules-list.h,v
 retrieving revision 1.4
-diff -p -u -r1.4 modules-list.h
+diff -u -r1.4 modules-list.h
 --- src/modules-list.h	23 Jul 2004 18:56:59 -0000	1.4
-+++ src/modules-list.h	8 Aug 2004 15:14:26 -0000
++++ src/modules-list.h	11 Aug 2004 17:01:53 -0000
 @@ -1,3 +1 @@
  
 -WITH_MODULE(snoop)
@@ -263,10 +263,10 @@ Index: src/opserv.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/opserv.c,v
 retrieving revision 1.2
-diff -p -u -r1.2 opserv.c
+diff -u -r1.2 opserv.c
 --- src/opserv.c	10 Jun 2004 20:14:33 -0000	1.2
-+++ src/opserv.c	8 Aug 2004 15:14:29 -0000
-@@ -244,6 +244,8 @@ static const struct message_entry msgtab
++++ src/opserv.c	11 Aug 2004 17:01:56 -0000
+@@ -244,6 +244,8 @@
      { "OSMSG_CHANINFO_TOPIC_UNKNOWN", "Topic: (none / not gathered)" },
      { "OSMSG_CHANINFO_BAN_COUNT", "Bans (%d):" },
      { "OSMSG_CHANINFO_BAN", "%%s by %%s (%a %b %d %H:%M:%S %Y)" },
@@ -275,7 +275,7 @@ diff -p -u -r1.2 opserv.c
      { "OSMSG_CHANINFO_MANY_USERS", "%d users (\"/msg $S %s %s users\" for the list)" },
      { "OSMSG_CHANINFO_USER_COUNT", "Users (%d):" },
      { "OSMSG_CSEARCH_CHANNEL_INFO", "%s [%d users] %s %s" },
-@@ -420,6 +422,7 @@ static MODCMD_FUNC(cmd_chaninfo)
+@@ -420,6 +422,7 @@
      char buffer[MAXLEN];
      const char *fmt;
      struct banNode *ban;
@@ -283,7 +283,7 @@ diff -p -u -r1.2 opserv.c
      struct modeNode *moden;
      unsigned int n;
  
-@@ -449,6 +452,15 @@ static MODCMD_FUNC(cmd_chaninfo)
+@@ -449,6 +452,15 @@
  	    send_message_type(4, user, cmd->parent->bot, buffer, ban->ban, ban->who);
  	}
      }
@@ -299,7 +299,7 @@ diff -p -u -r1.2 opserv.c
      if ((argc < 2) && (channel->members.used >= 50)) {
          /* early out unless they ask for users */
          reply("OSMSG_CHANINFO_MANY_USERS", channel->members.used, argv[0], channel->name);
-@@ -913,7 +925,7 @@ static MODCMD_FUNC(cmd_join)
+@@ -913,7 +925,7 @@
          reply("MSG_NOT_CHANNEL_NAME");
          return 0;
      } else if (!(channel = GetChannel(argv[1]))) {
@@ -308,7 +308,7 @@ diff -p -u -r1.2 opserv.c
          AddChannelUser(bot, channel)->modes |= MODE_CHANOP;
      } else if (GetUserMode(channel, bot)) {
          reply("OSMSG_ALREADY_JOINED", channel->name);
-@@ -2259,7 +2271,7 @@ static MODCMD_FUNC(cmd_clone)
+@@ -2259,7 +2271,7 @@
      channel = GetChannel(argv[3]);
      if (!irccasecmp(argv[1], "JOIN")) {
  	if (!channel
@@ -317,7 +317,7 @@ diff -p -u -r1.2 opserv.c
  	    reply("MSG_CHANNEL_UNKNOWN", argv[3]);
  	    return 0;
  	}
-@@ -2981,7 +2993,7 @@ opserv_discrim_create(struct userNode *u
+@@ -2981,7 +2993,7 @@
                      send_message(user, opserv, "MSG_CHANNEL_UNKNOWN", argv[i]);
                      goto fail;
                  } else {
@@ -326,7 +326,7 @@ diff -p -u -r1.2 opserv.c
                  }
  	    }
              LockChannel(discrim->channel);
-@@ -3907,7 +3919,7 @@ opserv_conf_read(void)
+@@ -3907,7 +3919,7 @@
          str2 = database_get_data(conf_node, KEY_DEBUG_CHANNEL_MODES, RECDB_QSTRING);
          if (!str2)
              str2 = "+tinms";
@@ -335,7 +335,7 @@ diff -p -u -r1.2 opserv.c
          AddChannelUser(opserv, opserv_conf.debug_channel)->modes |= MODE_CHANOP;
      } else {
  	opserv_conf.debug_channel = NULL;
-@@ -3917,7 +3929,7 @@ opserv_conf_read(void)
+@@ -3917,7 +3929,7 @@
          str2 = database_get_data(conf_node, KEY_ALERT_CHANNEL_MODES, RECDB_QSTRING);
          if (!str2)
              str2 = "+tns";
@@ -344,7 +344,7 @@ diff -p -u -r1.2 opserv.c
          AddChannelUser(opserv, opserv_conf.alert_channel)->modes |= MODE_CHANOP;
      } else {
  	opserv_conf.alert_channel = NULL;
-@@ -3927,7 +3939,7 @@ opserv_conf_read(void)
+@@ -3927,7 +3939,7 @@
          str2 = database_get_data(conf_node, KEY_STAFF_AUTH_CHANNEL_MODES, RECDB_QSTRING);
          if (!str2)
              str2 = "+timns";
@@ -357,10 +357,10 @@ Index: src/proto-common.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/proto-common.c,v
 retrieving revision 1.2
-diff -p -u -r1.2 proto-common.c
+diff -u -r1.2 proto-common.c
 --- src/proto-common.c	10 Jun 2004 20:14:33 -0000	1.2
-+++ src/proto-common.c	8 Aug 2004 15:14:30 -0000
-@@ -552,6 +552,7 @@ void
++++ src/proto-common.c	11 Aug 2004 17:01:57 -0000
+@@ -552,6 +552,7 @@
  mod_chanmode_apply(struct userNode *who, struct chanNode *channel, struct mod_chanmode *change)
  {
      struct banNode *bn;
@@ -368,7 +368,7 @@ diff -p -u -r1.2 proto-common.c
      unsigned int ii, jj;
  
      assert(change->argc <= change->alloc_argc);
-@@ -592,6 +593,36 @@ mod_chanmode_apply(struct userNode *who,
+@@ -592,6 +593,36 @@
                  break;
              }
              break;
@@ -409,10 +409,10 @@ Index: src/proto-p10.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/proto-p10.c,v
 retrieving revision 1.3
-diff -p -u -r1.3 proto-p10.c
+diff -u -r1.3 proto-p10.c
 --- src/proto-p10.c	14 Jun 2004 07:32:06 -0000	1.3
-+++ src/proto-p10.c	8 Aug 2004 15:14:32 -0000
-@@ -574,6 +574,7 @@ irc_burst(struct chanNode *chan)
++++ src/proto-p10.c	11 Aug 2004 17:01:59 -0000
+@@ -574,6 +574,7 @@
      int pos, base_len, len;
      struct modeNode *mn;
      struct banNode *bn;
@@ -420,7 +420,7 @@ diff -p -u -r1.3 proto-p10.c
      long last_mode=-1;
      unsigned int n;
  
-@@ -632,6 +633,33 @@ irc_burst(struct chanNode *chan)
+@@ -632,6 +633,33 @@
              burst_line[pos++] = ' ';
          }
      }
@@ -454,7 +454,7 @@ diff -p -u -r1.3 proto-p10.c
      /* print the last line */
      burst_line[pos] = 0;
      putsock("%s", burst_line);
-@@ -937,7 +965,7 @@ create_helper(char *name, void *data)
+@@ -937,7 +965,7 @@
          return;
      }
  
@@ -463,7 +463,7 @@ diff -p -u -r1.3 proto-p10.c
  }
  
  static CMD_FUNC(cmd_create)
-@@ -1034,18 +1062,26 @@ static CMD_FUNC(cmd_fakehost)
+@@ -1034,18 +1062,26 @@
  static CMD_FUNC(cmd_burst)
  {
      extern int rel_age;
@@ -492,7 +492,7 @@ diff -p -u -r1.3 proto-p10.c
      while (next < argc) {
          switch (argv[next][0]) {
          case '+': {
-@@ -1058,9 +1094,52 @@ static CMD_FUNC(cmd_burst)
+@@ -1058,9 +1094,52 @@
              next += n_modes;
              break;
          }
@@ -520,19 +520,19 @@ diff -p -u -r1.3 proto-p10.c
 +              if (ctype == 1) {
 +                if (bcheck == 0) {
 +                  /* strip % char off start of very first ban */
-+                  strcat(banlist, strtok(parm, "%"));
-+                  strcat(banlist, " ");
++                  strncat(banlist, strtok(parm, "%"), sizeof(banlist) - 1 - strlen(banlist));
++                  strncat(banlist, " ", sizeof(banlist) - 1 - strlen(banlist));
 +                  bcheck = 1;
 +                } else {
-+                  strcat(banlist, parm);
-+                  strcat(banlist, " ");
++                  strncat(banlist, parm, sizeof(banlist) - 1 - strlen(banlist));
++                  strncat(banlist, " ", sizeof(banlist) - 1 - strlen(banlist));
 +                }
 +              } else if (ctype == 2) {
 +                if (echeck == 0) {
 +                   echeck = 1;
 +                } else {
-+                  strcat(exemptlist, parm);
-+                  strcat(exemptlist, " ");
++                  strncat(exemptlist, parm, sizeof(exemptlist) - 1 - strlen(exemptlist));
++                  strncat(exemptlist, " ", sizeof(exemptlist) - 1 - strlen(exemptlist));
 +                }
 +              }
 +            }
@@ -547,7 +547,7 @@ diff -p -u -r1.3 proto-p10.c
      }
  
      in_timestamp = atoi(argv[2]);
-@@ -1069,9 +1148,9 @@ static CMD_FUNC(cmd_burst)
+@@ -1069,9 +1148,9 @@
          dict_remove(unbursted_channels, cNode->name);
          irc_burst(cNode);
      }
@@ -559,7 +559,7 @@ diff -p -u -r1.3 proto-p10.c
      for (user = members, sep = *members, mode = 0; sep; user = end) {
          for (end = user + 3; isalnum(*end) || *end == '[' || *end == ']'; end++) ;
          sep = *end++; end[-1] = 0;
-@@ -2159,6 +2238,16 @@ mod_chanmode_parse(struct chanNode *chan
+@@ -2159,6 +2238,16 @@
                  change->args[ch_arg].mode |= MODE_REMOVE;
              change->args[ch_arg++].hostmask = modes[in_arg++];
              break;
@@ -576,7 +576,7 @@ diff -p -u -r1.3 proto-p10.c
          case 'o': case 'v':
          {
              struct userNode *victim;
-@@ -2286,6 +2375,9 @@ mod_chanmode_announce(struct userNode *w
+@@ -2286,6 +2375,9 @@
          case MODE_BAN:
              mod_chanmode_append(&chbuf, 'b', change->args[arg].hostmask);
              break;
@@ -586,7 +586,7 @@ diff -p -u -r1.3 proto-p10.c
          default:
              if (change->args[arg].mode & MODE_CHANOP)
                  mod_chanmode_append(&chbuf, 'o', change->args[arg].member->user->numeric);
-@@ -2336,6 +2428,9 @@ mod_chanmode_announce(struct userNode *w
+@@ -2336,6 +2428,9 @@
          case MODE_BAN:
              mod_chanmode_append(&chbuf, 'b', change->args[arg].hostmask);
              break;
@@ -596,7 +596,7 @@ diff -p -u -r1.3 proto-p10.c
          default:
              if (change->args[arg].mode & MODE_CHANOP)
                  mod_chanmode_append(&chbuf, 'o', change->args[arg].member->user->numeric);
-@@ -2446,6 +2541,7 @@ clear_chanmode(struct chanNode *channel,
+@@ -2446,6 +2541,7 @@
              channel->limit = 0;
              break;
          case 'b': remove |= MODE_BAN; break;
@@ -604,7 +604,7 @@ diff -p -u -r1.3 proto-p10.c
          case 'D': remove |= MODE_DELAYJOINS; break;
          case 'r': remove |= MODE_REGONLY; break;
          case 'c': remove |= MODE_NOCOLORS;
-@@ -2473,6 +2569,14 @@ clear_chanmode(struct chanNode *channel,
+@@ -2473,6 +2569,14 @@
          channel->banlist.used = 0;
      }
  
@@ -623,10 +623,10 @@ Index: src/tools.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/tools.c,v
 retrieving revision 1.2
-diff -p -u -r1.2 tools.c
+diff -u -r1.2 tools.c
 --- src/tools.c	10 Jun 2004 20:14:33 -0000	1.2
-+++ src/tools.c	8 Aug 2004 15:14:33 -0000
-@@ -854,3 +854,26 @@ tools_cleanup(void)
++++ src/tools.c	11 Aug 2004 17:02:00 -0000
+@@ -854,3 +854,26 @@
          free(str_tab.list[ii]);
      free(str_tab.list);
  }
