@@ -59,7 +59,6 @@ int ms_sapart(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) 
   struct Channel *chptr;
   struct Membership *member;
   struct JoinBuf parts;
-  char *p = 0;
   char *name;
 
   if(!(acptr = FindClient(parv[1])))

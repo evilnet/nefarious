@@ -35,6 +35,8 @@
 	* Renamed q:lines to R:lines because they stand for
 	"Redirection lines".
 
+	* Stomped out several compiler warnings.
+
 2003-07-05  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_user.c: Fixed a problem of when an oper was +xh and

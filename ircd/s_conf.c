@@ -759,6 +759,7 @@ char* find_csline(struct Client* sptr, const char* mask)
       return 0;
     }
   }
+  return 0;
 }
 
 void conf_add_csline(const char* const* fields, int count)

@@ -35,6 +35,7 @@
 #include "ircd_chattr.h"
 #include "ircd_features.h"
 #include "ircd_log.h"
+#include "ircd_relay.h"
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
@@ -2098,12 +2099,11 @@ lsc(struct Client *cptr, const char *target, const char *prepend,
 {
   char *tmp;
   char msg[255] = "";
-  struct Client *tptr;
   char *kludge;
   int x; 
 
   if (feature_bool(FEAT_IDLE_FROM_MSG))
-    cli_user(cptr)->last, CurrentTime;
+    cli_user(cptr)->last = CurrentTime;
   
   kludge = parv[1];
 
@@ -2164,4 +2164,6 @@ lsc(struct Client *cptr, const char *target, const char *prepend,
      relay_directed_message(cptr, target, tmp, msg);
    else
      relay_private_message(cptr, target, msg);
+
+   return 0;
 }

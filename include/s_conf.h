@@ -248,5 +248,6 @@ extern void conf_add_csline(const char* const* fields, int count);
 extern void clear_cslines(void);
 extern void conf_add_svcline(const char * const* fields, int count); 
 extern void clear_svclines(void);
+extern struct svcline *find_svc(const char *cmd);
 
 #endif /* INCLUDED_s_conf_h */
