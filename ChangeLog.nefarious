@@ -2,7 +2,7 @@
 
 	* Synced to current u2_10_11_05.
 
-	* ircd/gline.c: Reverted to original till I can fix it.
+	* ircd/gline.c: Fixed bugs in syncing.
 
 	* ircd/s_user.c: Fixed gcc warning.
 
