@@ -1368,6 +1368,7 @@ top:
 int can_join(struct Client *sptr, struct Channel *chptr, char *key)
 {
   int overrideJoin = 0;  
+  int keyv = 0;
   
   /*
    * Now a banned user CAN join if invited -- Nemesi
@@ -1394,16 +1395,28 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   if (IsXtraOp(sptr))
     return 0;
 
-  if (chptr->mode.mode & MODE_INVITEONLY)
+  /*
+   * now using compall (above) to test against a whole key ring -Kev
+   */
+  if (*chptr->mode.key && (EmptyString(key) || compall(chptr->mode.key, key)))
+    return overrideJoin + ERR_BADCHANNELKEY;
+  else
+    keyv = 1;
+
+  if ((chptr->mode.mode & MODE_INVITEONLY) && ((keyv == 0) ||
+     (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_INVITEONLYCHAN;
 
-  if (chptr->mode.limit && chptr->users >= chptr->mode.limit)
+  if (chptr->mode.limit && chptr->users >= chptr->mode.limit && ((keyv == 0) ||
+     (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_CHANNELISFULL;
 
-  if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr))
+  if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr) && ((keyv == 0) ||
+     (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_NEEDREGGEDNICK;
 
-  if ((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(sptr))
+  if ((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(sptr) && ((keyv == 0) ||
+     (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_OPERONLYCHAN; 
 
   if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
@@ -1412,16 +1425,14 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   if (is_banned(sptr, chptr, NULL) && !is_excepted(sptr, chptr, NULL))
   	return overrideJoin + ERR_BANNEDFROMCHAN;
   
-  /*
-   * now using compall (above) to test against a whole key ring -Kev
-   */
-  if (*chptr->mode.key && (EmptyString(key) || compall(chptr->mode.key, key)))
-    return overrideJoin + ERR_BADCHANNELKEY;
 
   if (overrideJoin) 	
   	return ERR_DONTCHEAT;
   	
-  return 0;
+  if (keyv == 1)
+    return -1;
+  else
+    return 0;
 }
 
 /*

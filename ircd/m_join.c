@@ -170,7 +170,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct JoinBuf create;
   struct Gline *gline;
   unsigned int flags = 0;
-  int i;
+  int i, flex = 0;
   char *p = 0;
   char *chanlist;
   char *name;
@@ -233,7 +233,9 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       if (check_target_limit(sptr, chptr, chptr->chname, 0))
 	continue; /* exceeded target limit */
       else if ((i = can_join(sptr, chptr, keys))) {
-	if (i > MAGIC_OPER_OVERRIDE) { /* oper overrode mode */
+        if (i == -1)
+          flex = 1;
+	else if (i > MAGIC_OPER_OVERRIDE) { /* oper overrode mode */
 	  switch (i - MAGIC_OPER_OVERRIDE) {
 	  case ERR_CHANNELISFULL: /* figure out which mode */
 	    i = 'l';
@@ -302,6 +304,13 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     }
 
     do_names(sptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
+
+    if (((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr)) || (chptr->mode.mode & MODE_MODERATED) &&
+       (flex == 1) && feature_bool(FEAT_FLEXABLEKEYS)) {
+        sendcmdto_one(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr, "%H +v %C",
+          chptr, sptr);
+    }
   }
 
   joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */
