@@ -2,6 +2,18 @@
  Nefarious IRCu ChangeLog
 
 
+2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added lines for HIS_IRCOPS and HIS_IRCOPS_SERVERS.
+
+	* include/ircd_features.h: Same as above.
+
+	* ircd/ircd_features.c: Same as above.
+
+	* ircd/m_ircops.c: If HIS_IRCOPS is TRUE then dont let normal users use
+	IRCOPS. If HIS_IRCOPS_SERVERS is TRUE then if a normal user can use IRCOPS
+	the opers server will not display. HIS_SERVERNAME will be displayed instead.
+
 2004-08-19  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/s_user.c: Bug fix for with default umodes, the mode(s) were being sent

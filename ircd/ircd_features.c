@@ -441,6 +441,8 @@ static struct FeatureDesc {
   F_B(TARGET_LIMITING, 0, 1, 0),
   F_S(BADUSER_URL, 0, "http://www.mirc.co.uk/help/servererrors.html", 0),
   F_B(STATS_C_IPS, 0, 0, 0),
+  F_B(HIS_IRCOPS, 0, 1, 0),
+  F_B(HIS_IRCOPS_SERVERS, 0, 1, 0),
 
 #undef F_S
 #undef F_B
