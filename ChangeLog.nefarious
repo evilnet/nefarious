@@ -1,5 +1,11 @@
 2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
 
+        * ircd/channel.c: Removed some unnessecary checks
+
+	* ircd/m_burst.c: Removed some unnessecary checks
+
+2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* include/patchlevel.h: Bumped the patchlevel, so we can differ between
 	who has +he and who doesnt. Should be a bump after every major commit.
 

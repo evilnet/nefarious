@@ -503,28 +503,26 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       lp_p = &(*lp_p)->next;
     }
 
-    if (feature_bool(FEAT_EXCEPTS)) {
-      /* Now deal with channel excepts */
-      lp_p = &chptr->exceptlist;
-      while (*lp_p) {
-        lp = *lp_p;
+    /* Now deal with channel excepts */
+    lp_p = &chptr->exceptlist;
+    while (*lp_p) {
+      lp = *lp_p;
 
-        /* remove except from channel */
-        if (lp->flags & (CHFL_EXCEPT_OVERLAPPED | CHFL_BURST_EXCEPT_WIPEOUT)) {
-          modebuf_mode_string(mbuf, MODE_DEL | MODE_EXCEPT,
-                              lp->value.except.exceptstr, 1); /* let it free exceptstr */
+      /* remove except from channel */
+      if (lp->flags & (CHFL_EXCEPT_OVERLAPPED | CHFL_BURST_EXCEPT_WIPEOUT)) {
+        modebuf_mode_string(mbuf, MODE_DEL | MODE_EXCEPT,
+                            lp->value.except.exceptstr, 1); /* let it free exceptstr */
 
-          *lp_p = lp->next; /* clip out of list */
-          MyFree(lp->value.except.who); /* free who */
-          free_link(lp); /* free except */
-          continue;
-        } else if (lp->flags & CHFL_BURST_EXCEPT) /* add except to channel */
-          modebuf_mode_string(mbuf, MODE_ADD | MODE_EXCEPT,
-                              lp->value.except.exceptstr, 0); /* don't free exceptstr */
+        *lp_p = lp->next; /* clip out of list */
+        MyFree(lp->value.except.who); /* free who */
+        free_link(lp); /* free except */
+        continue;
+      } else if (lp->flags & CHFL_BURST_EXCEPT) /* add except to channel */
+        modebuf_mode_string(mbuf, MODE_ADD | MODE_EXCEPT,
+                            lp->value.except.exceptstr, 0); /* don't free exceptstr */
 
-        lp->flags &= (CHFL_EXCEPT | CHFL_EXCEPT_IPMASK); /* reset the flag */
-        lp_p = &(*lp_p)->next;
-      }
+      lp->flags &= (CHFL_EXCEPT | CHFL_EXCEPT_IPMASK); /* reset the flag */
+      lp_p = &(*lp_p)->next;
     }
   }
 

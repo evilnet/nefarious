@@ -1175,23 +1175,21 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
 	first = 0;
       }
 
-      if (feature_bool(FEAT_EXCEPTS)) {
-        /* Attach all excepts, space seperated " :%except except ..." */
-        for (first = 2; lp3; lp3 = lp3->next)
+      /* Attach all excepts, space seperated " :%except except ..." */
+      for (first = 2; lp3; lp3 = lp3->next)
+      {
+        len = strlen(lp3->value.except.exceptstr);
+	if (msgq_bufleft(mb) < len + 1 + first)
+          /* The +1 stands for the added ' '.
+           * The +first stands for the added "~".
+           */
         {
-          len = strlen(lp3->value.except.exceptstr);
-  	  if (msgq_bufleft(mb) < len + 1 + first)
-            /* The +1 stands for the added ' '.
-            * The +first stands for the added "~".
-             */
-          {
-            full = 1;
-            break;
-          }
-  	  msgq_append(&me, mb, " %s%s", first ? "~ " : "",
-		      lp3->value.except.exceptstr);
-	  first = 0;
+          full = 1;
+          break;
         }
+  	msgq_append(&me, mb, " %s%s", first ? "~ " : "",
+	            lp3->value.except.exceptstr);
+	first = 0;
       }
     }
 
