@@ -38,6 +38,7 @@
 #include "ircd_xopen.h"
 #include "jupe.h"
 #include "list.h"
+#include "map.h"
 #include "match.h"
 #include "msg.h"
 #include "msgq.h"
@@ -163,6 +164,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
   sendto_opmask_butone(acptr, SNO_OLDSNO, "Link with %s established.", inpath);
   cli_serv(cptr)->up = &me;
   cli_serv(cptr)->updown = add_dlink(&(cli_serv(&me))->down, cptr);
+  map_update(cptr);
   sendto_opmask_butone(0, SNO_NETWORK, "Net junction: %s %s", cli_name(&me),
                        cli_name(cptr));
   SetJunction(cptr);

@@ -443,6 +443,9 @@ static struct FeatureDesc {
   F_B(STATS_C_IPS, 0, 0, 0),
   F_B(HIS_IRCOPS, 0, 1, 0),
   F_B(HIS_IRCOPS_SERVERS, 0, 1, 0),
+  F_B(HIS_MAP_SCRAMBLED, 0, 1, 0),
+  F_B(HIS_LINKS_SCRAMBLED, 0, 1, 0),
+  F_I(HIS_SCRAMBLED_CACHE_TIME, 0, 604800, 0),
 
 #undef F_S
 #undef F_B

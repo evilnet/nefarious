@@ -87,6 +87,7 @@
 #include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
+#include "map.h"
 #include "match.h"
 #include "msg.h"
 #include "numeric.h"
@@ -131,15 +132,20 @@ int m_links(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else
     mask = parc < 2 ? 0 : parv[1];
 
-  for (acptr = GlobalClientList, collapse(mask); acptr; acptr = cli_next(acptr))
-  {
-    if (!IsServer(acptr) && !IsMe(acptr))
-      continue;
-    if (!BadPtr(mask) && match(mask, cli_name(acptr)))
-      continue;
-    send_reply(sptr, RPL_LINKS, cli_name(acptr), cli_name(cli_serv(acptr)->up),
-        cli_hopcount(acptr), cli_serv(acptr)->prot,
-        ((cli_info(acptr))[0] ? cli_info(acptr) : "(Unknown Location)"));
+
+  if (feature_bool(FEAT_HIS_LINKS_SCRAMBLED) && IsAnOper(sptr)) {
+    for (acptr = GlobalClientList, collapse(mask); acptr; acptr = cli_next(acptr))
+    {
+      if (!IsServer(acptr) && !IsMe(acptr))
+        continue;
+      if (!BadPtr(mask) && match(mask, cli_name(acptr)))
+        continue;
+      send_reply(sptr, RPL_LINKS, cli_name(acptr), cli_name(cli_serv(acptr)->up),
+          cli_hopcount(acptr), cli_serv(acptr)->prot,
+          ((cli_info(acptr))[0] ? cli_info(acptr) : "(Unknown Location)"));
+    }
+  } else {
+    map_dump_links_head_in_sand(sptr, mask);
   }
 
   send_reply(sptr, RPL_ENDOFLINKS, BadPtr(mask) ? "*" : mask);

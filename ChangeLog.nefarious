@@ -1,6 +1,32 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added F:Lines for HIS_MAP_SCRAMBLED,
+	HIS_LINKS_SCRAMBLED and HIS_SCRAMBLED_CACHE_TIME.
+
+	* include/ircd_features.h: Same as above.
+
+	* include/map.h: Declerations etc.
+
+	* ircd/Makefile.in: Compile map.c.
+
+	* ircd/ircd_features.c: Same as the example.conf entry.
+
+	* ircd/m_links.c: Use the scrambled links code if its enabled and
+	the user is not an oper.
+
+	* ircd/m_map.c: Same as above.
+
+	* ircd/m_server.c: Updated the map on new links.
+
+	* ircd/map.c: File containing functions for scrambled maps/links.
+
+	* ircd/s_misc.c: Update the map on splits.
+
+	* ircd/s_serv.c: Update the map on links.
+
 2004-08-21  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/m_ircops: Tweak to IRCOPS HIS stuff.
