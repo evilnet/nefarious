@@ -105,14 +105,37 @@
 #include <stdlib.h>
 #include <string.h>
 
-static char* getkeyfromburst(char *parv[], int param)
+static int
+netride_modes(int parc, char **parv, const char *curr_key)
 {
-  char* ch = parv[param];
-  for(;*ch;ch++) {
-    if (*ch == 'k') {param++; return parv[param]; };
-    if (*ch == 'l') param++;
-  }	
-  return 0;
+  char *modes = parv[0];
+  int result = 0;
+
+  assert(modes && modes[0] == '+');
+  while (*modes) {
+    switch (*modes++) {
+    case 'i':
+      result |= MODE_INVITEONLY;
+      break;
+    case 'k':
+      if (strcmp(curr_key, *++parv))
+        result |= MODE_KEY;
+      break;
+    case 'l':
+      ++parv;
+      break;
+    case 'r':
+      result |= MODE_REGONLY;
+      break;
+    case 'z':
+      result |= MODE_SSLONLY;
+      break;
+    case 'O':
+      result |= MODE_OPERONLY;
+      break;
+    }
+  }
+  return result;
 }
 
 /*
@@ -175,17 +198,28 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
      * we have to do this before mode_parse, as chptr may go away.
      */
     for (param = 3; param < parc; param++) {
+      int check_modes;
       if (parv[param][0] != '+')
         continue;
-      if (strchr(parv[param], 'i') || strchr(parv[param], 'k')) {
-	if (strchr(parv[param], 'k') && (*chptr->mode.key) && !strchr(parv[param], 'i'))
-	  if (!ircd_strcmp(chptr->mode.key, getkeyfromburst(parv,param)))
-	    continue;
+      check_modes = netride_modes(parc - param, parv + param, chptr->mode.key);
+      if (check_modes) {
         /* Clear any outstanding rogue invites */
         mode_invite_clear(chptr);
         for (member = chptr->members; member; member = nmember) {
           nmember=member->next_member;
-          if (!MyUser(member->user) || IsZombie(member) || IsOper(member->user))
+          if (!MyUser(member->user) || IsZombie(member))
+            continue;
+          /* Kick as netrider if key mismatch *or* remote channel is
+           * +i (unless user is an oper) *or* remote channel is +r
+           * (unless user has an account) *or& remote channel is +z 
+	   * (unless user is using SSL) *or* remote channel is +O
+	   * (unless user is an oper).
+           */
+          if (!(check_modes & MODE_KEY)
+              && (!(check_modes & MODE_INVITEONLY) || IsAnOper(member->user))
+              && (!(check_modes & MODE_REGONLY) || IsAccount(member->user))
+              && (!(check_modes & MODE_SSLONLY) || IsSSL(member->user))
+              && (!(check_modes & MODE_OPERONLY) || IsAnOper(member->user)))
             continue;
           sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Net Rider", chptr, member->user);
           sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Net Rider", chptr, member->user);

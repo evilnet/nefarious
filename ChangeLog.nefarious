@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-30  Reed Loden  <reed@reedloden.com>
+
+	* include/supported.h: Alphabetized the channel/user mode lists.
+
+	* ircd/m_burst.c: Swaped to .12's version of the anti-netrider
+	with exceptions code. Added support for +O and +z in the
+	anti-netride and exceptions code.
+
+	* ircd/m_svsnick.c: Added some basic sanity checks.
+
 2004-08-27  Reed Loden  <reed@reedloden.com>
 
 	* doc/example.conf: Added FEAT_CREATE_CHAN_OPER_ONLY (restricts 

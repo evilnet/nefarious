@@ -80,9 +80,10 @@
  *
  *            note:   it is guaranteed that parv[0]..parv[parc-1] are all
  *                    non-NULL pointers.
+ *
+ * $Id$
  */
 #include "config.h"
-
 
 #include "client.h"
 #include "hash.h"
@@ -110,24 +111,80 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client* acptr = NULL;
   struct Client* acptr2 = NULL;
+  char		 nick[NICKLEN + 2];
+  char*		 arg;
 
-  if (parc<3)
-    return(need_more_params(sptr, "SVSNICK")); 
+  if (parc < 3)
+    return need_more_params(sptr, "SVSNICK"); 
 
   if (!(acptr = findNUser(parv[1])))
     return 0; /* Ignore SVSNICK for a user that has quit */
 
-  if (ircd_strcmp(cli_name(acptr), parv[2]) == 0)
-    return 0; /* Nick already set to what SVSNICK wants, ignoring... */
- 
-  if ((acptr2 = FindClient(parv[2]))) {
-    /* Nick collision occured, kill user with specific reason */
-    ++ServerStats->is_kill;
-    SetFlag(cptr, FLAG_KILLED);
-    exit_client(cptr, acptr2, &me, "Killed (Nickname Enforcement)");
+  /*
+   * Basic sanity checks
+   */
+
+  /*
+   * Don't let them make us send back a really long string of
+   * garbage
+   */
+  arg = parv[2];
+  if (strlen(arg) > IRCD_MIN(NICKLEN, feature_int(FEAT_NICKLEN)))
+    arg[IRCD_MIN(NICKLEN, feature_int(FEAT_NICKLEN))] = '\0';
+
+  if ((s = strchr(arg, '~')))
+    *s = '\0';
+
+  strcpy(nick, arg);
+
+  /*
+   * If do_nick_name() returns a null name then reject it.
+   */
+  if (0 == do_nick_name(nick))
+    return 0;
+
+  /*
+   * Check if this is a LOCAL user trying to use a reserved (Juped)
+   * nick, if so tell him that it's a nick in use...
+   */
+  if (isNickJuped(nick))
+    return 0;                        /* NICK message ignored */
+
+  if (feature_bool(FEAT_OPER_SINGLELETTERNICK) && !IsAnOper(acptr)
+      && nick[1] == '\0')
+    return 0;
+
+#ifdef NICKGLINES
+  /*
+   * Check if this is a LOCAL user trying to use a nick that has been
+   * "nick g-lined"; if so reject it...
+   */
+  if (IsNickGlined(acptr, nick) && !IsAnOper(acptr))
+    return 0;
+#endif
+
+  /*
+   * Set acptr2 to the client pointer of any user with nick's name.
+   * If the user is the same as the person being svsnick'ed, let it
+   * through as it is probably a change in the nickname's case.
+   */
+  if ((acptr2 = FindClient(nick))) {
+    /*
+     * If acptr == acptr2, then we have a client doing a nick
+     * change between *equivalent* nicknames as far as server
+     * is concerned (user is changing the case of his/her
+     * nickname or somesuch), so we let it through :)
+     */
+    if (acptr != acptr2) {
+      /* Nick collision occured, kill user with specific reason */
+      ++ServerStats->is_kill;
+      /* ??? - Why do we use cptr here? */
+      SetFlag(cptr, FLAG_KILLED);
+      exit_client(cptr, acptr2, &me, "Killed (Nickname Enforcement)");
+    }
   }
 
-  set_nick_name(acptr, acptr, parv[2], parc, parv);  
-  sendcmdto_serv_butone(sptr, CMD_SVSNICK, cptr, "%s %s", parv[1], parv[2]);
+  set_nick_name(acptr, acptr, nick, parc, parv);  
+  sendcmdto_serv_butone(sptr, CMD_SVSNICK, cptr, "%s %s", parv[1], nick);
   return 0;
 }
