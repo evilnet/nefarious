@@ -3487,7 +3487,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'z': /* deal with SSL only */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
-        if (IsSSL(sptr) || IsServer(sptr) || IsChannelService(sptr)) {
+        if (((MyConnect(sptr) && IsSSL(sptr)) || !MyConnect(sptr))
+	    || IsServer(sptr) || IsChannelService(sptr)) {
           mode_parse_mode(&state, flag_p);
 	} else {
 	  send_reply(sptr, ERR_NOPRIVILEGES);

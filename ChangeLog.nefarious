@@ -3,7 +3,11 @@
 
 2004-12-16  Reed Loden  <reed@reedloden.com>
 
-	* ircd/channel.c: Oops, I thought I fixed this.
+	* include/channel.h: Removed the MyConnect() restraint from 
+	IsSSL() as it is no longer needed.
+
+	* ircd/channel.c: Fixed compile error and hopefully corrected 
+	(for the final time) the annoying +z permission denied bug.
 
 	* ircd/m_rehash.c: Added SSL pem reopening support where it was
 	missing and restricted special commands to one character server
