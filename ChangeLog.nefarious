@@ -13,6 +13,9 @@
 
 	* ircd/m_invite.c: Miscellaneous whitespacing changes.
 
+	* ircd/m_trace.c: Changed some code to work with u2.10.11 due 
+	to changes in u2.10.12.
+
 	* ircd/s_auth.c: Removed unneeded initialization.
 
 	* ircd/s_conf.c: Replaced RPL_REDIR with RPL_BOUNCE.
