@@ -53,9 +53,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 struct dnsblexempts*    DNSBLExemptList = 0;
-
 
 char* find_dnsblexempt(const char* host)
 {
@@ -126,7 +124,8 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!feature_bool(FEAT_DNSBL_CHECKS))
     return send_reply(sptr, ERR_DISABLED, "EXEMPT");
 
-  if (parc < 2 || EmptyString(parv[1])) {
+
+  if (parc < 2 || EmptyString(parv[1]) || (strlen(parv[1]) <= 4)) {
     for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next)
       send_reply(sptr, RPL_DNSBLEXEMPTLIST, dnsblexempts->host);
 
@@ -143,8 +142,10 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else
     c = '+';
 
+  cp = pretty_mask(cp);
+
   if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp)))
-    sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s", sptr, parv[1]);
+    sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %c%s", sptr, c, cp);
 
   return 0;
 }

@@ -595,13 +595,12 @@ int register_user(struct Client *cptr, struct Client *sptr,
   }
 
   if (MyConnect(sptr) && feature_bool(FEAT_DNSBL_CHECKS)) {
-    char *dhost;
+    char *dhost = NULL;
     char chkhost[USERLEN+HOSTLEN+2];
 
     release_dnsbl_reply(sptr);
 
-    ircd_snprintf(0, chkhost, USERLEN+HOSTLEN+2, "%s@%s", user->username, cli_sockhost(sptr));
-
+    ircd_snprintf(0, chkhost, USERLEN+HOSTLEN+2, "%s!%s@%s", cli_name(sptr), user->username, cli_sockhost(sptr));
     if (IsDNSBL(sptr) && (dhost = find_dnsblexempt(chkhost))) {
       SetDNSBLAllowed(sptr);
       SetDNSBLMarked(sptr);

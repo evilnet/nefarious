@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/handlers.h: Added new handlers for exempt command.
+
+	* include/ircd_struct.h: Structure for exemptions plus a function
+	decleration.. keeping it here with the exemption structure.
+
+	* include/msg.h: Added stuff for EXEMPT command.
+
+	* include/numeric.h: Two new numerics for exemption listing.
+
+	* ircd/Makefile.in: Added m_exempt.c.
+
+	* ircd/m_exempt.c: New file, opers can now add exemptions.
+
+	* ircd/parse.c: EXEMPT command stuff.
+
+	* ircd/s_err.c: Numeric stuff.
+
+	* ircd/s_serv.c: Burst exempts on links.
+
+	* ircd/s_user.c: Mark a client if they are exempted and let
+	them in.
+
 2005-02-27  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: Regenerated.
