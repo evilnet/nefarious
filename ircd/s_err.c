@@ -1116,9 +1116,9 @@ static Numeric replyTable[] = {
 /* 539 */
   { ERR_HALFCANTKICKOP, "%s :Halfops cannot kick channel operators", "539" },
 /* 540 */
-  { 0 },
+  { RPL_DNSBLEXEMPTLIST, "%s", "540" },
 /* 541 */
-  { 0 },
+  { RPL_ENDOFEXEMPTLIST, "%s :End of DNSBL Exempt List", "541" },
 /* 542 */
   { 0 },
 /* 543 */

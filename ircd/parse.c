@@ -533,6 +533,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_silence, ms_silence, m_silence, m_ignore }
   },
   {
+    MSG_EXEMPT,
+    TOK_EXEMPT,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_not_oper, ms_exempt, mo_exempt, m_ignore }
+  },
+  {
     MSG_GLINE,
     TOK_GLINE,
     0, MAXPARA,         0, 0,

@@ -95,4 +95,16 @@ struct LOCInfo {
   char               password[ACCPASSWDLEN + 1];
 };
 
+struct dnsblexempts {
+  struct dnsblexempts *next;
+  struct dnsblexempts **prev;
+
+  char *host;
+};
+
+extern struct dnsblexempts*    DNSBLExemptList;
+
+extern char* find_dnsblexempt(const char* host);
+
+
 #endif /* INCLUDED_ircd_struct_h */

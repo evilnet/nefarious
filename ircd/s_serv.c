@@ -103,6 +103,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
   struct Client* acptr = 0;
   const char*    inpath;
   int            i;
+  struct dnsblexempts *dnsblexempts;
 
   assert(0 != cptr);
   assert(0 != cli_local(cptr));
@@ -232,6 +233,9 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
     }
   }
 
+  for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next)
+    sendcmdto_one(cli_user(cptr)->server, CMD_EXEMPT, cptr, "%C +%s", cptr, dnsblexempts->host);
+
   for (acptr = &me; acptr; acptr = cli_prev(acptr))
   {
     /* acptr->from == acptr for acptr == cptr */
@@ -259,6 +263,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 
     }
   }
+
   /*
    * Last, send the BURST.
    * (Or for 2.9 servers: pass all channels plus statuses)

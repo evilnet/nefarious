@@ -485,8 +485,10 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_OMOTD            536
 #define RPL_ENDOFOMOTD       537
 #define ERR_HALFCANTKICKOP   539	/* Nefarious extension */
+#define RPL_DNSBLEXEMPTLIST  540
+#define RPL_ENDOFEXEMPTLIST  541
 
-#define ERR_LASTERROR        540
+#define ERR_LASTERROR        542
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

@@ -322,6 +322,10 @@ struct Client;
 #define TOK_SILENCE             "U"
 #define CMD_SILENCE		MSG_SILENCE, TOK_SILENCE
 
+#define MSG_EXEMPT              "EXEMPT"       /* EXEM */
+#define TOK_EXEMPT              "EX"
+#define CMD_EXEMPT              MSG_EXEMPT, TOK_EXEMPT
+
 #define MSG_GLINE               "GLINE"         /* GLIN */
 #define TOK_GLINE               "GL"
 #define CMD_GLINE		MSG_GLINE, TOK_GLINE

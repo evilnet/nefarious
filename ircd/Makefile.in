@@ -121,6 +121,7 @@ IRCD_SRC = \
 	m_die.c \
 	m_endburst.c \
 	m_error.c \
+	m_exempt.c \
 	m_fakehost.c \
 	m_get.c \
 	m_gline.c \
