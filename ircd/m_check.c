@@ -571,7 +571,7 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan)
       if (IsMe(acptr))   /* Always the last acptr record */
          break;
 
-      if(count > 500)   /* sanity stuff */
+      if(count > feature_int(FEAT_MAX_CHECK_OUTPUT))   /* sanity stuff */
       {
          send_reply(sptr, RPL_ENDOFCHECK, " ");
          break;

@@ -1,7 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2004-08-31  Neil Spierling <vulcan@linux-boxen.org>
+2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added FEAT_MAX_CHECK_OUTPUT.
+
+	* include/ircd_features.h: Added FEAT_MAX_CHECK_OUTPUT.
+
+	* ircd/ircd_features.c: Added FEAT_MAX_CHECK_OUTPUT, default 1000.
+
+	* ircd/m_check.c: Actually use FEAT_MAX_CHECK_OUTPUT.
+
+2004-09-02  Neil Spierling <vulcan@linux-boxen.org>
 
 	* Sync with u2.10.11.07(pre1) as per 2004-08-31 (2 Commits).
 

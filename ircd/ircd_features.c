@@ -452,6 +452,7 @@ static struct FeatureDesc {
   F_B(CREATE_CHAN_OPER_ONLY, 0, 0, 0),
   F_B(VERIFIED_ACCOUNTS, 0, 0, 0),
   F_S(UNVERIFIED, 0, "You account is unverified, please verify it, reconnect and login again.", 0),
+  F_I(MAX_CHECK_OUTPUT, 0, 1000, 0),
 
 #undef F_S
 #undef F_B
