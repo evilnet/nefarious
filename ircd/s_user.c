@@ -812,7 +812,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
       char* dnsblhost;
       memset(flagbuf, 0, BUFSIZE);
 
-      if (IsDNSBLMarked(sptr)) {
+      if (IsDNSBLMarked(sptr) && !IsAccount(sptr)) {
         ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
         strcat(flagbuf, "m");
 
@@ -828,6 +828,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
           sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s %s", cli_name(sptr), "+x");
         }
       }
+
+      if (IsDNSBLMarked(sptr) && IsAccount(sptr))
+        ClearDNSBLMarked(sptr);
 
       strcat(flagbuf, "a");
 

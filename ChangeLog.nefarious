@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-04-03  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/client.h: Added ClearDNSBLMarked().
+
+	* ircd/s_user.c: If a user has loc'ed and is marked then skip
+	marking their host and unmark them. Their normal hidden host
+	(style 1) should kick in and work fine.
+
 2005-04-01  Alex Schumann <rubin@afternet.org>
 
 	* ircd/m_mode.c: Fixed a core when +k users set bans. Thanks to

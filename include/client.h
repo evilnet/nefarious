@@ -546,6 +546,7 @@ struct Client {
 #define ClearNoIdle(x)		ClrFlag(x, FLAG_NOIDLE)
 #define ClearAdmin(x)		ClrFlag(x, FLAG_ADMIN)
 #define ClearWhois(x)		ClrFlag(x, FLAG_WHOIS)
+#define ClearDNSBLMarked(x)	ClrFlag(x, FLAG_DNSBLMARKED)
 
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \
 			      && (HasPriv(acptr, PRIV_DISPLAY) \
