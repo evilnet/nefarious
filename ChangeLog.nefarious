@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+
+	* ircd/m_oper.c: Switched a couple of things.
+
 2005-01-27  Reed Loden  <reed@reedloden.com>
 
 	* doc/example.conf: Removed FEAT_DISALLOW_CHMODE_L. The new

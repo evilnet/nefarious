@@ -320,11 +320,10 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	   return 0;
 	 }
 
+  	 SetRemoteOper(sptr);
+
 	 /* Tell client_set_privs to send privileges to the user */
 	 client_set_privs(sptr);
-
-	 /* XXX: Why is SetRemoteOper() done AFTER client_set_privs()? */
-  	 SetRemoteOper(sptr);
 
          if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
            ClearAdmin(sptr);
