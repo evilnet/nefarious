@@ -255,7 +255,7 @@ static struct FeatureDesc {
   F_B(HOST_HIDING, 0, 1, 0),
   F_S(HIDDEN_HOST, FEAT_CASE, "users.afternet.org", 0),
   F_S(HIDDEN_IP, 0, "127.0.0.1", 0),
-  F_B(AUTOHIDE, 0, 1, 0),
+  F_B(AUTOHIDE, 0, 0, 0),
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
   F_B(REMOTE_OPER, 0, 1, 0),
   F_B(EVILNET, FEAT_NODISP, 0, 0),
@@ -300,10 +300,10 @@ static struct FeatureDesc {
   F_B(UNLIMIT_OPER_QUERY, 0, 0, 0),
   F_B(LOCAL_KILL_ONLY, 0, 0, 0),
   F_B(CONFIG_OPERCMDS, 0, 1, 0),
-  F_B(SETHOST, 0, 0, 0),
+  F_B(SETHOST, 0, 1, 0),
   F_B(SETHOST_FREEFORM, 0, 0, 0),
-  F_B(SETHOST_USER, 0, 0, 0),
-  F_B(SETHOST_AUTO, 0, 0, 0),
+  F_B(SETHOST_USER, 0, 1, 0),
+  F_B(SETHOST_AUTO, 0, 1, 0),
 
   /* features that affect global opers on this server */
   F_B(OPER_KILL, 0, 1, 0),

@@ -678,7 +678,7 @@ static const struct UserMode {
   { FLAG_DEBUG,       'g' },
   { FLAG_ACCOUNT,     'r' },
   { FLAG_HIDDENHOST,  'x' },
-  { FLAG_SETHOST,     'h' ),
+  { FLAG_SETHOST,     'h' },
   { FLAG_ACCOUNTONLY, 'R' }
 };
 
@@ -1198,7 +1198,7 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
   /* MODE_ADD: set a new hostmask */
   } else {
     /* chop up ident and host.cc */
-    if (host = (strrchr(hostmask, '@'))) /* oper can specifiy ident@host.cc */
+    if ((host = (strrchr(hostmask, '@')))) /* oper can specify ident@host.cc */
       *host++ = '\0';
     else /* user can only specifiy host.cc [password] */
       host = hostmask;
@@ -1321,7 +1321,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
   unsigned int tmpmask = 0;
   int snomask_given = 0;
   char buf[BUFSIZE];
-  chat *hostmask, *password;
+  char *hostmask = NULL;
+  char *password = NULL;
   int prop = 0;
   int do_host_hiding = 0;
   int do_set_host = 0;

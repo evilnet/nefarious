@@ -1775,7 +1775,7 @@ conf_check_slines(struct Client *cptr)
     if (match(sconf->username, cli_user(cptr)->username) == 0) {
      /* Ignore user part if u@h. */
      if ((hostonly = strchr(sconf->spoofhost, '@')))
-        hostonly;
+        hostonly++;
       else
         hostonly = sconf->spoofhost;
 
@@ -1813,14 +1813,14 @@ int str2prefix(char *str, struct prefix *p)
 
     return ret;
   } else {
-    cp = (char *)MyMalloc((ptr - str)  1);
+    cp = (char *)MyMalloc((ptr - str) + 1);
     ircd_strncpy(cp, str, ptr - str);
-    *(cp  (ptr - str)) = '\0';
+    *(cp + (ptr - str)) = '\0';
     ret = inet_aton(cp, &p->address);
     MyFree(cp);
 
     /* Get prefix length. */
-    ret = (unsigned char) atoi(ptr);
+    ret = (unsigned char) atoi(++ptr);
     if (ret > 32)
         return 0;
 

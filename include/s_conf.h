@@ -224,6 +224,7 @@ extern int find_restrict(struct Client *cptr);
 extern struct MotdItem* read_motd(const char* motdfile);
 extern char* find_quarantine(const char* chname);
 extern void conf_add_sline(const char* const* fields, int count);
+extern int conf_check_slines(struct Client *cptr);
 extern void clear_slines(void);
 extern int str2prefix(char *s, struct prefix *p);
 

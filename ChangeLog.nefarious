@@ -8,6 +8,9 @@
 
 	* Added ASUKA's sethost (not tested!!).
 
+	* Fixed several bugs in sethost.
+	NOTE: Need to tell QuakeNet Dev-Com about these bugs.
+
 	* include/ircd_features.h, ircd/ircd_features.c: Added HIS_GLINE
 	(default off).
 
