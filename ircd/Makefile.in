@@ -296,6 +296,7 @@ install-with-symlink: build mkbindir
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}	
 	${top_srcdir}/tools/makepem/makepem ${DPATH} ${top_srcdir}
+	${RM} -f ${top_srcdir}/ircd/version.c
 # 	( cd ${DPATH}; \
 # 	  ${TOUCH} ${MPATH}; \
 # 	  ${TOUCH} ${RPATH}; \
@@ -318,6 +319,7 @@ install-no-symlink: build mkbindir
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}
+	${RM} -f ${top_srcdir}/ircd/version.c
 # 	( cd ${DPATH}; \
 # 	  ${TOUCH} ${MPATH}; \
 # 	  ${TOUCH} ${RPATH}; \

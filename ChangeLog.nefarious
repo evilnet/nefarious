@@ -3,6 +3,11 @@
 
 2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/Makefile.in: Remove version.c on a make install, makes
+	life easier for keeping track of CVS version when coding.
+	
+2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+
 	* More bug fixes, see ChangeLog.
 
 2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
