@@ -718,7 +718,7 @@ static Numeric replyTable[] = {
 /* 338 */
   { RPL_WHOISACTUALLY, "%s %s@%s %s :Actual user@host, Actual IP", "338" },
 /* 339 */
-  { RPL_WHOISVERIFIED, "%s :is using a %s account", "339" },
+  { 0 },
 /* 340 */
   { RPL_USERIP, ":", "340" },
 /* 341 */
@@ -1116,7 +1116,7 @@ static Numeric replyTable[] = {
 /* 537 */
   { RPL_ENDOFOMOTD, ":End of IRC Operator MOTD.", "537" },
 /* 538 */
-  { ERR_NOTVERIFIED, ":%s", "538" },
+  { 0 },
 /* 539 */
   { ERR_HALFCANTKICKOP, "%s :Halfops cannot kick channel operators", "539" },
 /* 540 */

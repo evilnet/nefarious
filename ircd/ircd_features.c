@@ -431,8 +431,6 @@ static struct FeatureDesc {
   F_S(GEO_LOCATION, FEAT_NULL, 0, 0),
   F_B(MOTD_LAST_CHANGED, 0, 0, 0),
   F_B(SPAMBOT_CHECKS, 0, 0, 0),
-  F_B(VERIFIED_ACCOUNTS, 0, 0, 0),
-  F_S(UNVERIFIED, 0, "You account is unverified, please verify it, reconnect and login again.", 0),
   F_B(HOST_IN_TOPIC, 0, 1, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
   F_B(HALFOPS, 0, 0, 0),

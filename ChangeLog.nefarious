@@ -1,3 +1,28 @@
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Removed verified accounts code, will be re added later.
+
+	* doc/readme.login-on-connect: Readme detailing login on connects. While the
+	code isnt 100% added yet (wont be till 0.4 or so), admins can see what the
+	functions will do.
+
+	* include/client.h: Removed verified accounts code, will be re added later.
+
+	* include/ircd_features.h: Removed verified accounts code, will be re added later.
+
+	* include/numeric.h: Removed verified accounts code, will be re added later.
+
+	* ircd/ircd_features.c: Removed verified accounts code, will be re added later.
+
+	* ircd/m_account.c: Removed verified accounts code, will be re added later.
+	 		    Added first part of login on connect code.
+
+	* ircd/m_whois.c: Removed verified accounts code, will be re added later.
+
+	 * ircd/s_err.c: Removed verified accounts code, will be re added later.
+
+	* ircd/s_user.c: Removed verified accounts code, will be re added later.
+
 2004-07-07  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/m_whois.c: Reverted verified accounts code back.

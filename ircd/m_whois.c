@@ -243,13 +243,6 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (IsBot(acptr))
       send_reply(sptr, RPL_WHOISBOT, name);
 
-    if (IsVerified(acptr) && feature_bool(FEAT_VERIFIED_ACCOUNTS) &&
-       (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
-      send_reply(sptr, RPL_WHOISVERIFIED, name, "Verified");
-    else if (!IsVerified(acptr) && IsAccount(acptr) &&
-      feature_bool(FEAT_VERIFIED_ACCOUNTS))
-      send_reply(sptr, RPL_WHOISVERIFIED, name, "UnVerified");
-
     if (MyConnect(acptr) &&
 	(IsAnOper(sptr) ||
 	 (!IsNoIdle(acptr) && (!feature_bool(FEAT_HIS_WHOIS_IDLETIME) ||

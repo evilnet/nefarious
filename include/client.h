@@ -155,7 +155,6 @@ enum Flag {
     FLAG_NOCHAN,                    /* ASUKA_n: hide channels */
     FLAG_NOIDLE,                    /* ASUKA_I: hide idle time */
     FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
-    FLAG_VERIFIED,                  /* Verified user */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -450,7 +449,6 @@ struct Client {
 #define IsXtraOp(x)		HasFlag(x, FLAG_XTRAOP)
 #define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
-#define IsVerified(x)		HasFlag(x, FLAG_VERIFIED)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -482,7 +480,6 @@ struct Client {
 #define SetXtraOp(x)		SetFlag(x, FLAG_XTRAOP)
 #define SetNoChan(x)		SetFlag(x, FLAG_NOCHAN)
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
-#define SetVerified(x)		SetFlag(x, FLAG_VERIFIED)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)

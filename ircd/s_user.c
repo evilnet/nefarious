@@ -1703,20 +1703,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           ClearDebug(acptr);
         break;
       case 'x':
-        if ((IsVerified(acptr) && feature_bool(FEAT_VERIFIED_ACCOUNTS) &&
-           (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) || !feature_bool(FEAT_VERIFIED_ACCOUNTS)) {
-          if (what == MODE_ADD) {
-  	    SetHiddenHost(acptr);
-  	    if (!FlagHas(&setflags, FLAG_HIDDENHOST))
-	      do_host_hiding = 1;
-	  } else {
-	    if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-  	      ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
-	      ClearHiddenHost(acptr);
-	    }
+        if (what == MODE_ADD) {
+	  SetHiddenHost(acptr);
+	  if (!FlagHas(&setflags, FLAG_HIDDENHOST))
+	    do_host_hiding = 1;
+	} else {
+	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+  	    ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
+	    ClearHiddenHost(acptr);
 	  }
-	} else
-          send_reply(acptr, ERR_NOTVERIFIED, feature_str(FEAT_UNVERIFIED));
+	}
 	break;
       case 'h':
         if (what == MODE_ADD) {
