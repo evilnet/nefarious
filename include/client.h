@@ -391,10 +391,10 @@ struct Client {
 #define SetMe(x)                (cli_status(x) = STAT_ME)
 #define SetUser(x)              (cli_status(x) = STAT_USER)
 
-#define MyConnect(x)    (cli_from(x) == (x))
-#define MyUser(x)       (MyConnect(x) && IsUser(x))
-#define MyOper(x)       (MyConnect(x) && IsOper(x))
-#define Protocol(x)     ((cli_serv(x))->prot)
+#define MyConnect(x)		(cli_from(x) == (x))
+#define MyUser(x)		(MyConnect(x) && IsUser(x))
+#define MyOper(x)		(MyConnect(x) && IsOper(x))
+#define Protocol(x)		((cli_serv(x))->prot)
 
 #define PARSE_AS_SERVER(x) (cli_status(x) & \
             (STAT_SERVER | STAT_CONNECTING | STAT_HANDSHAKE))

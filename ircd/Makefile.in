@@ -57,7 +57,7 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 CPPFLAGS = -I. -I.. -I${top_srcdir}/include @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
-LIBS = @LIBS@ -lssl
+LIBS = @LIBS@ -lssl -lcrypto
 
 #### End of system configuration section. ####
 PURIFY =

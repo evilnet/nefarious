@@ -1,3 +1,17 @@
+2003-07-03  Reed Loden  <reed@reedloden.com>
+
+	* Added some fixes from asuka.
+
+	* ircd/m_topic.c (do_settopic): If chan +m and -t don't let +b
+	people set topic.
+	(found by OUTsider but he had a broken patch)
+
+	* Add a SSL fix from OUTsider.
+
+	* Fix a typo in s_user.c made by Isomer.
+
+	* Sync with u2.10.11.05...
+
 2003-06-19  Reed Loden  <reed@reedloden.com>
 
 	* Fixed the annoying assignment from incompatible pointer type 

@@ -556,7 +556,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
   }
   else {
     ircd_strncpy(user->username, username, USERLEN);
-    ircd_strncpy(user->realusername, username, USERLEN);
     Count_newremoteclient(UserStats, user->server);
   }
   if(MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
@@ -599,9 +598,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
       set_snomask(sptr, cli_snomask(sptr) & SNO_NOISY, SNO_ADD);
     if (feature_bool(FEAT_CONNEXIT_NOTICES))
       sendto_opmask_butone(0, SNO_CONNEXIT,
-			   "Client connecting: %s (%s@%s) [%s] {%d}",
+			   "Client connecting: %s (%s@%s) [%s] {%d} [%s]",
 			   cli_name(sptr), user->username, user->host,
-			   cli_sock_ip(sptr), get_client_class(sptr));
+			   cli_sock_ip(sptr), get_client_class(sptr),
+			   cli_info(sptr)
+			   );
     IPcheck_connect_succeeded(sptr);
   }
   else

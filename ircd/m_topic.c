@@ -115,6 +115,15 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
       send_reply(sptr, ERR_CHANOPRIVSNEEDED, chptr->chname);
       return;
    }
+
+   /* if chan +m and user not service/+v/+o, return error and ignore */
+   if (!client_can_send_to_channel(sptr, chptr)
+       && !IsChannelService(sptr) && !IsVoicedOrOpped(member))
+   {
+      send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+      return;
+   }
+
    /* Note if this is just a refresh of an old topic, and don't
     * send it to all the clients to save bandwidth.  We still send
     * it to other servers as they may have split and lost the topic.
@@ -126,8 +135,8 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    chptr->topic_time = ts ? ts : TStime();
    /* Fixed in 2.10.11: Don't propagate local topics */
    if (!IsLocalChannel(chptr->chname))
-     sendcmdto_serv_butone(sptr, CMD_TOPIC, cptr, "%H %Tu :%s", chptr,
-		           chptr->topic_time, chptr->topic);
+     sendcmdto_serv_butone(sptr, CMD_TOPIC, cptr, "%H %Tu %Tu :%s", chptr,
+			   chptr->creationtime, chptr->topic_time, chptr->topic);
    if (newtopic)
       sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL,
       				       "%H :%s", chptr, chptr->topic);
@@ -195,7 +204,8 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
  *
  * parv[0]        = sender prefix
  * parv[1]        = channel
- * parv[parc - 2] = timestamp
+ * parv[parc - 3] = channel timestamp (optional)
+ * parv[parc - 2] = topic timestamp (optional)
  * parv[parc - 1] = topic
  */
 int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
