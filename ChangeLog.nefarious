@@ -3,6 +3,8 @@
 
 2004-10-18 Alex Schumann <rubinlinux@gmail.com>
 	* ircd/m_account.c: modded LOC code to resolve some bugs with it.
+	* patches/loc.srvx2.diff: The changes necessary to our srvx2 to support
+	this. Probably very similar for srvx.
 
 2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
 
