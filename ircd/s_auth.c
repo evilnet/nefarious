@@ -331,7 +331,7 @@ void destroy_auth_request(struct AuthRequest* auth, int send_reports)
   if (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)) {
     delete_resolver_queries(auth);
     if (send_reports && IsUserPort(auth->client))
-      sendheader(auth->client, REPORT_FIN_DNS);
+      sendheader(auth->client, REPORT_FIN_DNSBL);
   }
 
   if (send_reports) {

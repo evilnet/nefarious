@@ -3,8 +3,12 @@
 
 2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/s_auth.c: Small bug fix, was sending the wrong header.
+
+2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/parse.c: Fixed bug with commands like /1 or /2 being
-	accepted, which had wierd sideaffects. Fix by Entrope
+	accepted, which had wierd sideaffects. Fix by Entrope.
 
 2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
 
