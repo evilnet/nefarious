@@ -1280,6 +1280,7 @@ read_actual_config(const char *cfile)
 
     if(0 == ircd_strcmp(field_vector[0], "include")) {
       read_actual_config(field_vector[1]);
+      continue;
     }
 
     aconf = make_conf();

@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-03  Neil Spierling <vulcan@linux-boxen.org>
+
+        * ircd/s_conf.c: Dont parse "include" lines fully, gets an ugly
+	I:Line without this continue. Probably would cause issues for
+	connecting clients.
+
 2004-09-29  Neil Spierling <vulcan@linux-boxen.org>
 
 	* configure: Reran autoconf again.
