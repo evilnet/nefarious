@@ -54,6 +54,7 @@
 #endif /* USE_SSL */
 #include "struct.h"
 #include "userload.h"
+#include "querycmds.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -396,7 +397,7 @@ stats_servers_verbose(struct Client* sptr, struct StatDesc* sd, int stat,
 	       cli_serv(acptr)->asll_rtt,
 	       cli_serv(acptr)->asll_to,
 	       cli_serv(acptr)->asll_from,
-	       cli_serv(acptr)->clients,
+	       (acptr == &me) ? UserStats.local_clients : cli_serv(acptr)->clients,
 	       cli_serv(acptr)->nn_mask,
 	       cli_serv(acptr)->prot,
 	       cli_serv(acptr)->timestamp,
