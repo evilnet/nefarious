@@ -182,7 +182,7 @@ enum Feature {
   FEAT_NETWORK,
   FEAT_URL_CLIENTS,
 
-  /* nefarious features */
+  /* Nefarious features */
   FEAT_NEFARIOUS,
   FEAT_OMPATH,
   FEAT_QPATH,
@@ -213,6 +213,7 @@ enum Feature {
   FEAT_HIS_STATS_s,
   FEAT_HIS_WHOIS_LOCALCHAN,
   FEAT_HIS_GLINE,
+  FEAT_HIS_USERGLINE,
   FEAT_AUTOJOIN,
   FEAT_AUTOJOIN_NOTICE,
   FEAT_AUTOJOIN_NOTICE_VALUE,

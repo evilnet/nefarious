@@ -140,7 +140,6 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
 	  /* search for overlapping glines first, skipping badchans 
 	   */
 #endif
-
     for (gline = GlobalGlineList; gline; gline = sgline) {
       sgline = gline->gl_next;
 
@@ -238,12 +237,11 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
     else
 	gline->gl_host = 0;
 
-    if (*user!='$' && check_if_ipmask(host)) { /* mark if it's an IP  mask */
+    if (*user!='$' && check_if_ipmask(host)) { /* mark if it's an IP mask */
       int class;
       char ipname[16];
       int ad[4] = { 0 };
       int bits2 = 0;
-	
       char *ch;
       int seenwild;
       int badmask=0;
@@ -307,9 +305,13 @@ do_badchanneled(struct Channel *chptr, struct Gline *gline) {
     nmember=member->next_member;
     if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
       continue;
-    sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :%s (%s)", chptr, member->user, feature_str(FEAT_BADCHAN_REASON), gline->gl_reason);
-    sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :%s (%s)", chptr, member->user, 
-                                     feature_str(FEAT_BADCHAN_REASON), gline->gl_reason);
+    sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :%s (%s)", chptr,
+			  member->user, feature_str(FEAT_BADCHAN_REASON),
+			  gline->gl_reason);
+    sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL,
+			  "%H %C :%s (%s)", chptr, member->user,
+			  feature_str(FEAT_BADCHAN_REASON), 
+			  gline->gl_reason);
     make_zombie(member, member->user, &me, &me, chptr);
     return 1;
   }
@@ -386,7 +388,6 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	  }
 	}
 	continue;
-
       } else { /* Host/IP gline */
 #ifdef NICKGLINES
               if (cli_name(acptr) && 
@@ -577,7 +578,8 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
         /* uh, what to do here? */
         /* The answer, my dear Watson, is we throw a protocol_violation()
            -- hikari */
-        return protocol_violation(sptr,"%s has sent an incorrectly formatted gline",cli_name(sptr));
+        return protocol_violation(sptr, "%s has sent an incorrectly formatted gline",
+				  cli_name(sptr));
         break;
     }
      user = (*userhost =='$' ? userhost : userhost+2);

@@ -28,7 +28,6 @@
 #include <string.h>
 #include <sys/time.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 char localkey[9] = "12345678";
 

@@ -94,13 +94,13 @@
 /* Define for nickname glines to be enabled */
 #undef NICKGLINES
 
-/* Key 1 used for crypting hostnames under host hiding syle 2. */ 
+/* Key 1 used for crypting hostnames under host hiding style 2. */ 
 #undef KEY
 
-/* Key 2 used for crypting hostnames under host hiding syle 2. */ 
+/* Key 2 used for crypting hostnames under host hiding style 2. */ 
 #undef KEY2
 
-/* Key 3 used for crypting hostnames under host hiding syle 2. */ 
+/* Key 3 used for crypting hostnames under host hiding style 2. */ 
 #undef KEY3
 
 /* Configuration file name */

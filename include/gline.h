@@ -35,7 +35,11 @@
 struct Client;
 struct StatDesc;
 
-#define GLINE_MAX_EXPIRE 604800	/* max expire: 7 days */
+#ifdef NICKGLINES
+# define GLINE_MAX_EXPIRE 31536000	/* max expire: 1 year */
+#else
+# define GLINE_MAX_EXPIRE 604800	/* max expire: 7 days */
+#endif
 
 struct Gline {
   struct Gline *gl_next;

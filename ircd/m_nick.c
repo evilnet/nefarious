@@ -183,13 +183,6 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
   }
 
-#ifdef NICKGLINES
-  if (IsRegistered(sptr) && !IsAnOper(sptr) && IsNickGlined(sptr, nick)) {
-    send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
-    return 0;
-  }
-#endif
-
   /* 
    * Check if this is a LOCAL user trying to use a reserved (Juped)
    * nick, if so tell him that it's a nick in use...
@@ -199,22 +192,33 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;                        /* NICK message ignored */
   }
 
-   if (feature_bool(FEAT_ASUKA_SINGLELETTERNICK) && !IsAnOper(sptr)
-       && nick[1] == '\0') {
-     send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
-     return 0;
-   }
+  if (feature_bool(FEAT_ASUKA_SINGLELETTERNICK) && !IsAnOper(sptr)
+      && nick[1] == '\0') {
+    send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+    return 0;
+  }
 
-   /* Don't let users use X<numerics here> so they can't fake X2 -reed */
-   if (!ircd_strcmp(feature_str(FEAT_NETWORK), "AfterNET")
-       && !IsAnOper(sptr) && nick[0] == 'X') {
-     for(n = nick+1;n;n++) {
-       if (!IsDigit(*n))
-         return 0;
-     }
-     send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
-     return 0;
-   }
+  /* Don't let users use X<numerics here> so they can't fake X2 -reed */
+  if (!ircd_strcmp(feature_str(FEAT_NETWORK), "AfterNET")
+      && !IsAnOper(sptr) && nick[0] == 'X') {
+    for (n = nick+1;n;n++) {
+      if (!IsDigit(*n))
+	return 0;
+    }
+    send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+    return 0;
+  }
+
+#ifdef NICKGLINES
+  /*
+   * Check if this is a LOCAL user trying to use a nick that has been
+   * "nick g-lined"; if so reject it...
+   */
+  if (IsNickGlined(sptr, nick) && !IsAnOper(sptr)) {
+    send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+    return 0;
+  }
+#endif
 
   if (!(acptr = FindClient(nick))) {
     /*

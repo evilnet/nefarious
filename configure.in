@@ -348,7 +348,7 @@ AC_ARG_WITH([cloakone],
 
 AC_MSG_RESULT([$unet_cv_with_cloakone (random if unspecified)])
 AC_DEFINE_UNQUOTED(KEY, $unet_cv_with_cloakone,
-[First key used for crypting hostnames under host hiding syle 2 (random if not given).])
+[First key used for crypting hostnames under host hiding style 2 (random if not given).])
 
 
 dnl Now check for --with-cloaktwo
@@ -361,7 +361,7 @@ AC_ARG_WITH([cloaktwo],
 
 AC_MSG_RESULT([$unet_cv_with_cloaktwo (random if unspecified)])
 AC_DEFINE_UNQUOTED(KEY2, $unet_cv_with_cloaktwo,
-[Second key used for crypting hostnames under host hiding syle 2 (random if not given).])
+[Second key used for crypting hostnames under host hiding style 2 (random if not given).])
 
 
 dnl Now check for --with-cloakthree
@@ -374,7 +374,7 @@ AC_ARG_WITH([cloakthree],
 
 AC_MSG_RESULT([$unet_cv_with_cloakthree (random if unspecified)])
 AC_DEFINE_UNQUOTED(KEY3, $unet_cv_with_cloakthree,
-[Third key used for crypting hostnames under host hiding syle 2 (random if not given).])
+[Third key used for crypting hostnames under host hiding style 2 (random if not given).])
 
 
 

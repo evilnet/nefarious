@@ -125,7 +125,7 @@ int m_sethost(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (IsAnOper(sptr)) {
       ircd_snprintf(0, hostmask, USERLEN + HOSTLEN + 1, "%s@%s", parv[1], parv[2]);
       if (!is_hostmask(hostmask)) {
-	send_reply(sptr, ERR_BADHOSTMASK, parv[1]);
+	send_reply(sptr, ERR_BADHOSTMASK, hostmask);
 	return 0;
       }
       if (set_hostmask(sptr, hostmask, NULL))

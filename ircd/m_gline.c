@@ -337,5 +337,8 @@ m_gline(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   if (parc < 2)
     return send_reply(sptr, ERR_NOSUCHGLINE, "");
 
+  if (feature_bool(FEAT_HIS_USERGLINE))
+    return send_reply(sptr, ERR_DISABLED, "GLINE");
+
   return gline_list(sptr, parv[1]);
 }
