@@ -3477,7 +3477,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_DEL,		'-',
     0x0, 0x0
   };
-  int i;
+  int i, destroyed = 0;
   int *flag_p;
   unsigned int t_mode;
   char *modestr;
@@ -3667,11 +3667,13 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	break;
 
       case 'z': /* deal with persistant (MODE_PERSIST) channels */
-  if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
-      (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
-    break;
-  mode_parse_mode(&state, flag_p);
-  break;
+        if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
+           (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
+          break;
+        else if (state.dir == '-')
+          destroyed = 1;
+        mode_parse_mode(&state, flag_p);
+        break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);
@@ -3736,13 +3738,6 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       mode_invite_clear(state.chptr);
 
     state.chptr->mode.mode = t_mode;
-
-    /* YOU CANNOT DESTROY CHPTR IF ITS USED BELOW!! WTF.
-    if (!(chptr->mode.mode & MODE_PERSIST)) {
-      if (chptr->users <= 0)
-        destroy_unregistered_channel(chptr);
-    }
-    */
   }
 
   if (state.flags & MODE_PARSE_WIPEOUT) {
@@ -3763,6 +3758,13 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   /* process client changes */
   if (state.cli_change[0].flag)
     mode_process_clients(&state);
+
+  if (destroyed) {
+    if (state.flags & MODE_PARSE_BURST)
+      protocol_violation(&me,"Recieved -z during netburst (%H)", chptr);
+    else
+      destroy_unregistered_channel(chptr);
+  }
 
   return state.args_used; /* tell our parent how many args we gobbled */
 }

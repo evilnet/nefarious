@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-23  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Ok -z is hopefully fixed now.
+
+	* ircd/m_mode.c: If you are using mode_parse it could result in
+	a destroy_unregistered_channel if you are doing a -z.
+
 2005-03-22  Alex Schumann   <rubin@afternet.org>
 
 	* ircd/channel.c: sv: You cant destroy that chptr its used more

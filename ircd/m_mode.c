@@ -100,6 +100,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* NOTE:
+ * mode_parse could result in destroy_unregistered_channel if 
+ * doing a -z
+ */
+
 int
 m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
