@@ -3,6 +3,23 @@
 
 2004-08-31  Neil Spierling <vulcan@linux-boxen.org>
 
+	* Sync with u2.10.11.07(pre1) as per 2004-08-31 (2 Commits).
+
+	* include/client.h: Is/SetVerifiedAccount stuff.
+
+	* include/ircd_features.h: F:Lines for verified accounts, default
+	FALSE.
+
+	* include/numeric.h: Two numerics added, one for error replies
+	and the other for WHOIS replies.
+
+	* ircd/ircd_features.c: F:Lines for verified accounts, default
+	FALSE.
+
+	* ircd/m_account.c: Re added verified accounts.
+	
+2004-08-31  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/s_user.h: do_nick_name can be called outside of
 	m_nick.c now.
 

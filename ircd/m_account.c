@@ -102,20 +102,9 @@
  * parv[0] = sender prefix
  * parv[1] = numeric of client to act on
  * parv[2] = account name (12 characters or less)
- * parv[3] = message sub-type
- *
- * for parv[4] == 'R' (remote auth):
- * parv[4] = account name (12 characters or less)
- * parv[5] = account TS (optional)
- *
- * for parv[4] == 'C' (auth check):
- * parv[4] = request id (transparent, uninterpreted string)
- * parv[5] = username
- * parv[parc-1] = password
- *
- * for parv[3] == 'A' (auth ok) or
- * for parv[3] == 'D' (auth denied):
- * parv[4] = request id (transparent, uninterpreted string)
+ * parv[3] = timestamp
+ * parv[4] = verified account, can also be parv[3] when the timestamp
+ *           isnt not specified.
  *
  */
 int ms_account(struct Client* cptr, struct Client* sptr, int parc,
@@ -123,7 +112,6 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 {
   struct Client *acptr;
   int hidden;
-  char type;
 
   if (parc < 3)
     return need_more_params(sptr, "ACCOUNT");
@@ -132,86 +120,63 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     return protocol_violation(cptr, "ACCOUNT from non-server %s",
 			      cli_name(sptr));
 
-#if 1
-  /* XXX HACK -- remove when all servers understand the new syntax */
-  if (parc < 4) {
-    /* old-school message, remap it to 'R' */
-    parv[4] = NULL;
-    parv[3] = parv[2];
-    parv[2] = "R";
-    parc = 4;
-  } else if (parc == 4 && atoi(parv[3])) {
-    /* old-school message with timestamp, remap it to 'R' */
-    parv[5] = NULL;
-    parv[4] = parv[3];
-    parv[3] = parv[2];
-    parv[2] = "R";
-    parc = 5;
-  }
-#endif
+  if (!(acptr = findNUser(parv[1])))
+    return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
 
-  type = parv[2][0];
-  if (type == 'R') {
-    if (!(acptr = findNUser(parv[1])))
-      return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+  if (IsAccount(acptr))
+    return protocol_violation(cptr, "ACCOUNT for already registered user %s "
+                  "(%s -> %s)", cli_name(acptr),
+                  cli_user(acptr)->account, parv[2]);
 
-    if (IsAccount(acptr))
-      return protocol_violation(cptr, "ACCOUNT for already registered user %s "
-			        "(%s -> %s)", cli_name(acptr),
-			        cli_user(acptr)->account, parv[3]);
+  assert(0 == cli_user(acptr)->account[0]);
 
-    assert(0 == cli_user(acptr)->account[0]);
+  if (strlen(parv[2]) > ACCOUNTLEN)
+    return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.",
+                              parv[2], ACCOUNTLEN, cli_name(acptr));
 
-    if (strlen(parv[3]) > ACCOUNTLEN) {
-      return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.",
-                                parv[3], ACCOUNTLEN, cli_name(acptr));
-    }
-
-    if (parc > 4) {
-      cli_user(acptr)->acc_create = atoi(parv[4]);
+  if (parc == 4) {
+    if (is_timestamp(parv[3])) {
+      cli_user(acptr)->acc_create = atoi(parv[3]);
       Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
-	     "timestamp %Tu", parv[3], cli_user(acptr)->acc_create));
+             "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
+    } else {
+      if (feature_bool(FEAT_VERIFIED_ACCOUNTS) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
+        if (0 == ircd_strcmp("v", parv[3])) {
+          Debug((DEBUG_DEBUG, "Account Verified (without stamp)"));
+          SetVerified(acptr);
+        }
+      }
     }
-
-    hidden = HasHiddenHost(acptr);
-    SetAccount(acptr);
-    ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
-
-    /* Fake hosts have precedence over account-based hidden hosts,
-       so, if the user was already hidden, don't do it again */
-    if (!hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
-       hide_hostmask(acptr);
-
-#if 1
-  /* remove when all servers understand the new syntax */
-    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
-			  cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s",
-			  acptr, cli_user(acptr)->account,
-			  cli_user(acptr)->acc_create);
-#else
-    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
-			  cli_user(acptr)->acc_create ? "%C R %s %Tu" : "%C R %s",
-			  acptr, cli_user(acptr)->account,
-			  cli_user(acptr)->acc_create);
-#endif
+  } else if (parc == 5) {
+    if (is_timestamp(parv[3])) {
+      cli_user(acptr)->acc_create = atoi(parv[3]); 
+      Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
+             "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
+    }
+    if (feature_bool(FEAT_VERIFIED_ACCOUNTS) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
+      if (0 == ircd_strcmp("v", parv[4])) {
+        Debug((DEBUG_DEBUG, "Account Verified (with stamp)"));
+        SetVerified(acptr);
+      }
+    }
   } else {
-    if (type == 'C' && parc < 6)
-      return need_more_params(sptr, "ACCOUNT");
-
-    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
-      return 0; /* target not online, ignore */
-    
-    if (!IsMe(acptr)) {
-      /* in-transit message, forward it */
-      sendcmdto_one(sptr, CMD_ACCOUNT, acptr,
-                   type == 'C' ? "%C %s %s %s :%s" : "%C %s %s",
-                   acptr, parv[2], parv[3], parv[4], parv[parc-1]);
-      return 0;
-    }
-    
-    /* the message is for &me, process it */
-    return protocol_violation(cptr, "ACCOUNT sub-type '%s' not implemented.", parv[2]);
+    /* this should only happen if there is no timestamp and no verification */
   }
+
+  hidden = HasHiddenHost(acptr);
+  SetAccount(acptr);
+  ircd_strncpy(cli_user(acptr)->account, parv[2], ACCOUNTLEN);
+
+  /* Fake hosts have precedence over account-based hidden hosts,
+     so, if the user was already hidden, don't do it again */
+  if (!hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+    hide_hostmask(acptr);
+
+  sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
+            cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s %s",
+            acptr, cli_user(acptr)->account,
+            cli_user(acptr)->acc_create,
+            feature_bool(FEAT_VERIFIED_ACCOUNTS) ? parv[4] : "");
 
   return 0;
 }
