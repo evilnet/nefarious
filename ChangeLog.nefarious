@@ -1,3 +1,7 @@
+2004-06-11  Rubin <rubin@afternet.org>
+
+	* ircd/m_nick.c: Removed X* nick blocking code for AfterNET
+
 2004-06-10  Reed Loden  <reed@reedloden.com>
 
 	* include/patchlevel.h: Bump patchlevel (0.1.0).
