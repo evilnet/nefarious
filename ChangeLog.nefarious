@@ -25,6 +25,7 @@
 			  instead of host.
 			 Modified exit_client_msg, other servers wont
 			  return protocol errors now.
+			 Use user->username as cli_username isnt set yet.
 
 2004-10-18  Reed Loden  <reed@reedloden.com>
 

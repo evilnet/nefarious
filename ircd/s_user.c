@@ -612,7 +612,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         } else
           return exit_client_msg(sptr, cptr, &me, "%s",
                                  format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-                                                  cli_user(sptr)->realhost, cli_username(sptr),
+                                                  cli_user(sptr)->realhost, user->username,
                                                   cli_name(sptr), cli_dnsblformat(sptr))
                                  );
       }
