@@ -22,7 +22,6 @@
 #include "config.h"
 
 #include "gline.h"
-#inclide "channel.h"
 #include "client.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -195,24 +194,6 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
         if (match(gline->gl_user+2, cli_info(acptr)) != 0)
             continue;
         Debug((DEBUG_DEBUG,"Matched!"));
-
-      } else if (gline->gl_flags & GLINE_BADCHAN) { /* Badchan Gline */
-        struct Channel *chptr,*nchptr;
-        struct Membership *member,*nmember;
-
-        for(chptr=GlobalChannelList;chptr;chptr=nchptr) {
-	  nchptr=chptr->next;
-	  if (match(gline->gl_user, chptr->chname))
-	    continue;
-	  for (member=chptr->members;member;member=nmember) {
-	    nmember=member->next_member;
-	  if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
-	    continue;
-	  sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	  sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	  make_zombie(member, member->user, &me, &me, chptr);
-	  retval=1;
-	}
       } else { /* Host/IP gline */
 	      if (cli_user(acptr)->username && 
 			      match (gline->gl_user, (cli_user(acptr))->username) != 0)
@@ -240,8 +221,8 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       		     get_client_name(acptr, TRUE));
 
       /* and get rid of him */
-      if ((tval = exit_client_msg(cptr, acptr, &me,
-	  feature_bool(FEAT_HIS_GLINE) ? "G-lined" : "G-lined (%s)", gline->gl_reason)))
+      if ((tval = exit_client_msg(cptr, acptr, &me, "G-lined (%s)",
+          gline->gl_reason)))
         retval = tval; /* retain killed status */
     }
   }
@@ -436,6 +417,9 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
     return 0;
 
   gline_propagate(cptr, sptr, agline);
+
+  if (GlineIsBadChan(agline))
+    return 0;
 
   return do_gline(cptr, sptr, agline); /* knock off users if necessary */
 }
