@@ -1,3 +1,25 @@
+2003-10-25 beware <steendijk@xs4all.nl>
+        * ircd/m_who.c: Fixed /whois comma separated list with wildcards cpu
+        hog bug
+
+2003-10-25 Isomer <isomer@undernet.org>
+	* ircd/gline.c: When comparing hosts for equality, check that
+	one isn't NULL.
+
+2003-10-25  Entrope <entrope@users.sourceforge.net>
+        * ircd/channel.c: Move IsUserParting() test up so we do not
+        send the part to other servers.
+
+2003-10-24  Entrope <entrope@users.sourceforge.net>
+        * include/channel.h: Add new flag to indicate a user is
+        parting a channel.
+
+        * ircd/channel.c: Use it.
+
+2003-10-25 Isomer <isomer@undernet.org>
+	* ircd/gline.c: Make sure we never use the gl_host variable when we
+	are dealing with a realname (or other magical) gline.
+
 2003-10-15 splidge <splidge@quakenet.org>
 	* ircd/channel.c: Fixed buggy MODE +k handling (broke with '+k :').
 

@@ -91,7 +91,7 @@ const char *infotext[] = {
     "Kev, Isomer, Gte, Ghostwolf, Bleep",
     "Debugging and support:",
     "SeKs, Maniac-, HeKTik, OmniDynmc, Liandrin, Dianora",
-    "Special thanks to Angel and Buff for believing in us and putting"
+    "Special thanks to Angel and Buff for believing in us and putting",
     "up with frantic late night phone calls"
     "",
     "Thanks goes to all other people who contributed to any version.",
