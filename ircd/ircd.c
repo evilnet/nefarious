@@ -415,7 +415,12 @@ static void check_pings(struct Event* ev) {
         sendto_opmask_butone(0, SNO_OLDSNO,
                              "No response from %s, closing link",
                              cli_name(cptr));
-      exit_client_msg(cptr, cptr, &me, "Ping timeout");
+
+      if (feature_bool(FEAT_TIME_IN_TIMEOUT))
+        exit_client_msg(cptr, cptr, &me, "Ping timeout: %d seconds",CurrentTime-cli_lasttime(cptr));
+      else
+        exit_client_msg(cptr, cptr, &me, "Ping timeout");
+
       continue;
     }
     

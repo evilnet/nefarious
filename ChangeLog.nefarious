@@ -2,9 +2,20 @@
 
 	* doc/example.conf: Added new F:Line.
 
+	* include/ircd_features.h: Added FEAT_TIME_IN_TIMEOUT.
+
+	* ircd/ircd_features.h: Added FEAT_TIME_IN_TIMEOUT  (Default FALSE).
+
+	* ircd/ircd.c: Display the amount of time since the last ping in the
+	time in the Ping Timeout message.
+
+2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added new F:Line.
+
 	* include/ircd_features.h: Added FEAT_HOST_IN_TOPIC.
 
-	* ircd/ircd_features.h: Added FEAT_HOST_IN_TOPIC (Default TRUE).
+	* ircd/ircd_features.c: Added FEAT_HOST_IN_TOPIC (Default TRUE).
 
 	* ircd/m_topic: Made FEAT_HOST_IN_TOPIC useful, if its enabled the host
 	will be added to topic_nick (See Below). RFE 975655.
