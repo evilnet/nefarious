@@ -175,7 +175,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 
     hidden = HasHiddenHost(acptr);
     SetAccount(acptr);
-    ircd_strncpy(cli_user(acptr)->account, parv[2], ACCOUNTLEN);
+    ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
 
     /* Fake hosts have precedence over account-based hidden hosts,
        so, if the user was already hidden, don't do it again */

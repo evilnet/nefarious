@@ -1,5 +1,9 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/m_account.c: quick fix.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* ircd/channel.c: Odd fix for +z, adding brackets to the check if the user is
 		   	   connected via SSL or is a server.
 			  Also done this to the +h and +O checks for now. Just in case.
