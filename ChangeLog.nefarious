@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
+	* ircd/ircd_relay.c: Minor fix, thought i had put it in the
+	place originally. Fixed now.
+
+	* ircd/m_join.c: Small bug fix.
+
 2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/Makefile.in: Remove version.c on a make install, makes

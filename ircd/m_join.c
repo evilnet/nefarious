@@ -312,7 +312,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	((chptr->mode.mode & MODE_MODERATED) &&
 	(flex == 1) && feature_bool(FEAT_FLEXABLEKEYS))) {
       sendcmdto_one(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
-      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr,
+      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr, 0,
 				       "%H +v %C", chptr, sptr);
     }
   }
