@@ -1,23 +1,11 @@
- chanserv.c     |  148 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- chanserv.h     |    6 ++
- chanserv.help  |   33 +++++++++++-
- hash.c         |    1
- hash.h         |    1
- modcmd.c       |    1
- modules-list.h |    2
- opserv.c       |  144 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- proto-common.c |    6 +-
- proto-p10.c    |   39 +++++++++++++--
- 10 files changed, 356 insertions(+), 25 deletions(-)
-
 Index: src/chanserv.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/chanserv.c,v
 retrieving revision 1.6
-diff -p -u -r1.6 chanserv.c
+diff -u -r1.6 chanserv.c
 --- src/chanserv.c	28 Jun 2004 22:45:20 -0000	1.6
-+++ src/chanserv.c	8 Aug 2004 15:52:23 -0000
-@@ -172,8 +172,9 @@ static const struct message_entry msgtab
++++ src/chanserv.c	12 Aug 2004 17:43:28 -0000
+@@ -172,8 +172,9 @@
      { "CSMSG_ILLEGAL_CHANNEL", "$b%s$b is an illegal channel, and cannot be registered." },
      { "CSMSG_GODMODE_UP", "You may not use $b%s$b to op yourself unless you are on the user list.  Use the $bop$b command instead." },
      { "CSMSG_ALREADY_OPPED", "You are already opped in $b%s$b." },
@@ -28,7 +16,7 @@ diff -p -u -r1.6 chanserv.c
      { "CSMSG_ALREADY_OPCHANNED", "There has been no net.join since the last opchan in $b%s$b." },
      { "CSMSG_OPCHAN_DONE", "I have (re-)opped myself in $b%s$b." },
  
-@@ -240,7 +241,8 @@ static const struct message_entry msgtab
+@@ -240,7 +241,8 @@
      { "CSMSG_CONFIRM_DEFAULTS", "To reset %s's settings to the defaults, you must use 'set defaults %s'." },
      { "CSMSG_SETTINGS_DEFAULTED", "All settings for %s have been reset to default values." },
      { "CSMSG_BAD_SETLEVEL", "You cannot change any setting to above your level." },
@@ -38,7 +26,7 @@ diff -p -u -r1.6 chanserv.c
      { "CSMSG_BAD_GIVEOPS", "You cannot change GiveOps to below GiveVoice (%d)." },
      { "CSMSG_BAD_SETTERS", "You cannot change Setters to above your level." },
      { "CSMSG_INVALID_MODE_LOCK", "$b%s$b is an invalid mode lock." },
-@@ -255,9 +257,11 @@ static const struct message_entry msgtab
+@@ -255,9 +257,11 @@
      { "CSMSG_SET_OFFCHANNEL",    "$bOffChannel  $b %s" },
      { "CSMSG_SET_USERINFO",      "$bUserInfo    $b %d" },
      { "CSMSG_SET_GIVE_VOICE",    "$bGiveVoice   $b %d" },
@@ -50,7 +38,7 @@ diff -p -u -r1.6 chanserv.c
      { "CSMSG_SET_GIVE_OPS",      "$bGiveOps     $b %d" },
      { "CSMSG_SET_ENFMODES",      "$bEnfModes    $b %d" },
      { "CSMSG_SET_ENFTOPIC",      "$bEnfTopic    $b %d" },
-@@ -275,9 +279,12 @@ static const struct message_entry msgtab
+@@ -275,9 +279,12 @@
  
      { "CSMSG_USER_PROTECTED", "Sorry, $b%s$b is protected." },
      { "CSMSG_OPBY_LOCKED", "You may not op users who lack op or greater access." },
@@ -63,7 +51,7 @@ diff -p -u -r1.6 chanserv.c
      { "CSMSG_VOICED_USERS", "Voiced users in $b%s$b." },
      { "CSMSG_DEVOICED_USERS", "Devoiced users in $b%s$b." },
      { "CSMSG_PROTECT_ALL", "Non-users and users will be protected from those of equal or lower access." },
-@@ -568,6 +575,7 @@ static const struct {
+@@ -568,6 +575,7 @@
      char ch;
  } accessLevels[] = {
      { "peon", "Peon", UL_PEON, '+' },
@@ -71,7 +59,7 @@ diff -p -u -r1.6 chanserv.c
      { "op", "Op", UL_OP, '@' },
      { "manager", "Manager", UL_MANAGER, '%' },
      { "coowner", "Coowner", UL_COOWNER, '*' },
-@@ -584,8 +592,10 @@ static const struct {
+@@ -584,8 +592,10 @@
      unsigned short flag_value;
  } levelOptions[] = {
      { "CSMSG_SET_GIVE_VOICE", "givevoice", 100, ~0, CHANNEL_VOICE_ALL, 0 },
@@ -82,7 +70,7 @@ diff -p -u -r1.6 chanserv.c
      { "CSMSG_SET_ENFMODES", "enfmodes", 200, 3, 0, 0 },
      { "CSMSG_SET_ENFTOPIC", "enftopic", 200, 4, 0, 0 },
      { "CSMSG_SET_PUBCMD", "pubcmd", 0, 5, 0, 0 },
-@@ -1438,6 +1448,24 @@ validate_op(struct userNode *user, struc
+@@ -1438,6 +1448,24 @@
  }
  
  static int
@@ -107,7 +95,7 @@ diff -p -u -r1.6 chanserv.c
  validate_deop(struct userNode *user, struct chanNode *channel, struct userNode *victim)
  {
      if(IsService(victim))
-@@ -1455,6 +1483,24 @@ validate_deop(struct userNode *user, str
+@@ -1455,6 +1483,24 @@
      return 1;
  }
  
@@ -132,7 +120,7 @@ diff -p -u -r1.6 chanserv.c
  static struct do_not_register *
  chanserv_add_dnr(const char *chan_name, const char *setter, const char *reason)
  {
-@@ -2374,6 +2420,12 @@ static CHANSERV_FUNC(cmd_mdelpeon)
+@@ -2374,6 +2420,12 @@
      return cmd_mdel_user(user, channel, UL_PEON, UL_PEON, argv[1], cmd);
  }
  
@@ -145,7 +133,7 @@ diff -p -u -r1.6 chanserv.c
  static int
  cmd_trim_bans(struct userNode *user, struct chanNode *channel, unsigned long duration)
  {
-@@ -2518,6 +2570,11 @@ static CHANSERV_FUNC(cmd_up)
+@@ -2518,6 +2570,11 @@
          change.args[0].mode = MODE_CHANOP;
          errmsg = "CSMSG_ALREADY_OPPED";
      }
@@ -157,7 +145,7 @@ diff -p -u -r1.6 chanserv.c
      else if(uData->access >= channel->channel_info->lvlOpts[lvlGiveVoice])
      {
          change.args[0].mode = MODE_VOICE;
-@@ -2635,11 +2692,21 @@ static CHANSERV_FUNC(cmd_op)
+@@ -2635,11 +2692,21 @@
      return modify_users(CSFUNC_ARGS, validate_op, MODE_CHANOP, "CSMSG_OPPED_USERS");
  }
  
@@ -179,7 +167,7 @@ diff -p -u -r1.6 chanserv.c
  static CHANSERV_FUNC(cmd_voice)
  {
      return modify_users(CSFUNC_ARGS, NULL, MODE_VOICE, "CSMSG_VOICED_USERS");
-@@ -2913,7 +2980,7 @@ eject_user(struct userNode *user, struct
+@@ -2913,7 +2980,7 @@
          change = mod_chanmode_alloc(victimCount + 1);
          for(n = 0; n < victimCount; ++n)
          {
@@ -188,7 +176,7 @@ diff -p -u -r1.6 chanserv.c
              change->args[n].member = victims[n];
          }
          if(!exists)
-@@ -3206,6 +3273,8 @@ static CHANSERV_FUNC(cmd_myaccess)
+@@ -3206,6 +3273,8 @@
          {
              if(uData->access >= cData->lvlOpts[lvlGiveOps])
                  string_buffer_append(&sbuf, 'o');
@@ -197,7 +185,7 @@ diff -p -u -r1.6 chanserv.c
              else if(uData->access >= cData->lvlOpts[lvlGiveVoice])
                  string_buffer_append(&sbuf, 'v');
          }
-@@ -3531,9 +3600,14 @@ static CHANSERV_FUNC(cmd_olist)
+@@ -3531,9 +3600,14 @@
      return cmd_list_users(CSFUNC_ARGS, UL_OP, UL_MANAGER-1);
  }
  
@@ -213,10 +201,11 @@ diff -p -u -r1.6 chanserv.c
  }
  
  static CHANSERV_FUNC(cmd_bans)
-@@ -4094,6 +4168,25 @@ static CHANSERV_FUNC(cmd_resync)
+@@ -4093,6 +4167,25 @@
+                 changes->args[used++].member = mn;
              }
          }
-         else if(!cData->lvlOpts[lvlGiveVoice]
++        else if(!cData->lvlOpts[lvlGiveHalfOps]
 +                || (uData && uData->access >= cData->lvlOpts[lvlGiveHalfOps]))
 +        {
 +            if(!(mn->modes & MODE_HALFOP))
@@ -235,11 +224,10 @@ diff -p -u -r1.6 chanserv.c
 +                changes->args[used++].member = mn;
 +            }
 +        }
-+        else if(!cData->lvlOpts[lvlGiveVoice]
+         else if(!cData->lvlOpts[lvlGiveVoice]
                  || (uData && uData->access >= cData->lvlOpts[lvlGiveVoice]))
          {
-             if(mn->modes & MODE_CHANOP)
-@@ -4101,6 +4194,11 @@ static CHANSERV_FUNC(cmd_resync)
+@@ -4101,6 +4194,11 @@
                  changes->args[used].mode = MODE_REMOVE | (mn->modes & ~MODE_VOICE);
                  changes->args[used++].member = mn;
              }
@@ -251,7 +239,7 @@ diff -p -u -r1.6 chanserv.c
              if(!(mn->modes & MODE_VOICE))
              {
                  changes->args[used].mode = MODE_VOICE;
-@@ -5049,6 +5147,13 @@ channel_level_option(enum levelOption op
+@@ -5049,6 +5147,13 @@
                  return 0;
              }
              break;
@@ -265,7 +253,7 @@ diff -p -u -r1.6 chanserv.c
          case lvlGiveOps:
              if(value < cData->lvlOpts[lvlGiveVoice])
              {
-@@ -5081,11 +5186,21 @@ static MODCMD_FUNC(chan_opt_enfops)
+@@ -5081,11 +5186,21 @@
      return channel_level_option(lvlEnfOps, CSFUNC_ARGS);
  }
  
@@ -287,7 +275,7 @@ diff -p -u -r1.6 chanserv.c
  static MODCMD_FUNC(chan_opt_enfmodes)
  {
      return channel_level_option(lvlEnfModes, CSFUNC_ARGS);
-@@ -5902,6 +6017,8 @@ handle_join(struct modeNode *mNode)
+@@ -5902,6 +6017,8 @@
      }
      else if(cData->lvlOpts[lvlGiveOps] == 0)
          modes |= MODE_CHANOP;
@@ -296,7 +284,7 @@ diff -p -u -r1.6 chanserv.c
      else if(cData->lvlOpts[lvlGiveVoice] == 0)
          modes |= MODE_VOICE;
  
-@@ -5931,6 +6048,8 @@ handle_join(struct modeNode *mNode)
+@@ -5931,6 +6048,8 @@
              {
                  if(uData->access >= cData->lvlOpts[lvlGiveOps])
                      modes |= MODE_CHANOP;
@@ -305,7 +293,7 @@ diff -p -u -r1.6 chanserv.c
                  else if(uData->access >= cData->lvlOpts[lvlGiveVoice])
                      modes |= MODE_VOICE;
              }
-@@ -5951,8 +6070,10 @@ handle_join(struct modeNode *mNode)
+@@ -5951,8 +6070,10 @@
      {
          if(modes)
          {
@@ -317,7 +305,7 @@ diff -p -u -r1.6 chanserv.c
              change.args[0].mode = modes;
              change.args[0].member = mNode;
              mod_chanmode_announce(chanserv, channel, &change);
-@@ -6005,6 +6126,8 @@ handle_auth(struct userNode *user, UNUSE
+@@ -6005,6 +6126,8 @@
          {
              if(channel->access >= cn->channel_info->lvlOpts[lvlGiveOps])
                  change.args[0].mode = MODE_CHANOP;
@@ -326,7 +314,7 @@ diff -p -u -r1.6 chanserv.c
              else if(channel->access >= cn->channel_info->lvlOpts[lvlGiveVoice])
                  change.args[0].mode = MODE_VOICE;
              else
-@@ -6023,7 +6146,7 @@ handle_auth(struct userNode *user, UNUSE
+@@ -6023,7 +6146,7 @@
          struct chanNode *channel = user->channels.list[ii]->channel;
          struct banData *ban;
  
@@ -335,7 +323,7 @@ diff -p -u -r1.6 chanserv.c
             || !channel->channel_info)
              continue;
          for(jj = 0; jj < channel->banlist.used; ++jj)
-@@ -6237,7 +6360,7 @@ handle_nick_change(struct userNode *user
+@@ -6237,7 +6360,7 @@
      {
          channel = user->channels.list[ii]->channel;
          /* Need not check for bans if they're opped or voiced. */
@@ -344,7 +332,7 @@ diff -p -u -r1.6 chanserv.c
              continue;
          /* Need not check for bans unless channel registration is active. */
          if(!channel->channel_info || IsSuspended(channel->channel_info))
-@@ -6411,8 +6534,8 @@ chanserv_conf_read(void)
+@@ -6411,8 +6534,8 @@
              /* free form text */
              "DefaultTopic", "TopicMask", "Greeting", "UserGreeting", "Modes",
              /* options based on user level */
@@ -355,7 +343,7 @@ diff -p -u -r1.6 chanserv.c
              /* multiple choice options */
              "CtcpReaction", "Protect", "Toys", "TopicRefresh",
              /* binary options */
-@@ -6690,6 +6813,7 @@ chanserv_channel_read(const char *key, s
+@@ -6690,6 +6813,7 @@
              case 'n': lvl = UL_OWNER+1; break;
              case 'o': lvl = UL_OP; break;
              case 'p': lvl = UL_PEON; break;
@@ -363,7 +351,7 @@ diff -p -u -r1.6 chanserv.c
              case 'w': lvl = UL_OWNER; break;
              default: lvl = 0; break;
              }
-@@ -7146,6 +7270,7 @@ init_chanserv(const char *nick)
+@@ -7146,6 +7270,7 @@
      DEFINE_COMMAND(mdelmanager, 2, MODCMD_REQUIRE_CHANUSER, "access", "coowner", NULL);
      DEFINE_COMMAND(mdelop, 2, MODCMD_REQUIRE_CHANUSER, "access", "manager", NULL);
      DEFINE_COMMAND(mdelpeon, 2, MODCMD_REQUIRE_CHANUSER, "access", "manager", NULL);
@@ -371,7 +359,7 @@ diff -p -u -r1.6 chanserv.c
  
      DEFINE_COMMAND(trim, 3, MODCMD_REQUIRE_CHANUSER, "access", "manager", NULL);
      DEFINE_COMMAND(opchan, 1, MODCMD_REQUIRE_REGCHAN|MODCMD_NEVER_CSUSPEND, "access", "1", NULL);
-@@ -7156,8 +7281,10 @@ init_chanserv(const char *nick)
+@@ -7156,8 +7281,10 @@
      DEFINE_COMMAND(down, 1, MODCMD_REQUIRE_REGCHAN, NULL);
      DEFINE_COMMAND(upall, 1, MODCMD_REQUIRE_AUTHED, NULL);
      DEFINE_COMMAND(downall, 1, MODCMD_REQUIRE_AUTHED, NULL);
@@ -382,7 +370,7 @@ diff -p -u -r1.6 chanserv.c
      DEFINE_COMMAND(voice, 2, MODCMD_REQUIRE_CHANNEL, "template", "op", NULL);
      DEFINE_COMMAND(devoice, 2, MODCMD_REQUIRE_CHANNEL, "template", "op", NULL);
  
-@@ -7192,6 +7319,7 @@ init_chanserv(const char *nick)
+@@ -7192,6 +7319,7 @@
      DEFINE_COMMAND(clist, 1, MODCMD_REQUIRE_REGCHAN, "flags", "+nolog,+joinable", NULL);
      DEFINE_COMMAND(mlist, 1, MODCMD_REQUIRE_REGCHAN, "flags", "+nolog,+joinable", NULL);
      DEFINE_COMMAND(olist, 1, MODCMD_REQUIRE_REGCHAN, "flags", "+nolog,+joinable", NULL);
@@ -390,7 +378,7 @@ diff -p -u -r1.6 chanserv.c
      DEFINE_COMMAND(plist, 1, MODCMD_REQUIRE_REGCHAN, "flags", "+nolog,+joinable", NULL);
      DEFINE_COMMAND(info, 1, MODCMD_REQUIRE_REGCHAN, "flags", "+nolog,+joinable", NULL);
      DEFINE_COMMAND(seen, 2, MODCMD_REQUIRE_REGCHAN, "flags", "+nolog,+joinable", NULL);
-@@ -7226,7 +7354,9 @@ init_chanserv(const char *nick)
+@@ -7226,7 +7354,9 @@
      DEFINE_CHANNEL_OPTION(usergreeting);
      DEFINE_CHANNEL_OPTION(modes);
      DEFINE_CHANNEL_OPTION(enfops);
@@ -404,9 +392,9 @@ Index: src/chanserv.h
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/chanserv.h,v
 retrieving revision 1.3
-diff -p -u -r1.3 chanserv.h
+diff -u -r1.3 chanserv.h
 --- src/chanserv.h	26 Jun 2004 21:23:22 -0000	1.3
-+++ src/chanserv.h	8 Aug 2004 15:52:23 -0000
++++ src/chanserv.h	12 Aug 2004 17:43:28 -0000
 @@ -25,6 +25,7 @@
  
  enum UL_ALIASES {
@@ -415,7 +403,7 @@ diff -p -u -r1.3 chanserv.h
      UL_OP = 200,
      UL_MANAGER = 300,
      UL_PRESENT = UL_MANAGER,
-@@ -35,8 +36,10 @@ enum UL_ALIASES {
+@@ -35,8 +36,10 @@
  
  enum levelOption {
      lvlGiveVoice,
@@ -426,7 +414,7 @@ diff -p -u -r1.3 chanserv.h
      lvlEnfModes,
      lvlEnfTopic,
      lvlPubCmd,
-@@ -60,11 +63,14 @@ enum charOption {
+@@ -60,11 +63,14 @@
  #define CHANNEL_SUSPENDED	0x00000002 /* (1 << 1) */
  #define CHANNEL_INFO_LINES	0x00000004 /* (1 << 2) - DEPRECATED */
  #define CHANNEL_VOICE_ALL    	0x00000008 /* (1 << 3) - DEPRECATED */
@@ -445,9 +433,9 @@ Index: src/chanserv.help
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/chanserv.help,v
 retrieving revision 1.5
-diff -p -u -r1.5 chanserv.help
+diff -u -r1.5 chanserv.help
 --- src/chanserv.help	28 Jun 2004 22:45:21 -0000	1.5
-+++ src/chanserv.help	8 Aug 2004 15:52:25 -0000
++++ src/chanserv.help	12 Aug 2004 17:43:29 -0000
 @@ -23,6 +23,7 @@
              " $bCLIST$b       Show all COOWNERs of a channel.",
              " $bMLIST$b       Show all MANAGERs of a channel.",
@@ -578,10 +566,10 @@ Index: src/hash.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/hash.c,v
 retrieving revision 1.1.1.1
-diff -p -u -r1.1.1.1 hash.c
+diff -u -r1.1.1.1 hash.c
 --- src/hash.c	3 Jun 2004 17:13:59 -0000	1.1.1.1
-+++ src/hash.c	8 Aug 2004 15:52:25 -0000
-@@ -315,6 +315,7 @@ wipeout_channel(struct chanNode *cNode, 
++++ src/hash.c	12 Aug 2004 17:43:30 -0000
+@@ -315,6 +315,7 @@
          if ((mn->modes & MODE_CHANOP) && IsService(mn->user) && IsLocal(mn->user))
              argc++;
      }
@@ -593,9 +581,9 @@ Index: src/hash.h
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/hash.h,v
 retrieving revision 1.3
-diff -p -u -r1.3 hash.h
+diff -u -r1.3 hash.h
 --- src/hash.h	14 Jun 2004 07:32:05 -0000	1.3
-+++ src/hash.h	8 Aug 2004 15:52:25 -0000
++++ src/hash.h	12 Aug 2004 17:43:30 -0000
 @@ -48,6 +48,7 @@
  #define MODE_NOQUITMSGS         0x00100000 /* +Q suppress messages from quit notices */
  #define MODE_NOAMSG             0x00200000 /* +T no multi-target messages */
@@ -608,10 +596,10 @@ Index: src/modcmd.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/modcmd.c,v
 retrieving revision 1.2
-diff -p -u -r1.2 modcmd.c
+diff -u -r1.2 modcmd.c
 --- src/modcmd.c	3 Jun 2004 23:34:03 -0000	1.2
-+++ src/modcmd.c	8 Aug 2004 15:52:28 -0000
-@@ -2325,6 +2325,7 @@ create_default_binds(void) {
++++ src/modcmd.c	12 Aug 2004 17:43:32 -0000
+@@ -2325,6 +2325,7 @@
              service_make_alias(service, "addcoowner", "*chanserv.adduser", "$1", "coowner", NULL);
              service_make_alias(service, "addmanager", "*chanserv.adduser", "$1", "manager", NULL);
              service_make_alias(service, "addop", "*chanserv.adduser", "$1", "op", NULL);
@@ -623,9 +611,9 @@ Index: src/modules-list.h
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/modules-list.h,v
 retrieving revision 1.4
-diff -p -u -r1.4 modules-list.h
+diff -u -r1.4 modules-list.h
 --- src/modules-list.h	23 Jul 2004 18:56:59 -0000	1.4
-+++ src/modules-list.h	8 Aug 2004 15:52:28 -0000
++++ src/modules-list.h	12 Aug 2004 17:43:32 -0000
 @@ -1,3 +1 @@
  
 -WITH_MODULE(snoop)
@@ -634,10 +622,10 @@ Index: src/opserv.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/opserv.c,v
 retrieving revision 1.2
-diff -p -u -r1.2 opserv.c
+diff -u -r1.2 opserv.c
 --- src/opserv.c	10 Jun 2004 20:14:33 -0000	1.2
-+++ src/opserv.c	8 Aug 2004 15:52:31 -0000
-@@ -101,6 +101,8 @@ static const struct message_entry msgtab
++++ src/opserv.c	12 Aug 2004 17:43:36 -0000
+@@ -101,6 +101,8 @@
      { "OSMSG_NO_CHANNEL_MODES", "Channel $b%s$b had no modes to clear." },
      { "OSMSG_DEOP_DONE", "Deopped the requested lusers." },
      { "OSMSG_DEOPALL_DONE", "Deopped everyone on $b%s$b." },
@@ -646,7 +634,7 @@ diff -p -u -r1.2 opserv.c
      { "OSMSG_NO_DEBUG_CHANNEL", "No debug channel has been configured." },
      { "OSMSG_INVITE_DONE", "Invited $b%s$b to $b%s$b." },
      { "OSMSG_ALREADY_THERE", "You are already in $b%s$b." },
-@@ -112,6 +114,8 @@ static const struct message_entry msgtab
+@@ -112,6 +114,8 @@
      { "OSMSG_MODE_SET", "I have set the modes for $b%s$b." },
      { "OSMSG_OP_DONE", "Opped the requested lusers." },
      { "OSMSG_OPALL_DONE", "Opped everyone on $b%s$b." },
@@ -655,7 +643,7 @@ diff -p -u -r1.2 opserv.c
      { "OSMSG_WHOIS_IDENT", "%s (%s@%s) from %d.%d.%d.%d" },
      { "OSMSG_WHOIS_NICK", "Nick    : %s" },
      { "OSMSG_WHOIS_HOST", "Host    : %s@%s" },
-@@ -177,6 +181,7 @@ static const struct message_entry msgtab
+@@ -177,6 +181,7 @@
      { "OSMSG_CLONE_JOINED", "$b%s$b has joined $b%s$b." },
      { "OSMSG_CLONE_PARTED", "$b%s$b has left $b%s$b." },
      { "OSMSG_OPS_GIVEN", "I have given ops in $b%s$b to $b%s$b." },
@@ -663,7 +651,7 @@ diff -p -u -r1.2 opserv.c
      { "OSMSG_CLONE_SAID", "$b%s$b has spoken to $b%s$b." },
      { "OSMSG_UNKNOWN_SUBCOMMAND", "$b%s$b is not a valid subcommand of $b%s$b." },
      { "OSMSG_UNKNOWN_OPTION", "$b%s$b has not been set." },
-@@ -461,13 +466,18 @@ static MODCMD_FUNC(cmd_chaninfo)
+@@ -461,13 +466,18 @@
              send_message_type(4, user, cmd->parent->bot, " @%s (%s@%s)", moden->user->nick, moden->user->ident, moden->user->hostname);
      }
      for (n=0; n<channel->members.used; n++) {
@@ -684,7 +672,7 @@ diff -p -u -r1.2 opserv.c
              send_message_type(4, user, cmd->parent->bot, "  %s (%s@%s)", moden->user->nick, moden->user->ident, moden->user->hostname);
      }
      return 1;
-@@ -570,6 +580,31 @@ static MODCMD_FUNC(cmd_deop)
+@@ -570,6 +580,31 @@
      return 1;
  }
  
@@ -716,7 +704,7 @@ diff -p -u -r1.2 opserv.c
  static MODCMD_FUNC(cmd_deopall)
  {
      struct mod_chanmode *change;
-@@ -592,6 +627,28 @@ static MODCMD_FUNC(cmd_deopall)
+@@ -592,6 +627,28 @@
      return 1;
  }
  
@@ -745,7 +733,7 @@ diff -p -u -r1.2 opserv.c
  static MODCMD_FUNC(cmd_rehash)
  {
      extern char *services_config;
-@@ -856,6 +913,8 @@ opserv_ison(struct userNode *tell, struc
+@@ -856,6 +913,8 @@
  	}
  	if (mn->modes & MODE_CHANOP)
              buff[count++] = '@';
@@ -754,7 +742,7 @@ diff -p -u -r1.2 opserv.c
  	if (mn->modes & MODE_VOICE)
              buff[count++] = '+';
  	memcpy(buff+count, mn->channel->name, here_len);
-@@ -1127,6 +1186,33 @@ static MODCMD_FUNC(cmd_op)
+@@ -1127,6 +1186,33 @@
      return 1;
  }
  
@@ -788,7 +776,7 @@ diff -p -u -r1.2 opserv.c
  static MODCMD_FUNC(cmd_opall)
  {
      struct mod_chanmode *change;
-@@ -1149,6 +1235,28 @@ static MODCMD_FUNC(cmd_opall)
+@@ -1149,6 +1235,28 @@
      return 1;
  }
  
@@ -817,7 +805,7 @@ diff -p -u -r1.2 opserv.c
  static MODCMD_FUNC(cmd_whois)
  {
      struct userNode *target;
-@@ -1229,7 +1337,7 @@ static MODCMD_FUNC(cmd_voiceall)
+@@ -1229,7 +1337,7 @@
      change = mod_chanmode_alloc(channel->members.used);
      for (ii = count = 0; ii < channel->members.used; ++ii) {
  	struct modeNode *mn = channel->members.list[ii];
@@ -826,7 +814,7 @@ diff -p -u -r1.2 opserv.c
              continue;
          change->args[count].mode = MODE_VOICE;
          change->args[count++].member = mn;
-@@ -2298,6 +2406,24 @@ static MODCMD_FUNC(cmd_clone)
+@@ -2298,6 +2406,24 @@
  	reply("OSMSG_OPS_GIVEN", channel->name, clone->nick);
  	return 1;
      }
@@ -851,7 +839,7 @@ diff -p -u -r1.2 opserv.c
      if (argc < 5) {
  	reply("MSG_MISSING_PARAMS", argv[1]);
  	OPSERV_SYNTAX();
-@@ -2958,11 +3084,17 @@ opserv_discrim_create(struct userNode *u
+@@ -2958,11 +3084,17 @@
                  case '#':
                      goto find_channel;
                  case '-':
@@ -870,7 +858,7 @@ diff -p -u -r1.2 opserv.c
                      break;
                  case '@':
                      discrim->chan_req_modes |= MODE_CHANOP;
-@@ -4056,6 +4188,8 @@ init_opserv(const char *nick)
+@@ -4056,6 +4188,8 @@
      opserv_define_func("DELTRUST", cmd_deltrust, 800, 0, 2);
      opserv_define_func("DEOP", cmd_deop, 100, 2, 2);
      opserv_define_func("DEOPALL", cmd_deopall, 400, 2, 0);
@@ -879,7 +867,7 @@ diff -p -u -r1.2 opserv.c
      opserv_define_func("DEVOICEALL", cmd_devoiceall, 300, 2, 0);
      opserv_define_func("DIE", cmd_die, 900, 0, 2);
      opserv_define_func("DUMP", cmd_dump, 999, 0, 2);
-@@ -4079,6 +4213,8 @@ init_opserv(const char *nick)
+@@ -4079,6 +4213,8 @@
      opserv_define_func("MODE", cmd_mode, 100, 2, 2);
      opserv_define_func("OP", cmd_op, 100, 2, 2);
      opserv_define_func("OPALL", cmd_opall, 400, 2, 0);
@@ -892,10 +880,10 @@ Index: src/proto-common.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/proto-common.c,v
 retrieving revision 1.2
-diff -p -u -r1.2 proto-common.c
+diff -u -r1.2 proto-common.c
 --- src/proto-common.c	10 Jun 2004 20:14:33 -0000	1.2
-+++ src/proto-common.c	8 Aug 2004 15:52:32 -0000
-@@ -593,11 +593,13 @@ mod_chanmode_apply(struct userNode *who,
++++ src/proto-common.c	12 Aug 2004 17:43:37 -0000
+@@ -593,11 +593,13 @@
              }
              break;
          case MODE_CHANOP:
@@ -915,9 +903,9 @@ Index: src/proto-p10.c
 ===================================================================
 RCS file: /cvsroot/x2serv/srvx2/src/proto-p10.c,v
 retrieving revision 1.3
-diff -p -u -r1.3 proto-p10.c
+diff -u -r1.3 proto-p10.c
 --- src/proto-p10.c	14 Jun 2004 07:32:06 -0000	1.3
-+++ src/proto-p10.c	8 Aug 2004 15:52:34 -0000
++++ src/proto-p10.c	12 Aug 2004 17:43:39 -0000
 @@ -96,8 +96,10 @@
  #define CMD_VERSION             "VERSION"
  #define CMD_WALLCHOPS           "WALLCHOPS"
@@ -948,7 +936,7 @@ diff -p -u -r1.3 proto-p10.c
  #define P10_WALLUSERS           TYPE(WALLUSERS)
  #define P10_WALLVOICES          TYPE(WALLVOICES)
  #define P10_WHO                 TYPE(WHO)
-@@ -600,6 +605,8 @@ irc_burst(struct chanNode *chan)
+@@ -600,6 +605,8 @@
              burst_line[pos++] = ':';
              if (last_mode & MODE_CHANOP)
                  burst_line[pos++] = 'o';
@@ -957,7 +945,7 @@ diff -p -u -r1.3 proto-p10.c
              if (last_mode & MODE_VOICE)
                  burst_line[pos++] = 'v';
          }
-@@ -1051,11 +1058,14 @@ static CMD_FUNC(cmd_burst)
+@@ -1051,9 +1058,10 @@
          case '+': {
              const char *pos;
              int n_modes;
@@ -965,15 +953,11 @@ diff -p -u -r1.3 proto-p10.c
 +            for (pos=argv[next], n_modes = 1; *pos; pos++) {
                  if ((*pos == 'k') || (*pos == 'l'))
                      n_modes++;
-+                log_module(MAIN_LOG, LOG_WARNING, "SS %s", pos);
 +            }
              unsplit_string(argv+next, n_modes, modes);
              next += n_modes;
-+            log_module(MAIN_LOG, LOG_WARNING, "MM %s",modes);
              break;
-         }
-         case '%': banlist = argv[next++]+1; break;
-@@ -1063,6 +1073,7 @@ static CMD_FUNC(cmd_burst)
+@@ -1063,6 +1071,7 @@
          }
      }
  
@@ -981,7 +965,7 @@ diff -p -u -r1.3 proto-p10.c
      in_timestamp = atoi(argv[2]);
      if ((cNode = dict_find(unbursted_channels, argv[1], NULL))) {
          cNode->timestamp = in_timestamp;
-@@ -1080,6 +1091,8 @@ static CMD_FUNC(cmd_burst)
+@@ -1080,6 +1089,8 @@
              while ((sep = *end++)) {
                  if (sep == 'o')
                      mode |= MODE_CHANOP;
@@ -990,7 +974,7 @@ diff -p -u -r1.3 proto-p10.c
                  else if (sep == 'v')
                      mode |= MODE_VOICE;
                  else
-@@ -1576,9 +1589,13 @@ init_parse(void)
+@@ -1576,9 +1587,13 @@
      dict_insert(irc_func_dict, TOK_WALLCHOPS, cmd_dummy);
      dict_insert(irc_func_dict, CMD_WALLVOICES, cmd_dummy);
      dict_insert(irc_func_dict, TOK_WALLVOICES, cmd_dummy);
@@ -1004,7 +988,7 @@ diff -p -u -r1.3 proto-p10.c
      /* We have reliable clock!  Always!  Wraaa! */
      dict_insert(irc_func_dict, CMD_SETTIME, cmd_dummy);
      dict_insert(irc_func_dict, TOK_SETTIME, cmd_dummy);
-@@ -2159,14 +2176,21 @@ mod_chanmode_parse(struct chanNode *chan
+@@ -2159,14 +2174,21 @@
                  change->args[ch_arg].mode |= MODE_REMOVE;
              change->args[ch_arg++].hostmask = modes[in_arg++];
              break;
@@ -1028,7 +1012,7 @@ diff -p -u -r1.3 proto-p10.c
              if (!add)
                  change->args[ch_arg].mode |= MODE_REMOVE;
              if (flags & MCP_FROM_SERVER)
-@@ -2289,6 +2313,8 @@ mod_chanmode_announce(struct userNode *w
+@@ -2289,6 +2311,8 @@
          default:
              if (change->args[arg].mode & MODE_CHANOP)
                  mod_chanmode_append(&chbuf, 'o', change->args[arg].member->user->numeric);
@@ -1037,7 +1021,7 @@ diff -p -u -r1.3 proto-p10.c
              if (change->args[arg].mode & MODE_VOICE)
                  mod_chanmode_append(&chbuf, 'v', change->args[arg].member->user->numeric);
              break;
-@@ -2339,6 +2365,8 @@ mod_chanmode_announce(struct userNode *w
+@@ -2339,6 +2363,8 @@
          default:
              if (change->args[arg].mode & MODE_CHANOP)
                  mod_chanmode_append(&chbuf, 'o', change->args[arg].member->user->numeric);
@@ -1046,7 +1030,7 @@ diff -p -u -r1.3 proto-p10.c
              if (change->args[arg].mode & MODE_VOICE)
                  mod_chanmode_append(&chbuf, 'v', change->args[arg].member->user->numeric);
              break;
-@@ -2430,6 +2458,7 @@ clear_chanmode(struct chanNode *channel,
+@@ -2430,6 +2456,7 @@
      for (remove = 0; *modes; modes++) {
          switch (*modes) {
          case 'o': remove |= MODE_CHANOP; break;
@@ -1054,7 +1038,7 @@ diff -p -u -r1.3 proto-p10.c
          case 'v': remove |= MODE_VOICE; break;
          case 'p': remove |= MODE_PRIVATE; break;
          case 's': remove |= MODE_SECRET; break;
-@@ -2474,8 +2503,8 @@ clear_chanmode(struct chanNode *channel,
+@@ -2474,8 +2501,8 @@
      }
  
      /* Remove member modes. */
