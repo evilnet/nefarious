@@ -1714,7 +1714,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         if (what == MODE_ADD)
           SetAdmin(acptr);
         else
-          ClrAdmin(acptr);
+          ClearAdmin(acptr);
         break;
       case 'o':
         if (what == MODE_ADD) {
@@ -1723,9 +1723,9 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           SetOper(acptr);
         }
         else {
-          ClrFlag(acptr, FLAG_ADMIN);
-          ClrFlag(acptr, FLAG_OPER);
-          ClrFlag(acptr, FLAG_LOCOP);
+          ClearAdmin(acptr);
+          ClearOper(acptr);
+          ClearLocOp(acptr);
           if (MyConnect(acptr)) {
             tmpmask = cli_snomask(acptr) & ~SNO_OPER;
             cli_handler(acptr) = CLIENT_HANDLER;
