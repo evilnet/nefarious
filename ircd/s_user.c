@@ -631,8 +631,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
       m_randquote(sptr, sptr, 1, parv);
 
 #ifdef USE_SSL
-    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are connected to %s with %s", sptr,
-	 	  cli_name(&me), ssl_get_cipher(cli_socket(sptr).ssl));
+    if (IsSSL(sptr))
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are connected to %s with %s", sptr,
+ 	 	    cli_name(&me), ssl_get_cipher(cli_socket(sptr).ssl));
 #endif
 
     m_lusers(sptr, sptr, 1, parv);

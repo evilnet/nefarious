@@ -1,5 +1,9 @@
 2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/s_user.c: Only send the cipher notice to SSL users only!
+
+2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+
 	* configure: Regenerated configure.
 
 2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
