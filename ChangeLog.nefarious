@@ -20,7 +20,8 @@
 
 	* ircd/m_account.c: Fixed a bug where if the account name began 
 	with 'M' or 'U', bad things would happen (only if 
-	sending service does not support LOC).
+	sending service does not support LOC). == should have been !=.
+	:/
 
 	* ircd/m_burst.c: Renamed MODE_ADMINONLY from +A to +a.
 
