@@ -102,9 +102,11 @@ int            GlobalRestartFlag = 0;   /* do a restart if set */
 time_t         CurrentTime;          /* Updated every time we leave select() */
 
 char          *configfile        = CPATH; /* Server configuration file */
+char          *logfile           = LPATH;
 int            debuglevel        = -1;    /* Server debug level  */
 char          *debugmode         = "";    /* Server debug level */
 static char   *dpath             = DPATH;
+static char   *spath             = SPATH;
 
 static struct Timer connect_timer; /* timer structure for try_connections() */
 static struct Timer ping_timer; /* timer structure for check_pings() */
@@ -455,7 +457,7 @@ static void check_pings(struct Event* ev) {
  * debugmode
  *--------------------------------------------------------------------------*/
 static void parse_command_line(int argc, char** argv) {
-  const char *options = "d:f:h:ntvx:";
+  const char *options = "d:s:f:l:h:ntvx:";
   int opt;
 
   if (thisServer.euid != thisServer.uid)
@@ -469,7 +471,9 @@ static void parse_command_line(int argc, char** argv) {
     case 'n':
     case 't':  thisServer.bootopt |= BOOT_TTY;         break;
     case 'd':  dpath      = optarg;                    break;
+    case 's':  spath      = optarg;                    break;
     case 'f':  configfile = optarg;                    break;
+    case 'l':  logfile    = optarg;                    break;
     case 'h':  ircd_strncpy(cli_name(&me), optarg, HOSTLEN); break;
     case 'v':
       printf("ircd %s\n", version);
@@ -500,7 +504,7 @@ static void parse_command_line(int argc, char** argv) {
       break;
       
     default:
-      printf("Usage: ircd [-f config] [-h servername] [-x loglevel] [-ntv]\n");
+      printf("Usage: ircd [-f config] [-d configpath] [-s serverpath] [-h servername] [-l logpath] [-x loglevel] [-ntv]\n");
       printf("\n -n -t\t Don't detach\n -v\t display version\n\n");
       printf("Server not started.\n");
       exit(1);

@@ -1,3 +1,8 @@
+2004-04-05  Neil Spierling  <sirvulcan@sirvulcan.org>
+
+	* ircd/ircd.c: Added a few more optional paramaters to the ircd, they will
+		       make life easier for users using the ircd under windows.
+
 2004-02-16  Neil Spierling  <sirvulcan@sirvulcan.org>
 
 	* doc/example.conf: Updated with new F:Lines.
