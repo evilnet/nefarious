@@ -72,7 +72,6 @@
 struct ConfItem* GlobalConfList  = 0;
 int              GlobalConfCount = 0;
 struct qline*    GlobalQuarantineList = 0;
-struct sline*    GlobalSpoofList = 0;
 
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
@@ -735,33 +734,6 @@ void clear_quarantines(void)
   }
 }
 
-void conf_add_spoof(const char* const* fields, int count)
-{
-  struct sline *sline;
-
-  if (count < 3 || EmptyString(fields[1]) || EmptyString(fields[3]))
-    return;
-
-  sline = (struct sline *) MyMalloc(sizeof(struct sline));
-  DupString(sline->realip, fields[1]);
-  DupString(sline->fakeip, fields[2]);
-  DupString(sline->fakehost, fields[3]);
-  sline->next = GlobalSpoofList;
-  GlobalSpoofList = sline;
-}
-
-void clear_spoofs(void)
-{
-  struct sline *sline;
-  while ((sline = GlobalSpoofList)) {
-    GlobalSpoofList = sline->next;
-    MyFree(sline->fakehost);
-    MyFree(sline->fakeip);
-    MyFree(sline->realip);
-    MyFree(sline);
-  }
-}
-
 void conf_add_local(const char* const* fields, int count)
 {
   if (count < 6 || EmptyString(fields[1]) || EmptyString(fields[5])) {
@@ -1198,11 +1170,6 @@ int read_configuration_file(void)
       conf_add_quarantine(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'S':                /* spoof line */
-    case 's':        /* CONF_SPOOF */
-      conf_add_spoof(field_vector, field_count);
-      aconf->status = CONF_SPOOF;
-      break;
     case 'T':                /* print out different motd's */
     case 't':                /* based on hostmask - CONF_TLINES */
       motd_add(field_vector[1], field_vector[2]);
@@ -1305,9 +1272,6 @@ int read_configuration_file(void)
     if ((aconf->status == CONF_UWORLD) && (aconf->passwd) && (*aconf->passwd))
       addNickJupes(aconf->passwd);
 
-    if (aconf->status & CONF_SPOOF)
-      lookup_confhost(aconf);
-
     collapse(aconf->host);
     collapse(aconf->name);
     Debug((DEBUG_NOTICE,
@@ -1387,8 +1351,6 @@ int rehash(struct Client *cptr, int sig)
   clearNickJupes();
 
   clear_quarantines();
-
-  clear_spoofs();
 
   if (sig != 2)
     flush_resolver_cache();
@@ -1685,72 +1647,5 @@ int conf_check_server(struct Client *cptr)
     c_conf->ipnum.s_addr = cli_ip(cptr).s_addr;
 
   Debug((DEBUG_DNS, "sv_cl: access ok: %s[%s]", cli_name(cptr), cli_sockhost(cptr)));
-  return 0;
-}
-
-/*
- * conf_check_slines()
- *
- * Check S lines for the specified client, passed in cptr struct.
- * If the client's IP is S-lined, process the substitution here.
- * 1. cptr->cli_ip                    (cli_ip(cptr))
- * 2. cptr->cli_connect->con_sock_ip  (cli_sock_ip(cptr))
- * 3. cptr->cli_connect->sockhost     (cli_sockhost(cptr))
- *
- * If no substitued IP are specified, only change sockhost.
- *
- * Precondition
- *  cptr != NULL
- *
- * Returns
- *  0 = No S-line found
- *  1 = S-line found and substitution done.
- *
- * -mbuna 9/2001
- *
- */
-
-int
-conf_check_slines(struct Client *cptr)
-{
-  struct ConfItem* aconf;
-  struct in_addr iptemp;
-  char* hostonly;
-
-  if (!IsUser(cptr))
-    return 0;
-
-  for (aconf = GlobalConfList; aconf; aconf = aconf->next) {
-    if (aconf->status != CONF_SPOOF)
-      continue;
-    if ((aconf->dns_pending)
-      || (INADDR_NONE == aconf->ipnum.s_addr)
-      || EmptyString(aconf->name))
-      continue;
-
-    if (cli_ip(cptr).s_addr == aconf->ipnum.s_addr) {
-
-                               /* Ignore user part if u@h. */
-      if ((hostonly = strchr(aconf->name, '@')))
-        hostonly++;
-      else
-        hostonly = aconf->name;
-
-      if(!*hostonly)
-        continue;
-
-      if (!EmptyString(aconf->passwd)) {
-        iptemp.s_addr = inet_addr(aconf->passwd);
-        if (INADDR_NONE == iptemp.s_addr)
-          continue;
-        cli_ip(cptr).s_addr = iptemp.s_addr;
-      }
-
-                               /* Perform a luxurious ircd_ntoa for sanity. */
-      ircd_strncpy(cli_sock_ip(cptr), ircd_ntoa((const char*) &cli_ip(cptr)), SOCKIPLEN);
-      ircd_strncpy(cli_sockhost(cptr), hostonly, HOSTLEN);
-      return 1;
-    }
-  }
   return 0;
 }

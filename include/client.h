@@ -147,7 +147,6 @@ enum Flag {
     FLAG_HIDDENHOST,                /* user's host is hidden */
     FLAG_ACCOUNTONLY,               /* hide privmsgs/notices if user is
                                        not authed or opered */
-    FLAG_SLINE,                     /* user is S:Lined */
     FLAG_REMOTEOPER,
 
     _FLAG_COUNT,
@@ -438,7 +437,6 @@ struct Client {
 #define IsHiddenHost(x)		HasFlag(x, FLAG_HIDDENHOST)
 #define HasHiddenHost(x)	(IsAccount(x) && IsHiddenHost(x))
 #define IsAccountOnly(x)	HasFlag(x, FLAG_ACCOUNTONLY)
-#define HasSLine(x)             HasFlag(x, FLAG_SLINE)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -462,7 +460,6 @@ struct Client {
 #define SetAccount(x)           SetFlag(x, FLAG_ACCOUNT)
 #define SetHiddenHost(x)	SetFlag(x, FLAG_HIDDENHOST)
 #define SetAccountOnly(x)	SetFlag(x, FLAG_ACCOUNTONLY)
-#define SetSLined(x)            SetFlag(x, FLAG_SLINE)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)

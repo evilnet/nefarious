@@ -46,7 +46,6 @@
 #include "querycmds.h"
 #include "res.h"
 #include "s_bsd.h"
-#include "s_conf.h"
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
@@ -83,7 +82,6 @@ static struct {
   { "NOTICE AUTH :*** No ident response\r\n",              36 },
   { "NOTICE AUTH :*** Your forward and reverse DNS do not match, " \
     "ignoring hostname.\r\n",                              80 },
-  { "NOTICE AUTH :*** Using Spoofed hostname\r\n",         41 },
   { "NOTICE AUTH :*** Invalid hostname\r\n",               35 }
 };
 
@@ -96,7 +94,6 @@ typedef enum {
   REPORT_FIN_ID,
   REPORT_FAIL_ID,
   REPORT_IP_MISMATCH,
-  REPORT_USING_SLINE,
   REPORT_INVAL_DNS
 } ReportType;
 
@@ -600,13 +597,6 @@ void start_auth(struct Client* client)
   struct AuthRequest* auth = 0;
 
   assert(0 != client);
-
-  if (conf_check_slines(client)) {
-    sendheader(client, REPORT_USING_SLINE);
-    SetSLined(client);
-    release_auth_client(client);
-    return;
-  }
 
   auth = make_auth_request(client);
   assert(0 != auth);

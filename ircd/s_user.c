@@ -443,8 +443,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     clean_user_id(user->username,
         HasFlag(sptr, FLAG_GOTID) ? cli_username(sptr) : username,
-        HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
-        && !(HasSLine(sptr))); /* No tilde for S-lined users. */
+        HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID));
 
     if ((user->username[0] == '\0')
         || ((user->username[0] == '~') && (user->username[1] == '\000')))
