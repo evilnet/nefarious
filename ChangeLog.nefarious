@@ -3,6 +3,11 @@
 
 2005-01-24  Neil Spierling <sirvulcan@gmail.com>
 
+	* ircd/m_ircops.c: Differ between irc admins and irc operators
+	in the output.
+
+2005-01-24  Neil Spierling <sirvulcan@gmail.com>
+
         * doc/example.conf: Added missing REMOTE_OPER.
 
 	* ircd/ircd_relay.c: Extended ERR_CANNOTSENDTOCHAN replies to

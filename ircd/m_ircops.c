@@ -149,19 +149,21 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       {
         if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
         {
-  	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
+  	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
 		        acptr->cli_name ? acptr->cli_name : "<Unknown>",
 		        acptr->cli_user->away ? " (AWAY)" : "",
-		        (feature_bool(FEAT_OPER_HIDEIDLE) &&
+                        IsAdmin(acptr) ? "IRC Administrator" :
+                        "IRC Operator", (feature_bool(FEAT_OPER_HIDEIDLE) &&
 			 IsNoIdle(acptr) && !oper) ?
 			 0 : CurrentTime - acptr->cli_user->last);
 	  ircops++;
 	  send_reply(sptr, RPL_IRCOPS, buf);
         } else if (parc == 1) {
-	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
+	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] [%s] - Idle: %d",
 		        acptr->cli_name ? acptr->cli_name : "<Unknown>",
 		        acptr->cli_user->away ? " (AWAY)" : "",
-		        (feature_bool(FEAT_HIS_IRCOPS_SERVERS)
+                        IsAdmin(acptr) ? "IRC Administrator" :
+                        "IRC Operator", (feature_bool(FEAT_HIS_IRCOPS_SERVERS)
 			 && !oper) ?
 			 feature_str(FEAT_HIS_SERVERNAME) :
 			 cli_name(acptr->cli_user->server),
