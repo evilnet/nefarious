@@ -106,7 +106,8 @@
  * parv[1] = numeric of client to act on
  * parv[2] = channel to force client to part
  */
-int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
+int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+{
   struct Client *acptr;
   char* newparv[BUFSIZE];
 
@@ -115,7 +116,7 @@ int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return need_more_params(sptr, "SVSPART");
   }
 
-  if(!(acptr = findNUser(parv[1])))
+  if (!(acptr = findNUser(parv[1])))
     return 0;
 
   if (IsChannelService(acptr))

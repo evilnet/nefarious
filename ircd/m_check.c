@@ -84,7 +84,7 @@ int mo_check(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    int flags = CHECK_SHOWUSERS, i;
 
 
-   if (!feature_bool(FEAT_CHECK))
+   if (!HasPriv(sptr, PRIV_CHECK))
      return send_reply(sptr, ERR_DISABLED, "CHECK");
 
    if (parc < 2) {

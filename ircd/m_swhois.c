@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_ircops.c
+ * IRC - Internet Relay Chat, ircd/m_swhois.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  *
@@ -81,127 +81,98 @@
  */
 #include "config.h"
 
-#include "channel.h"
 #include "client.h"
-#include "handlers.h"
-#include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
-#include "ircd_defs.h"
 #include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
-#include "ircd_snprintf.h"
-#include "list.h"
-#include "match.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
-#include "send.h"
-#include "s_conf.h"
 #include "s_user.h"
-#include "s_debug.h"
+#include "send.h"
 
+#include <assert.h>
 #include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
 
 /*
- * m_ircops - generic message handler
- *
- * parv[0]        = sender prefix
- * parv[1]        = servername
+ * user_set_swhois - set user swhois state
+ * returns 1 if client has swhois or swhois is changing.
+ * returns 0 if client's swhois is being removed.
+ * NOTE: this function may modify user and message, so they
+ * must be mutable.
  */
-int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
+static int user_set_swhois(struct User* user, char* message)
 {
-  struct Client *acptr;
-  struct Client *server = 0;
-  char buf[BUFSIZE];
-  int ircops = 0;
-  int oper = IsAnOper(sptr);
+  char* swhois;
+  assert(0 != user);
 
-  if (!MyUser(sptr))
-    return 0;
+  swhois = user->swhois;
 
-  /*
-   * If user is only looking for opers on a specific server, we need 
-   * to find that server.
-   */
-  if (parc > 1)
-  {
-    if (!string_has_wildcards(parv[1]))
-      server = FindServer(parv[1]);
-    else
-      server = find_match_server(parv[1]);
-
-    if (!server || IsService(server))
-      return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
-  }   
-
-  if (oper || !feature_bool(FEAT_HIS_IRCOPS)) {
-    send_reply(sptr, RPL_IRCOPSHEADER, (parc > 1) ? cli_name(server) :
-	       feature_str(FEAT_NETWORK));
- 
-    for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
-    {
-      if (acptr->cli_user && IsOper(acptr) && !IsChannelService(acptr)
-	  && !IsService(acptr->cli_user->server))
-      {
-        if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
-        {
-  	  ircd_snprintf(0, buf, sizeof(buf), "%s %s%s - Idle: %d",
-			feature_bool(FEAT_OPERFLAGS) ?
-			(IsAdmin(acptr) ? "[A]" : "[O]") : "*",
-		        acptr->cli_name ? acptr->cli_name : "<Unknown>",
-		        acptr->cli_user->away ? " (AWAY)" : "",
-                        IsAdmin(acptr) ? "IRC Administrator" :
-                        "IRC Operator", (feature_bool(FEAT_OPER_HIDEIDLE) &&
-			 IsNoIdle(acptr) && !oper) ?
-			 0 : CurrentTime - acptr->cli_user->last);
-	  ircops++;
-	  send_reply(sptr, RPL_IRCOPS, buf);
-        } else if (parc == 1) {
-	  ircd_snprintf(0, buf, sizeof(buf), "%s %s%s [%s] - Idle: %d",
-			feature_bool(FEAT_OPERFLAGS) ?
-			(IsAdmin(acptr) ? "[A]" : "[O]") : "*",
-		        acptr->cli_name ? acptr->cli_name : "<Unknown>",
-		        acptr->cli_user->away ? " (AWAY)" : "",
-		        (feature_bool(FEAT_HIS_IRCOPS_SERVERS)
-			 && !oper) ?
-			 feature_str(FEAT_HIS_SERVERNAME) :
-			 cli_name(acptr->cli_user->server),
-		        (feature_bool(FEAT_OPER_HIDEIDLE) &&
-			 IsNoIdle(acptr) && !oper) ?
-			 0 : CurrentTime - acptr->cli_user->last);
-	  ircops++;
-	  send_reply(sptr, RPL_IRCOPS, buf);
-        }
-      }
+  if (EmptyString(message)) {
+    /*
+     * Marking as not swhois
+     */
+    if (swhois) {
+      MyFree(swhois);
+      user->swhois = 0;
     }
-
-    ircd_snprintf(0, buf, sizeof(buf), "Total: %d IRCop%s connected",
-		  ircops, (ircops != 1) ? "s" : "");
-    send_reply(sptr, RPL_ENDOFIRCOPS, buf);
-    return 0;
-  } else {
-    return send_reply(sptr, ERR_NOPRIVILEGES);
   }
+  else {
+    /*
+     * Marking as having a swhois
+     */
+    unsigned int len = strlen(message);
+
+    if (len > AWAYLEN) {
+      message[AWAYLEN] = '\0';
+      len = AWAYLEN;
+    }
+    if (swhois)
+      swhois = (char*) MyRealloc(swhois, len + 1);
+    else
+      swhois = (char*) MyMalloc(len + 1);
+    assert(0 != swhois);
+
+    user->swhois = swhois;
+    strcpy(swhois, message);
+  }
+  return (user->swhois != 0);
 }
 
 /*
- * ms_ircops - server message handler
+ * ms_swhois - server message handler
  *
- * parv[0]        = sender prefix
- * parv[1]        = servername
+ * parv[0] = sender prefix
+ * parv[1] = numeric of client to act on
+ * parv[2] = swhois message
  */
-int ms_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
+int ms_swhois(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-/**
- *  if (hunt_server_cmd(sptr, CMD_IRCOPS, cptr, 0, "%C", 1, parc, parv) !=
- *    HUNTED_ISME)
- *  return 0;
- *
- *  return m_ircops(cptr, sptr, parc, parv);
- */
+  struct Client *acptr;
+  char* swhois = parv[2];
+
+  assert(0 != cptr);
+  assert(0 != sptr);
+
+  if (!feature_bool(FEAT_SWHOIS))
+    return 0;
+
+  if (parc < 3) {
+    protocol_violation(sptr, "Too few arguments for SWHOIS");
+    return need_more_params(sptr, "SWHOIS");
+  }
+
+  if (!(acptr = findNUser(parv[1])))
+    return 0;
+
+  if (IsChannelService(acptr))
+    return 0;
+
+  if (user_set_swhois(cli_user(acptr), swhois))
+    sendcmdto_serv_butone(acptr, CMD_SWHOIS, acptr, ":%s", swhois);
+  else
+    sendcmdto_serv_butone(acptr, CMD_SWHOIS, acptr, "");
   return 0;
 }

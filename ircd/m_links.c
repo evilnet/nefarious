@@ -133,7 +133,9 @@ int m_links(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     mask = parc < 2 ? 0 : parv[1];
 
 
-  if (feature_bool(FEAT_HIS_LINKS_SCRAMBLED) && IsAnOper(sptr)) {
+  if (feature_bool(FEAT_HIS_LINKS_SCRAMBLED) && !IsAnOper(sptr)) {
+    map_dump_links_head_in_sand(sptr, mask);
+  } else {
     for (acptr = GlobalClientList, collapse(mask); acptr; acptr = cli_next(acptr))
     {
       if (!IsServer(acptr) && !IsMe(acptr))
@@ -144,8 +146,6 @@ int m_links(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           cli_hopcount(acptr), cli_serv(acptr)->prot,
           ((cli_info(acptr))[0] ? cli_info(acptr) : "(Unknown Location)"));
     }
-  } else {
-    map_dump_links_head_in_sand(sptr, mask);
   }
 
   send_reply(sptr, RPL_ENDOFLINKS, BadPtr(mask) ? "*" : mask);

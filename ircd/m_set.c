@@ -102,15 +102,15 @@ int mo_set(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
 int ms_set(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-	struct Client *acptr;
-	if (parc < 4)
-		return need_more_params(sptr, "SET");
-	if (!(acptr = FindNServer(parv[1])))
-		return 0;
-	if (!IsMe(acptr)) {
-		sendcmdto_serv_butone(sptr, CMD_SET, cptr, "%C %s :%s",
-				acptr, parv[2], parv[3]);
-		return 0;
-	}
-	return feature_set(sptr, (const char* const*)parv + 2, parc - 2);
+  struct Client *acptr;
+  if (parc < 4)
+    return need_more_params(sptr, "SET");
+  if (!(acptr = FindNServer(parv[1])))
+    return 0;
+  if (!IsMe(acptr)) {
+    sendcmdto_serv_butone(sptr, CMD_SET, cptr, "%C %s :%s",
+			  acptr, parv[2], parv[3]);
+    return 0;
+  }
+  return feature_set(sptr, (const char* const*)parv + 2, parc - 2);
 }

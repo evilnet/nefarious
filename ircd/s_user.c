@@ -113,6 +113,8 @@ void free_user(struct User* user)
   if (--user->refcnt == 0) {
     if (user->away)
       MyFree(user->away);
+    if (user->swhois)
+      MyFree(user->swhois);
     /*
      * sanity check
      */
@@ -596,11 +598,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
     release_dnsbl_reply(sptr);
 
     if (IsDNSBL(sptr)) {
-      if (feature_bool(FEAT_DNSBL_TEST_N_WALLOP)) {
+      if (feature_bool(FEAT_DNSBL_WALLOPS_ONLY))
          sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
                 "DNSBL Detected %s!%s@%s (%s)", cli_name(sptr), user->username,
                 cli_user(sptr)->realhost, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
-      } else {
+      else {
         int class_exempt = 0, loc_exempt = 0;
 
         if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
@@ -1226,44 +1228,37 @@ int whisper(struct Client* source, const char* nick, const char* channel,
     if (chptr == membership->channel)
       break;
   }
-  if (0 == membership) {
+  if (0 == membership)
     return send_reply(source, ERR_NOTONCHANNEL, chptr->chname);
-  }
-  if (!IsVoicedOrOpped(membership)) {
+  if (!IsVoicedOrOpped(membership))
     return send_reply(source, ERR_VOICENEEDED, chptr->chname);
-  }
   /*
    * lookup channel in destination
    */
   assert(0 != cli_user(dest));
-  for (membership = cli_user(dest)->channel; membership; membership = membership->next_channel) {
+  for (membership = cli_user(dest)->channel; membership;
+       membership = membership->next_channel) {
     if (chptr == membership->channel)
       break;
   }
-  if (0 == membership || IsZombie(membership)) {
-    return send_reply(source, ERR_USERNOTINCHANNEL, cli_name(dest), chptr->chname);
-  }
+  if (0 == membership || IsZombie(membership))
+    return send_reply(source, ERR_USERNOTINCHANNEL, cli_name(dest),
+		      chptr->chname);
+
   if (is_silenced(source, dest))
     return 0;
 
   if (cli_user(dest)->away)
     send_reply(source, RPL_AWAY, cli_name(dest), cli_user(dest)->away);
 
-  if (is_notice) {
-    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source) &&
-	(dest != source))
-      send_reply(source, ERR_ACCOUNTONLY, cli_name(source), "CNOTICE",
-		 cli_name(dest));
-    else
-      sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);
-  } else {
-    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source) &&
-	(dest != source))
-      send_reply(source, ERR_ACCOUNTONLY, cli_name(source), "CPRIVMSG",
-                 cli_name(dest));
-    else
-      sendcmdto_one(source, CMD_PRIVATE, dest, "%C :%s", dest, text);
-  }
+  if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source) &&
+      (dest != source))
+    send_reply(source, ERR_ACCOUNTONLY, cli_name(source),
+	       (is_notice) ? "CNOTICE" : "CPRIVMSG", cli_name(dest));
+  else if (is_notice)
+    sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);
+  else
+    sendcmdto_one(source, CMD_PRIVATE, dest, "%C :%s", dest, text);
 
   return 0;
 }
@@ -1952,7 +1947,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    */
   if (!IsServer(cptr)) {
     if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAdmin(acptr)) || !feature_bool(FEAT_OPERFLAGS))
-      ClearAdmin(sptr);
+      ClearAdmin(acptr);
     if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
       ClearOper(acptr);
     if (!FlagHas(&setflags, FLAG_LOCOP) && IsLocOp(acptr))

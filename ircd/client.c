@@ -140,6 +140,9 @@ static struct {
   { PRIV_JUPE, FEAT_OPER_JUPE, FEATFLAG_ADMIN_OPERS },
   { PRIV_DIE, FEAT_OPER_DIE, FEATFLAG_ADMIN_OPERS },
   { PRIV_SET, FEAT_OPER_SET, FEATFLAG_ADMIN_OPERS },
+  { PRIV_REMOTEREHASH, FEAT_OPER_REHASH, FEATFLAG_ADMIN_OPERS },
+  { PRIV_CHECK, FEAT_CHECK, FEATFLAG_ADMIN_OPERS },
+  { PRIV_SEE_SECRET_CHAN, FEAT_OPER_WHOIS_SECRET, FEATFLAG_ADMIN_OPERS },
 
   { PRIV_PROPAGATE, FEAT_LAST_F, FEATFLAG_GLOBAL_OPERS },
   { PRIV_SEE_OPERS, FEAT_LAST_F, FEATFLAG_GLOBAL_OPERS },
@@ -186,7 +189,7 @@ static struct {
   P(OPMODE),         P(LOCAL_OPMODE),   P(SET),           P(WHOX),
   P(BADCHAN),        P(LOCAL_BADCHAN),  P(SEE_CHAN),      P(PROPAGATE),
   P(DISPLAY),        P(SEE_OPERS),      P(WIDE_GLINE),    P(FORCE_OPMODE),
-  P(FORCE_LOCAL_OPMODE),
+  P(FORCE_LOCAL_OPMODE), P(REMOTEREHASH), P(CHECK), P(SEE_SECRET_CHAN),
 #undef P
   { 0, 0 }
 };
@@ -261,20 +264,20 @@ client_set_privs(struct Client* client)
 
   cli_privs(client) = privs;
   if (IsRemoteOper(client)) {
-	  char privbuf[512] = "";
-	  int i;
-	  /* Send privileges */
-	    for (i = 0; privtab[i].name; i++)
-		        if (HasPriv(client, privtab[i].priv)) {
-				strcat(privbuf, privtab[i].name);
-				strcat(privbuf, ",");
-			}
-	    privbuf[strlen(privbuf)] = 0;
-	    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
-	    ClearRemoteOper(client);
-	    client_set_privs(client); /* Call this function recursively so
-	    				that privileges are set for a remote user 
-					rather than like any oper */
+    char privbuf[512] = "";
+    int i;
+    /* Send privileges */
+    for (i = 0; privtab[i].name; i++)
+      if (HasPriv(client, privtab[i].priv)) {
+	strcat(privbuf, privtab[i].name);
+	strcat(privbuf, ",");
+      }
+    privbuf[strlen(privbuf)] = 0;
+    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
+    ClearRemoteOper(client);
+    /* Call client_set_privs() recursively so that privileges
+       are set for a remote user rather than like any oper */
+    client_set_privs(client);
   }
 }
 

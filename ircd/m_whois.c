@@ -153,12 +153,12 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
        chptr = chan->channel;
   
        if (!(IsOper(sptr) && IsLocalChannel(chptr->chname)) &&
-          (!ShowChannel(sptr, chptr) && !IsOper(sptr)))
-         continue;
+	   (!ShowChannel(sptr, chptr) && !IsOper(sptr)))
+	 continue;
 
-       if (!feature_bool(FEAT_OPER_WHOIS_SECRET) && IsOper(sptr) &&
-           !ShowChannel(sptr, chptr))
-         continue;
+       if (!HasPriv(sptr, PRIV_SEE_SECRET_CHAN) &&
+	   !ShowChannel(sptr, chptr))
+	 continue;
           
        if (acptr != sptr && IsZombie(chan))
          continue;
@@ -223,10 +223,9 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
 
     if ((((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ?
 	  HasHiddenHost(acptr) : IsHiddenHost(acptr)) ||
-	 HasSetHost(acptr)) && (IsAnOper(sptr) || acptr == sptr)) {
+	 HasSetHost(acptr)) && (IsAnOper(sptr) || acptr == sptr))
       send_reply(sptr, RPL_WHOISACTUALLY, name, user->realusername,
 		 user->realhost, ircd_ntoa((const char*) &(cli_ip(acptr))));
-    }
 
     /* Hint: if your looking to add more flags to a user, eg +h, here's
      *       probably a good place to add them :)
@@ -234,15 +233,18 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (IsChannelService(acptr))
       send_reply(sptr, RPL_WHOISSERVICE, name, feature_str(FEAT_WHOIS_SERVICE));
 
-    if (IsSSL(acptr) && ((parc >= 3) || (acptr == sptr) ||
-	IsAnOper(sptr)))
-      send_reply(sptr, RPL_WHOISSSL, name);
-
     if (IsAccountOnly(acptr))
       send_reply(sptr, RPL_WHOISACCOUNTONLY, name);
 
     if (IsBot(acptr))
       send_reply(sptr, RPL_WHOISBOT, name);
+
+    if (IsSSL(acptr) && ((parc >= 3) || (acptr == sptr) ||
+	IsAnOper(sptr)))
+      send_reply(sptr, RPL_WHOISSSL, name);
+
+    if (user->swhois)
+      send_reply(sptr, RPL_WHOISSPECIAL, name, user->swhois);
 
     if (MyConnect(acptr) &&
 	(IsAnOper(sptr) ||

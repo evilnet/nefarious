@@ -80,6 +80,7 @@ enum Priv {
   PRIV_KILL,		/* oper can KILL */
   PRIV_LOCAL_KILL,	/* oper can local KILL */
   PRIV_REHASH,		/* oper can REHASH */
+  PRIV_REMOTEREHASH,	/* oper can remote REHASH */
   PRIV_RESTART,		/* oper can RESTART */
   PRIV_DIE,		/* oper can DIE */
   PRIV_GLINE,		/* oper can GLINE */
@@ -101,7 +102,10 @@ enum Priv {
   PRIV_WIDE_GLINE,	/* oper can set wider G-lines */
 
   PRIV_FORCE_OPMODE,	/* oper can override a Q-line */
-  PRIV_FORCE_LOCAL_OPMODE,/* oper can override a local channel Q-line */
+  PRIV_FORCE_LOCAL_OPMODE, /* oper can override a local channel Q-line */
+
+  PRIV_CHECK,		/* oper can use CHECK */
+  PRIV_SEE_SECRET_CHAN,	/* oper can see +s channels in whois */
 
   PRIV_LAST_PRIV	/* must be the same as the last priv */
 };
@@ -533,11 +537,11 @@ struct Client {
                             || HasPriv(sptr, PRIV_SEE_OPERS)))
 
 /* Oper Flags */
-#define OFLAG_ADMIN	0x008
-#define OFLAG_GLOBAL	0x010
+#define OFLAG_GLOBAL	0x001 /* Global Oper (O) */
+#define OFLAG_ADMIN	0x002 /* Admin (A) */
 
-#define OpIsGlobal(x)		(cli_oflags(x) & OFLAG_GLOBAL)
-#define OpIsAdmin(x)		(cli_oflags(x) & OFLAG_ADMIN)
+#define OIsGlobal(x)		(cli_oflags(x) & OFLAG_GLOBAL)
+#define OIsAdmin(x)		(cli_oflags(x) & OFLAG_ADMIN)
 
 #define OSetGlobal(x)		(cli_oflags(x) |= OFLAG_GLOBAL)
 #define OSetAdmin(x)		(cli_oflags(x) |= OFLAG_ADMIN)

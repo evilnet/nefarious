@@ -1,6 +1,77 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-27  Reed Loden  <reed@reedloden.com>
+
+	* doc/example.conf: Removed FEAT_DISALLOW_CHMODE_L. The new
+	features have yet to be added.
+
+	* include/client.h: Added PRIV_REMOTEREHASH, PRIV_CHECK, and 
+	PRIV_SEE_SECRET_CHAN. Renamed OpIsGlobal/OpIsAdmin to
+	OIsGlobal/OIsAdmin.
+
+	* include/handlers.h: Added ms_swhois handler.
+
+	* include/ircd_features.h: Added FEAT_SWHOIS and FEAT_CHMODE_*. 
+	Renamed FEAT_DNSBL_TEST_N_WALLOP to FEAT_DNSBL_WALLOPS_ONLY.
+	Removed FEAT_DISALLOW_CHMODE_L.
+
+	* include/ircd_struct.h: Added pointer to swhois message.
+
+	* include/msg.h: Added SWHOIS token (SW).
+
+	* include/numeric.h: Added RPL_WHOISSPECIAL (320).
+
+	* ircd/Makefile.in: Added m_swhois.c and ran make depend.
+
+	* ircd/channel.c: Removed FEAT_DISALLOW_CHMODE_L and added
+	support for the new FEAT_CHMODE_* stuff.
+
+	* ircd/client.c: Added PRIV_REMOTEREHASH, PRIV_CHECK, and
+	PRIV_SEE_SECRET_CHAN. Cleaned up whitespacing.
+
+	* ircd/ircd_features.c: Added FEAT_SWHOIS and FEAT_CHMODE_*. 
+	Renamed FEAT_DNSBL_TEST_N_WALLOP to FEAT_DNSBL_WALLOPS_ONLY.
+	Removed FEAT_DISALLOW_CHMODE_L.
+
+	* ircd/m_check.c: Swapped a feature check to a privilege check.
+
+	* ircd/m_ircops.c: Changed to a hybrid format for /IRCOPS 
+	output.
+
+	* ircd/m_links.c: Fixed a bug in which FEAT_HIS_LINKS_SCRAMBLED 
+	was not being considered. Thanks to Protium (CaptKirk`/Maximus)
+	for finding this.
+
+	* ircd/m_mode.c: Cleaned up whitespacing.
+
+	* ircd/m_oper.c: Attempted to clean-up code. I think there are 
+	problems with this code, so it needs a second look.
+	One thing: Why is SetRemoteOper() called AFTER 
+	client_set_privs()?
+
+	* ircd/m_rehash.c: Implemented PRIV_REMOTEREHASH.
+
+	* ircd/m_set.c: Cleaned up whitespacing.
+
+	* ircd/m_svsjoin.c: SVSJOIN now calls m_join().
+
+	* ircd/m_svspart.c: Cleaned up whitespacing.
+
+	* ircd/m_swhois.c: Added SWHOIS support (new file).
+
+	* ircd/m_whois.c: Cleaned up whitespacing. Moved around some
+	replies. Implemented SWHOIS. Implemented PRIV_SEE_SECRET_CHAN.
+
+	* ircd/parse.c: Added SWHOIS support.
+
+	* ircd/s_conf.c: Cleaned up whitespacing. Optimized code.
+	Removed unnecessary variables (were causing warnings).
+
+	* ircd/s_user.c: Added SWHOIS support. Cleaned up whitespacing.
+	Optimized code. Fixed a potential core bug (sptr -> acptr).
+	Renamed FEAT_DNSBL_TEST_N_WALLOP to FEAT_DNSBL_WALLOPS_ONLY.
+
 2005-01-28  Neil Spierling <sirvulcan@gmail.com>
 
 	* include/check.h: Quakenet updates, flags added.

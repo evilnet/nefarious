@@ -140,8 +140,11 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      * NOTE: Here we assume that there are no servers named
      * 'm', 'l', 's', or 'q'.
      */
-    else if (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME)
-      return 0;
+    else
+      if (HasPriv(sptr, PRIV_REMOTEREHASH) &&
+	  (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv)
+	   != HUNTED_ISME))
+	return 0;
   }
 
   send_reply(sptr, RPL_REHASHING, configfile);

@@ -411,6 +411,10 @@ struct Client;
 #define TOK_SVSNOOP             "SO"
 #define CMD_SVSNOOP             MSG_SVSNOOP, TOK_SVSNOOP
 
+#define MSG_SWHOIS		"SWHOIS"	/* SWHO */
+#define TOK_SWHOIS		"SW"
+#define CMD_SWHOIS		MSG_SWHOIS, TOK_SWHOIS
+
 /*
  * Constants
  */

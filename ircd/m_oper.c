@@ -320,26 +320,29 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	   return 0;
 	 }
 
+	 /* Tell client_set_privs to send privileges to the user */
 	 client_set_privs(sptr);
 
+	 /* XXX: Why is SetRemoteOper() done AFTER client_set_privs()? */
+  	 SetRemoteOper(sptr);
+
          if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
-  	   SetRemoteOper(sptr);
            ClearAdmin(sptr);
-  	   sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr, "+oiwsg");
          } else {
-           SetRemoteOper(sptr);
            OSetGlobal(sptr);
            SetAdmin(sptr);
-  	   sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr, "+oiwsgA");
          }
-	 /* Tell client_set_privs to send privileges to the user */
+         sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
+		       (IsAdmin(sptr)) ? "+Aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
 	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
-		"%s (%s@%s) is now %s", parv[0],
+		"%s (%s@%s) is now an IRC %s", parv[0],
 		cli_user(sptr)->realusername, cli_user(sptr)->realhost,
-                IsAdmin(sptr) ? "an IRC Administrator (A)" : "an IRC Operator (O)");
-		return 0;
-		break;
+		(IsAdmin(sptr)) ? "Administrator (A)" : "Operator (O)");
+	 if (feature_bool(FEAT_OPERMOTD))
+	   m_opermotd(sptr, sptr, 1, parv);
+	 return 0;
+	 break;
 	default:
 	 return 0; /* This should never happen */
 	 break;

@@ -87,31 +87,28 @@ static struct DenyConf*   denyConfList;
 
 
 static int oper_access[] = {
-        OFLAG_GLOBAL,    'O',
-        OFLAG_ADMIN,     'A',
-        0, 0
+	OFLAG_GLOBAL,	'O',
+	OFLAG_ADMIN,	'A',
+	0, 0
 };
 
 char oflagbuf[128];
 
 char *oflagstr(long oflag)
 {
-        int *i;
-        int flag;
-        char m;
-        char *p = oflagbuf;
+ int *i;
+ int flag;
+ char m;
+ char *p = oflagbuf;
 
-        for (i = &oper_access[0], m = *(i + 1); (flag = *i);
-            i += 2, m = *(i + 1))
-        {
-                if (oflag & flag)
-                {
-                        *p = m;
-                        p++;
-                }
-        }
-        *p = '\0';
-        return oflagbuf;
+ for (i = &oper_access[0], m = *(i + 1); (flag = *i);
+      i += 2, m = *(i + 1))
+   if (oflag & flag) {
+     *p = m;
+     p++;
+   }
+ *p = '\0';
+ return oflagbuf;
 }
 
 
@@ -954,28 +951,17 @@ void clear_dnsbl_list(void)
 int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 {
   struct blline *blline;
-
   static char dhname[HOSTLEN + 1] = "";
-
   char* rep = NULL;
-  char* p = 0;
-  char* q = 0;
-
-  char *name;
-  char *csep;
-  char *brkt;
-  char *brktb;
-  char *oct;
-
+  char* p = NULL;
+  char *csep, *brkt, *brktb, *oct;
   char cstr[80];
   char ipname[16];
   char ipl[80];
-
   int c = 0;
   int a = 0;
   int total = 0;
   int octcount = 0;
-
 
   strcpy(ipl, replyip);
   for (oct = strtok_r(ipl, ".", &brktb);
@@ -987,12 +973,12 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       break;
   }
 
-  for (rep = ircd_strtok(&p, checkhost, "."); rep; rep = ircd_strtok(&p, 0, ".")) {
-    if (c == 4) {
+  for (rep = ircd_strtok(&p, checkhost, "."); rep;
+       rep = ircd_strtok(&p, 0, ".")) {
+    if (c == 4)
       ircd_snprintf(0, dhname, HOSTLEN + 1, "%s", rep);
-    } else if (c > 4) {
+    else if (c > 4)
       ircd_snprintf(0, dhname, HOSTLEN + 1, "%s.%s", dhname,rep);
-    }
     c++;
   }
 
@@ -1005,9 +991,8 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       for (csep = strtok_r(cstr, ",", &brkt);
           csep;
           csep = strtok_r(NULL, ",", &brkt))
-      {
         total = total + atoi(csep);
-      }
+
       ircd_snprintf(0, ipname, sizeof(ipname), "%d", total);
       if (!ircd_strcmp(dhname, blline->server)) {
         if (!ircd_strcmp(ipname, oct)) {
@@ -1019,10 +1004,8 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     } else {
       strcpy(cstr, blline->replies);
 
-      for (csep = strtok_r(cstr, ",", &brkt);
-          csep;
-          csep = strtok_r(NULL, ",", &brkt))
-      {
+      for (csep = strtok_r(cstr, ",", &brkt); csep;
+	   csep = strtok_r(NULL, ",", &brkt)) {
         if (!ircd_strcmp(dhname, blline->server)) {
           if (!ircd_strcmp(csep, oct)) {
             SetDNSBL(sptr);
@@ -1035,11 +1018,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     }
   }
 
-  if (a == 1)
-    return 1;
-  else
-    return 0;
-
+  return a;
 }
 
 void conf_add_local(const char* const* fields, int count)
