@@ -2674,7 +2674,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   modestr = state.parv[state.args_used++];
   state.parc--;
 
-v  while (*modestr) {
+  while (*modestr) {
     for (; *modestr; modestr++) {
       for (flag_p = chan_flags; flag_p[0]; flag_p += 2) /* look up flag */
 	if (flag_p[1] == *modestr)
