@@ -1,3 +1,14 @@
+2003-10-02  Reed Loden  <reed@reedloden.com>
+
+	* include/handlers.h, ircd/m_rehash.c, ircd/parse.c: Added
+	remote rehash support. (made by clsk, modified by myself)
+	NOTE: NOT TESTED YET!
+
+	* ircd/m_ircops.c: More formatting changes.
+
+	* ircd/m_quit.c: If MODE_COLOUR is on, don't let people use
+	color in quits.
+
 2003-09-30  Reed Loden  <reed@reedloden.com>
 
 	* ircd/match.c, ircd/m_ircops.c, ircd/s_user.c: Fixed bugs.

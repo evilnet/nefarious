@@ -85,6 +85,7 @@ const char *infotext[] = {
     "Modifications for evilnet (AfterNET [IRC.AfterNET.Org]):",
     "reed	  Reed Loden		   <reed@reedloden.com>",
     "Math	  Mathieu Rene		   <math@rootservices.net>",
+    "clsk	  Alan Alvarez		   <clsk@users.sourceforge.net>",
     "",
     "Contributors to this release:",
     "Kev, Isomer, Gte, Ghostwolf, Bleep",

@@ -208,6 +208,7 @@ extern int ms_pong(struct Client*, struct Client*, int, char*[]);
 extern int ms_privmsg(struct Client*, struct Client*, int, char*[]);
 extern int ms_privs(struct Client*, struct Client*, int, char*[]);
 extern int ms_quit(struct Client*, struct Client*, int, char*[]);
+extern int ms_rehash(struct Client*, struct Client*, int, char*[]);
 extern int ms_rping(struct Client*, struct Client*, int, char*[]);
 extern int ms_rpong(struct Client*, struct Client*, int, char*[]);
 extern int ms_sajoin(struct Client*, struct Client*, int, char*[]);

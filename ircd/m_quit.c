@@ -108,7 +108,9 @@ int m_quit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     struct Membership* chan;
     for (chan = cli_user(sptr)->channel; chan; chan = chan->next_channel) {
       if (!IsZombie(chan) && (!member_can_send_to_channel(chan)
-	  || (chan->channel->mode.mode & MODE_NOQUITPARTS)))
+	  || (chan->channel->mode.mode & MODE_NOQUITPARTS)
+	  || ((chan->channel->mode.mode & MODE_NOCOLOUR)
+	  && IsColor(parv[parc - 1]))))
         return exit_client(cptr, sptr, sptr, "Signed off");
     }
   }

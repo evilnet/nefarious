@@ -70,20 +70,10 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
   if (parc > 1)
   {
     if (!string_has_wildcards(parv[1]))
-    {
       server = FindServer(parv[1]);
-    }
     else
-    {
-      for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
-      {        
-        if (FindServer(acptr->cli_name) != 0 && match(parv[1], acptr->cli_name) == 0)
-        { 
-          server = acptr;
-          break;
-        }
-      }
-    }
+      server = find_match_server(parv[1]);
+
     if (!server)
       return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
   }   

@@ -87,8 +87,10 @@
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "motd.h"
+#include "msg.h"
 #include "numeric.h"
 #include "s_conf.h"
+#include "s_user.h"
 #include "send.h"
 
 #include <assert.h>
@@ -107,6 +109,9 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!HasPriv(sptr, PRIV_REHASH))
     return send_reply(sptr, ERR_NOPRIVILEGES);
 
+  if ((parc > 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%c %C", 2, parc, parv) != HUNTED_ISME))
+    return 0;
+
   if (parc > 1) { /* special processing */
     if (*parv[1] == 'm') {
       send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
@@ -118,6 +123,13 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return 0;
     } else if (*parv[1] == 'q')
       flag = 2;
+    /*
+     * Maybe the user wants to rehash another server with no parameters.
+     * NOTE: Here we assume that there are no servers named
+     * 'm', 'l' or 'q'.
+     */
+    else if ((parc == 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME))
+      return 0;
   }
 
   send_reply(sptr, RPL_REHASHING, configfile);
@@ -129,3 +141,40 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   return rehash(cptr, flag);
 }
 
+int ms_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+{
+  int flag = 0;
+
+  if ((parc > 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME))
+    return 0;
+
+  if (parc > 1) { /* special processing */
+    if (*parv[1] == 'm') {
+      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Flushing MOTD cache");
+      motd_recache(); /* flush MOTD cache */
+      return 0;
+    } else if (*parv[1] == 'l') {
+      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
+      log_reopen(); /* reopen log files */
+      return 0;
+    } else if (*parv[1] == 'q')
+      flag = 2;
+    /*
+     * Maybe the user wants to rehash another server with no parameters.
+     * NOTE: Here we assume that there are no servers named
+     * 'm', 'l' or 'q'.
+     */
+    else if ((parc == 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME))
+      return 0;
+  }
+
+  send_reply(sptr, RPL_REHASHING, configfile);
+  sendto_opmask_butone(0, SNO_OLDSNO, "%C [%s] is remotely rehashing server config file",
+                       sptr, cli_name(sptr->cli_user->server));
+  sendwallto_group_butone(&me, WALL_DESYNCH, NULL, "%C [%s] is remotely rehashing server config file",
+			  sptr, cli_name(sptr->cli_user->server));
+
+  log_write(LS_SYSTEM, L_INFO, 0, "Remote REHASH From %#C (%s)", sptr, cli_name(sptr->cli_user->server));
+
+  return rehash(cptr, flag);
+}
