@@ -1511,8 +1511,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       case 'B':
        if (what == MODE_ADD
            && feature_int(FEAT_BOT_CLASS) > 0
-           && get_client_class(sptr) == feature_int(FEAT_BOT_CLASS))
-         SetBot(sptr);
+           && get_client_class(acptr) == feature_int(FEAT_BOT_CLASS))
+         SetBot(acptr);
+       else
+         ClearBot(acptr);
        break;
       default:
         break;

@@ -587,7 +587,7 @@ struct Message msgtab[] = {
     TOK_MKPASSWD,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_ignore, m_mkpasswd, m_ignore, m_mkpasswd, m_ignore }
+    { m_ignore, m_ignore, m_ignore, mo_mkpasswd, m_ignore }
   },
   {
     MSG_ASLL,

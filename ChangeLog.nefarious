@@ -1,3 +1,11 @@
+2003-06-13  Reed Loden  <reed@reedloden.com>
+
+	* It's Friday the 13th! *BOO*	
+
+	* Oops, forgot to commit makepem.
+
+	* Synced Kev's fix of m_settime.c.
+
 2003-06-12  Reed Loden  <reed@reedloden.com>
 
 	* Added asuka's noquitparts.
@@ -6,18 +14,19 @@
 	(no targetlimits/floodlimits/chanlimits)
 
 	* Allow opers to see all channels in /whois.
-	
-	* Added chanmode +O (oper only).
 
 	* Modified asuka's +c to reply with 480 on nocolour.
 
 	* Added whoisservice (shows if client is +k).
 
-	* Added whoisaccountonly (shows if client is +R).
+	* Added OUTsider's whoisaccountonly (shows if client is +R).
 
 	* Modified some FEAT_EVILNET stuff.
 
 	* Added asuka's opersendq patch (which was made by me).
+
+	* Added several patches from SiRVulCaN.
+	(/ircops, /mkpasswd, warn_change, chmodeslist)
 
 2003-06-11  Reed Loden  <reed@reedloden.com>
 

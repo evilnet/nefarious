@@ -80,7 +80,7 @@ static char *make_md5_salt(void)
   return salt;
 }
 
-int m_mkpasswd(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+int mo_mkpasswd(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   int is_md5 = 0;
 

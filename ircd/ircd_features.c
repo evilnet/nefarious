@@ -234,7 +234,7 @@ static struct FeatureDesc {
   /* Misc. features */
   F_N(LOG, FEAT_MYOPER, feature_log_set, feature_log_reset, feature_log_get,
       0, log_feature_unmark, log_feature_mark, log_feature_report),
-  F_S(DOMAINNAME, 0, "AfterNET.org", 0),
+  F_S(DOMAINNAME, 0, "AfterNET.Org", 0),
   F_B(RELIABLE_CLOCK, 0, 0, 0),
   F_I(BUFFERPOOL, 0, 27000000, 0),
   F_B(HAS_FERGUSON_FLUSHER, 0, 0, 0),

@@ -149,6 +149,7 @@ extern int mo_gline(struct Client*, struct Client*, int, char*[]);
 extern int mo_info(struct Client*, struct Client*, int, char*[]);
 extern int mo_jupe(struct Client*, struct Client*, int, char*[]);
 extern int mo_kill(struct Client*, struct Client*, int, char*[]);
+extern int mo_mkpasswd(struct Client*, struct Client*, int, char*[]);
 extern int mo_notice(struct Client*, struct Client*, int, char*[]);
 extern int mo_oper(struct Client*, struct Client*, int, char*[]);
 extern int mo_opmode(struct Client*, struct Client*, int, char*[]);
@@ -224,8 +225,6 @@ extern int ms_wallvoices(struct Client*, struct Client*, int, char*[]);
 extern int ms_wallops(struct Client*, struct Client*, int, char*[]);
 extern int ms_wallusers(struct Client*, struct Client*, int, char*[]);
 extern int ms_whois(struct Client*, struct Client*, int, char*[]);
-extern int m_mkpasswd(struct Client*, struct Client*, int, char*[]);
- 
 
 #endif /* INCLUDED_handlers_h */
 
