@@ -171,12 +171,12 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return send_reply(sptr, ERR_NOOPERHOST);
     }
 
-    if (!IsMe(srv)) {
-      sendcmdto_one(sptr, CMD_OPER, srv, "%C %s %s", srv, parv[2], parv[3]);
-      return 0;
-    } else {
+    if (IsMe(srv)) {
       parv[1] = parv[2];
       parv[2] = parv[3];
+    } else {
+      sendcmdto_one(sptr, CMD_OPER, srv, "%C %s %s", srv, parv[2], parv[3]);
+      return 0;
     }
   }
 

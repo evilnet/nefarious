@@ -1,26 +1,47 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-25  Reed Loden  <reed@reedloden.com>
+
+	* include/ircd_features.h: Renamed FEAT_EXTENDED_CHECKCMD to
+	FEAT_CHECK_EXTENDED, moved FEAT_DEFAULT_UMODE, and added
+	FEAT_NOTHROTTLE.
+
+	* ircd/IPcheck.c: Added FEAT_NOTHROTTLE to replace
+	the NOTHROTTLE #ifdef (default: FALSE).
+
+	* ircd/ircd_features.c: Renamed FEAT_EXTENDED_CHECKCMD to
+	FEAT_CHECK_EXTENDED, moved FEAT_DEFAULT_UMODE, and added
+	FEAT_NOTHROTTLE.
+
+	* ircd/m_check.c: Corrected a couple of code inconsistances.
+
+	* ircd/m_ircops.c: Miscellaneous whitespace changes and let 
+	opers see other opers' idle time.
+
+	* ircd/m_oper.c: Flip-flop'd an 'if' check.
+
 2004-08-26  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Added new feature EXTENDED_CHECKCMD.
+	* doc/example.conf: Added new feature CHECK_EXTENDED.
 
 	* include/check.h: Added new parm to checkusers.
 
-	* include/ircd_features.h: Added FEAT_EXTENDED_CHECKCMD.
+	* include/ircd_features.h: Added FEAT_CHECK_EXTENDED.
 
-	* ircd/ircd_features.c: Added FEAT_EXTENDED_CHECKCMD (default TRUE).
+	* ircd/ircd_features.c: Added FEAT_CHECK_EXTENDED
+	(default: TRUE).
 
 	* ircd/m_check.c: A few CHECK updates:
-	Extended information with FEAT_EXTENDED_CHECKCMD
+	Extended information with FEAT_CHECK_EXTENDED
 	An update for flags with CHECK.
 	Small F:Line tweak for EXCEPTS.
 	Small bug fix with displaying modes in CHECK output.
 
 2004-08-25  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/ssl.c: Generate an error message when a client connects to
-	a SSL port on a normal connection (non SSL).
+	* ircd/ssl.c: Generate an error message when a client connects
+	to a SSL port on a normal connection (non-SSL).
 
 2004-08-24  Neil Spierling  <vulcan@linux-boxen.org>
 
@@ -36,14 +57,14 @@
 
 2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* include/map.h: Added an extra var to map_update for removing a
-	server.
+	* include/map.h: Added an extra var to map_update for removing
+	a server.
 
 	* ircd/m_server.c: Updated map_update() call.
 
 	* ircd/map.c: if map_update is called with a 1 then the server
 	will thats being updated will be removed. This really drops the
-	need for the cache time stuff. Ill see how this goes.
+	need for the cache time stuff. I'll see how this goes.
 
 	* ircd/s_misc.c: Save as m_server.c entry.
 
@@ -62,14 +83,15 @@
 
 	* ircd/ircd_features.c: Same as the example.conf entry.
 
-	* ircd/m_links.c: Use the scrambled links code if its enabled and
-	the user is not an oper.
+	* ircd/m_links.c: Use the scrambled links code if its enabled
+	and the user is not an oper.
 
 	* ircd/m_map.c: Same as above.
 
 	* ircd/m_server.c: Updated the map on new links.
 
-	* ircd/map.c: File containing functions for scrambled maps/links.
+	* ircd/map.c: File containing functions for scrambled
+	maps/links.
 
 	* ircd/s_misc.c: Update the map on splits.
 
@@ -83,46 +105,52 @@
 
 2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/m_oper.c: Bug fix, allow an oper to "remote oper" on the server
-	he/she is on (user on irc.abc.com, /oper irc.abc.com user pass).
+	* ircd/m_oper.c: Bug fix, allow an oper to "remote oper" on the
+	server he/she is on.
+	(user on irc.abc.com, /oper irc.abc.com user pass)
 
 2004-08-20  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Added lines for HIS_IRCOPS and HIS_IRCOPS_SERVERS.
+	* doc/example.conf: Added lines for HIS_IRCOPS and
+	HIS_IRCOPS_SERVERS.
 
 	* include/ircd_features.h: Same as above.
 
 	* ircd/ircd_features.c: Same as above.
 
-	* ircd/m_ircops.c: If HIS_IRCOPS is TRUE then dont let normal users use
-	IRCOPS. If HIS_IRCOPS_SERVERS is TRUE then if a normal user can use IRCOPS
-	the opers server will not display. HIS_SERVERNAME will be displayed instead.
+	* ircd/m_ircops.c: If HIS_IRCOPS is TRUE then don't let normal
+	users use IRCOPS. If HIS_IRCOPS_SERVERS is TRUE then if a
+	normal user can use IRCOPS the opers server will not display.
+	HIS_SERVERNAME will be displayed instead.
 
 2004-08-19  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/s_user.c: Bug fix for with default umodes, the mode(s) were being sent
-	out to other servers before the nick was even sent out.
+	* ircd/s_user.c: Bug fix for with default umodes, the mode(s)
+	were being sent out to other servers before the nick was even
+	sent out.
 
 2004-08-17  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/os_linux.c: Bug fix for fedora systems. This should fix the
-	`_SC_CLK_TCK' undeclared  error.
+	* ircd/os_linux.c: Bug fix for fedora systems. This should fix
+	the `_SC_CLK_TCK' undeclared  error.
 
 2004-08-15  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/s_user.c: Bug fix for setting +B, the server was letting any user
-	set +B. Reported by CaptKirk.
+	* ircd/s_user.c: Bug fix for setting +B, the server was letting
+	any user set +B. Reported by CaptKirk.
 
 2004-08-13  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/s_user.c: Bug fix for DEFAULT_UMODE, dont know why i added the
-	clearhiddenhsot part in the first place. When +x was auto set and a user
-	logged in their hidden host wasnt being set. This fixes that.
+	* ircd/s_user.c: Bug fix for DEFAULT_UMODE, dont know why I
+	added the clearhiddenhost part in the first place. When +x was
+	auto set and a user logged in, their hidden host wasn't being
+	set. This fixes that.
 
 2004-08-13  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* patches/halfops.srvx2.diff: Removed a couple of uneeded debugging bits
-	i added while creating the patch. Small code fix also.
+	* patches/halfops.srvx2.diff: Removed a couple of unneeded
+	debugging bits I added while creating the patch. Small code fix
+	also.
 
 2004-08-12  Neil Spierling  <vulcan@linux-boxen.org>
 

@@ -147,10 +147,12 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
    char outbuf[BUFSIZE], ustat[64];
    int cntr = 0, opcntr = 0, hopcntr = 0, vcntr = 0, clones = 0, bans = 0, excepts = 0, c = 0, authed = 0;
 
-   if (feature_bool(FEAT_HALFOPS))
-     if (showusers) send_reply(sptr, RPL_DATASTR, "Users (@ = op, % = half op, + = voice, * = clone)");
-   else
-     send_reply(sptr, RPL_DATASTR, "Users (@ = op, + = voice, * = clone)");
+   if (showusers) {
+     if (feature_bool(FEAT_HALFOPS))
+       send_reply(sptr, RPL_DATASTR, "Users (@ = op, % = halfop, + = voice, * = clone)");
+     else
+       send_reply(sptr, RPL_DATASTR, "Users (@ = op, + = voice, * = clone)");
+   }
 
    for (lp = chptr->members; lp; lp = lp->next_member)
    {
@@ -215,6 +217,7 @@ void checkUsers(struct Client *sptr, struct Channel *chptr, int showusers)
 
    send_reply(sptr, RPL_DATASTR, " ");
 
+   /* Do not display bans if ! showusers */
    if (!showusers) {
      send_reply(sptr, RPL_ENDOFCHECK, " ");
      return;
@@ -462,7 +465,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
       ircd_snprintf(0, outbuf, sizeof(outbuf), "          Ports:: %d -> %d (client -> server)",
          cli_port(acptr), cli_listener(acptr)->port);
       send_reply(sptr, RPL_DATASTR, outbuf);
-      if (feature_bool(FEAT_EXTENDED_CHECKCMD)) {
+      if (feature_bool(FEAT_CHECK_EXTENDED)) {
         /* Note: sendq = receiveq for a client (it makes sense really) */
         ircd_snprintf(0, outbuf, sizeof(outbuf), "      Data sent:: %u.%0.3u Kb (%u protocol messages)",
            cli_receiveK(acptr), cli_receiveB(acptr), cli_receiveM(acptr));
@@ -650,6 +653,8 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int showchan)
                   {
                   if (IsChanOp(lp))
                      *(chntext + len++) = '@';
+                  else if (IsHalfOp(lp))
+                     *(chntext + len++) = '%';
                   else if (HasVoice(lp))
                      *(chntext + len++) = '+';
                   }

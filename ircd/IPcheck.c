@@ -266,13 +266,13 @@ int ip_registry_check_local(unsigned int addr, time_t* next_target_out)
     /* 
      * Don't refuse connection when we just rebooted the server
      */
-#ifdef NOTHROTTLE 
-    return 1;
-#else
-    assert(entry->connected>0);
-    --entry->connected;
-    return 0;
-#endif        
+    if (feature_bool(FEAT_NOTHROTTLE))
+      return 1;
+    else {
+      assert(entry->connected>0);
+      --entry->connected;
+      return 0;
+    }
   }
   return 1;
 }

@@ -254,7 +254,6 @@ static struct FeatureDesc {
   F_B(HOST_HIDING, 0, 1, 0),
   F_S(HIDDEN_HOST, FEAT_CASE, "Users.Nefarious", 0),
   F_S(HIDDEN_IP, 0, "127.0.0.1", 0),
-  F_S(DEFAULT_UMODE, 0, "+", 0),
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
 
   /* features that probably should not be touched */
@@ -407,6 +406,7 @@ static struct FeatureDesc {
   F_B(OPER_HIDECHANS, 0, 0, 0),
   F_B(OPER_HIDEIDLE, 0, 0, 0),
   F_B(CHECK, 0, 1, 0),
+  F_B(CHECK_EXTENDED, 0, 1, 0),
   F_B(OPER_SINGLELETTERNICK, 0, 0, 0),
   F_B(SETHOST, 0, 1, 0),
   F_B(SETHOST_FREEFORM, 0, 0, 0),
@@ -430,6 +430,7 @@ static struct FeatureDesc {
   F_B(OPERMOTD, 0, 0, 0),
   F_S(GEO_LOCATION, FEAT_NULL, 0, 0),
   F_B(MOTD_LAST_CHANGED, 0, 0, 0),
+  F_S(DEFAULT_UMODE, 0, "+", 0),
   F_B(HOST_IN_TOPIC, 0, 1, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
   F_B(HALFOPS, 0, 0, 0),
@@ -446,7 +447,7 @@ static struct FeatureDesc {
   F_B(HIS_MAP_SCRAMBLED, 0, 1, 0),
   F_B(HIS_LINKS_SCRAMBLED, 0, 1, 0),
   F_I(HIS_SCRAMBLED_CACHE_TIME, 0, 604800, 0),
-  F_B(EXTENDED_CHECKCMD, 0, 1, 0),
+  F_B(NOTHROTTLE, 0, 0, 0),
 
 #undef F_S
 #undef F_B
