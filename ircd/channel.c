@@ -412,10 +412,12 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char          nu_host[NUH_BUFSIZE];
   char          nu_accthost[NUH_BUFSIZE];
   char          nu_realhost[NUH_BUFSIZE];
+  char          nu_fakehost[NUH_BUFSIZE];
   char          nu_ip[NUI_BUFSIZE];
   char*         s;
-  char*         sr = NULL;
   char*         sa = NULL;
+  char*         sr = NULL;
+  char*         sf = NULL;
   char*         ip_s = NULL;
 
   if (!IsUser(cptr))
@@ -426,6 +428,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
   /* This is horrible code.  s is always set to the apparent host */
   /* If the user is sethosted, sr is set to the real host */
+  /* If the user is fakehosted, sf is set to the real host */
   /* If the user is authed and +x (and not +h), then sa is set to the real host */
   /* If the user is authed and -x (or +h), then sa is set to the "account" host */
 
@@ -433,22 +436,23 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 			  (cli_user(cptr))->host);
 
   if (HasSetHost(cptr))
-        sr = make_nick_user_host(nu_realhost, cli_name(cptr),
-				 cli_user(cptr)->username,
-				 cli_user(cptr)->realhost);
+    sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+			     cli_user(cptr)->realusername,
+			     cli_user(cptr)->realhost);
+
+  if (HasFakeHost(cptr))
+    sf = make_nick_user_host(nu_fakehost, cli_name(cptr),
+			     cli_user(cptr)->username,
+			     cli_user(cptr)->fakehost);
 
   if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
     if (IsAccount(cptr)) {
        if (HasHiddenHost(cptr) && !HasSetHost(cptr))
           sa = make_nick_user_host(nu_accthost, cli_name(cptr),
-                                  cli_user(cptr)->username,
+                                  cli_user(cptr)->realusername,
                                   cli_user(cptr)->realhost);
        else {
-          ircd_snprintf(0, tmphost, HOSTLEN, "%s.%s",
-  		      cli_user(cptr)->account, (IsAnOper(cptr) &&
-  		      feature_bool(FEAT_OPERHOST_HIDING)) ?
- 		      feature_str(FEAT_HIDDEN_OPERHOST) :
-  		      feature_str(FEAT_HIDDEN_HOST));
+	  make_hidden_hostmask(tmphost, cptr);
           sa = make_nick_user_host(nu_accthost, cli_name(cptr),
                                    cli_user(cptr)->username,
                                    tmphost);
@@ -457,7 +461,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   } else {
      if (IsHiddenHost(cptr) && !HasSetHost(cptr))
        sr = make_nick_user_host(nu_realhost, cli_name(cptr),
-                               cli_user(cptr)->username,
+                               cli_user(cptr)->realusername,
                                cli_user(cptr)->realhost);
      else {
        ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
@@ -478,6 +482,8 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     if (match(tmp->value.ban.banstr, s) == 0)
       break;
     else if (sr && match(tmp->value.ban.banstr, sr) == 0)
+      break;
+    else if (sf && match(tmp->value.ban.banstr, sf) == 0)
       break;
     else if (sa && match(tmp->value.ban.banstr, sa) == 0)
       break;

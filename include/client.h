@@ -146,6 +146,7 @@ enum Flag {
     FLAG_ACCOUNT,                   /* account name has been set */
     FLAG_HIDDENHOST,                /* user's host is hidden */
     FLAG_SETHOST,                   /* oper's host is changed */
+    FLAG_FAKEHOST,                  /* user has been assigned a fake host */
     FLAG_ACCOUNTONLY,               /* hide privmsgs/notices if user is
                                        not authed or opered */
     FLAG_REMOTEOPER,                /* Remote operator */
@@ -437,9 +438,10 @@ struct Client {
 #define IsService(x)            HasFlag(x, FLAG_SERVICE)
 #define IsAccount(x)            HasFlag(x, FLAG_ACCOUNT)
 #define IsHiddenHost(x)		HasFlag(x, FLAG_HIDDENHOST)
-#define HasHiddenHost(x)	(IsAccount(x) && IsHiddenHost(x))
+#define HasHiddenHost(x)	(IsHiddenHost(x) && (IsAccount(x) || HasFakeHost(x)))
 #define IsSetHost(x)		HasFlag(x, FLAG_SETHOST)
 #define HasSetHost(x)		(IsSetHost(x))
+#define HasFakeHost(x)		HasFlag(x, FLAG_FAKEHOST)
 #define IsAccountOnly(x)	HasFlag(x, FLAG_ACCOUNTONLY)
 #define IsRemoteOper(x)		HasFlag(x, FLAG_REMOTEOPER)
 #define IsBot(x)		HasFlag(x, FLAG_BOT)
@@ -470,6 +472,7 @@ struct Client {
 #define SetAccount(x)           SetFlag(x, FLAG_ACCOUNT)
 #define SetHiddenHost(x)	SetFlag(x, FLAG_HIDDENHOST)
 #define SetSetHost(x)		SetFlag(x, FLAG_SETHOST)
+#define SetFakeHost(x)		SetFlag(x, FLAG_FAKEHOST)
 #define SetAccountOnly(x)	SetFlag(x, FLAG_ACCOUNTONLY)
 #define SetRemoteOper(x)	SetFlag(x, FLAG_REMOTEOPER)
 #define SetBot(x)		SetFlag(x, FLAG_BOT)
@@ -493,6 +496,7 @@ struct Client {
 #define ClearServNotice(x)      ClrFlag(x, FLAG_SERVNOTICE)
 #define ClearHiddenHost(x)	ClrFlag(x, FLAG_HIDDENHOST)
 #define ClearSetHost(x)		ClrFlag(x, FLAG_SETHOST)
+#define ClearFakeHost(x)	ClrFlag(x, FLAG_FAKEHOST)
 #define ClearAccountOnly(x)	ClrFlag(x, FLAG_ACCOUNTONLY)
 #define ClearRemoteOper(x)	ClrFlag(x, FLAG_REMOTEOPER)
 #define ClearBot(x)		ClrFlag(x, FLAG_BOT)

@@ -652,27 +652,45 @@ struct Message msgtab[] = {
     { m_unregistered, m_sethost, m_ignore, m_sethost, m_ignore }
   },
   {
+    MSG_FAKEHOST,
+    TOK_FAKEHOST,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_ignore, ms_fakehost, m_ignore, m_ignore }
+  },
+  {
     MSG_CHECK,
     TOK_CHECK,
     0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_not_oper, mo_check, mo_check, m_ignore }
   },
   {
     MSG_RULES,
     TOK_RULES,
     0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_rules, ms_rules, m_rules, m_ignore }
   },
   {
     MSG_OPERMOTD,
     TOK_OPERMOTD,
     0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_not_oper, ms_opermotd, m_opermotd, m_ignore }
+  },
+  {
+    MSG_SVSNICK,
+    TOK_SVSNICK,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_ignore, ms_svsnick, m_ignore, m_ignore }
   },
   {
     MSG_SVSNOOP,
     TOK_SVSNOOP,
     0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_ignore, ms_svsnoop, m_ignore, m_ignore }
   },
   /* This command is an alias for QUIT during the unregistered part of

@@ -66,6 +66,6 @@
 
 #define infochanmodes "biklmnopstvrcCMNOQSTz"
 #define infochanmodeswithparams "bklov"
-#define infousermodes "dioswkgxhBRXIn"
+#define infousermodes "dioswkgxhBRXInf"
 
 #endif /* INCLUDED_supported_h */

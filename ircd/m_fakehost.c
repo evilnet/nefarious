@@ -1,7 +1,6 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_privs.c
- * Copyright (C) 1990 Jarkko Oikarinen and
- *                    University of Oulu, Computing Center
+ * IRC - Internet Relay Chat, ircd/m_fakehost.c
+ * Copyright (C) 2004 Zoot <zoot@gamesurge.net>
  *
  * See file AUTHORS in IRC package for additional names of
  * the programmers.
@@ -84,74 +83,64 @@
 #include "client.h"
 #include "hash.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
+#include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
+#include "s_conf.h"
+#include "s_user.h"
 #include "send.h"
-#include "msg.h"
 
 #include <assert.h>
 
 /*
- * mo_privs - report operator privileges
+ * ms_fakehost - fakehost server message handler
+ *
+ * parv[0] = sender prefix
+ * parv[1] = target user numeric
+ * parv[2] = target user's new fake host
  */
-int mo_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+int ms_fakehost(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  struct Client *acptr;
-  char *name;
-  char *p = 0;
-  int i;
-
-  if (parc < 2)
-    return client_report_privs(sptr, sptr);
-
-  for (i = 1; i < parc; i++) {
-    for (name = ircd_strtok(&p, parv[i], " "); name;
-	 name = ircd_strtok(&p, 0, " ")) {
-      if ((acptr = FindUser(name)))
-	client_report_privs(sptr, acptr);
-    }
-  }
-
-  return 0;
-}
-
-int ms_privs(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
-  struct Client *acptr = parc > 1 ? findNUser(parv[1]) : NULL;
-  char buf[512] = "";
-  int what = PRIV_ADD;
-  int modified = 0;
-  char *p = 0;
-  char *tmp;
-  int i;
+  struct Client *target;
 
   if (parc < 3)
-    return need_more_params(sptr, "PRIVS");
+    return need_more_params(sptr, "FAKEHOST");
 
-  if (!acptr)
+  if (!IsServer(sptr))
+    return protocol_violation(cptr, "FAKEHOST from non-server %s",
+                              cli_name(sptr));
+
+  /* Locate our target user; ignore the message if we can't */
+  if(!(target = findNUser(parv[1])))
     return 0;
 
-  for (i=1; i<parc; i++) {
-    strcat(buf, parv[i]);
-    strcat(buf, " ");
+  /* fakehost enabled? */
+  if (MyConnect(cptr) && !feature_bool(FEAT_FAKEHOST)) {
+    send_reply(cptr, ERR_DISABLED, "FAKEHOST");
+    return 0;
   }
 
-  for (i = 2; i < parc; i++) {
-    if (*parv[i] == '+') { what = PRIV_ADD; parv[i]++; }
-    if (*parv[i] == '-') { what = PRIV_DEL; parv[i]++; }
-    for (tmp = ircd_strtok(&p, parv[i], ","); tmp;
-	 tmp = ircd_strtok(&p, NULL, ",")) {
-    client_modify_priv_by_name(acptr, tmp, what);
-    if (!modified)
-      modified = 1;
-    }
+  /* Fake host assignments must be from services */
+  if (!find_conf_byhost(cli_confs(cptr), cli_name(sptr), CONF_UWORLD)) {
+    return protocol_violation(cptr, "Non-U:lined server %s set fake host on user %s", cli_name(sptr), cli_name(target));
   }
 
-  if (MyConnect(acptr) && modified)
-    sendcmdto_one(&me, CMD_NOTICE, acptr,
-		  "%C :Your privileges were modified", acptr);
+  /* Ignore the assignment if it changes nothing */
+  if (HasFakeHost(target) &&
+      ircd_strcmp(cli_user(target)->fakehost, parv[2]) == 0)
+  {
+    return 0;
+  }
 
-  sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%s", buf);
+  /* Assign and propagate the fakehost */
+  SetFakeHost(target);
+  ircd_strncpy(cli_user(target)->fakehost, parv[2], HOSTLEN);
+  hide_hostmask(target);
+
+  sendcmdto_serv_butone(sptr, CMD_FAKEHOST, cptr, "%C %s", target,
+			cli_user(target)->fakehost);
   return 0;
 }

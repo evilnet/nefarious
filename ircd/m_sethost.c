@@ -132,7 +132,7 @@ int m_sethost(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       	FlagClr(&setflags, FLAG_SETHOST);
     } else {
       if (!is_hostmask(parv[1])) {
-	send_reply(sptr, ERR_BADHOSTMASK, hostmask);
+	send_reply(sptr, ERR_BADHOSTMASK, parv[1]);
 	return 0;
       }
       if (set_hostmask(sptr, parv[1], parv[2]))

@@ -1,7 +1,7 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_privs.c
- * Copyright (C) 1990 Jarkko Oikarinen and
- *                    University of Oulu, Computing Center
+ * IRC - Internet Relay Chat, ircd/m_svsnick.c
+ * Copyright (C) 2002 Mathieu Rene <math@rootservices.net>
+ *                  
  *
  * See file AUTHORS in IRC package for additional names of
  * the programmers.
@@ -29,6 +29,8 @@
  *    cptr    is always NON-NULL, pointing to a *LOCAL* client
  *            structure (with an open socket connected!). This
  *            identifies the physical socket where the message
+ *            originated (or which caused the m_function to be
+ *            executed--some m_functions may call others...).
  *            originated (or which caused the m_function to be
  *            executed--some m_functions may call others...).
  *
@@ -81,77 +83,51 @@
  */
 #include "config.h"
 
+
 #include "client.h"
 #include "hash.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
-#include "numeric.h"
-#include "numnicks.h"
-#include "send.h"
 #include "msg.h"
+#include "numnicks.h"
+#include "s_misc.h"
+#include "s_user.h"
+#include "send.h"
 
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*
- * mo_privs - report operator privileges
+ * ms_svsnick - server message handler
+ * parv[0] = sender prefix
+ * parv[1] = Target numeric
+ * parv[2] = New nickname
  */
-int mo_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  struct Client *acptr;
-  char *name;
-  char *p = 0;
-  int i;
+  struct Client* acptr = NULL;
+  struct Client* acptr2 = NULL;
 
-  if (parc < 2)
-    return client_report_privs(sptr, sptr);
+  if (parc<3)
+    return(need_more_params(sptr, "SVSNICK")); 
 
-  for (i = 1; i < parc; i++) {
-    for (name = ircd_strtok(&p, parv[i], " "); name;
-	 name = ircd_strtok(&p, 0, " ")) {
-      if ((acptr = FindUser(name)))
-	client_report_privs(sptr, acptr);
-    }
+  if (!(acptr = findNUser(parv[1])))
+    return 0; /* Ignore SVSNICK for a user that has quit */
+
+  if (ircd_strcmp(cli_name(acptr), parv[2]) == 0)
+    return 0; /* Nick already set to what SVSNICK wants, ignoring... */
+ 
+  if ((acptr2 = FindClient(parv[2]))) {
+    /* Nick collision occured, kill user with specific reason */
+    ++ServerStats->is_kill;
+    SetFlag(cptr, FLAG_KILLED);
+    exit_client(cptr, acptr2, &me, "Killed (Nickname Enforcement)");
   }
 
-  return 0;
-}
-
-int ms_privs(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
-  struct Client *acptr = parc > 1 ? findNUser(parv[1]) : NULL;
-  char buf[512] = "";
-  int what = PRIV_ADD;
-  int modified = 0;
-  char *p = 0;
-  char *tmp;
-  int i;
-
-  if (parc < 3)
-    return need_more_params(sptr, "PRIVS");
-
-  if (!acptr)
-    return 0;
-
-  for (i=1; i<parc; i++) {
-    strcat(buf, parv[i]);
-    strcat(buf, " ");
-  }
-
-  for (i = 2; i < parc; i++) {
-    if (*parv[i] == '+') { what = PRIV_ADD; parv[i]++; }
-    if (*parv[i] == '-') { what = PRIV_DEL; parv[i]++; }
-    for (tmp = ircd_strtok(&p, parv[i], ","); tmp;
-	 tmp = ircd_strtok(&p, NULL, ",")) {
-    client_modify_priv_by_name(acptr, tmp, what);
-    if (!modified)
-      modified = 1;
-    }
-  }
-
-  if (MyConnect(acptr) && modified)
-    sendcmdto_one(&me, CMD_NOTICE, acptr,
-		  "%C :Your privileges were modified", acptr);
-
-  sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%s", buf);
+  set_nick_name(acptr, acptr, parv[2], parc, parv);  
+  sendcmdto_serv_butone(sptr, CMD_SVSNICK, cptr, "%s %s", parv[1], parv[2]);
   return 0;
 }

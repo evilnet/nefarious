@@ -24,32 +24,10 @@
  */
 
 
-#include "channel.h"
 #include "config.h"
-#include "client.h"
-#include "handlers.h"
-#include "hash.h"
 #include "ircd.h"
-#include "ircd_chattr.h"
 #include "ircd_defs.h"
-#include "ircd_features.h"
-#include "ircd_relay.h"
-#include "ircd_reply.h"
-#include "ircd_string.h"
 #include "ircd_snprintf.h"
-#include "ircd_alloc.h"
-#include "list.h"
-#include "msg.h"
-#include "numeric.h"
-#include "numnicks.h"
-#include "random.h"
-#include "querycmds.h"
-#include "send.h"
-#include "s_conf.h"
-#include "s_user.h"
-#include "s_debug.h"
-#include "userload.h"
-#include "patchlevel.h"
 
 #include <string.h>
 #include <ctype.h>
@@ -70,8 +48,6 @@
 #ifndef KEY3
 #define KEY3 cloakrand()
 #endif
-
-int str2arr (char **, char *, char *);
 
  /* This coded was ported from Ultimate IRCd (http://www.shadow-realm.org),
   * modifications made by SiRVu|caN <vulcan@linux-boxen.org> to work on 
@@ -228,8 +204,8 @@ make_virthost (char *curr, char *host, char *new, char *virt)
   parc2 = str2arr (parv2, s2, ".");
 
   /* crc32 and hashing using our 3 keys */
-  hash[0] = ((crc32 (parv[3], strlen (parv[3])) + KEY2) ^ KEY) ^ KEY3;
-  hash[1] = ((crc32 (parv[2], strlen (parv[2])) + KEY2) ^ KEY) ^ KEY3;
+  hash[0] = ((crc32 ((unsigned char *)parv[3], strlen (parv[3])) + KEY2) ^ KEY) ^ KEY3;
+  hash[1] = ((crc32 ((unsigned char *)parv[2], strlen (parv[2])) + KEY2) ^ KEY) ^ KEY3;
 
 
   /* Why make life easy on crackers? Bitshifting */
@@ -249,7 +225,7 @@ make_virthost (char *curr, char *host, char *new, char *virt)
       if (strchr ("0123456789", parv2[3][len - 1]))
 	{
 
-	  hash[2] = ((crc32 (parv[1], strlen (parv[1])) + KEY2) ^ KEY) ^ KEY3;
+	  hash[2] = ((crc32 ((unsigned char *)parv[1], strlen (parv[1])) + KEY2) ^ KEY) ^ KEY3;
 
 	  hash[2] <<= 2;
 	  hash[2] >>= 2;
@@ -284,7 +260,6 @@ make_virthost (char *curr, char *host, char *new, char *virt)
   return;
 }
 
-
 void
 make_virtip (char *curr, char *host, char *new)
 {
@@ -302,8 +277,8 @@ make_virtip (char *curr, char *host, char *new)
   parc2 = str2arr (parv2, s2, ".");
 
   /* crc32 and hashing using our 3 keys */
-  hash[0] = ((crc32 (parv[3], strlen (parv[3])) + KEY2) ^ KEY) ^ KEY3;
-  hash[1] = ((crc32 (parv[2], strlen (parv[2])) + KEY2) ^ KEY) ^ KEY3;
+  hash[0] = ((crc32 ((unsigned char *)parv[3], strlen (parv[3])) + KEY2) ^ KEY) ^ KEY3;
+  hash[1] = ((crc32 ((unsigned char *)parv[2], strlen (parv[2])) + KEY2) ^ KEY) ^ KEY3;
 
 
   /* Why make life easy on crackers? Bitshifting */
@@ -318,7 +293,7 @@ make_virtip (char *curr, char *host, char *new)
   /* Check if its an IPv4 for sure */
   if (strchr ("0123456789", parv2[3][len - 1]))
     {
-      hash[2] = ((crc32 (parv[1], strlen (parv[1])) + KEY2) ^ KEY) ^ KEY3;
+      hash[2] = ((crc32 ((unsigned char *)parv[1], strlen (parv[1])) + KEY2) ^ KEY) ^ KEY3;
 
       hash[2] <<= 2;
       hash[2] >>= 2;
@@ -335,4 +310,10 @@ make_virtip (char *curr, char *host, char *new)
 
   strncpy (new, mask, SOCKIPLEN + 30);
   return;
+}
+
+int cloakrand()
+{
+    srandom(CurrentTime); /* may not be the BEST salt, but its close */
+    return (unsigned int)(random() / 65536) % 32768;
 }

@@ -70,6 +70,10 @@ struct Client;
 #define TOK_NICK                "N"
 #define CMD_NICK		MSG_NICK, TOK_NICK
 
+#define MSG_SVSNICK		"SVSNICK"	/* SVNI */
+#define TOK_SVSNICK		"SN"
+#define CMD_SVSNICK		MSG_SVSNICK, TOK_SVSNICK
+
 #define MSG_SERVER              "SERVER"        /* SERV */
 #define TOK_SERVER              "S"
 #define CMD_SERVER		MSG_SERVER, TOK_SERVER
@@ -218,7 +222,7 @@ struct Client;
 #define TOK_JOIN                "J"
 #define CMD_JOIN		MSG_JOIN, TOK_JOIN
 
-#define MSG_SVSJOIN             "SVSJOIN"	/* SJ */
+#define MSG_SVSJOIN             "SVSJOIN"	/* SVJO */
 #define TOK_SVSJOIN             "SJ"
 #define CMD_SVSJOIN		MSG_SVSJOIN, TOK_SVSJOIN
 
@@ -226,7 +230,7 @@ struct Client;
 #define TOK_PART                "L"
 #define CMD_PART		MSG_PART, TOK_PART
 
-#define MSG_SVSPART             "SVSPART"	/* SP */
+#define MSG_SVSPART             "SVSPART"	/* SVPA */
 #define TOK_SVSPART             "SP"
 #define CMD_SVSPART		MSG_SVSPART, TOK_SVSPART
 
@@ -270,8 +274,9 @@ struct Client;
 #define TOK_SERVSET             "SERVSET"
 #define CMD_SERVSET		MSG_SERVSET, TOK_SERVSET
 
-#define MSG_CHECK       "CHECK"
-#define TOK_CHECK       "CC"
+#define MSG_CHECK		"CHECK"		/* CHEC */
+#define TOK_CHECK		"CC"
+#define CMD_CHECK		MSG_CHECK, TOK_CHECK
 
 #define MSG_REHASH              "REHASH"        /* REHA */
 #define TOK_REHASH              "REHASH"
@@ -377,6 +382,10 @@ struct Client;
 #define MSG_SETHOST		"SETHOST"	/* SETH */
 #define TOK_SETHOST		"SH"
 #define CMD_SETHOST		MSG_SETHOST, TOK_SETHOST
+
+#define MSG_FAKEHOST		"FAKE"		/* FAKE */
+#define TOK_FAKEHOST		"FA"
+#define CMD_FAKEHOST		MSG_FAKEHOST, TOK_FAKEHOST
 
 #define MSG_OPERMOTD		"OPERMOTD"	/* OPMO */
 #define TOK_OPERMOTD		"OPM"

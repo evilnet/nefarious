@@ -120,7 +120,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   int ircops = 0;
 
   if (!MyUser(sptr))
-  return 0;
+    return 0;
 
   /*
    * If user is only looking for opers on a specific server, we need 
@@ -174,4 +174,19 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		ircops, (ircops != 1) ? "s" : "");
   send_reply(sptr, RPL_ENDOFIRCOPS, buf);
   return 0;
+}
+
+/*
+ * ms_ircops - server message handler
+ *
+ * parv[0]        = sender prefix
+ * parv[1]        = servername
+ */
+int ms_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
+{
+  if (hunt_server_cmd(sptr, CMD_IRCOPS, cptr, 0, "%C", 1, parc, parv) !=
+      HUNTED_ISME)
+    return 0;
+
+  return m_ircops(cptr, sptr, parc, parv);
 }

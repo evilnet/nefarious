@@ -25,24 +25,17 @@
 
 #include "config.h"
 
-#include "class.h"
 #include "client.h"
 #include "handlers.h"
 #include "ircd.h"
 #include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
-#include "match.h"
 #include "msg.h"
 #include "numeric.h"
-#include "numnicks.h"
-#include "s_conf.h"
 #include "s_serv.h"
 #include "s_user.h"
 #include "send.h"
-
-#include <stdlib.h>
-#include <assert.h>
 
 /*
  * m_opermotd - generic message handler
@@ -53,7 +46,7 @@
  */
 int m_opermotd(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  if (!feature_bool(FEAT_CMD_OPERMOTD))
+  if (!feature_bool(FEAT_OPERMOTD))
     return 0;
 
   if (!IsAnOper(sptr)) {

@@ -1,9 +1,12 @@
+#ifndef INCLUDED_hosthiding_h
+#define INCLUDED_hosthiding_h
 /*
- * IRC - Internet Relay Chat, include/patchlevel.h
+ * IRC - Internet Relay Chat, include/hosthiding.h
+ * Copyright (C) 2004 Reed Loden <reed@reedloden.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 1, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -16,21 +19,16 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * $Id$
- *
  */
-#define PATCHLEVEL "07+Nefarious(0.0.2)"
-
-#define RELEASE ".11."
 
 /*
- * Deliberate empty lines
+ * Proto types
  */
-/* Do NOT edit those: */
 
-#ifndef BASE_VERSION
-#define BASE_VERSION "u2.10"
-#endif
+extern int str2arr (char **, char *, char *);
+extern unsigned long crc32 (const unsigned char *, unsigned int);
+extern void make_virthost (char *curr, char *host, char *new, char *virt);
+extern void make_virtip (char *curr, char *host, char *new);
+extern int cloakrand();
 
-#ifndef MAJOR_PROTOCOL
-#define MAJOR_PROTOCOL "10"
-#endif
+#endif /* INCLUDED_hosthiding_h */

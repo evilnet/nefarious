@@ -106,6 +106,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	       char* parv[])
 {
   struct Client *acptr;
+  int hidden;
 
   if (parc < 3)
     return need_more_params(sptr, "ACCOUNT");
@@ -133,11 +134,14 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	   "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
   }
 
+  hidden = HasHiddenHost(acptr);
+  SetAccount(acptr);
   ircd_strncpy(cli_user(acptr)->account, parv[2], ACCOUNTLEN);
-  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
-    hide_hostmask(acptr, FLAG_ACCOUNT);
-  else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2)
-    SetAccount(acptr);
+
+  /* Fake hosts have precedence over account-based hidden hosts,
+     so, if the user was already hidden, don't do it again */
+  if (!hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+    hide_hostmask(acptr);
 
   sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
 			cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s",

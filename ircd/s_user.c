@@ -30,6 +30,7 @@
 #include "class.h"
 #include "client.h"
 #include "hash.h"
+#include "hosthiding.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_chattr.h"
@@ -421,6 +422,14 @@ int register_user(struct Client *cptr, struct Client *sptr,
     }
     ircd_strncpy(user->host, cli_sockhost(sptr), HOSTLEN);
     ircd_strncpy(user->realhost, cli_sockhost(sptr), HOSTLEN);
+    if (feature_bool(FEAT_FAKEHOST) && feature_str(FEAT_DEFAULT_FAKEHOST)) {
+      /* If the server-wide default fakehost has been set, give
+	 all users connecting to this server only a fakehost.
+	 This does prevent them from using their account-based
+	 hidden host permanently. */
+      ircd_strncpy(user->fakehost, feature_str(FEAT_DEFAULT_FAKEHOST), HOSTLEN);
+      SetFakeHost(sptr);
+    }
     aconf = cli_confs(sptr)->value.aconf;
 
     if ((find_csline(sptr, cli_sockhost(sptr)) != NULL)) {
@@ -581,7 +590,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
     if (feature_bool(FEAT_AUTOHIDE) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
       SetHiddenHost(sptr);
     } else if (feature_bool(FEAT_AUTOHIDE) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) {
-        make_virthost(ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->host, cli_user(sptr)->host, cli_user(sptr)->virthost);
+        make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->host, cli_user(sptr)->host, cli_user(sptr)->virthost);
         SetFlag(sptr, FLAG_HIDDENHOST);
     }
 
@@ -590,7 +599,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
      * ip of the client so we dont have to do it each time the client +x's 
      */
     if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-        make_virtip(ircd_ntoa((const char*) &(cli_ip(sptr))), ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->virtip);
+        make_virtip((char*)ircd_ntoa((const char*) &(cli_ip(sptr))), (char*)ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->virtip);
     }
 
     SetLocalNumNick(sptr);
@@ -686,7 +695,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
 
     if (feature_bool(FEAT_POLICY_NOTICE)) {
-      if (feature_bool(FEAT_CMD_RULES))
+      if (feature_bool(FEAT_RULES))
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2 and \2/RULES\2", sptr, feature_str(FEAT_NETWORK));
       else
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2", sptr, feature_str(FEAT_NETWORK));
@@ -721,6 +730,7 @@ static const struct UserMode {
   { FLAG_ACCOUNT,     'r' },
   { FLAG_HIDDENHOST,  'x' },
   { FLAG_SETHOST,     'h' },
+  { FLAG_FAKEHOST,    'f' },
   { FLAG_ACCOUNTONLY, 'R' },
   { FLAG_BOT,         'B' },
   { FLAG_XTRAOP,      'X' },
@@ -741,7 +751,8 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
   if (IsServer(sptr)) {
     int   i;
     const char* account = 0;
-    char* hostmask = 0;
+    const char* sethost = 0;
+    const char* fakehost = 0;
     char* host = 0;
     const char* p;
 
@@ -754,14 +765,17 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     cli_hopcount(new_client) = atoi(parv[2]);
     cli_lastnick(new_client) = atoi(parv[3]);
     if (Protocol(cptr) > 9 && parc > 7 && *parv[6] == '+') {
+      int argi = 7;
       for (p = parv[6] + 1; *p; p++) {
         for (i = 0; i < USERMODELIST_SIZE; ++i) {
           if (userModeList[i].c == *p) {
             SetFlag(new_client, userModeList[i].flag);
 	    if (userModeList[i].flag == FLAG_ACCOUNT)
-	      account = parv[7];
+	      account = parv[argi++];
 	    if (userModeList[i].flag == FLAG_SETHOST)
-	      hostmask = parv[parc - 4];
+	      sethost = parv[argi++];
+            if (userModeList[i].flag == FLAG_FAKEHOST)
+              fakehost = parv[argi++];
             break;
           }
         }
@@ -800,20 +814,20 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       }
       ircd_strncpy(cli_user(new_client)->account, account, len);
     }
+    if (fakehost) {
+      SetFakeHost(new_client);
+      ircd_strncpy(cli_user(new_client)->fakehost, fakehost, HOSTLEN);
+    }
     if (HasHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
-        ircd_snprintf(0, cli_user(new_client)->host, HOSTLEN, "%s.%s",
-          account, (IsAnOper(new_client) &&
-  	  feature_bool(FEAT_OPERHOST_HIDING)) ?
-  	  feature_str(FEAT_HIDDEN_OPERHOST) :
-  	  feature_str(FEAT_HIDDEN_HOST));
+	make_hidden_hostmask(cli_user(new_client)->host, new_client);
       } else if (IsHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) {
-        make_virthost(ircd_ntoa((const char*) &(cli_ip(new_client))), cli_user(new_client)->host, cli_user(new_client)->host, cli_user(new_client)->virthost);
+        make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(new_client))), cli_user(new_client)->host, cli_user(new_client)->host, cli_user(new_client)->virthost);
         SetFlag(new_client, FLAG_HIDDENHOST);
       }
     if (HasSetHost(new_client)) {
-      if ((host = strrchr(hostmask, '@')) != NULL) {
+      if ((host = strrchr(sethost, '@')) != NULL) {
         *host++ = '\0';
-	ircd_strncpy(cli_username(new_client), hostmask, USERLEN);
+	ircd_strncpy(cli_username(new_client), sethost, USERLEN);
 	ircd_strncpy(cli_user(new_client)->host, host, HOSTLEN);
       }
     }
@@ -1177,16 +1191,46 @@ void send_user_info(struct Client* sptr, char* names, int rpl, InfoFormatter fmt
 }
 
 /*
+ * make_hidden_hostmask()
+ *
+ * Generates a user's hidden hostmask based on their account unless
+ * they have a custom [vanity] host set. This function expects a
+ * buffer of sufficient size to hold the resulting hostmask.
+ */
+void make_hidden_hostmask(char *buffer, struct Client *cptr)
+{
+  assert(HasFakeHost(cptr) || IsAccount(cptr));
+
+  if (HasFakeHost(cptr)) {
+    /* The user has a fake host; make that their hidden hostmask. */
+    ircd_strncpy(buffer, cli_user(cptr)->fakehost, HOSTLEN);
+    return;
+  }
+
+  if (IsAccount(cptr)) {
+    /* Generate a hidden host based on the user's account name. */
+    ircd_snprintf(0, buffer, HOSTLEN, "%s.%s", cli_user(cptr)->account,
+		  (IsAnOper(cptr) && feature_bool(FEAT_OPERHOST_HIDING)) 
+		   ? feature_str(FEAT_HIDDEN_OPERHOST)
+		   : feature_str(FEAT_HIDDEN_HOST));
+    return;
+  }
+}
+
+/*
  * hide_hostmask()
  *
- * If, after setting the flags, the user has both HiddenHost and Account
- * set, its hostmask is changed.
+ * If the user has HiddenHost and either of Account or FakeHost set,
+ * its hostmask is changed.
  */
-int hide_hostmask(struct Client *cptr, unsigned int flag)
+int hide_hostmask(struct Client *cptr)
 {
   struct Membership *chan;
 
-  if (MyConnect(cptr) && !feature_bool(FEAT_HOST_HIDING) && (flag == FLAG_HIDDENHOST))
+  if (MyConnect(cptr) && !feature_bool(FEAT_HOST_HIDING))
+    return 0;
+
+  if (!HasHiddenHost(cptr))
     return 0;
 
   /* Invalidate all bans against the user so we check them again */
@@ -1194,25 +1238,14 @@ int hide_hostmask(struct Client *cptr, unsigned int flag)
        chan = chan->next_channel)
      ClearBanValid(chan);
 
-  /* If the user is +h, we don't hide the hostmask.  Set the flag to keep sync though */
+  /* If user is +h, don't hide the host. Set flag to keep sync though. */
   if (HasSetHost(cptr)) {
-    SetFlag(cptr, flag);
-    return 0;
-  }
-
-  if (((flag == FLAG_HIDDENHOST) && !HasFlag(cptr, FLAG_ACCOUNT))
-      || ((flag == FLAG_ACCOUNT) && !HasFlag(cptr, FLAG_HIDDENHOST))) {
-    /* The user doesn't have both flags, don't change the hostmask */
-    SetFlag(cptr, flag);
+    SetHiddenHost(cptr);
     return 0;
   }
 
   sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":Registered");
-  ircd_snprintf(0, cli_user(cptr)->host, HOSTLEN, "%s.%s",
-    cli_user(cptr)->account, (IsAnOper(cptr) &&
-    feature_bool(FEAT_OPERHOST_HIDING)) ?
-    feature_str(FEAT_HIDDEN_OPERHOST) : feature_str(FEAT_HIDDEN_HOST));
-  SetFlag(cptr, flag);
+  make_hidden_hostmask(cli_user(cptr)->host, cptr);
 
   /* ok, the client is now fully hidden, so let them know -- hikari */
   if (MyConnect(cptr))
@@ -1272,11 +1305,7 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
       sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":Host change");
       /* If they are +rx, we need to return to their +x host, not their "real" host */
       if (HasHiddenHost(cptr))
-        ircd_snprintf(0, cli_user(cptr)->host, HOSTLEN, "%s.%s",
-          cli_user(cptr)->account, (IsAnOper(cptr) &&
-          feature_bool(FEAT_OPERHOST_HIDING)) ?
-          feature_str(FEAT_HIDDEN_OPERHOST) :
-          feature_str(FEAT_HIDDEN_HOST));
+	make_hidden_hostmask(cli_user(cptr)->host, cptr);
       else
         strncpy(cli_user(cptr)->host, cli_user(cptr)->realhost, HOSTLEN);
       strncpy(cli_user(cptr)->username, cli_user(cptr)->realusername, USERLEN);
@@ -1470,7 +1499,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     for (i = 0; i < USERMODELIST_SIZE; ++i) {
       if (HasFlag(acptr, userModeList[i].flag) &&
 	  ((userModeList[i].flag != FLAG_ACCOUNT) &&
-	   (userModeList[i].flag != FLAG_SETHOST)))
+	   (userModeList[i].flag != FLAG_SETHOST) &&
+	   (userModeList[i].flag != FLAG_FAKEHOST)))
         *m++ = userModeList[i].c;
     }
     *m = '\0';
@@ -1597,11 +1627,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         break;
       case 'x':
         if (what == MODE_ADD) {
-	  do_host_hiding = 1;
+	  SetHiddenHost(acptr);
+	  if (!FlagHas(&setflags, FLAG_HIDDENHOST))
+	    do_host_hiding = 1;
 	} else {
 	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-  	    ircd_strncpy(cli_user(sptr)->host, cli_user(sptr)->realhost, HOSTLEN);
-	    ClearHiddenHost(sptr);
+  	    ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
+	    ClearHiddenHost(acptr);
 	  }
 	}
 	break;
@@ -1728,9 +1760,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     ++UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding) {
     if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
-      hide_hostmask(acptr, FLAG_HIDDENHOST);
+      if (do_host_hiding)
+	hide_hostmask(acptr);
     } else {
-      make_virthost(ircd_ntoa((const char*) &(cli_ip(acptr))), cli_user(acptr)->host, cli_user(acptr)->host, cli_user(acptr)->virthost);
+      make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(acptr))), cli_user(acptr)->host, cli_user(acptr)->host, cli_user(acptr)->virthost);
       SetFlag(acptr, FLAG_HIDDENHOST);
     }
   }
@@ -1787,15 +1820,25 @@ char *umode_str(struct Client *cptr)
       while ((*m++ = *t++))
 	; /* Empty loop */
     }
-    m--; /* Step back over the '\0' */
+    m--; /* back up over previous nul-termination */
   }
 
   if (IsSetHost(cptr)) {
     *m++ = ' ';
-    ircd_snprintf(0, m, USERLEN + HOSTLEN + 2, "%s@%s", cli_user(cptr)->username,
-         cli_user(cptr)->host);
-  } else
-    *m = '\0';
+    ircd_snprintf(0, m, USERLEN + HOSTLEN + 2, "%s@%s",
+		  cli_user(cptr)->username, cli_user(cptr)->host);
+    m--; /* back up over previous nul-termination */
+  }
+
+  if (HasFakeHost(cptr)) {
+    char* t = cli_user(cptr)->fakehost;
+
+    *m++ = ' ';
+    while ((*m++ = *t++))
+      ; /* Empty loop */
+   }
+
+  *m = '\0';
 
   return umodeBuf;                /* Note: static buffer, gets
                                    overwritten by send_umode() */
@@ -1846,7 +1889,8 @@ void send_umode(struct Client *cptr, struct Client *sptr, struct Flags *old, int
       /* If we're setting +h, add the parameter later */
       if (!FlagHas(old, flag))	
       	needhost++;    
-    }
+    } else if (flag == FLAG_ACCOUNT || flag == FLAG_FAKEHOST)
+      continue;
     if (FlagHas(old, flag))
     {
       if (what == MODE_DEL)

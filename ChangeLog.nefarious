@@ -1,3 +1,24 @@
+2004-06-04  Reed Loden  <reed@reedloden.com>
+
+	* Corrected all warnings.
+
+	* Added fakehost (from GameSurge) support.
+
+	* Redid lots of code.
+
+	* ircd/Makefile.in: Run "make depend".
+
+	* ircd/m_check.c: Fix bug with cli_ip (from QuakeNet).
+
+	* ircd/m_ircops.c: Add ms_ircops() to allow services to send an
+	/IRCOPS to a user.
+
+	* ircd/m_sethost.c: Fix bug with uninitialized variable (from 
+	QuakeNet).
+
+	* ircd/m_svsnick.c: Add SVSNICK support as requested by 
+	CaptKirk` (Quarantined/Protium). Will add F:lines later.
+
 2004-06-01  Reed Loden  <reed@reedloden.com>
 
 	* Sync with u2.10.11.07(pre1).

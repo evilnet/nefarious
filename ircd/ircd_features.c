@@ -413,6 +413,8 @@ static struct FeatureDesc {
   F_B(SETHOST_FREEFORM, 0, 0, 0),
   F_B(SETHOST_USER, 0, 1, 0),
   F_B(SETHOST_AUTO, 0, 1, 0),
+  F_B(FAKEHOST, 0, 1, 0),
+  F_S(DEFAULT_FAKEHOST, FEAT_NULL | FEAT_CASE, 0, 0),
   F_B(HIS_STATS_b, 0, 1, 0),
   F_B(HIS_STATS_R, 0, 1, 0),
   F_B(HIS_STATS_s, 0, 1, 0),
@@ -421,10 +423,10 @@ static struct FeatureDesc {
   F_B(AUTOJOIN, 0, 0, 0),
   F_B(AUTOJOIN_NOTICE, 0, 1, 0),
   F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #Nefarious", 0),
-  F_B(QUOTES, 0, 1, 0),
+  F_B(QUOTES, 0, 0, 0),
   F_B(POLICY_NOTICE, 0, 1, 0),
-  F_B(CMD_RULES, 0, 1, 0),
-  F_B(CMD_OPERMOTD, 0, 1, 0),
+  F_B(RULES, 0, 0, 0),
+  F_B(OPERMOTD, 0, 0, 0),
 
 #undef F_S
 #undef F_B
