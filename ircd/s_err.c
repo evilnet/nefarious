@@ -990,7 +990,7 @@ static Numeric replyTable[] = {
 /* 478 */
   { ERR_BANLISTFULL, "%s %s :Channel ban/ignore list is full", "478" },
 /* 479 */
-  { ERR_BADCHANNAME, "%s :Cannot join channel (access denied on this server)", "479" },
+  { ERR_BADCHANNAME, "%s :Cannot join channel (%s)", "479" },
 /* 480 */
   { 0 },
 /* 481 */

@@ -99,7 +99,7 @@ static void makeTables(void)
   markString(NTL_PRINT, " ");
 
   markRange(NTL_IRCCH, 0, (char) UCHAR_MAX);
-  unMarkString(NTL_IRCCH, "\007\040\054\240");
+  unMarkString(NTL_IRCCH, "\007\040\054\240*");
 
   markRange(NTL_IRCCL, '\300', '\326');
   markRange(NTL_IRCCL, '\330', '\336');

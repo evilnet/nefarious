@@ -212,9 +212,9 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     }
 
     /* BADCHANed channel */
-    if ((gline = gline_find(name, GLINE_BADCHAN | GLINE_EXACT)) &&
+    if ((gline = gline_find(name, GLINE_BADCHAN)) &&
 	GlineIsActive(gline) && !IsAnOper(sptr)) {
-      send_reply(sptr, ERR_BANNEDFROMCHAN, name);
+      send_reply(sptr, ERR_BADCHANNAME, name, gline->gl_reason);
       continue;
     }
 
