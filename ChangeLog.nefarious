@@ -1,6 +1,28 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-12-10  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added OPER_WHOIS_SECRET.
+
+	* include/client.h: Added ClearAccount().
+
+	* include/ircd_features.h: Added FEAT_OPER_WHOIS_SECRET.
+
+	* include/s_user.h: Added unhide_hostmask().
+
+	* ircd/ircd_features.c: Added OPER_WHOIS_SECRET, default TRUE.
+
+	* ircd/m_account.c: Added two new flags. M for renaming an
+	account (AZ AC AZAAA M newaccount). And U for removing an
+	account (AZ AC AZAAA U).
+
+	* ircd/m_whois.c: If OPER_WHOIS_SECRET is TRUE then show +s
+	channels for opers.
+
+	* ircd/s_user.c: Added unhide_hostmask to unhide an account
+	based hidden host. Works with Account removal.
+
 2004-11-20  Reed Loden  <reed@reedloden.com>
 
 	* ircd/channel.c (SetAutoChanModes): Fixed a warning in

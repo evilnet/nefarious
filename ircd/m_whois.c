@@ -151,9 +151,13 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     for (chan = user->channel; chan; chan = chan->next_channel)
     {
        chptr = chan->channel;
-       
-       if (!ShowChannel(sptr, chptr)
-           && !(IsOper(sptr) && IsLocalChannel(chptr->chname)))
+  
+       if (!(IsOper(sptr) && IsLocalChannel(chptr->chname)) &&
+          (!ShowChannel(sptr, chptr) && !IsOper(sptr)))
+         continue;
+
+       if (!feature_bool(FEAT_OPER_WHOIS_SECRET) && IsOper(sptr) &&
+           !ShowChannel(sptr, chptr))
          continue;
           
        if (acptr != sptr && IsZombie(chan))

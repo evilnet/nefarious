@@ -513,6 +513,7 @@ struct Client {
 #define ClearInvisible(x)       ClrFlag(x, FLAG_INVISIBLE)
 #define ClearLocOp(x)           ClrFlag(x, FLAG_LOCOP)
 #define ClearOper(x)            ClrFlag(x, FLAG_OPER)
+#define ClearAccount(x)         ClrFlag(x, FLAG_ACCOUNT)
 #define ClearUPing(x)           ClrFlag(x, FLAG_UPING)
 #define ClearWallops(x)         ClrFlag(x, FLAG_WALLOP)
 #define ClearServNotice(x)      ClrFlag(x, FLAG_SERVNOTICE)

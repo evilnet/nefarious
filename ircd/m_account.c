@@ -151,6 +151,12 @@ static struct Client *decode_auth_id(const char *id)
  * for parv[3] == 'D' (auth denied):
  * parv[4] = request id (transparent, uninterpreted string)
  *
+ * for parv[3] == 'U' (unregister)
+ * no extra parms
+ *
+ * for parv[3] == 'M' (account renaming)
+ * parv[3] = new account name
+ *
  */
 int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	       char* parv[])
@@ -166,23 +172,71 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     return protocol_violation(cptr, "ACCOUNT from non-server %s",
 			      cli_name(sptr));
 
-  if (parc < 4) {
-    /* old-school message, remap it to 'R' */
-    parv[4] = NULL;
-    parv[3] = parv[2];
-    parv[2] = "R";
-    parc = 4;
-  } else if (parc == 4 && atoi(parv[3])) {
-    /* old-school message with timestamp, remap it to 'R' */
-    parv[5] = NULL;
-    parv[4] = parv[3];
-    parv[3] = parv[2];
-    parv[2] = "R";
-    parc = 5;
+  if (parv[2][0] != 'U' && parv[2][0] != 'M') {
+    if (parc < 4) {
+      /* old-school message, remap it to 'R' */
+      parv[4] = NULL;
+      parv[3] = parv[2];
+      parv[2] = "R";
+      parc = 4;
+    } else if (parc == 4 && atoi(parv[3])) {
+      /* old-school message with timestamp, remap it to 'R' */
+      parv[5] = NULL;
+      parv[4] = parv[3];
+      parv[3] = parv[2];
+      parv[2] = "R";
+      parc = 5;
+    }
   }
 
   type = parv[2][0];
-  if (type == 'R') {
+
+  if (type == 'U') { /* account removal */
+    if (!(acptr = findNUser(parv[1])))
+      return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+
+    if (!IsAccount(acptr))
+      return protocol_violation(cptr, "User %s does not have an account set (ACCOUNT Removal)", cli_name(acptr));
+
+    assert(0 != cli_user(acptr)->account[0]);
+
+    ircd_strncpy(cli_user(acptr)->account, "", ACCOUNTLEN);
+
+    hidden = HasHiddenHost(acptr);
+    if (hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+      unhide_hostmask(acptr);
+
+    ClearAccount(acptr);
+
+    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C U", acptr);
+    return 0;
+  } else if (type == 'M') { /* account renaming */
+
+    if (!(acptr = findNUser(parv[1])))
+      return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+
+    if (!IsAccount(acptr)) {
+      parv[2] = "R";
+    } else {
+      if (strlen(parv[3]) > ACCOUNTLEN) {
+	return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring. (rename)",
+                                  parv[3], ACCOUNTLEN, cli_name(acptr));
+      }
+
+      ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
+
+      hidden = HasHiddenHost(acptr);
+      if (hidden && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+        hide_hostmask(acptr);
+
+      sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C M %s", acptr, parv[3]);
+      return 0;
+    }
+  }
+
+  /* Ended here just in case an account rename was remapped to a R */
+
+  if (type == 'R') { /* account login */
     if (!(acptr = findNUser(parv[1])))
       return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
 
@@ -241,7 +295,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     if (type == 'C')
       /* auth checks are for services, not servers */
       return protocol_violation(cptr, "ACCOUNT check (%s %s %s)", parv[3], parv[4], parv[5]);
-    else if (type != 'A' && type != 'D')
+    else if (type != 'A' && type != 'D' && type != 'U' && type != 'M')
       return protocol_violation(cptr, "ACCOUNT sub-type '%s' not implemented", parv[2]);
     
     if (!(acptr = decode_auth_id(parv[3])))

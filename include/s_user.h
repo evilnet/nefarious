@@ -79,6 +79,7 @@ extern int add_silence(struct Client* sptr, const char* mask);
 
 extern void make_hidden_hostmask(char *buffer, struct Client *cptr);
 extern int hide_hostmask(struct Client *cptr);
+extern int unhide_hostmask(struct Client *cptr);
 extern int set_hostmask(struct Client *cptr, char *hostmask, char *password);
 extern int set_user_mode(struct Client *cptr, struct Client *sptr,
                          int parc, char *parv[]);
