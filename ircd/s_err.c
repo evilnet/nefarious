@@ -1100,10 +1100,11 @@ static Numeric replyTable[] = {
 /* 531 */
   { ERR_HOSTUNAVAIL, "%s :sethost not found", "531" },
 /* 532 */
-  { RPL_RULESSTART, ":- %s Network Rules - ", "532" },
+  { 0 },
 /* 533 */
+  { 0 },
 /* 534 */
-  { RPL_ENDOFRULES, ":End of /RULES list.", "534" },
+  { 0 },
 /* 535 */
   { RPL_OMOTDSTART, ":%s IRC Operator MOTD", "535" },
 /* 536 */

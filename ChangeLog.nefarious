@@ -3,6 +3,10 @@
 
 2005-02-21  Reed Loden  <reed@reedloden.com>
 
+	* ircd/s_err.c: Oops, forgot to remove the old entries.
+
+2005-02-21  Reed Loden  <reed@reedloden.com>
+
 	* ChangeLog.nefarious: Redid Rubin's ChangeLog entry.
 
 	* config.h.in: Ran autoheader.
