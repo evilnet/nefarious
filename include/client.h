@@ -150,6 +150,7 @@ enum Flag {
                                        not authed or opered */
     FLAG_REMOTEOPER,                /* Remote operator */
     FLAG_BOT,                       /* Bot */
+    FLAG_SSL,                       /* SSL user */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -437,7 +438,9 @@ struct Client {
 #define IsSetHost(x)		HasFlag(x, FLAG_SETHOST)
 #define HasSetHost(x)		(IsSetHost(x))
 #define IsAccountOnly(x)	HasFlag(x, FLAG_ACCOUNTONLY)
+#define IsRemoteOper(x)		HasFlag(x, FLAG_REMOTEOPER)
 #define IsBot(x)		HasFlag(x, FLAG_BOT)
+#define IsSSL(x)		HasFlag(x, FLAG_SSL)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -462,7 +465,9 @@ struct Client {
 #define SetHiddenHost(x)	SetFlag(x, FLAG_HIDDENHOST)
 #define SetSetHost(x)		SetFlag(x, FLAG_SETHOST)
 #define SetAccountOnly(x)	SetFlag(x, FLAG_ACCOUNTONLY)
+#define SetRemoteOper(x)	SetFlag(x, FLAG_REMOTEOPER)
 #define SetBot(x)		SetFlag(x, FLAG_BOT)
+#define SetSSL(x)		SetFlag(x, FLAG_SSL)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)
@@ -480,7 +485,9 @@ struct Client {
 #define ClearHiddenHost(x)	ClrFlag(x, FLAG_HIDDENHOST)
 #define ClearSetHost(x)		ClrFlag(x, FLAG_SETHOST)
 #define ClearAccountOnly(x)	ClrFlag(x, FLAG_ACCOUNTONLY)
+#define ClearRemoteOper(x)	ClrFlag(x, FLAG_REMOTEOPER)
 #define ClearBot(x)		ClrFlag(x, FLAG_BOT)
+#define ClearSSL(x)		ClrFlag(x, FLAG_SSL)
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/* socket needs to be freed */

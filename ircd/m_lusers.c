@@ -122,6 +122,9 @@ int m_lusers(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   send_reply(sptr, RPL_LUSERME, UserStats.local_clients,
 	     UserStats.local_servers);
 
+  send_reply(sptr, RPL_CURRENT_LOCAL, UserStats.local_clients, UserStats.localclients);
+  send_reply(sptr, RPL_CURRENT_GLOBAL,  UserStats.clients, UserStats.globalclients);
+
   sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Highest connection count: "
 		"%d (%d clients)", sptr, max_connection_count,
 		max_client_count);
@@ -154,6 +157,9 @@ int ms_lusers(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_reply(sptr, RPL_LUSERCHANNELS, UserStats.channels);
   send_reply(sptr, RPL_LUSERME, UserStats.local_clients,
 	     UserStats.local_servers);
+
+  send_reply(sptr, RPL_CURRENT_LOCAL, UserStats.local_clients, UserStats.localclients);  
+  send_reply(sptr, RPL_CURRENT_GLOBAL, UserStats.clients, UserStats.globalclients);
 
   sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Highest connection count: "
 		"%d (%d clients)", sptr, max_connection_count,

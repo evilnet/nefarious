@@ -180,6 +180,20 @@ struct prefix
     unsigned char bits;
 };
 
+struct csline {
+  struct csline *next;
+  char *mask;
+  char *server;
+  char *port;
+};
+
+struct svcline {
+  struct svcline *next;
+  char *cmd;
+  char *target;
+  char *prepend;
+};
+
 /*
  * GLOBALS
  */
@@ -191,6 +205,8 @@ extern struct MotdItem* rmotd;
 extern struct TRecord*  tdata;
 extern struct qline*	GlobalQuarantineList;
 extern struct sline*	GlobalSList;
+extern struct csline*	GlobalConnStopList;
+extern struct svcline*	GlobalServicesList;
 
 /*
  * Proto types
@@ -227,5 +243,10 @@ extern void conf_add_sline(const char* const* fields, int count);
 extern int conf_check_slines(struct Client *cptr);
 extern void clear_slines(void);
 extern int str2prefix(char *s, struct prefix *p);
+extern char* find_csline(struct Client* sptr, const char* mask);
+extern void conf_add_csline(const char* const* fields, int count);
+extern void clear_cslines(void);
+extern void conf_add_svcline(const char * const* fields, int count); 
+extern void clear_svclines(void);
 
 #endif /* INCLUDED_s_conf_h */

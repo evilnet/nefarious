@@ -49,7 +49,9 @@
 #include "s_serv.h"
 #include "s_user.h"
 #include "send.h"
+#ifdef USE_SSL
 #include "ssl.h"
+#endif /* USE_SSL */
 #include "struct.h"
 #include "userload.h"
 
@@ -289,6 +291,15 @@ stats_commands(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_cslines(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct csline *csline;
+
+  for (csline = GlobalConnStopList; csline; csline = csline->next)
+    send_reply(to, RPL_STATSqLINE, csline->mask, csline->server, csline->port);
+}
+
+static void
 stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   struct qline *qline;
@@ -462,7 +473,10 @@ struct StatDesc statsinfo[] = {
   { 'p', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_p,
     show_ports, 0,
     "Listening ports." },
-  { 'q', (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_q,
+  { 'q', (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_q,
+    stats_cslines, 0,
+    "Connection Redirection lines." },
+  { 'Q', (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_Q,
     stats_quarantine, 0,
     "Quarantined channels list." },
 #ifdef DEBUGMODE

@@ -36,7 +36,7 @@ static Numeric replyTable[] = {
 /* 003 */
   { RPL_CREATED, ":This server was created %s", "003" },
 /* 004 */
-  { RPL_MYINFO, "%s %s dhioswkgxBR bciklmnopstuvrC bklov", "004" },
+  { RPL_MYINFO, "%s %s dhioswkgxBR bciklmnopstvrCMQS bklov", "004" },
 /* 005 */
   { RPL_ISUPPORT, "%s :are supported by this server", "005" },
 /* 006 */
@@ -48,13 +48,13 @@ static Numeric replyTable[] = {
 /* 009 */
   { RPL_STATMEMTOT, "%u %u :Bytes Blocks", "009" },
 /* 010 */
-#ifdef MEMSIZESTATS
-  { RPL_STATMEM, "%u %u %s %u", "010" },
-#else
-  { RPL_STATMEM, "%u %u %s", "010" },
-#endif
+  { RPL_REDIR, "%s %s :Please use this Server/Port instead", "010" },
 /* 011 */
-  { 0 },
+#ifdef MEMSIZESTATS
+  { RPL_STATMEM, "%u %u %s %u", "011" },
+#else
+  { RPL_STATMEM, "%u %u %s", "011" },
+#endif
 /* 012 */
   { 0 },
 /* 013 */
@@ -486,7 +486,7 @@ static Numeric replyTable[] = {
 /* 226 */
   { 0 },
 /* 227 */
-  { 0 },
+  { RPL_STATSqLINE, "q %s %s [%s]", "227" },
 /* 228 */
   { RPL_STATSQLINE, "Q %s :%s", "228" },
 /* 229 */
@@ -562,9 +562,9 @@ static Numeric replyTable[] = {
 /* 264 */
   { 0 },
 /* 265 */
-  { 0 },
+  { RPL_CURRENT_LOCAL, ":Current local users: %d Max: %d", "265" },
 /* 266 */
-  { 0 },
+  { RPL_CURRENT_GLOBAL, ":Current global users: %d Max: %d", "266" },
 /* 267 */
   { 0 },
 /* 268 */
@@ -702,11 +702,11 @@ static Numeric replyTable[] = {
 /* 334 */
   { RPL_LISTUSAGE, ":%s", "334" },
 /* 335 */
-  { RPL_WHOISACCOUNTONLY, "%s :Only accepts messages from registered users", "335" },
+  { RPL_WHOISACCOUNTONLY, "%s :Only accepts messages from registered users.", "335" },
 /* 336 */
-  { RPL_WHOISBOT, "%s :is a bot", "336" },
+  { RPL_WHOISBOT, "%s :is a Bot", "336" },
 /* 337 */
-  { 0 },
+  { RPL_WHOISSSL, "%s :is connected via SSL", "337" },
 /* 338 */
   { RPL_WHOISACTUALLY, "%s %s@%s %s :Actual user@host, Actual IP", "338" },
 /* 339 */
@@ -868,7 +868,7 @@ static Numeric replyTable[] = {
 /* 417 */
   { 0 },
 /* 418 */
-  { 0 },
+  { ERR_SACOM, ":%s Error: %s", "418" },
 /* 419 */
   { 0 },
 /* 420 */
@@ -924,7 +924,7 @@ static Numeric replyTable[] = {
 /* 445 */
   { 0 },
 /* 446 */
-  { 0 },
+  { ERR_NEEDACCCHAN, "%s :You need to login to services to message or notice this channel", "446" },
 /* 447 */
   { 0 },
 /* 448 */
@@ -970,9 +970,9 @@ static Numeric replyTable[] = {
 /* 468 */
   { ERR_INVALIDUSERNAME, 0, "468" },
 /* 469 */
-  { 0 },
+  { ERR_SSLONLYCHAN, "%s :Cannot join channel (+S)", "469" },
 /* 470 */
-  { 0 },
+  { ERR_OPERONLYCHAN, "%s :Cannot join channel (+O)", "470" },
 /* 471 */
   { ERR_CHANNELISFULL, "%s :Cannot join channel (+l)", "471" },
 /* 472 */
@@ -1004,7 +1004,7 @@ static Numeric replyTable[] = {
 /* 485 */
   { 0 },
 /* 486 */
-  { ERR_ACCOUNTONLY, "%s :You must be authed in order to message this user", "486" },
+  { ERR_ACCOUNTONLY, "%s :You need to login to services to %s %s", "486" },
 /* 487 */
   { 0 },
 /* 488 */

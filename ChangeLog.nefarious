@@ -1,3 +1,32 @@
+2003-07-15  Reed Loden  <reed@reedloden.com>
+
+	* Added and modified some more of SiRVulCaN's patches.
+	  - +M ACCOUNT Only Channel Mode
+	  - Local/Global LUSERS Counts
+	  - RPL_REDIR Connection Redirection (q:lines)
+	  - SAJOIN Command (services only)
+	  - SAPART Command (services only)
+
+	* Messed with the REMOTEOPER macros again.
+
+	* Added MODE_OPERONLY and MODE_SSLONLY.
+
+	* Modded SSL stuff to use #ifdef USE_SSL.
+
+	* Added some SSL macros and another reply in whois.
+
+	* Did some work on configure/aclocal/etc. stuff.
+
+	* Added B:lines from ircu-eden.
+
+	* Added FEAT_HIS_MAP_CRIPPLED and FEAT_HIS_LINKS_CRIPPLED
+	from ircu-eden.
+
+	* ircd/s_auth.c: Modify AUTH_TIMEOUT from 30 to 8.
+
+	* Sync with u2.10.11.05: Unwrap the connected counter in
+	ip_registry_check_local() before returning.
+
 2003-07-05  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_user.c: Fixed a problem of when an oper was +xh and

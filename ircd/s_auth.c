@@ -50,7 +50,9 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
+#ifdef USE_SSL
 #include "ssl.h"
+#endif /* USE_SSL */
 #include "struct.h"
 #include "sys.h"               /* TRUE bleah */
 
@@ -99,13 +101,18 @@ typedef enum {
   REPORT_INVAL_DNS
 } ReportType;
 
+#ifdef USE_SSL
 #define sendheader(c, r) \
    ssl_send(c, HeaderMessages[(r)].message, HeaderMessages[(r)].length)
+#else
+#define sendheader(c, r) \
+   send(cli_fd(c), HeaderMessages[(r)].message, HeaderMessages[(r)].length, 0)
+#endif /* USE_SSL */
 
 struct AuthRequest* AuthPollList = 0; /* GLOBAL - auth queries pending io */
 static struct AuthRequest* AuthIncompleteList = 0;
 
-enum { AUTH_TIMEOUT = 30 };
+enum { AUTH_TIMEOUT = 8 }; /* 60 -> 15 -> 8 */
 
 static void release_auth_client(struct Client* client);
 static void unlink_auth_request(struct AuthRequest* request,

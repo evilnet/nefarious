@@ -297,16 +297,15 @@ void relay_private_message(struct Client* sptr, const char* name, const char* te
       is_silenced(sptr, acptr))
     return;
 
-  /* ASUKA -- slug
-     +R check, if target is +R and we're not +r (or opered) then
-     deny the message
-  */
-
+  /*
+   * +R check, if target is +R and we're not +r (or opered) then
+   * deny the message.
+   */
   if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr)) {
-    send_reply(sptr, ERR_ACCOUNTONLY, cli_name(acptr));
+    send_reply(sptr, ERR_ACCOUNTONLY, cli_name(sptr), "PRIVMSG",
+	       cli_name(acptr));
     return;
   }
-
 
   /*
    * send away message if user away
@@ -336,13 +335,15 @@ void relay_private_notice(struct Client* sptr, const char* name, const char* tex
       is_silenced(sptr, acptr))
     return;
 
-  /* ASUKA -- slug
-     +R check, if target is +R and we're not +r (or opered) then
-     deny the message
-  */
-
-  if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr))
+  /*
+   * +R check, if target is +R and we're not +r (or opered) then
+   * deny the message.
+   */
+  if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr)) {
+    send_reply(sptr, ERR_ACCOUNTONLY, cli_name(sptr), "NOTICE",
+	       cli_name(acptr));
     return;
+  }
 
   /*
    * deliver the message

@@ -202,7 +202,7 @@ client_set_privs(struct Client* client)
   if (!IsAnOper(client)) { /* clear privilege mask */
     memset(&(cli_privs(client)), 0, sizeof(struct Privs));
     return;
-  } else if (!MyConnect(client) && !HasFlag(client, FLAG_REMOTEOPER)) {
+  } else if (!MyConnect(client) && !IsRemoteOper(client)) {
     memset(&(cli_privs(client)), 255, sizeof(struct Privs));
     PrivClr(&(cli_privs(client)), PRIV_SET);
     return;
@@ -246,7 +246,7 @@ client_set_privs(struct Client* client)
     privs.priv_mask[i] &= ~antiprivs.priv_mask[i];
 
   cli_privs(client) = privs;
-  if (HasFlag(client, FLAG_REMOTEOPER)) {
+  if (IsRemoteOper(client)) {
 	  char privbuf[512] = "";
 	  int i;
 	  /* Send privileges */
@@ -257,7 +257,7 @@ client_set_privs(struct Client* client)
 			}
 	    privbuf[strlen(privbuf)] = 0;
 	    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
-	    ClrFlag(client, FLAG_REMOTEOPER);
+	    ClearRemoteOper(client);
 	    client_set_privs(client); /* Call this function recursively so
 	    				that privileges are set for a remote user 
 					rather than like any oper */

@@ -218,9 +218,17 @@ struct Client;
 #define TOK_JOIN                "J"
 #define CMD_JOIN		MSG_JOIN, TOK_JOIN
 
+#define MSG_SAJOIN              "SAJOIN"	/* SJ */
+#define TOK_SAJOIN              "SJ"
+#define CMD_SAJOIN		MSG_SAJOIN, TOK_SAJOIN
+
 #define MSG_PART                "PART"          /* PART */
 #define TOK_PART                "L"
 #define CMD_PART		MSG_PART, TOK_PART
+
+#define MSG_SAPART              "SAPART"	/* SP */
+#define TOK_SAPART              "SP"
+#define CMD_SAPART		MSG_SAPART, TOK_SAPART
 
 #define MSG_LUSERS              "LUSERS"        /* LUSE */
 #define TOK_LUSERS              "LU"

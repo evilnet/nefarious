@@ -1,3 +1,4 @@
+#ifdef USE_SSL
 /*
  * IRC - Internet Relay Chat (SSL), ircd/ssl.c
  * Copyright (C) 2002 Alex Badea <vampire@go.ro>
@@ -341,3 +342,4 @@ void ssl_init(void)
        
 	Debug((DEBUG_DEBUG, "SSL: init ok"));
 }
+#endif /* USE_SSL */

@@ -422,6 +422,10 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ircd_strncpy(user->realhost, cli_sockhost(sptr), HOSTLEN);
     aconf = cli_confs(sptr)->value.aconf;
 
+    if ((0 == find_csline(sptr, cli_sockhost(sptr)))) {
+      return exit_client(cptr, sptr, &me, "No Authorization - use another server");
+    }
+
     clean_user_id(user->username,
         HasFlag(sptr, FLAG_GOTID) ? cli_username(sptr) : username,
         HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
@@ -545,6 +549,20 @@ int register_user(struct Client *cptr, struct Client *sptr,
   }
   SetUser(sptr);
 
+  /* incrememnt global count if needed */
+  if (UserStats.globalclients < UserStats.clients && IsUser(sptr)) {
+    if (UserStats.globalclients >= 0) {
+      ++UserStats.globalclients;
+    }
+  }
+
+  /* increment local count if needed */
+  if (UserStats.localclients < UserStats.local_clients && IsUser(sptr)) {
+    if (UserStats.localclients >= 0) {
+      ++UserStats.localclients;
+    }
+  }
+
   if (IsInvisible(sptr))
     ++UserStats.inv_clients;
   if (IsOper(sptr))
@@ -660,7 +678,8 @@ static const struct UserMode {
   { FLAG_HIDDENHOST,  'x' },
   { FLAG_SETHOST,     'h' },
   { FLAG_ACCOUNTONLY, 'R' },
-  { FLAG_BOT,         'B' }
+  { FLAG_BOT,         'B' },
+  { FLAG_SSL,         'S' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -1010,13 +1029,24 @@ int whisper(struct Client* source, const char* nick, const char* channel,
   }
   if (is_silenced(source, dest))
     return 0;
-          
+
   if (cli_user(dest)->away)
     send_reply(source, RPL_AWAY, cli_name(dest), cli_user(dest)->away);
-  if (is_notice)
-    sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);
-  else
-    sendcmdto_one(source, CMD_PRIVATE, dest, "%C :%s", dest, text);
+
+  if (is_notice) {
+    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source))
+      send_reply(source, ERR_ACCOUNTONLY, cli_name(source), "CNOTICE",
+		 cli_name(dest));
+    else
+      sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);
+  } else {
+    if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source))
+      send_reply(source, ERR_ACCOUNTONLY, cli_name(source), "CPRIVMSG",
+                 cli_name(dest));
+    else
+      sendcmdto_one(source, CMD_PRIVATE, dest, "%C :%s", dest, text);
+  }
+
   return 0;
 }
 
@@ -2053,4 +2083,79 @@ send_supported(struct Client *cptr)
   send_reply(cptr, RPL_ISUPPORT, featurebuf);
 
   return 0; /* convenience return, if it's ever needed */
+}
+
+/* handler for b:line commands -akl (adam@PGPN.com) */
+int
+lsc(struct Client *cptr, const char *target, const char *prepend,
+    const char *servicename, int parc, char* parv[])
+{
+  char *tmp;
+  char msg[255] = "";
+  struct Client *tptr;
+  char *kludge;
+  int x; 
+
+  if (feature_bool(FEAT_IDLE_FROM_MSG))
+    cli_user(cptr)->last, CurrentTime;
+  
+  kludge = parv[1];
+
+  if (strcmp(prepend, "*")) {
+    strncpy(msg, prepend, sizeof(msg) - 1);
+    strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
+  }
+
+  for (x = 1; x != parc; x++) {
+     strncat(msg, parv[x], sizeof(msg) - 1 - strlen(msg));
+     if (x != (parc - 1))
+       strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
+  }
+
+#if 0
+  if (strcmp(prepend, "*")) {
+    strncpy(msg, prepend, sizeof(msg) - 1);
+    strcat(msg, " ");
+    for (x = 1; x != parc; x++)
+     if (x != parc - 1)
+       strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
+     else
+       strncat(msg, parv[x], sizeof(msg) - 1 - strlen(msg));
+  } else {
+   strcpy(msg, parv[parc - 1]);
+  }
+#endif
+  
+  if (EmptyString(msg))
+   return send_reply(cptr, ERR_NOTEXTTOSEND);
+  
+#if 0
+   if ((tmp = strchr(target, '@')) && !FindServer(tmp + 1))
+	   return send_reply(cptr, ERR_SERVICEDOWN, cli_name(cptr),
+			     servicename, servicename);
+   else if (IsChannelPrefix(*target) && !FindChannel(target))
+	   return send_reply(cptr, ERR_SERVICEDOWN, cli_name(cptr),
+			     servicename, servicename);
+   else if (!FindUser(target))
+	   return send_reply(cptr, ERR_SERVICEDOWN, cli_name(cptr),
+			     servicename, servicename);
+#endif
+
+   /*
+    * B:X2:#supersecretchannel:*
+    * -- technically should be valid, so we allow it.
+    * (note: doesn't work, though included in code here for sanity)
+    * B:X2:X2@X2.AfterNET.Services:*
+    * -- this is how all the lines *SHOULD* be formed, but I'm
+    * sure many nets won't do it this way
+    * B:X2:X2:*
+    * -- equivelent of /msg X2
+    */
+
+   if (IsChannelPrefix(*target))
+     relay_channel_message(cptr, target, msg); 
+   else if ((tmp = strchr(target, '@')))
+     relay_directed_message(cptr, target, tmp, msg);
+   else
+     relay_private_message(cptr, target, msg);
 }

@@ -73,6 +73,8 @@ struct ConfItem* GlobalConfList  = 0;
 int              GlobalConfCount = 0;
 struct qline*    GlobalQuarantineList = 0;
 struct sline*    GlobalSList = 0;
+struct csline*   GlobalConnStopList = 0;
+struct svcline*  GlobalServicesList = 0;
 
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
@@ -680,7 +682,9 @@ void conf_add_listener(const char* const* fields, int count)
 {
   int is_server = 0;
   int is_hidden = 0;
+#ifdef USE_SSL
   int is_ssl = 0;
+#endif /* USE_SSL */
 
   /*
    * need a port
@@ -693,12 +697,20 @@ void conf_add_listener(const char* const* fields, int count)
     if ('S' == ToUpper(*x))
       is_server = 1, ++x;
     if ('H' == ToUpper(*x))
+#ifdef USE_SSL
       is_hidden = 1, ++x;
     if ('E' == ToUpper(*x))
       is_ssl = 1, ++x;
+#else
+      is_hidden = 1;
+#endif /* USE_SSL */
   }
   /*           port             vhost      mask  */
+#ifdef USE_SSL
   add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_ssl);
+#else
+  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden);
+#endif /* USE_SSL */
 }
 
 void conf_add_quarantine(const char* const* fields, int count)
@@ -734,6 +746,44 @@ void clear_quarantines(void)
     MyFree(qline->reason);
     MyFree(qline->chname);
     MyFree(qline);
+  }
+}
+
+char* find_csline(struct Client* sptr, const char* mask)
+{
+  struct csline *csline;
+
+  for (csline = GlobalConnStopList; csline; csline = csline->next) {
+    if (!match(csline->mask, mask)) {
+      send_reply(sptr, RPL_REDIR, csline->server, csline->port);
+      return 0;
+    }
+  }
+}
+
+void conf_add_csline(const char* const* fields, int count)
+{
+  struct csline *csline;
+  if (count < 3 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
+      EmptyString(fields[2]))
+    return;
+  csline = (struct csline *) MyMalloc(sizeof(struct csline));
+  DupString(csline->mask, fields[1]);
+  DupString(csline->server, fields[2]);
+  DupString(csline->port, fields[3]);
+  csline->next = GlobalConnStopList;
+  GlobalConnStopList = csline;
+}
+
+void clear_cslines(void)
+{
+  struct csline *csline;
+  while ((csline = GlobalConnStopList)) {
+    GlobalConnStopList = csline->next;
+    MyFree(csline->mask);
+    MyFree(csline->server);
+    MyFree(csline->port);
+    MyFree(csline);
   }
 }
 
@@ -1113,6 +1163,11 @@ int read_configuration_file(void)
       conf_add_admin(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
+    case 'B':		     /* 'services' lines (aka 'bot lines'). */
+    case 'b':		     /* I honestly couldn't think of a better letter. -akl */
+      conf_add_svcline(field_vector, field_count);
+      aconf->status = CONF_ILLEGAL;
+      break;
     case 'C':                /* Server where I should try to connect */
     case 'c':                /* in case of lp failures             */
       ++ccount;
@@ -1174,8 +1229,11 @@ int read_configuration_file(void)
       conf_add_listener(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'Q':                /* quarantine line */
-    case 'q':        /* CONF_QUARANTINE */
+    case 'q':        /* CONF_CONNSTOP */
+      conf_add_csline(field_vector, field_count);
+      aconf->status = CONF_ILLEGAL;
+      break;
+    case 'Q':        /* CONF_QUARANTINE */
       conf_add_quarantine(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
@@ -1366,6 +1424,8 @@ int rehash(struct Client *cptr, int sig)
 
   clear_quarantines();
   clear_slines();
+  clear_cslines();
+  clear_svclines();
 
   if (sig != 2)
     flush_resolver_cache();
@@ -1663,6 +1723,57 @@ int conf_check_server(struct Client *cptr)
 
   Debug((DEBUG_DNS, "sv_cl: access ok: %s[%s]", cli_name(cptr), cli_sockhost(cptr)));
   return 0;
+}
+
+void conf_add_svcline(const char* const* fields, int count)
+{
+  struct svcline *new_svc;
+
+  /* b:X2:X2@X2.AfterNET.Services:* */
+  /* b:AUTH:AuthServ@OperServ.AfterNET.Services:AUTH */
+
+  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]))
+    return;
+
+  new_svc = (struct svcline *)MyMalloc(sizeof(struct svcline));
+  
+  DupString(new_svc->cmd, fields[1]);
+  DupString(new_svc->target, fields[2]);
+  if (!EmptyString(fields[3]))
+    DupString(new_svc->prepend, fields[3]);
+
+  new_svc->next = GlobalServicesList;
+  GlobalServicesList = new_svc;
+
+}
+ 
+void clear_svclines(void)
+{
+  struct svcline *svc;
+  
+  while ((svc = GlobalServicesList)) {
+	  GlobalServicesList = svc->next;
+
+	  MyFree(svc->cmd);
+	  MyFree(svc->target);
+
+	  if (!EmptyString(svc->prepend))
+	    MyFree(svc->prepend);
+
+	  MyFree(svc);
+  }
+}
+
+struct svcline *find_svc(const char *cmd)
+{
+  struct svcline *confbot = NULL;
+  
+  for (confbot = GlobalServicesList; confbot; confbot = confbot->next) {
+    if (confbot->cmd && !match(confbot->cmd, cmd)) 
+      return confbot;
+  }
+
+  return NULL;
 }
 
 void conf_add_sline(const char* const* fields, int count)

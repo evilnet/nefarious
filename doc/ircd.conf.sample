@@ -370,6 +370,43 @@ O:kermit@muppet.coolisp.nl:VRKLKuGKn0jLs:Kermit::30
 o:*@piglatin.coolisp.nl:eUi5trgahhTyp:MsPiggy::30
 
 
+# [S:lines]
+#
+# S:<spoof host>:<password>:<*.host.cc|a.b.c.*|CIDR>:<ident>
+# <spoof host>  A hostname to be spoofed
+# <password>    A password for this spoof host. Used if SETHOST_USER is enabled.
+# <hostmask>    A hostmask for matching against users that are to be auto
+#               spoofed. Used if SETHOST_AUTO is enabled. Can be of form:
+#               host.domain.cc, 127.0.0.1 or 127.0.0.0/24, supports wildcards
+#               for non-CIDR.
+# <ident>       A mask for matching against the user's ident reply.
+#
+# Oper sethost for 'moo.fish.moo'
+#S:moo.fish.moo:::
+# User & Oper sethost for 'moo.fish.moo'
+#S:moo.fish.moo:elitepassword::
+# Oper sethost for 'moo.fish.moo' with auto on 'ident@*.example.com"
+#S:moo.fish.moo::*.example.com:ident
+# Oper sethost for 'moo.fish.moo' with auto on 'user*@*.example.com"
+#S:moo.fish.moo::*.example.com:user*
+
+
+# [B:lines]
+# These are lines intended to improve the generic irc users ability to
+# use network services. Each line sets up a /<service> alias so that
+# users may type that instead of a full /msg command.
+#
+# for example.. adding:
+## B:X2:X2@X2.AfterNET.Services:*
+# would result in commands like this being possible
+## /X2 HELP
+#
+# B:<name of command/service>:<target>:<anything to prepend to message>
+#
+# B:X2:X2@X2.AfterNET.Services:*
+# B:AUTH:AuthServ@OperServ.AfterNET.Services:"AUTH"
+
+
 # [P:lines]
 # Defines listening ports and the type(s) of connections they will accept.
 # P:<IP-mask>:<address>:<status>:<port>
@@ -398,6 +435,22 @@ P:192.168.10.12:SH:4400
 
 # A restricted port for staff only
 P:192.168.10.*:192.168.10.11:C:7000
+
+
+# [q:lines]
+#
+# These are redirection lines, when a client connects and his/her host
+# matches a q:line then a 010 reply is sent with the redir server and
+# port. Currently only epic supports a autoredirection when it gets a
+# 010 reply (ie it will automatically connect to the server said in the
+# 010 reply. Other clients will get a message saying what server and
+# port to connect to. Aswell as a unauthorised connection quit.
+#
+# q:<mask>:<redirection server>:<redirection port>
+#
+# q:*.aol.com:irc.aol.com:6667
+# q:*.us:us.undernet.org:6667
+# q:*.nz:nz.undernet.org:6667
 
 
 # [Q:lines]
@@ -544,6 +597,7 @@ Q:\#coder-com:"What the hell do you think you are doing?!"
 #F:HIS_STATS_o:TRUE
 #F:HIS_STATS_p:TRUE
 #F:HIS_STATS_q:TRUE
+#F:HIS_STATS_Q:TRUE
 #F:HIS_STATS_r:TRUE
 #F:HIS_STATS_d:TRUE
 #F:HIS_STATS_e:TRUE

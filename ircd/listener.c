@@ -313,8 +313,13 @@ static int connection_allowed(const char* addr, const char* mask)
  * vhost_ip - if non-null must contain a valid IP address string in
  * the format "255.255.255.255"
  */
+#ifdef USE_SSL
 void add_listener(int port, const char* vhost_ip, const char* mask,
                   int is_server, int is_hidden, int is_ssl)
+#else
+void add_listener(int port, const char* vhost_ip, const char* mask,
+                  int is_server, int is_hidden)
+#endif /* USE_SSL */
 {
   struct Listener* listener;
   struct in_addr   vaddr;
@@ -342,7 +347,9 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
     set_listener_mask(listener, mask);
     listener->hidden = is_hidden;
     listener->server = is_server;
+#ifdef USE_SSL
     listener->ssl = is_ssl;
+#endif /* USE_SSL */
     return;
   }
 
@@ -353,7 +360,9 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
     set_listener_mask(listener, mask);
     listener->hidden = is_hidden;
     listener->server = is_server;
+#ifdef USE_SSL
     listener->ssl = is_ssl;
+#endif /* USE_SSL */
     listener->next   = ListenerPollList;
     ListenerPollList = listener; 
   }
@@ -517,10 +526,14 @@ static void accept_connection(struct Event* ev)
       ++ServerStats->is_ac;
       /* nextping = CurrentTime; */
 
+#ifdef USE_SSL
       if (listener->ssl)
 	ssl_add_connection(listener, fd);
       else
 	add_connection(listener, fd, NULL);
+#else
+      add_connection(listener, fd);
+#endif /* USE_SSL */
 
     }
   }

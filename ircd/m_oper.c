@@ -274,7 +274,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
 			     return 0;
 		     }
-		     SetFlag(sptr, FLAG_REMOTEOPER);
+		     SetRemoteOper(sptr);
 		     /* Tell client_set_privs to send privileges
 			to the user */
 		     client_set_privs(sptr);

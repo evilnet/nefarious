@@ -51,7 +51,9 @@
 #include "s_misc.h"
 #include "s_stats.h"
 #include "send.h"
+#ifdef USE_SSL
 #include "ssl.h"
+#endif /* USE_SSL */
 #include "sys.h"
 #include "uping.h"
 #include "userload.h"
@@ -665,7 +667,9 @@ int main(int argc, char **argv) {
 
   uping_init();
 
+#ifdef USE_SSL
   ssl_init();
+#endif /* USE_SSL */
 
   stats_init();
 

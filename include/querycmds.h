@@ -25,6 +25,8 @@ struct UserStatistics {
   /* Global counts: */
   unsigned int servers;         /* IsServer() || IsMe() */
   unsigned int clients;         /* IsUser() */
+  unsigned int localclients;
+  unsigned int globalclients;
 
   /* Global user mode changes: */
   unsigned int inv_clients;     /* IsUser() && IsInvisible() */

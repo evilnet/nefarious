@@ -648,6 +648,16 @@ int member_can_send_to_channel(struct Membership* member)
    */
   if (member->channel->mode.mode & MODE_MODERATED)
     return 0;
+
+ /*
+  * If it's ACCONLY, and you aren't logged in, you can't speak.
+  */
+  if (member->channel->mode.mode & MODE_ACCONLY)
+    if (!IsAccount(member->user)) {
+	send_reply(member->user, ERR_NEEDACCCHAN, member->channel);
+	return 0;
+    }
+
   /*
    * If you're banned then you can't speak either.
    * but because of the amount of CPU time that is_banned chews
@@ -674,7 +684,8 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
   /* You can't speak if your off channel and +n (no external messages) or +m (moderated). */
   if (!member) {
     if ((chptr->mode.mode & (MODE_NOPRIVMSGS|MODE_MODERATED)) ||
-	((chptr->mode.mode & MODE_REGONLY) && !IsAccount(cptr)))
+	((chptr->mode.mode & MODE_REGONLY) && !IsAccount(cptr)) ||
+	((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(cptr)))
       return 0;
     else
       return !is_banned(cptr, chptr, NULL);
@@ -731,8 +742,14 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'c';
   if (chptr->mode.mode & MODE_NOCTCP)
     *mbuf++ = 'C';
+  if (chptr->mode.mode & MODE_ACCONLY)
+    *mbuf++ = 'M';
+  if (chptr->mode.mode & MODE_OPERONLY)
+    *mbuf++ = 'O';
   if (chptr->mode.mode & MODE_NOQUITPARTS)
-    *mbuf++ = 'u'; 
+    *mbuf++ = 'Q';
+  if (chptr->mode.mode & MODE_SSLONLY)
+    *mbuf++ = 'S';
   if (chptr->mode.limit) {
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
@@ -1050,13 +1067,19 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
 
   if (chptr->mode.mode & MODE_INVITEONLY)
   	return overrideJoin + ERR_INVITEONLYCHAN;
-  	
+
   if (chptr->mode.limit && chptr->users >= chptr->mode.limit)
   	return overrideJoin + ERR_CHANNELISFULL;
 
   if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr))
   	return overrideJoin + ERR_NEEDREGGEDNICK;
-  	
+
+  if ((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(sptr))
+  	return overrideJoin + ERR_OPERONLYCHAN; 
+
+  if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
+	return overrideJoin + ERR_SSLONLYCHAN;
+
   if (is_banned(sptr, chptr, NULL))
   	return overrideJoin + ERR_BANNEDFROMCHAN;
   
@@ -1385,7 +1408,10 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_LIMIT,		'l', */
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
-    MODE_NOQUITPARTS,	'u',
+    MODE_ACCONLY,	'M',
+    MODE_OPERONLY,	'O',
+    MODE_NOQUITPARTS,	'Q',
+    MODE_SSLONLY,	'S',
     0x0, 0x0
   };
   int i;
@@ -1744,7 +1770,8 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
 
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
-	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_NOQUITPARTS);
+	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_OPERONLY |
+	   MODE_NOQUITPARTS | MODE_SSLONLY);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1850,7 +1877,10 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
-    MODE_NOQUITPARTS,	'u',
+    MODE_ACCONLY,	'M',
+    MODE_OPERONLY,	'O',
+    MODE_NOQUITPARTS,	'Q',
+    MODE_SSLONLY,	'S',
     0x0, 0x0
   };
   unsigned int add;
@@ -2519,7 +2549,10 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
-    MODE_NOQUITPARTS,	'u',
+    MODE_ACCONLY,	'M',
+    MODE_OPERONLY,	'O',
+    MODE_NOQUITPARTS,	'Q',
+    MODE_SSLONLY,	'S',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0
@@ -2598,6 +2631,38 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       case 'v':
 	mode_parse_client(&state, flag_p);
 	break;
+
+      case 'O':
+	/* If they're not an chan op and oper, they can't
+	 * +/- MODE_OPERONLY
+	 */
+	if (state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) {
+	  send_notoper(&state);
+	  break;
+	}
+	if (!IsOper(sptr)) {
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	  break;
+	} else {
+	  mode_parse_mode(&state, flag_p);
+	  break;
+	}
+
+      case 'S':
+        /* If they're not an chan op and SSL user, they can't
+	 * +/- MODE_SSLONLY.
+	 */
+        if (state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) {
+          send_notoper(&state);
+          break;
+        }
+        if (!IsSSL(sptr)) {
+          send_reply(sptr, ERR_NOPRIVILEGES);
+          break;
+        } else {
+          mode_parse_mode(&state, flag_p);
+          break;
+        }
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);

@@ -57,8 +57,8 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_MAPEND	       7	unreal */
 #define RPL_SNOMASK            8        /* Undernet extension */
 #define RPL_STATMEMTOT         9        /* Undernet extension */
-#define RPL_STATMEM           10        /* Undernet extension */
-					/* Hybrid: server redirect */
+#define RPL_REDIR	      10	/* Hybrid: server redirect */
+#define RPL_STATMEM           11        /* Undernet extension (pushed to 11 from 10)*/
 /*      RPL_YOURCOOKIE        14           IRCnet extension */
 #define RPL_MAP               15        /* Undernet extension */
 #define RPL_MAPMORE           16        /* Undernet extension */
@@ -111,6 +111,7 @@ extern const struct Numeric* get_error_numeric(int err);
 	RPL_STATSNLINE	     226	   unreal
 	RPL_STATSGLINE	     227	   Dalnet 
 	RPL_STATSVLINE	     227	   unreal */
+#define RPL_STATSqLINE       227
 #define RPL_STATSQLINE       228        /* Undernet extension */
 
 #define RPL_SERVICEINFO      231	/* unused */
@@ -159,8 +160,8 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      RPL_LOAD_THROTTLED   263           efnet/hybrid */
 /*	RPL_TRYAGAIN	     263	   Numerics List: IRCnet */
 /*	RPL_LOAD2HI	     263	   Dalnet */
-/*      RPL_CURRENT_LOCAL    265           aircd/efnet/hybrid/dalnet*/
-/*      RPL_CURRENT_GLOBAL   266           aircd/efnet/hybrid/dalnet */
+#define RPL_CURRENT_LOCAL    265	/* aircd/efnet/hybrid/dalnet */
+#define RPL_CURRENT_GLOBAL   266	/* aircd/efnet/hybrid/dalnet */
 /*      RPL_START_NETSTAT    267           aircd */
 /*      RPL_NETSTAT          268           aircd */
 /*      RPL_END_NETSTAT      269           aircd */
@@ -250,6 +251,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_LISTSYNTAX	     334	   unreal */
 #define RPL_WHOISACCOUNTONLY 335	/* evilnet extension */
 #define RPL_WHOISBOT         336	/* evilnet extension */
+#define RPL_WHOISSSL         337	/* evilnet extension */
 /*      RPL_CHANPASSOK       338           IRCnet extension (?)*/
 #define	RPL_WHOISACTUALLY    338	/* Undernet extension, dalnet */
 /*      RPL_BADCHANPASS      339           IRCnet extension (?)*/
@@ -336,6 +338,7 @@ extern const struct Numeric* get_error_numeric(int err);
      /* ERR_BADMASK          415           IRCnet extension */
 #define ERR_QUERYTOOLONG     416        /* Undernet extension */
      /* ERR_TOOMANYMATCHES   416           IRCnet extension */
+#define ERR_SACOM            418
 /*      ERR_LENGTHTRUNCATED  419           aircd */
 
 #define ERR_UNKNOWNCOMMAND   421
@@ -363,6 +366,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_USERONCHANNEL    443
 /*      ERR_NOLOGIN          444           removed from RFC1459 */
 /*      ERR_SUMMONDISABLED   445           removed from RFC1459 */
+#define ERR_NEEDACCCHAN      446	/* evilnet extension */
 /*      ERR_USERSDISABLED    446           removed from RFC1459 */
 /*	ERR_NONICKCHANGE     447	 unreal */
 
@@ -384,9 +388,11 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_KEYSET           467        /* Undernet extension */
 #define ERR_INVALIDUSERNAME  468        /* Undernet extension */
 /* 	ERR_ONLYSERVERSCANCHANGE 468	   Dalnet,unreal */
+#define ERR_SSLONLYCHAN      469
 /*	ERR_LINKSET	     469	unreal */
 /*	ERR_LINKCHANNEL	     470	unreal */
 /*      ERR_KICKEDFROMCHAN   470         aircd */
+#define ERR_OPERONLYCHAN     470	/* evilnet extension */
 #define ERR_CHANNELISFULL    471
 #define ERR_UNKNOWNMODE      472
 #define ERR_INVITEONLYCHAN   473

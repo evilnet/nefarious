@@ -121,6 +121,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_join, ms_join, m_join, m_ignore }
   },
   {
+    MSG_SAJOIN,
+    TOK_SAJOIN,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_ignore, ms_sajoin, m_ignore, m_ignore }
+  },
+  {
     MSG_MODE,
     TOK_MODE,
     0, MAXPARA, MFLG_SLOW, 0,
@@ -161,6 +168,13 @@ struct Message msgtab[] = {
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_part, ms_part, m_part, m_ignore }
+  },
+  {
+    MSG_SAPART,
+    TOK_SAPART,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_ignore, ms_sapart, m_ignore, m_ignore }
   },
   {
     MSG_TOPIC,
@@ -823,6 +837,7 @@ static struct Message *msg_tree_parse_client(char *cmd,
   unsigned char q = (0xdf & (unsigned char)*cmd) - 'A';
   if (q > 25 || !(mtree = root->pointers[q]))
     return NULL;
+
   for (;;)
   {
     q = 0xdf & (unsigned char)*++cmd;
@@ -848,6 +863,7 @@ int parse_client(struct Client *cptr, char *buffer, char *bufend)
   int             noprefix = 0;
   struct Message* mptr;
   MessageHandler  handler = 0;
+  struct svcline* svc = NULL;
 
   Debug((DEBUG_DEBUG, "Client Parsing: %s", buffer));
 
@@ -877,10 +893,17 @@ int parse_client(struct Client *cptr, char *buffer, char *bufend)
     *s++ = '\0';
 
   /*
+   * If there is a service, we simply force msg_ree_parse_client() to
+   * find the command for PRIVMSG. all of the /<SERVICE> commands use
+   * PRIVMSG, soo.... --akl
+   */
+  if ((svc = (struct svcline *)find_svc(ch))) {
+       mptr = msg_tree_parse_client(MSG_PRIVATE, &msg_tree_cmd);
+  /*
    * This is a client/unregistered entity.
    * Check long command list only.
    */
-  if (!(mptr = msg_tree_parse_client(ch, &msg_tree_cmd)))
+  } else if (!(mptr = msg_tree_parse_client(ch, &msg_tree_cmd)))
   {
     /*
      * Note: Give error message *only* to recognized
@@ -967,6 +990,9 @@ int parse_client(struct Client *cptr, char *buffer, char *bufend)
   if (!feature_bool(FEAT_IDLE_FROM_MSG) && IsUser(cptr) &&
       handler != m_ping && handler != m_ignore)
     cli_user(from)->last = CurrentTime;
+
+  if (svc != NULL)
+    return lsc(cptr, svc->target, svc->prepend, svc->cmd, i, para);
 
   return (*handler) (cptr, from, i, para);
 }

@@ -890,8 +890,14 @@ As per UnderNet CFV-165, this removes /STATS p from users.
 HIS_STATS_q
  * Type: boolean
  * Default: TRUE
- 
+
 As per UnderNet CFV-165, this removes /STATS q from users.
+
+HIS_STATS_Q
+ * Type: boolean
+ * Default: TRUE
+ 
+As per UnderNet CFV-165, this removes /STATS Q from users.
 
 HIS_STATS_r
  * Type: boolean

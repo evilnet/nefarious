@@ -88,10 +88,13 @@ struct Client;
 #define MODE_NOCOLOUR		0x1000 /* no color allowed in chan */
 #define MODE_NOCTCP		0x2000 /* no ctcp allowed towards chan */
 #define MODE_NOQUITPARTS	0x4000 /* no quit/parts in chan */
-#define MODE_LISTED		0x10000
-#define MODE_SAVE		0x20000	/* save this mode-with-arg 'til later */
-#define MODE_FREE		0x40000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED		0x80000	/* channel was created by a BURST */
+#define MODE_SSLONLY		0x8000 /* only SSL users may join */
+#define MODE_ACCONLY		0x10000 /* only +r users may speak */
+#define MODE_OPERONLY		0x20000 /* only opers may join */
+#define MODE_LISTED		0x40000
+#define MODE_SAVE		0x80000	/* save this mode-with-arg 'til later */
+#define MODE_FREE		0x100000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x200000 /* channel was created by a BURST */
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */

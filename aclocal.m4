@@ -1,14 +1,15 @@
-dnl aclocal.m4 generated automatically by aclocal 1.4
+# generated automatically by aclocal 1.7.5 -*- Autoconf -*-
 
-dnl Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
-dnl This file is free software; the Free Software Foundation
-dnl gives unlimited permission to copy and/or distribute it,
-dnl with or without modifications, as long as this notice is preserved.
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
+# Free Software Foundation, Inc.
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
 
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY, to the extent permitted by law; without
-dnl even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-dnl PARTICULAR PURPOSE.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
 
 dnl
 dnl Macro: unet_PIPE_CFLAGS
@@ -227,7 +228,24 @@ AC_DEFUN(AC_LIBRARY_NET, [
   ])
 
 
-# serial 1
+# Copyright 1996, 1997, 1999, 2000, 2001, 2002  Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+# serial 2
 
 # @defmac AC_PROG_CC_STDC
 # @maindex PROG_CC_STDC
@@ -244,7 +262,7 @@ AC_DEFUN(AC_LIBRARY_NET, [
 # program @code{ansi2knr}, which comes with Ghostscript.
 # @end defmac
 
-AC_DEFUN(AM_PROG_CC_STDC,
+AC_DEFUN([AM_PROG_CC_STDC],
 [AC_REQUIRE([AC_PROG_CC])
 AC_BEFORE([$0], [AC_C_INLINE])
 AC_BEFORE([$0], [AC_C_CONST])
@@ -254,7 +272,7 @@ dnl like #elif.
 dnl FIXME: can't do this because then AC_AIX won't work due to a
 dnl circular dependency.
 dnl AC_BEFORE([$0], [AC_PROG_CPP])
-AC_MSG_CHECKING(for ${CC-cc} option to accept ANSI C)
+AC_MSG_CHECKING([for ${CC-cc} option to accept ANSI C])
 AC_CACHE_VAL(am_cv_prog_cc_stdc,
 [am_cv_prog_cc_stdc=no
 ac_save_CC="$CC"
@@ -262,9 +280,10 @@ ac_save_CC="$CC"
 # breaks some systems' header files.
 # AIX			-qlanglvl=ansi
 # Ultrix and OSF/1	-std1
-# HP-UX			-Aa -D_HPUX_SOURCE
+# HP-UX 10.20 and later	-Ae
+# HP-UX older versions	-Aa -D_HPUX_SOURCE
 # SVR4			-Xc -D__EXTENSIONS__
-for ac_arg in "" -qlanglvl=ansi -std1 "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
 do
   CC="$ac_save_CC $ac_arg"
   AC_TRY_COMPILE(
@@ -306,11 +325,13 @@ CC="$ac_save_CC"
 if test -z "$am_cv_prog_cc_stdc"; then
   AC_MSG_RESULT([none needed])
 else
-  AC_MSG_RESULT($am_cv_prog_cc_stdc)
+  AC_MSG_RESULT([$am_cv_prog_cc_stdc])
 fi
 case "x$am_cv_prog_cc_stdc" in
   x|xno) ;;
   *) CC="$CC $am_cv_prog_cc_stdc" ;;
 esac
 ])
+
+AU_DEFUN([fp_PROG_CC_STDC], [AM_PROG_CC_STDC])
 

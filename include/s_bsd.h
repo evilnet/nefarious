@@ -84,7 +84,11 @@ extern int connect_server(struct ConfItem* aconf, struct Client* by,
 extern void release_dns_reply(struct Client* cptr);
 extern int  net_close_unregistered_connections(struct Client* source);
 extern void close_connection(struct Client *cptr);
+#ifdef USE_SSL
 extern void add_connection(struct Listener* listener, int fd, void *ssl);
+#else
+extern void add_connection(struct Listener* listener, int fd);
+#endif /* USE_SSL */
 extern int  read_message(time_t delay);
 extern void init_server_identity(void);
 extern void close_connections(int close_stderr);
