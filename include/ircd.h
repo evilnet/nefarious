@@ -5,8 +5,8 @@
  */
 #ifndef INCLUDED_ircd_h
 #define INCLUDED_ircd_h
-#ifndef INCLUDED_struct_h
-#include "struct.h"           /* struct Client */
+#ifndef INCLUDED_ircd_struct_h
+#include "ircd_struct.h"           /* struct Client */
 #endif
 #ifndef INCLUDED_sys_types_h
 #include <sys/types.h>        /* size_t, time_t */

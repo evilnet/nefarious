@@ -11,8 +11,6 @@
  */
 #define NETMASK(bits) htonl((bits) ? -(1 << (32 - (bits))) : 0)
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 /*
  * Prototypes
  */

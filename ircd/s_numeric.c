@@ -31,7 +31,7 @@
 #include "ircd_snprintf.h"
 #include "numnicks.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 
 /*

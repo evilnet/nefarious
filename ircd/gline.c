@@ -38,7 +38,7 @@
 #include "s_misc.h"
 #include "s_stats.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 #include "support.h"
 #include "msg.h"
 #include "numnicks.h"

@@ -1,3 +1,79 @@
+2004-07-07  Neil Spierling  <vulcan@linux-boxen.org>
+
+	* include/ircd.h: Include ircd_struct.h instead of struct.h.
+
+	* include/ircd_struct.h: Old struct.h.
+
+	* include/struct.h: Renamed to ircd_struct.h.
+
+	* include/support.h: Removed MIN define.
+
+	* ircd/ircd_features.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/ircd_log.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/ircd_snprintf.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/jupe.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/list.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_burst.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_invite.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_links.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_quit.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_sethost.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_settime.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_silence.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_stats.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_userhost.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/m_userip.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/Makefile.in: Rename struct.h's to ircd_struct.h.
+
+	* ircd/numnicks.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/opercmds.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/parse.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/res.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_auth.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_bsd.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_conf.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_debug.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_misc.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_numeric.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_serv.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_stats.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/s_user.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/send.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/userload.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/whocmds.c: Include ircd_struct.h instead of struct.h.
+
+	* ircd/whowas.c: Include ircd_struct.h instead of struct.h.
+
 2004-07-05  Neil Spierling  <vulcan@linux-boxen.org>
 
         * ircd/channel.c: Removed some unnessecary checks

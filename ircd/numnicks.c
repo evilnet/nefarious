@@ -29,7 +29,7 @@
 #include "s_bsd.h"
 #include "s_debug.h"
 #include "s_misc.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <assert.h>
 #include <stdio.h>

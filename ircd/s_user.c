@@ -56,7 +56,7 @@
 #include "s_misc.h"
 #include "s_serv.h" /* max_client_count */
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 #include "support.h"
 #include "supported.h"
 #include "sys.h"

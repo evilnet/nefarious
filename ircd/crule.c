@@ -46,7 +46,7 @@
 #include "match.h"
 #include "s_bsd.h"
 #include "s_debug.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <stdio.h>
 #include <stdlib.h>

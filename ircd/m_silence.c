@@ -93,7 +93,7 @@
 #include "numnicks.h"
 #include "s_user.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <assert.h>
 #include <stdlib.h>

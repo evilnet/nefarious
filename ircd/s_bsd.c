@@ -50,7 +50,7 @@
 #include "s_misc.h"
 #include "s_user.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 #include "support.h"
 #include "sys.h"
 #include "uping.h"

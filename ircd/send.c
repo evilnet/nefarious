@@ -38,7 +38,7 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "s_user.h"
-#include "struct.h"
+#include "ircd_struct.h"
 #include "sys.h"
 
 #include <assert.h>

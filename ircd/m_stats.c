@@ -94,7 +94,7 @@
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <assert.h>
 #include <stdlib.h>

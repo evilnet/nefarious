@@ -52,7 +52,7 @@
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
-#include "struct.h"
+#include "ircd_struct.h"
 #include "userload.h"
 #include "querycmds.h"
 

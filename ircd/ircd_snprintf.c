@@ -18,19 +18,6 @@
  *
  * $Id$
  */
-#include "config.h"
-
-#include "client.h"
-#include "channel.h"
-#include "ircd_snprintf.h"
-#include "struct.h"
-
-#include <assert.h>
-#include <errno.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 
 /* Inhibit complaints when we use GCC extensions */
 #if defined(__GNUC__) && defined(HAVE_LONG_LONG)
@@ -38,6 +25,21 @@
 #else
 # define EXTENSION
 #endif
+
+#include <stddef.h>
+
+#include "config.h"
+
+#include "client.h"
+#include "channel.h"
+#include "ircd_snprintf.h"
+#include "ircd_struct.h"
+
+#include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 /* Find the largest type */
 #ifdef HAVE_LONG_LONG

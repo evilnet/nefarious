@@ -126,7 +126,7 @@ dgetsagain:
        if (head < tail &&
            ((s = index(head, '\n')) || (s = index(head, '\r'))) && s < tail)
            {
-               n = MIN(s - head + 1, num);     /* at least 1 byte */
+               n = IRCD_MIN(s - head + 1, num);     /* at least 1 byte */
 dgetsreturnbuf:
                bcopy(head, buf, n);
                head += n;
@@ -152,7 +152,7 @@ dgetsreturnbuf:
            {
                if (head < tail)
                    {
-                       n = MIN(tail - head, num);
+                       n = IRCD_MIN(tail - head, num);
                        goto dgetsreturnbuf;
                    }
                head = tail = dgbuf;

@@ -32,7 +32,7 @@
 #include "s_conf.h"
 #include "s_debug.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 #include "ircd_string.h"
 
 #include <assert.h>

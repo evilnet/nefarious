@@ -34,7 +34,7 @@
 #include "numeric.h"
 #include "s_debug.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <assert.h>
 #include <errno.h>

@@ -53,7 +53,7 @@
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
-#include "struct.h"
+#include "ircd_struct.h"
 #include "sys.h"               /* TRUE bleah */
 
 #include <arpa/inet.h>         /* inet_netof */

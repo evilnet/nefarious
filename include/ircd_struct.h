@@ -20,8 +20,8 @@
  *
  * $Id$
  */
-#ifndef INCLUDED_struct_h
-#define INCLUDED_struct_h
+#ifndef INCLUDED_ircd_struct_h
+#define INCLUDED_ircd_struct_h
 #ifndef INCLUDED_sys_types_h
 #include <sys/types.h>      /* time_t */
 #define INCLUDED_sys_types_h

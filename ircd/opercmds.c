@@ -38,7 +38,7 @@
 #include "numnicks.h"
 #include "s_conf.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <stdio.h>
 #include <stdlib.h>

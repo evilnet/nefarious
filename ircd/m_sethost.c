@@ -90,7 +90,7 @@
 #include "numeric.h"
 #include "s_user.h"
 #include "s_debug.h"
-#include "struct.h"
+#include "ircd_struct.h"
 
 #include <assert.h>
 #include <stdlib.h>

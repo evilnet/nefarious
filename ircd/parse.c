@@ -45,7 +45,7 @@
 #include "s_numeric.h"
 #include "s_user.h"
 #include "send.h"
-#include "struct.h"
+#include "ircd_struct.h"
 #include "sys.h"
 #include "whocmds.h"
 #include "whowas.h"
