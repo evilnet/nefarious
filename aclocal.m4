@@ -266,6 +266,9 @@ AC_DEFUN([AM_PROG_CC_STDC],
 [AC_REQUIRE([AC_PROG_CC])
 AC_BEFORE([$0], [AC_C_INLINE])
 AC_BEFORE([$0], [AC_C_CONST])
+AC_REQUIRE([AC_OBJEXT])
+AC_REQUIRE([AC_EXEEXT])
+dnl
 dnl Force this before AC_PROG_CPP.  Some cpp's, eg on HPUX, require
 dnl a magic option to avoid problems with ANSI preprocessor commands
 dnl like #elif.

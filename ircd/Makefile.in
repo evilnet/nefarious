@@ -41,6 +41,7 @@ TOUCH = touch
 GREP = grep
 OSDEP_C = @OSDEP_C@
 ENGINE_C = @ENGINE_C@
+EXT = @EXEEXT@
 @SET_MAKE@
 
 BINDIR = @bindir@
@@ -231,7 +232,7 @@ build: ircd chkconf
 ircd: ${OBJS} ../include/patchlevel.h version.o
 	${PURIFY} ${CC} ${CFLAGS} ${LDFLAGS} ${OBJS} version.o ${RINGLOG_O} ${LDFLAGS} ${LIBS} \
 		-o ircd
-	${CHMOD} ${IRCDMODE} ircd
+	${CHMOD} ${IRCDMODE} ircd${EXT}
 
 #
 # Make sure the anti hack checksums get included when things change

@@ -809,6 +809,9 @@ if test -z "$HUMOR"; then
   ])
 fi
 
+if test "$host_os" = "cygwin"; then
+  LDFLAGS="-Wl,--enable-auto-import"
+fi
 
 dnl Finally really generate all output files:
 AC_CONFIG_FILES([Makefile ircd/Makefile doc/Makefile])

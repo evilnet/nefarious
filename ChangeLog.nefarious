@@ -1,3 +1,14 @@
+2004-04-11  Neil Spierling  <sirvulcan@sirvulcan.org>
+
+	* aclocal.m4: Added some extra macros for checking for the executable
+		        extension (handy for windows) + reran autoconf
+
+	* configure.in: If the host is a cygwin system then hide autoimport stuff,
+                          also reran autoconf.
+
+	* ircd/Makefile.in: Use the extension found via the exta aclocal macros,
+			      chmod ircd properly in windows.
+
 2004-04-05  Neil Spierling  <sirvulcan@sirvulcan.org>
 
 	* ircd/ircd.c: Added a few more optional paramaters to the ircd, they will

@@ -2367,6 +2367,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
+
+
+
 echo "$as_me:$LINENO: checking for ${CC-cc} option to accept ANSI C" >&5
 echo $ECHO_N "checking for ${CC-cc} option to accept ANSI C... $ECHO_C" >&6
 if test "${am_cv_prog_cc_stdc+set}" = set; then
@@ -9404,6 +9408,9 @@ fi
 
 fi
 
+if test "$host_os" = "cygwin"; then
+  LDFLAGS="-Wl,--enable-auto-import"
+fi
 
                               ac_config_files="$ac_config_files Makefile ircd/Makefile doc/Makefile"
 
