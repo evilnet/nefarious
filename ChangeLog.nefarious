@@ -1,3 +1,8 @@
+2003-10-19  Reed Loden  <reed@reedloden.com>
+
+	* ircd/gline.c: Incorporate IK's complete rewrite of the gline
+	quit reason parser.
+
 2003-10-18  Reed Loden  <reed@reedloden.com>
 
 	* include/ircd_string.h: Add an ircd_strrcmp() macro.

@@ -210,11 +210,39 @@ do_badchanneled(struct Channel *chptr, struct Gline *gline) {
 }
 
 static int
+do_mangle_gline(struct Client* cptr, struct Client* acptr,
+		struct Client* sptr, const char* orig_reason)
+{
+  int tval = 0;
+  int len = strlen(orig_reason);
+  char* reason = (char*) MyMalloc(len + 1);
+  char* endanglebracket = strchr(orig_reason, '>');
+  char* space = strchr(orig_reason, ' ');
+
+  assert(0 != reason);
+
+  if (!feature_bool(FEAT_HIS_GLINE))
+    return exit_client_msg(cptr, acptr, &me, orig_reason);
+
+  if (IsService(sptr) && (orig_reason[0] == '<') && endanglebracket
+      && endanglebracket < space)
+  {
+    strcpy(reason, "G-lined by ");
+    strncpy(reason, orig_reason+1, endanglebracket - orig_reason + 1);
+  } else {
+    ircd_snprintf(0, reason, len, "G-lined (<%s> %s)", sptr->cli_name,
+		  orig_reason);
+  }
+  tval = exit_client_msg(cptr, acptr, &me, reason);
+  MyFree(reason);
+  return tval;
+}
+
+static int
 do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 {
   struct Client *acptr;
-  int fd, retval = 0, tval, i;
-  char *reason, *tmp;
+  int fd, retval = 0, tval;
 
   if (!GlineIsActive(gline)) /* no action taken on inactive glines */
     return 0;
@@ -226,7 +254,6 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
     if ((acptr = LocalClientArray[fd])) {
       if (!cli_user(acptr))
         continue;
-
 
       if (gline->gl_flags & GLINE_REALNAME) { /* Realname Gline */
 	Debug((DEBUG_DEBUG,"Realname Gline: %s %s",(cli_info(acptr)),
@@ -275,45 +302,9 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       sendto_opmask_butone(0, SNO_GLINE, "G-line active for %s",
       		     get_client_name(acptr, TRUE));
 
-      /* decide about the gline reason */
-      tmp = (char *)MyMalloc(strlen(gline->gl_reason)+1);
-      reason = (char *)MyMalloc(strlen(gline->gl_reason)+1);
-      
-      assert(0 != tmp);
-      assert(0 != reason);
-
-      /* Initialize strings */
-      strcpy(reason, "");
-      strcpy(tmp, "");
-
-      if (feature_bool(FEAT_HIS_GLINE)) {
-	if (IsService(sptr) && strchr(gline->gl_reason, ' ') &&
-	    (gline->gl_reason[0] == '<') &&
-	    (strchr(gline->gl_reason, '>') < strchr(gline->gl_reason, ' ')))
-	{
-	  strcpy(reason, "G-lined by ");
-	  for (i = 0; i < strlen(gline->gl_reason); i++) {
-	    if (gline->gl_reason[i] != ' ') {
-	      ircd_snprintf(0, tmp, sizeof(tmp), "%c", gline->gl_reason[i]);
-	      strcat(reason, tmp);
-	    }
-	    else
-	      break;
-	  }
-        } else {
-	  ircd_snprintf(0, reason, sizeof(reason), "G-lined (<%s> %s)",
-			sptr->cli_name, gline->gl_reason);
-	}
-      } else {
-	strcat(reason, gline->gl_reason);
-      }
-
       /* and get rid of him */
-      if ((tval = exit_client_msg(cptr, acptr, &me, reason)))
+      if ((tval = do_mangle_gline(cptr, acptr, sptr, gline->gl_reason)))
         retval = tval; /* retain killed status */
-
-      MyFree(tmp);
-      MyFree(reason);
     }
   }
   return retval;
