@@ -109,6 +109,7 @@ extern int send_supported(struct Client *cptr);
 extern int is_hostmask(char *word);
 extern int lsc(struct Client *cptr, char *target, const char *prepend,
 	       const char *servicename, int parc, char* parv[]);
+extern int do_nick_name(char* nick);
 
 #define NAMES_ALL 1 /* List all users in channel */
 #define NAMES_VIS 2 /* List only visible users in non-secret channels */

@@ -1,6 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-31  Neil Spierling <vulcan@linux-boxen.org>
+
+	* include/s_user.h: do_nick_name can be called outside of
+	m_nick.c now.
+
+	* ircd/m_join.c: Fixed up a feature check.
+
+	* ircd/m_nick.c: Same as s_user.h.
+
+	* ircd/m_svsnick.c: Commented out some code thats not even being
+	used. Not deleted for now as reed may still be using it. Added
+	an #include for IRCD_MIN.
+
 2004-08-30  Reed Loden  <reed@reedloden.com>
 
 	* include/supported.h: Alphabetized the channel/user mode lists.

@@ -292,7 +292,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       /* Note: check_target_limit will only ever return 0 here */
       sub1_from_channel(chptr); /* created it... */
       continue;
-    } else if (feature_bool(CREATE_CHAN_OPER_ONLY) && !IsAnOper(sptr)) {
+    } else if (feature_bool(FEAT_CREATE_CHAN_OPER_ONLY) && !IsAnOper(sptr)) {
       send_reply(sptr, ERR_NOSUCHCHANNEL, name);
       continue;
     } else

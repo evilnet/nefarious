@@ -96,6 +96,7 @@
 #include "s_misc.h"
 #include "s_user.h"
 #include "send.h"
+#include "sys.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -132,8 +133,10 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (strlen(arg) > IRCD_MIN(NICKLEN, feature_int(FEAT_NICKLEN)))
     arg[IRCD_MIN(NICKLEN, feature_int(FEAT_NICKLEN))] = '\0';
 
-  if ((s = strchr(arg, '~')))
-    *s = '\0';
+/*
+ *  if ((s = strchr(arg, '~')))
+ *    *s = '\0';
+ */
 
   strcpy(nick, arg);
 
