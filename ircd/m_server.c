@@ -316,7 +316,7 @@ int mr_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (conf_check_server(cptr)) {
       ++ServerStats->is_ref;
       sendto_opmask_butone(0, SNO_OLDSNO, "Received unauthorized connection "
-			   "from %s.", cli_name(cptr));
+			   "from %s [%s]", cli_name(cptr), ircd_ntoa((const char*)&cli_ip(cptr)));
       log_write(LS_NETWORK, L_NOTICE, LOG_NOSNOTICE, "Received unauthorized "
 		"connection from %C [%s]", cptr,
 		ircd_ntoa((const char *)&(cli_ip(cptr))));
