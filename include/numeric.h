@@ -131,7 +131,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_STATSUPTIME      242
 #define RPL_STATSOLINE       243
 #define RPL_STATSHLINE       244
-/*      RPL_STATSSLINE       245           Reserved / Dalnet / IRCnet / EFnet */
+#define RPL_STATSSLINE       245	/* Reserved / Dalnet / IRCnet / EFnet / Nefarious */
 /*	RPL_STATSSPING	     246	   Numerics List: IRCnet */
 #define RPL_STATSTLINE       246        /* Undernet extension */
 /*	RPL_STATSULINE	     246	Dalnet */
@@ -322,7 +322,6 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      RPL_END_USERS        394        Dalnet/EFnet/IRCnet */
 /*      RPL_NOUSERS          395        Dalnet/EFnet/IRCnet */
 #define RPL_HOSTHIDDEN       396	/* UMODE +x completed succesfuly */
-#define RPL_STATSSLINE       398	/* QuakeNet extension -froo */
 #define RPL_USINGSLINE       399	/* QuakeNet extension -froo */
 
 /*

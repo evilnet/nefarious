@@ -996,7 +996,7 @@ static Numeric replyTable[] = {
 /* 479 */
   { ERR_BADCHANNAME, "%s :Cannot join channel (BADCHAN: %s)", "479" },
 /* 480 */
-  { ERR_ADMINONLYCHAN, "%s :Cannot join channel (+A)", "480" },
+  { ERR_ADMINONLYCHAN, "%s :Cannot join channel (+a)", "480" },
 /* 481 */
   { ERR_NOPRIVILEGES, ":Permission Denied: Insufficient privileges", "481" },
 /* 482 */

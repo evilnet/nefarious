@@ -2609,7 +2609,7 @@ send_supported(struct Client *cptr)
   return 0; /* convenience return, if it's ever needed */
 }
 
-/* handler for b:line commands -akl (adam@PGPN.com) */
+/* handler for B:line commands -akl (adam@PGPN.com) */
 int
 lsc(struct Client *cptr, char *target, const char *prepend,
     const char *servicename, int parc, char* parv[])

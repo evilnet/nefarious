@@ -331,7 +331,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	   SetAdmin(sptr);
 	 }
 	 sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
-		       (IsAdmin(sptr)) ? "+Aoiwsg" : "+oiwsg");
+		       (IsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
 	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		"%s (%s@%s) is now an IRC %s", parv[0],
