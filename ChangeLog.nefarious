@@ -14,11 +14,6 @@
 
 2004-08-12  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/m_topic.c: Adjusted another strcat i added a while back. Using
-	strncat now.
-
-2004-08-12  Neil Spierling  <vulcan@linux-boxen.org>
-
 	* patches/banexempts.srvx2.diff: Changed strcat to strncat.
 
 2004-08-11  Neil Spierling  <vulcan@linux-boxen.org>
