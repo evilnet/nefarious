@@ -644,9 +644,9 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
   struct Membership *member;
   assert(0 != cptr); 
   /*
-   * Servers can always speak on channels.
+   * Servers and channel services can always speak on channels.
    */
-  if (IsServer(cptr))
+  if (IsServer(cptr) || IsChannelService(cptr))
     return 1;
 
   member = find_channel_member(cptr, chptr);

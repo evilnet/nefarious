@@ -236,7 +236,7 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     protocol_violation(sptr,"Too few arguments to invite");
     return need_more_params(sptr,"INVITE");
   }
-  if ('#' != *parv[2]) {
+  if (!IsGlobalChannel(parv[2])) {
     /*
      * should not be sent
      */
@@ -266,7 +266,7 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
   }
 
-  if (!find_channel_member(sptr, chptr)) {
+  if (!find_channel_member(sptr, chptr) && !IsChannelService(sptr)) {
     send_reply(sptr, ERR_NOTONCHANNEL, chptr->chname);
     return 0;
   }

@@ -99,7 +99,8 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
 {
    int newtopic;
    /* if +n and not @'d, return an error and ignore the topic */
-   if ((chptr->mode.mode & MODE_TOPICLIMIT) != 0 && !is_chan_op(sptr, chptr)) 
+   if ((chptr->mode.mode & MODE_TOPICLIMIT) != 0 && !is_chan_op(sptr, chptr) &&
+	!IsChannelService(sptr)) 
    {
       send_reply(sptr, ERR_CHANOPRIVSNEEDED, chptr->chname);
       return;
@@ -206,7 +207,7 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     	continue;
     }
 
-    /* Ignore requests for topics from remote servers */
+    /* Ignore requests for local channel topics from remote servers */
     if (IsLocalChannel(name) && !MyUser(sptr))
     {
       protocol_violation(sptr,"Topic request");

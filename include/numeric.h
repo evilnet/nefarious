@@ -112,6 +112,7 @@ extern const struct Numeric* get_error_numeric(int err);
 	RPL_STATSGLINE	     227	   Dalnet 
 	RPL_STATSVLINE	     227	   unreal */
 #define RPL_STATSQLINE       228        /* Undernet extension */
+#define RPL_STATSSLINE	     229	/* S:line patch extension */
 
 #define RPL_SERVICEINFO      231	/* unused */
 #define RPL_ENDOFSERVICES    232	/* unused */
@@ -217,7 +218,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_WHOISHELPER	     309	austnet */
 /*      RPL_WHOISSVCMSG      310         Dalnet */
 /*	RPL_WHOISHELPOP	     310	unreal */
-/*	RPL_WHOISSERVICE     310	austnet */
+#define	RPL_WHOISSERVICE     310	/* austnet/ChatterNet */
 #define RPL_WHOISUSER        311        /* See also RPL_ENDOFWHOIS */
 #define RPL_WHOISSERVER      312
 #define RPL_WHOISOPERATOR    313

@@ -300,6 +300,19 @@ stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_spoof(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct sline *sline;
+
+  for (sline = GlobalSpoofList; sline; sline = sline->next) {
+    if (param && match(param, sline->realip)) /* narrow search */
+      continue;
+    send_reply(to, RPL_STATSSLINE, sline->realip, sline->fakeip, 
+	       sline->fakehost);
+  }
+}
+
+static void
 stats_uptime(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   time_t nowr;
@@ -431,6 +444,9 @@ struct StatDesc statsinfo[] = {
     send_usage, 0,
     "System resource usage (Debug only)." },
 #endif
+  { 's', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_s,
+    stats_spoof, 0,
+    "Spoof host list." },
   { 'T', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_T,
     motd_report, 0,
     "Configured Message Of The Day files." },

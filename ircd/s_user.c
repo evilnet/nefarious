@@ -368,6 +368,25 @@ int register_user(struct Client *cptr, struct Client *sptr,
   parv[0] = cli_name(sptr);
   parv[1] = parv[2] = NULL;
 
+  if (MyConnect(sptr) && sptr->cli_cs_service && sptr->cli_cs_user && sptr->cli_cs_pass) {
+    struct Client *acptr;
+    
+    if (!(acptr = FindUser(sptr->cli_cs_service)) || !IsChannelService(acptr)) {
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Service '%s' is not available", sptr, sptr->cli_cs_service);
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Type /QUOTE PASS to connect anyway", sptr);
+      MyFree(sptr->cli_cs_service);
+      MyFree(sptr->cli_cs_user);
+      MyFree(sptr->cli_cs_pass);
+      sptr->cli_cs_service = sptr->cli_cs_user = sptr->cli_cs_pass = NULL;
+    } else {
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Attempting service login to %s",
+      		    sptr, cli_name(acptr));
+      sendcmdto_one(&me, CMD_ACCOUNT, acptr, "%C C %s%s %s :%s", acptr,
+		    NumNick(sptr), sptr->cli_cs_user, sptr->cli_cs_pass);
+    }
+    return 0;
+  }
+
   if (MyConnect(sptr))
   {
     static time_t last_too_many1;
@@ -415,13 +434,16 @@ int register_user(struct Client *cptr, struct Client *sptr,
         IPcheck_connect_fail(cli_ip(sptr));
         return exit_client(cptr, sptr, &me, "Unknown error -- Try again");
     }
-    ircd_strncpy(user->host, cli_sockhost(sptr), HOSTLEN);
+    /* The host might be already set from login-on-connect */
+    if (!HasHiddenHost(sptr))
+	    ircd_strncpy(user->host, cli_sockhost(sptr), HOSTLEN);
     ircd_strncpy(user->realhost, cli_sockhost(sptr), HOSTLEN);
     aconf = cli_confs(sptr)->value.aconf;
 
     clean_user_id(user->username,
         HasFlag(sptr, FLAG_GOTID) ? cli_username(sptr) : username,
-        HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID));
+        HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
+        && !(HasSLine(sptr))); /* No tilde for S-lined users. */
 
     if ((user->username[0] == '\0')
         || ((user->username[0] == '~') && (user->username[1] == '\000')))
@@ -541,8 +563,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
     release_dns_reply(sptr);
 
     send_reply(
-	sptr, 
-	RPL_WELCOME, 
+	sptr,
+	RPL_WELCOME,
+	feature_str(FEAT_NETWORK),
 	feature_str(FEAT_PROVIDER) ? " via " : "",
 	feature_str(FEAT_PROVIDER) ? feature_str(FEAT_PROVIDER) : "",
 	nick);

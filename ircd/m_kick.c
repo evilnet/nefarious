@@ -197,9 +197,13 @@ int ms_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   /* Unless someone accepted it downstream (or the user isn't on the channel
    * here), if kicker is not on channel, or if kicker is not a channel
    * operator, bounce the kick
+   *
+   * Don't bounce the kick if it's coming from a channel service, regardless
+   * of channel membership.  -- aaronc
    */
   if (!IsServer(sptr) && member && cli_from(who) != cptr &&
-      (!(sptr_link = find_member_link(chptr, sptr)) || !IsChanOp(sptr_link))) {
+      ((!(sptr_link = find_member_link(chptr, sptr)) || !IsChanOp(sptr_link)) &&
+	!IsChannelService(sptr))) {
     sendto_opmask_butone(0, SNO_HACK2, "HACK: %C KICK %H %C %s", sptr, chptr,
 			 who, comment);
 

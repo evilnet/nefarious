@@ -86,15 +86,15 @@
 /*
  * SOCKIPLEN is the length of a dotted quad ip address "XXX.XXX.XXX.XXX"
  */
-#define SOCKIPLEN 15
+#define SOCKIPLEN	15
 /*
  * TOPICLEN is the maximum length for channel topics and kill comments
  */
-#define TOPICLEN        160
+#define TOPICLEN        250
 /*
  * AWAYLEN is the maximum length for away messages
  */
-#define AWAYLEN		160
+#define AWAYLEN		250
 /*
  * BUFSIZE is exactly long enough to hold one protocol message (RFC 1459)
  * including the line termination (\r\n).

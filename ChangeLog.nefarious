@@ -1,9 +1,54 @@
+2002-11-23  Aaron Catella  <acatella@users.sourceforge.net>
+
+	* include/channel.h: create new IsGlobalChannel()
+
+	* ircd/m_clearmode.c, ircd/m_invite.c, m_mode.c, m_opmode.c:
+	clean-up
+
+	* ircd/channel.c: allow non-member channel services to PRIVMSG,
+	NOTICE, WALLCHOPS, and WALLVOICE.
+
+	* ircd/m_invite.c: allow non-member channel services to INVITE
+	users.
+
+	* ircd/m_kick.c: allow non-member channel services to KICK
+	users.
+
+	* ircd/m_topic.c: allow non-member channel services to change
+	TOPICs.
+
+2002-04-12  Alex Badea  <vampire@p16.pub.ro>
+ 
+	* include/client.h (struct Client): new fields for storing
+	bot name, username and password for login-on-connect
+
+	* ircd/m_account.c: extensions for login-on-connect: route
+	and process auth-request and auth-reply messages
+
+	* ircd/m_pass.c: store bot name, username and password for
+	service login
+
+	* ircd/m_user.c: store username/hostname for the client
+	even if he finished registration, as register_user may not
+	do that anymore
+
+	* ircd/s_user.c (register_user): if the client specified
+	a service login in the PASS command, attempt to log him in;
+	also, don't set his hostname if it was set remotely by a
+	service bot
+
+2002-12-29  Reed Loden  <reed@reedloden.com>
+
+	* Added main ChatterNet defaults. Full ChangeLog coming soon.
+
 2002-12-28  Mathieu Rene  <math@rootservices.net>
 
 	* ircd/s_user.c (set_user_mode): Allow remote mode for a user by
 	a server.
+
 	* ircd/m_opmode.c (m_opmode): Blocked opmode for registered
 	channels.
+
 	* ircd/m_clearmode.c (m_clearmode): Blocked clearmode for
 	registered channels.
 

@@ -145,6 +145,7 @@ enum Flag {
     FLAG_DEBUG,                     /* send global debug/anti-hack info */
     FLAG_ACCOUNT,                   /* account name has been set */
     FLAG_HIDDENHOST,                /* user's host is hidden */
+    FLAG_SLINE,                     /* user is S:Lined */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -241,6 +242,10 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
+  
+  char *cli_cs_user;		/* channel service authentication (user)... */
+  char *cli_cs_pass;		/* ...and password... */
+  char *cli_cs_service;		/* ...and the service bot's nick */
 };
 
 #define CLIENT_MAGIC 0x4ca08286
@@ -429,6 +434,7 @@ struct Client {
 #define IsAccount(x)            HasFlag(x, FLAG_ACCOUNT)
 #define IsHiddenHost(x)		HasFlag(x, FLAG_HIDDENHOST)
 #define HasHiddenHost(x)	(IsAccount(x) && IsHiddenHost(x))
+#define HasSLine(x)             HasFlag(x, FLAG_SLINE)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -451,6 +457,7 @@ struct Client {
 #define SetService(x)           SetFlag(x, FLAG_SERVICE)
 #define SetAccount(x)           SetFlag(x, FLAG_ACCOUNT)
 #define SetHiddenHost(x)	SetFlag(x, FLAG_HIDDENHOST)
+#define SetSLined(x)            SetFlag(x, FLAG_SLINE)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)

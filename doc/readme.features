@@ -251,12 +251,6 @@ HIDDEN_IP
 This selects a fake IP to be shown on /USERIP and /WHO %i when the
 target has a hidden host (see HOST_HIDING).
 
-AUTOHIDE
- * Type: boolean
- * Default: TRUE
-
-If enabled, local users get umode +x by default when they connect.
-
 CONNEXIT_NOTICES
  * Type: boolean
  * Default: FALSE
@@ -904,6 +898,12 @@ HIS_STATS_r
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS r from users.
+
+HIS_STATS_s
+ * Type: boolean
+ * Default: TRUE
+
+As per S:line patch, this removes /STATS s from users.
 
 HIS_STATS_d
  * Type: boolean

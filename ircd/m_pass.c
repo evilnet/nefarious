@@ -84,7 +84,11 @@
 #include "client.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
+#include "ircd_alloc.h"
+#include "ircd_features.h"
+#include "s_user.h"
 #include "send.h"
+#include "struct.h"
 
 #include <assert.h>
 
@@ -99,15 +103,28 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   assert(cptr == sptr);
   assert(!IsRegistered(sptr));
 
-  if (EmptyString(password))
-    return need_more_params(cptr, "PASS");
-
   /* TODO: For protocol negotiation */
 #if 0
   if (ircd_strcmp(password,"PROT")==0) {
   	/* Do something here */
   }
 #endif
-  ircd_strncpy(cli_passwd(cptr), password, PASSWDLEN);
+
+  if (!EmptyString(password))
+    ircd_strncpy(cli_passwd(cptr), password, PASSWDLEN);
+
+  if (cptr->cli_cs_service)
+    return 0;
+
+  if (parc > 3) {
+    DupString(cptr->cli_cs_service, parv[parc-3]);
+    DupString(cptr->cli_cs_user, parv[parc-2]);
+    DupString(cptr->cli_cs_pass, parv[parc-1]);
+  }
+
+  /* Deal with password retries */
+  if ((cli_name(cptr))[0] && cli_cookie(cptr) == COOKIE_VERIFIED)
+    return register_user(cptr, cptr, cli_name(cptr), cli_user(cptr)->username);
+
   return 0;
 }

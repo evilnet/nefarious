@@ -82,10 +82,12 @@
 
 #include "client.h"
 #include "ircd.h"
+#include "ircd_alloc.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
 #include "numnicks.h"
+#include "s_debug.h"
 #include "s_user.h"
 #include "send.h"
 
@@ -97,39 +99,105 @@
  *
  * parv[0] = sender prefix
  * parv[1] = numeric of client to act on
- * parv[2] = account name (12 characters or less)
+ * parv[2] = message type
+ *
+ * for *parv[2] == 'R' (remote auth):
+ * parv[3] = account name (12 characters or less)
+ *
+ * for *parv[2] == 'C' (auth check):
+ * parv[3] = numeric of client to check
+ * parv[4] = username
+ * parv[parc-1] = password
+ *
+ * for *parv[2] == 'A' (auth ok) or
+ * for *parv[2] == 'D' (auth denied) or
+ * parv[3] = numeric of client to check
  */
 int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	       char* parv[])
 {
   struct Client *acptr;
+  char type;
 
   if (parc < 3)
     return need_more_params(sptr, "ACCOUNT");
+
+  if (parc < 4) {
+    /* old-style message, remap it */
+    parv[4] = NULL;
+    parv[3] = parv[2];
+    parv[2] = "R";
+  }
 
   if (!IsServer(sptr))
     return protocol_violation(cptr, "ACCOUNT from non-server %s",
 			      cli_name(sptr));
 
-  if (!(acptr = findNUser(parv[1])))
-    return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+  type = *parv[2];
+  if (type == 'R') {
+    if (!(acptr = findNUser(parv[1])))
+      return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
 
-  if (IsAccount(acptr))
-    return protocol_violation(cptr, "ACCOUNT for already registered user %s "
-			      "(%s -> %s)", cli_name(acptr),
-			      cli_user(acptr)->account, parv[2]);
+    if (IsAccount(acptr))
+      return protocol_violation(cptr, "ACCOUNT for already registered user %s "
+			        "(%s -> %s)", cli_name(acptr),
+			        cli_user(acptr)->account, parv[3]);
 
-  assert(0 == cli_user(acptr)->account[0]);
+    assert(0 == cli_user(acptr)->account[0]);
 
-  if (strlen(parv[2]) > ACCOUNTLEN) {
-    return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.", parv[2], ACCOUNTLEN, cli_name(acptr));
+    if (strlen(parv[2]) > ACCOUNTLEN)
+      return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.", parv[2], ACCOUNTLEN, cli_name(acptr));
+
+    ircd_strncpy(cli_user(acptr)->account, parv[3], ACCOUNTLEN);
+    hide_hostmask(acptr, FLAGS_ACCOUNT);
+
+    sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C R %s", acptr,
+			  cli_user(acptr)->account);
+  } else {
+    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
+      return 0;
+
+    if (type == 'C' && parc < 6)
+      return need_more_params(sptr, "ACCOUNT");
+
+    if (!IsMe(acptr)) {
+      /* in-transit message, forward it */
+      sendcmdto_one(sptr, CMD_ACCOUNT, acptr,
+		    type == 'C' ? "%C %s %s %s :%s" : "%C %s %s",
+		    acptr, parv[2], parv[3], parv[4], parv[parc-1]);
+      return 0;
+    }
+    
+    /* the message is for me, process it */
+    if (type == 'C')
+      return protocol_violation(cptr, "ACCOUNT check (%s %s %s)", parv[3], parv[4], parv[parc-1]);
+
+    if (!(acptr = findNUser(parv[3])))
+      return 0;
+    if (IsRegistered(acptr) || !acptr->cli_cs_service)
+      return protocol_violation(cptr, "Invalid ACCOUNT %s for %s", parv[2], cli_name(acptr));
+    
+    if (type == 'A') {
+      ircd_strncpy(cli_user(acptr)->account, acptr->cli_cs_user, ACCOUNTLEN);
+      hide_hostmask(acptr, FLAGS_ACCOUNT | FLAGS_HIDDENHOST);
+    }
+    
+    sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :AUTHENTICATION %s as %s", acptr,
+    		  type == 'A' ? "SUCCESSFUL" : "FAILED",
+		  acptr->cli_cs_user);
+
+    MyFree(acptr->cli_cs_service);
+    MyFree(acptr->cli_cs_user);
+    MyFree(acptr->cli_cs_pass);
+    acptr->cli_cs_service = acptr->cli_cs_user = acptr->cli_cs_pass = NULL;
+
+    if (type != 'A') {
+      sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Type /QUOTE PASS to connect anyway", acptr);
+      return 0;
+    }
+    
+    return register_user(acptr, acptr, cli_name(acptr), cli_user(acptr)->username);
   }
-
-  ircd_strncpy(cli_user(acptr)->account, parv[2], ACCOUNTLEN);
-  hide_hostmask(acptr, FLAG_ACCOUNT);
-
-  sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C %s", acptr,
-			cli_user(acptr)->account);
 
   return 0;
 }

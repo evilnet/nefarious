@@ -30,7 +30,7 @@ static Numeric replyTable[] = {
 /* 000 */
   { 0 },
 /* 001 */
-  { RPL_WELCOME, ":Welcome to the Internet Relay Network%s%s, %s", "001" },
+  { RPL_WELCOME, ":Welcome to the %s IRC Network%s%s, %s", "001" },
 /* 002 */
   { RPL_YOURHOST, ":Your host is %s, running version %s", "002" },
 /* 003 */
@@ -490,7 +490,7 @@ static Numeric replyTable[] = {
 /* 228 */
   { RPL_STATSQLINE, "Q %s :%s", "228" },
 /* 229 */
-  { 0 },
+  { RPL_STATSSLINE, "S %s %s %s", "229" },
 /* 230 */
   { 0 },
 /* 231 */
@@ -652,7 +652,7 @@ static Numeric replyTable[] = {
 /* 309 */
   { 0 },
 /* 310 */
-  { 0 },
+  { RPL_WHOISSERVICE, "%s :is a %s Network Service", "310" },
 /* 311 */
   { RPL_WHOISUSER, "%s %s %s * :%s", "311" },
 /* 312 */

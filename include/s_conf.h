@@ -33,6 +33,7 @@ struct TRecord;
 
 #define CONF_ILLEGAL            0x80000000
 #define CONF_MATCH              0x40000000
+#define CONF_SPOOF              0x20000000
 #define CONF_CLIENT             0x0002
 #define CONF_SERVER             0x0004
 #define CONF_LOCOP              0x0010
@@ -154,6 +155,13 @@ struct qline {
   char *reason;
 };
 
+struct sline {
+  struct sline *next;
+  char *realip;
+  char *fakeip;
+  char *fakehost;
+};
+
 /*
  * GLOBALS
  */
@@ -164,6 +172,7 @@ extern struct MotdItem* motd;
 extern struct MotdItem* rmotd;
 extern struct TRecord*  tdata;
 extern struct qline*	GlobalQuarantineList;
+extern struct sline*	GlobalSpoofList;
 
 /*
  * Proto types
