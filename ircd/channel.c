@@ -1382,7 +1382,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_LIMIT,		'l', */
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
-    MODE_NOQUITPARTS	'u',
+    MODE_NOQUITPARTS,	'u',
     0x0, 0x0
   };
   int i;
@@ -1847,7 +1847,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
-    MODE_NOQUITPARTS	'u',
+    MODE_NOQUITPARTS,	'u',
     0x0, 0x0
   };
   unsigned int add;

@@ -6,6 +6,8 @@
 
 	* Synced Kev's fix of m_settime.c.
 
+	* Fix bugs.
+
 2003-06-12  Reed Loden  <reed@reedloden.com>
 
 	* Added asuka's noquitparts.
