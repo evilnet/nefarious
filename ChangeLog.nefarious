@@ -1,6 +1,36 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-21  Reed Loden  <reed@reedloden.com>
+
+	* ChangeLog.nefarious: Redid Rubin's ChangeLog entry.
+
+	* config.h.in: Ran autoheader.
+
+	* configure: Regenerated through autoconf.
+
+	* configure.in: Redid humor stuff and removed second -lssl.
+
+	* include/client.h: Miscellaneous whitespacing changes.
+
+	* include/msg.h: Miscellaneous whitespacing changes.
+
+	* include/numeric.h: Renumbered some of the RULES numerics.
+	Miscellaneous whitespacing changes.
+
+	* ircd/Makefile.in: Correctly alphabetized m_wallvoices.c and
+	ran make depend.
+
+        * ircd/channel.c: Added nu_dnsblhoste and renamed sfd to sde in
+        ban exemptions. Added nu_dnsblhost to is_banned(). Swapped DNSBL 
+	checks to use the added variables.
+
+	* ircd/engine_epoll.c: Change a size_t to socklen_t to match
+	getsockopt prototype, so it compiles without warning on amd64
+	(Backported from u2.10.12).
+
+	* ircd/s_err.c: Renumbered some of the RULES numerics.
+
 2005-02-21  Neil Spierling  <sirvulcan@gmail.com>
 
 	* config.h.in: Removed KEY defines.
@@ -60,10 +90,36 @@
 	is allowed then also let them in even if they are on a dnsbl. Also
 	send out a MARK to all servers.
 
-2005-02-18  Rubin  <rubin@afternet.org>	
+2005-02-18  Reed Loden  <reed@reedloden.com>
 
-	* include/ircd_features.h, ircd/irc_features.c, m_pass.c: Added
-	improved login-on-connect syntax, and fixed a bug.
+	* config.h.in: Ran autoheader.
+
+	* configure: Ran autoconf.
+
+	* configure.in: Backported va_copy checks from u2.10.12.
+
+	* include/ircd_features.h: Renamed FEAT_LOC_DEFAULT_NICK to
+	FEAT_LOC_DEFAULT_SERVICE.
+
+	* include/ircd_snprintf.h: Added backported va_copy #ifdefs.
+
+	* ircd/ircd_features.c: Renamed FEAT_LOC_DEFAULT_NICK to
+	FEAT_LOC_DEFAULT_SERVICE.
+
+	* ircd/m_oper.c: Miscellaneous whitespacing changes.
+
+	* ircd/m_pass.c: Renamed FEAT_LOC_DEFAULT_NICK to
+	FEAT_LOC_DEFAULT_SERVICE. Miscellaneous whitespacing changes.
+
+2005-02-18  Alex Schumann  <rubin@afternet.org>	
+
+	* include/ircd_features.h: Added FEAT_LOC_DEFAULT_NICK.
+
+	* ircd/ircd_features.c: Added FEAT_LOC_DEFAULT_NICK (default:
+	"AuthServ").
+
+	* ircd/m_pass.c: Added improved login-on-connect syntax and
+	fixed a bug.
 
 2005-02-11  Reed Loden  <reed@reedloden.com>
 

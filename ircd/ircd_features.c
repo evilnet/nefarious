@@ -467,11 +467,10 @@ static struct FeatureDesc {
   F_B(AUTOCHANMODES, 0, 0, 0),
   F_S(AUTOCHANMODES_LIST, FEAT_CASE | FEAT_NULL, 0, 0),
   F_B(LOGIN_ON_CONNECT, 0, 0, 0),
+  F_S(LOC_DEFAULT_SERVICE, 0, "AuthServ", 0),
   F_B(DNSBL_LOC_EXEMPT, 0, 0, 0),
   F_S(DNSBL_LOC_EXEMPT_N_ONE, 0, "If you have an account with Nefarious services then you can bypass the DNSBL ban by logging in like this (where Account is your account name and Password is your password):", 0),
   F_S(DNSBL_LOC_EXEMPT_N_TWO, 0, "Type \002/QUOTE PASS AuthServ Account :Password\002 to connect", 0),
-  
-  F_S(LOC_DEFAULT_NICK, 0, "AuthServ", 0),
   F_B(DNSBL_WALLOPS_ONLY, 0, 0, 0),
   F_B(OPER_WHOIS_SECRET, 0, 1, 0),
   F_B(AUTOINVISIBLE, 0, 0, 0),

@@ -1,26 +1,4 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
-#ifndef INCLUDED_config_h
-#define INCLUDED_config_h
-/*
- * IRC - Internet Relay Chat
- * Copyright (C) 2000 Kevin L. Mitchell <klmitch@mit.edu>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
- */
 
 /* Define if you have (reliable) BSD signals. */
 #undef BSD_RELIABLE_SIGNALS
@@ -70,7 +48,7 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
-/* Does user have a sense of humour? */
+/* Does user have a sense of humor? */
 #undef HAVE_HUMOR
 
 /* Define to 1 if you have the <inttypes.h> header file. */
@@ -223,6 +201,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define if we have va_copy */
+#undef HAVE_VA_COPY
+
 /* Define to 1 if you have the `vfork' function. */
 #undef HAVE_VFORK
 
@@ -237,6 +218,9 @@
 
 /* Define to 1 if `vfork' works. */
 #undef HAVE_WORKING_VFORK
+
+/* Define if we have __va_copy */
+#undef HAVE___VA_COPY
 
 /* Path to debugging log file */
 #undef LPATH
@@ -379,5 +363,3 @@
 
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork
-
-#endif /* INCLUDED_config_h */

@@ -163,43 +163,43 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (feature_bool(FEAT_LOGIN_ON_CONNECT) && !cli_loc(cptr)) {
     /* Check for leading '/' to indicate new-fangled LOC syntax */
-    if(parc > 1 && parv[1][0] == '/')
-        loc = parv[1]+1;
-    else if(parc > 2 && parv[2][0] == '/')
-        loc = parv[2]+1;
-    if(loc && *loc) {  /* Split loc up into locargv[0 through 2] */
+    if (parc > 1 && parv[1][0] == '/')
+      loc = parv[1]+1;
+    else if (parc > 2 && parv[2][0] == '/')
+      loc = parv[2]+1;
+    if (loc && *loc) { /* Split loc up into locargv[0 through 2] */
       int locargc = 0;
-
       locargv[locargc++] = loc;
-      for(;*loc;loc++) {
-        if(*loc == '/') {
+      for ( ; *loc; loc++) {
+        if (*loc == '/') {
           *loc = 0;
           locargv[locargc++] = loc + 1;
-          if(locargc > 2)
+          if (locargc > 2)
             break;
         }
       }
-      if(locargc == 2) {
+      if (locargc == 2) {
         /* Missing service nick, fill in default and shift arguments up */
         locargv[2] = locargv[1];
         locargv[1] = locargv[0];
-        locargv[0] = (char *) feature_str(FEAT_LOC_DEFAULT_NICK);
+        locargv[0] = (char *)feature_str(FEAT_LOC_DEFAULT_SERVICE);
       }
     }
-    else if(parc > 3) { /* Old style for backward compatability:*/
+    else if (parc > 3) { /* Old style for backward compatability: */
       locargv[0] = parv[parc - 3];
       locargv[1] = parv[parc - 2];
       locargv[2] = parv[parc - 1];
     }
-    if (locargv[0] && *locargv[0] && locargv[1] && *locargv[1] && locargv[2] && *locargv[2]) {
+    if (locargv[0] && *locargv[0] && locargv[1] && *locargv[1] &&
+	locargv[2] && *locargv[2]) {
       cli_loc(cptr) = MyMalloc(sizeof(struct LOCInfo));
       memset(cli_loc(cptr), 0, sizeof(struct LOCInfo));
 
       cli_loc(cptr)->cookie = 0;
 
-      ircd_strncpy(cli_loc(cptr)->service,  locargv[0], NICKLEN);
-      ircd_strncpy(cli_loc(cptr)->account,  locargv[1], ACCOUNTLEN);
-      ircd_strncpy(cli_loc(cptr)->password,  locargv[2], ACCPASSWDLEN);
+      ircd_strncpy(cli_loc(cptr)->service, locargv[0], NICKLEN);
+      ircd_strncpy(cli_loc(cptr)->account, locargv[1], ACCOUNTLEN);
+      ircd_strncpy(cli_loc(cptr)->password, locargv[2], ACCPASSWDLEN);
     }
     
     /* handle retries */

@@ -627,6 +627,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   char          tmphoste[HOSTLEN + 1];
   char          nu_hoste[NUH_BUFSIZE];
   char          nu_accthoste[NUH_BUFSIZE];
+  char          nu_dnsblhoste[NUH_BUFSIZE];
   char          nu_realhoste[NUH_BUFSIZE];
   char          nu_fakehoste[NUH_BUFSIZE];
   char          nu_ipe[NUI_BUFSIZE];
@@ -634,7 +635,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   char*         sae = NULL;
   char*         sre = NULL;
   char*         sfe = NULL;
-  char*         sfd = NULL;
+  char*         sde = NULL;
   char*         ip_se = NULL;
   in_addr_t     cli_addr = 0;
 
@@ -654,7 +655,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
                           (cli_user(cptr))->host);
 
   if (IsDNSBLMarked(cptr))
-    sfd = make_nick_user_host(nu_realhoste, cli_name(cptr),
+    sde = make_nick_user_host(nu_dnsblhoste, cli_name(cptr),
                               cli_user(cptr)->realusername,
                               cli_user(cptr)->dnsblhost);
 
@@ -731,7 +732,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
     }
     if (match(tmpe->value.except.exceptstr, se) == 0)
       break;
-    else if (sfd && match(tmpe->value.except.exceptstr, sfd) == 0)
+    else if (sde && match(tmpe->value.except.exceptstr, sde) == 0)
       break;
     else if (sre && match(tmpe->value.except.exceptstr, sre) == 0)
       break;
@@ -767,6 +768,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char          tmphost[HOSTLEN + 1];
   char          nu_host[NUH_BUFSIZE];
   char          nu_accthost[NUH_BUFSIZE];
+  char          nu_dnsblhost[NUH_BUFSIZE];
   char          nu_realhost[NUH_BUFSIZE];
   char          nu_fakehost[NUH_BUFSIZE];
   char          nu_ip[NUI_BUFSIZE];
@@ -794,7 +796,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 			  (cli_user(cptr))->host);
 
   if (IsDNSBLMarked(cptr))
-    sd = make_nick_user_host(nu_realhost, cli_name(cptr),
+    sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
                              cli_user(cptr)->realusername,
                              cli_user(cptr)->dnsblhost);
 

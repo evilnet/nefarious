@@ -98,10 +98,6 @@ struct Client;
 #define TOK_VERSION             "V"
 #define CMD_VERSION		MSG_VERSION, TOK_VERSION
 
-#define MSG_MARK                "MARK"          /* MK */
-#define TOK_MARK                "MK"
-#define CMD_MARK		MSG_MARK, TOK_MARK
-
 #define MSG_QUIT                "QUIT"          /* QUIT */
 #define TOK_QUIT                "Q"
 #define CMD_QUIT		MSG_QUIT, TOK_QUIT
@@ -422,6 +418,10 @@ struct Client;
 #define MSG_SWHOIS		"SWHOIS"	/* SWHO */
 #define TOK_SWHOIS		"SW"
 #define CMD_SWHOIS		MSG_SWHOIS, TOK_SWHOIS
+
+#define MSG_MARK		"MARK"		/* MARK */
+#define TOK_MARK		"MK"
+#define CMD_MARK		MSG_MARK, TOK_MARK
 
 /*
  * Constants

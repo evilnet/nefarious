@@ -173,9 +173,8 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     else
       srv = find_match_server(parv[1]);
 
-    if (!srv) {
+    if (!srv)
       return send_reply(sptr, ERR_NOOPERHOST);
-    }
 
     if (IsMe(srv)) {
       parv[1] = parv[2];
@@ -217,7 +216,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
        */
       ClearLocOp(sptr);
       if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
-	/* Global Oper  */
+	/* Global Oper */
 	SetOper(sptr);
 	ClearAdmin(sptr);
       } else {

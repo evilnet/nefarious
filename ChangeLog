@@ -1,3 +1,8 @@
+2005-02-20  Perry Lorier <isomer@undernet.org>
+
+	* ircd/engine_epoll.c: Change a size_t to socklen_t to match
+	getsockopt prototype, so it compiles without warning on amd64
+
 2005-01-21  Michael Poole <mdpoole@troilus.org>
 
 	* ircd/engine_kqueue.c: Move <sys/types.h> earlier to fix build on

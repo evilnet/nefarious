@@ -402,7 +402,7 @@ if test x"$unet_cv_enable_ssl" = xyes; then
     AC_CHECK_LIB(crypto, X509_new, [
       AC_CHECK_HEADERS($base_ssl_inc/openssl/ssl.h $base_ssl_inc/openssl/err.h, [
         unet_cv_enable_ssl="yes";
-        OPENSSL_LDFLAGS="-lssl -lcrypto -lssl"
+        OPENSSL_LDFLAGS="-lssl -lcrypto"
         SSL_C=ssl.c
         AC_SUBST(SSL_C)
       ])
@@ -514,6 +514,25 @@ if test x"$unet_cv_enable_epoll" != xno; then
          AC_DEFINE([EPOLL_NEED_BODY],,[Define to implement epoll system calls])])
     AC_DEFINE([USE_EPOLL], , [Define to enable the epoll engine])
     ENGINE_C="engine_epoll.c $ENGINE_C"
+fi
+
+dnl How to copy one va_list to another?
+AC_CACHE_CHECK([for va_copy], unet_cv_c_va_copy, [AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; va_copy(ap1, ap2);])],
+  [unet_cv_c_va_copy="yes"],
+  [unet_cv_c_va_copy="no"]
+)])
+if test "$unet_cv_c_va_copy" = "yes" ; then
+  AC_DEFINE(HAVE_VA_COPY, 1, [Define if we have va_copy])
+fi
+
+AC_CACHE_CHECK([for __va_copy], unet_cv_c___va_copy, [AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([#include <stdarg.h>], [va_list ap1, ap2; __va_copy(ap1, ap2);])],
+  [unet_cv_c___va_copy="yes"],
+  [unet_cv_c___va_copy="no"]
+)])
+if test "$unet_cv_c___va_copy" = "yes" ; then
+  AC_DEFINE(HAVE___VA_COPY, 1, [Define if we have __va_copy])
 fi
 
 dnl --with-symlink lets us set the name of the symlink; defaults to "ircd"
@@ -812,14 +831,16 @@ AC_MSG_RESULT([$unet_cv_with_maxcon])
 AC_DEFINE_UNQUOTED(MAXCONNECTIONS, $unet_cv_with_maxcon,
 [Maximum number of network connections])
 
-dnl# Enable/disable humor
-AC_ARG_WITH(sense-of-humor, [  --without-sense-of-humor   Specify this if you have no sense of humor], [
-            if test "$withval" = "no"; then
-              HUMOR=none
-            fi
-])
+dnl Enable humor
+AC_MSG_CHECKING([sense of humor])
+AC_ARG_WITH([sense-of-humor],
+[  --with-sense-of-humor   Specify this if you have a sense of humor],
+[unet_cv_with_sense_of_humor=$with_sense_of_humor],
+[AC_CACHE_VAL(unet_cv_with_sense_of_humor,
+[unet_cv_with_sense_of_humor=no])])
+AC_MSG_RESULT([$unet_cv_with_sense_of_humor])
 
-if test -z "$HUMOR"; then
+if test x"$unet_cv_with_sense_of_humor" = xyes; then
   AC_CHECK_LIB(Fridge,mass_quantities_of_beer)
   AC_CHECK_LIB(Fridge,mass_quantities_of_any_alcohol, , [
     echo "Warning: No alcohol was found in your refrigerator."
@@ -828,7 +849,7 @@ if test -z "$HUMOR"; then
 
   AC_CHECK_LIB(Kenny, life_signs, , [
     echo "  Oh my god, they killed Kenny!  You bastards!"
-    AC_DEFINE(HAVE_HUMOR,1,[Does user have a sense of humour?])
+    AC_DEFINE([HAVE_HUMOR], , [Does user have a sense of humor?])
   ])
 fi
 

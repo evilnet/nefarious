@@ -492,7 +492,7 @@ static Numeric replyTable[] = {
 /* 231 */
   { RPL_SERVICEINFO, 0, "231" },
 /* 232 */
-  { RPL_ENDOFSERVICES, 0, "232" },
+  { RPL_RULES, ":- %s", "232" },
 /* 233 */
   { RPL_SERVICE, 0, "233" },
 /* 234 */
@@ -652,9 +652,9 @@ static Numeric replyTable[] = {
 /* 307 */
   { 0 },
 /* 308 */
-  { 0 },
+  { RPL_RULESSTART, ":- %s Network Rules - ", "308" },
 /* 309 */
-  { 0 },
+  { RPL_ENDOFRULES, ":End of /RULES list.", "309" },
 /* 310 */
   { RPL_WHOISSERVICE, "%s :%s", "310" },
 /* 311 */
@@ -1102,7 +1102,6 @@ static Numeric replyTable[] = {
 /* 532 */
   { RPL_RULESSTART, ":- %s Network Rules - ", "532" },
 /* 533 */
-  { RPL_RULES, ":- %s", "533" },
 /* 534 */
   { RPL_ENDOFRULES, ":End of /RULES list.", "534" },
 /* 535 */

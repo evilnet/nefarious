@@ -114,8 +114,8 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_STATSBLINE       229	/* Nefarious extension */
 
 #define RPL_SERVICEINFO      231	/* unused */
-#define RPL_ENDOFSERVICES    232	/* unused */
-/*	RPL_RULES	     232	unreal */
+/* 	RPL_ENDOFSERVICES    232	unused */
+#define	RPL_RULES	     232	/* unreal/Nefarious */
 #define RPL_SERVICE          233	/* unused */
 #define RPL_SERVLIST         234	/* unused */
 #define RPL_SERVLISTEND      235	/* unused */
@@ -219,10 +219,10 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_SUSERHOST	     307	austnet */
 /*      RPL_NOTIFYACTION     308         aircd */
 /*	RPL_WHOISADMIN	     308	Numeric List: Dalnet */
-/*	RPL_RULESSTART	     308	unreal */
+#define	RPL_RULESSTART	     308	/* unreal/Nefarious */
 /*      RPL_NICKTRACE        309         aircd */
 /*	RPL_WHOISSADMIN	     309	Numeric List: Dalnet */
-/*	RPL_ENDOFRULES	     309	unreal */
+#define	RPL_ENDOFRULES	     309	/* unreal/Nefarious */
 /*	RPL_WHOISHELPER	     309	austnet */
 /*      RPL_WHOISSVCMSG      310         Dalnet */
 /*	RPL_WHOISHELPOP	     310	unreal */
@@ -263,7 +263,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      RPL_CHANPASSOK       338           IRCnet extension (?)*/
 #define	RPL_WHOISACTUALLY    338	/* Undernet extension, dalnet */
 /*      RPL_BADCHANPASS      339           IRCnet extension (?)*/
-#define RPL_WHOISDNSBL       339
+#define RPL_WHOISDNSBL       339	/* Nefarious extension */
 #define RPL_USERIP           340        /* Undernet extension */
 #define RPL_INVITING         341
 /*      RPL_SUMMONING        342           removed from RFC1459 */
@@ -357,6 +357,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_NOMOTD           422
 #define ERR_NOADMININFO      423
 /*      ERR_FILEERROR        424           removed from RFC1459 */
+#define ERR_NOOPERMOTD       425	/* unreal/Nefarious */
 
 /* 	ERR_TOOMANYAWAY	     429	    Dalnet */
 #define ERR_NONICKNAMEGIVEN  431
@@ -480,9 +481,6 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_BADHOSTMASK      530	/* QuakeNet extension -froo */
 #define ERR_HOSTUNAVAIL      531	/* QuakeNet extension -froo */
 
-#define RPL_RULESSTART       532
-#define RPL_RULES            532
-#define RPL_ENDOFRULES       534
 #define RPL_OMOTDSTART       535
 #define RPL_OMOTD            536
 #define RPL_ENDOFOMOTD       537
