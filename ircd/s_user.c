@@ -596,36 +596,42 @@ int register_user(struct Client *cptr, struct Client *sptr,
     release_dnsbl_reply(sptr);
 
     if (IsDNSBL(sptr)) {
-      int class_exempt = 0, loc_exempt = 0;
+      if (feature_bool(FEAT_DNSBL_TEST_N_WALLOP)) {
+         sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+                "DNSBL Detected %s!%s@%s (%s)", cli_name(sptr), user->username,
+                cli_user(sptr)->realhost, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
+      } else {
+        int class_exempt = 0, loc_exempt = 0;
 
-      if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
-	   (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0))
-	class_exempt = 1;
+        if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
+  	   (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0))
+    	  class_exempt = 1;
 
-      if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT))
-	loc_exempt = 1;
+        if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+  	  loc_exempt = 1;
 
-      if ((class_exempt == 1) || (loc_exempt == 1)) {
-	loc_exempt = 0;
-	class_exempt = 0;
-      } else
-        if (feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) {
-          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr,
-                                 format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-                                                  cli_user(sptr)->realhost, user->username,
-                                                  cli_name(sptr), cli_dnsblformat(sptr))
-                                                  );
-          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_DNSBL_LOC_EXEMPT_N_ONE));
-          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_DNSBL_LOC_EXEMPT_N_TWO));
-          MyFree(cli_loc(sptr));
-          return 0;
+        if ((class_exempt == 1) || (loc_exempt == 1)) {
+	  loc_exempt = 0;
+	  class_exempt = 0;
         } else
-          if ((feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) || !feature_bool(FEAT_DNSBL_LOC_EXEMPT))
-            return exit_client_msg(sptr, cptr, &me, "%s",
-    			         format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
- 				  		  cli_user(sptr)->realhost, user->username,
-						  cli_name(sptr), cli_dnsblformat(sptr))
-						  );
+          if (feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) {
+            sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr,
+                                   format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+                                                    cli_user(sptr)->realhost, user->username,
+                                                    cli_name(sptr), cli_dnsblformat(sptr))
+                                                    );
+            sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_DNSBL_LOC_EXEMPT_N_ONE));
+            sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_DNSBL_LOC_EXEMPT_N_TWO));
+            MyFree(cli_loc(sptr));
+            return 0;
+          } else
+            if ((feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) || !feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+              return exit_client_msg(sptr, cptr, &me, "%s",
+       		                     format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+ 			  	     	  	      cli_user(sptr)->realhost, user->username,
+						      cli_name(sptr), cli_dnsblformat(sptr))
+		                                      );
+      }
     }
   }
 

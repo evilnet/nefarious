@@ -3,6 +3,18 @@
 
 2005-01-28  Neil Spierling <sirvulcan@gmail.com>
 
+	* doc/example.conf: Changed RECORD to REPLY for X:Lines.
+
+	* include/ircd_features.h: Added an undocumented F:Line for testing
+	the new DNSBL stuff (FEAT_DNSBL_TEST_N_WALLOP).
+
+	* ircd/ircd_features.c: See above.
+
+	* ircd/s_conf.c: Make use of the new line, send a wallop if an
+	connecting client is listed on an dnsbl set in the X:Lines.
+
+2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+
 	* doc/example.conf: Updated X:Lines entry.
 
 	* ircd/s_conf.c: Only check the last octet of the ip.
