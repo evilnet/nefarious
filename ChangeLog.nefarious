@@ -3,6 +3,18 @@
 
 2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_fakehost.c: Allow any server to set a fakehost.
+
+	* ircd/m_mark.c: Search for a nick now, also send a nickname now.
+
+	* ircd/s_serv.c: Send a nickname in MARK.
+
+	* ircd/s_user.c: Any marking commands are to be done after the N token!
+	Send +x's to the client and other servers so that they hide the clients
+	host with the dnsblhost. Send a nickname in MARK.
+
+2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_account.c: Temp debugging stuff.
 
 	* ircd/m_mark.c: Temp debugging stuff.

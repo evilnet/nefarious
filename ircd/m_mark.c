@@ -83,6 +83,7 @@
 #include "config.h"
 
 #include "client.h"
+#include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_features.h"
@@ -116,7 +117,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     struct Client* acptr;
 
     Debug((DEBUG_DEBUG, "Recieving Mark"));
-    if ((acptr = findNUser(parv[1]))) {
+    if ((acptr = FindUser(parv[1]))) {
       Debug((DEBUG_DEBUG, "Marking: %s d: %s f: %s r: %s", cli_name(acptr), parv[3],
              parv[4], parv[parc-1]));
 
@@ -137,7 +138,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
 
       ircd_snprintf(0, cli_user(acptr)->dnsblhost, HOSTLEN, "%s", parv[5]);
 
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s :%s", acptr, MARK_DNSBL,
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s :%s", cli_name(acptr), MARK_DNSBL,
                             cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
     } else
       Debug((DEBUG_DEBUG, "Mark Cant Find %s", parv[1]));

@@ -643,32 +643,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
 						      cli_name(sptr), cli_dnsblformat(sptr))
 		                                      );
       }
-    } else if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
-      char flagbuf[BUFSIZE];
-
-      if (IsDNSBLMarked(sptr)) {
-        ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
-        strcat(flagbuf, "m");
-
-        if (feature_bool(FEAT_FAKEHOST) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST)) {
-          SetFakeHost(sptr);
-          SetHiddenHost(sptr);
-          ircd_snprintf(0, cli_user(sptr)->fakehost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));  
-          hide_hostmask(sptr);
-  
-          sendcmdto_serv_butone(sptr, CMD_FAKEHOST, cptr, "%C %s", sptr,
-                                cli_user(sptr)->fakehost);
-        }
-      }
-
-      strcat(flagbuf, "a");
-
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s :%s", sptr, MARK_DNSBL, cli_dnsbl(sptr),
-                            flagbuf, cli_user(sptr)->dnsblhost, cli_dnsblformat(sptr));
-
-      Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
-          cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
-          IsDNSBL(sptr) ? "1" : "0", IsDNSBLMarked(sptr) ? "1" : "0", IsDNSBLAllowed(sptr) ? "1" : "0"));
     }
   }
 
@@ -829,6 +803,36 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyUser(sptr))
   {
     struct Flags flags;
+
+    if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
+      char flagbuf[BUFSIZE];
+
+      if (IsDNSBLMarked(sptr)) {
+        ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
+        strcat(flagbuf, "m");
+
+        if (feature_bool(FEAT_FAKEHOST) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST)) {
+          SetFakeHost(sptr);
+          SetHiddenHost(sptr);
+          ircd_snprintf(0, cli_user(sptr)->fakehost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
+          hide_hostmask(sptr);
+
+          sendcmdto_serv_butone(cli_user(sptr)->server, CMD_FAKEHOST, cptr, "%C %s", sptr,
+                                cli_user(sptr)->fakehost);
+          sendcmdto_one(sptr, CMD_MODE, cptr, "%s %s", cli_name(sptr), "+x");
+          sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s %s", cli_name(sptr), "+x");
+        }
+      }
+
+      strcat(flagbuf, "a");
+
+      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s %s %s :%s", cli_name(sptr), MARK_DNSBL, 
+                            cli_dnsbl(sptr), flagbuf, cli_user(sptr)->dnsblhost, cli_dnsblformat(sptr));
+
+      Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
+            cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
+            IsDNSBL(sptr) ? "1" : "0", IsDNSBLMarked(sptr) ? "1" : "0", IsDNSBLAllowed(sptr) ? "1" : "0"));
+    }
 
     /*
      * Set user's initial modes

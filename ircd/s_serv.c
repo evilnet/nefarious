@@ -258,9 +258,8 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 	sendcmdto_one(cli_user(acptr)->server, CMD_SWHOIS, cptr,
 		      "%C :%s", acptr, cli_user(acptr)->swhois);
       if (IsDNSBLMarked(acptr)) /* Burst even if dnsbl is disabled */
-        sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%C %s %s ma %s :%s",
-                              acptr, MARK_DNSBL, cli_dnsbl(acptr), cli_user(acptr)->dnsblhost,
-                              cli_dnsblformat(acptr));
+        sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s %s ma %s :%s", cli_name(acptr),
+                      MARK_DNSBL, cli_dnsbl(acptr), cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
 
     }
   }
