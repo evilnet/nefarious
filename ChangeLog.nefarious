@@ -1,5 +1,10 @@
 2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
 
+	* tools/makepem: Added basic support for users who already have an existing SSL
+	certificate they wish to use.
+
+2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/s_user.c: Dont let unregistered users send B:Line'd commands.
 
 2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
