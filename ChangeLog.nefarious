@@ -6,6 +6,8 @@
 	* ircd/s_serv.c: We only want to send dnsbl info to the linking
 	server.
 
+	* ircd/s_user.c: Send MARK from the server not the client.
+
 2005-02-21  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_err.c: Oops, forgot to remove the old entries.
