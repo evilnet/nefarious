@@ -135,7 +135,7 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /*
      * Maybe the user wants to rehash another server with no parameters.
      * NOTE: Here we assume that there are no servers named
-     * 'm', 'l' or 'q'.
+     * 'm', 'l', 's', or 'q'.
      */
     else if (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME)
       return 0;
@@ -166,12 +166,18 @@ int ms_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
       log_reopen(); /* reopen log files */
       return 0;
+#ifdef USE_SSL
+    } else if (*parv[1] == 's') {
+      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening SSL pem file");
+      ssl_init();
+      return 0;
+#endif
     } else if (*parv[1] == 'q')
       flag = 2;
     /*
      * Maybe the user wants to rehash another server with no parameters.
      * NOTE: Here we assume that there are no servers named
-     * 'm', 'l' or 'q'.
+     * 'm', 'l', 's', or 'q'.
      */
     else if ((parc == 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME))
       return 0;

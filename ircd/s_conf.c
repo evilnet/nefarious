@@ -50,6 +50,9 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
+#ifdef USE_SSL
+#include "ssl.h"
+#endif /* USE_SSL */
 #include "ircd_struct.h"
 #include "support.h"
 #include "sys.h"
@@ -1703,6 +1706,10 @@ int rehash(struct Client *cptr, int sig)
   read_configuration_file();
 
   log_reopen(); /* reopen log files */
+
+#ifdef USE_SSL
+  ssl_init();
+#endif /* USE_SSL */
 
   close_listeners();
   class_delete_marked();         /* unless it fails */

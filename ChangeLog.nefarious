@@ -1,6 +1,15 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-12-16  Reed Loden  <reed@reedloden.com>
+
+	* ircd/channel.c: Oops, I thought I fixed this.
+
+	* ircd/m_rehash.c: Added SSL pem reopening support where it was
+	missing.
+
+	* ircd/s_conf.c: Reopen SSL pem files on rehash.
+
 2004-12-15  Reed Loden  <reed@reedloden.com>
 
 	* configure: Ran autoconf.

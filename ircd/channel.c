@@ -2821,7 +2821,7 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 
   /* If they're not an oper, they can't change modes */
   if ((state->flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER))
-      && !(state.flags & MODE_PARSE_ISHALFOP)) {
+      && !(state->flags & MODE_PARSE_ISHALFOP)) {
     send_notoper(state);
     return;
   }
