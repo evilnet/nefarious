@@ -84,11 +84,7 @@
 #include "client.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
-#include "ircd_alloc.h"
-#include "ircd_features.h"
-#include "s_user.h"
 #include "send.h"
-#include "struct.h"
 
 #include <assert.h>
 

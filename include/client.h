@@ -246,10 +246,6 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
-  
-  char *cli_cs_user;		/* channel service authentication (user)... */
-  char *cli_cs_pass;		/* ...and password... */
-  char *cli_cs_service;		/* ...and the service bot's nick */
 };
 
 #define CLIENT_MAGIC 0x4ca08286
