@@ -235,7 +235,7 @@ struct Channel {
   struct SLink*      banlist;
   struct Mode        mode;
   char               topic[TOPICLEN + 1];
-  char               topic_nick[NICKLEN + HOSTLEN + 3];
+  char               topic_nick[NICKLEN + USERLEN + HOSTLEN + 3];
   char               chname[1];
 };
 

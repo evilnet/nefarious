@@ -1,3 +1,12 @@
+2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
+
+	* include/channel.h: Bumped up the size of topic_nick more so it can hold a
+	a users ident and a !.
+
+	* ircd/m_topic.c: Must of been tried when i done the host in topic stuff. Added
+	the display of a users ident, so now the output looks like this:
+	[03:03] * Set by gandalf!BigDaddy@306cb8dc.15ce75d4.jet.net.nz on Sun Jun 20 02:28:41
+
 2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added new F:Line.
