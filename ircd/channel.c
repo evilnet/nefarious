@@ -1075,7 +1075,7 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'N';
   if (chptr->mode.mode & MODE_OPERONLY)
     *mbuf++ = 'O';
-  if (chptr->mode.mode & MODE_OPERONLY)
+  if (chptr->mode.mode & MODE_ADMINONLY)
     *mbuf++ = 'A';
   if (chptr->mode.mode & MODE_NOQUITPARTS)
     *mbuf++ = 'Q';
