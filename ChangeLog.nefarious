@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-22  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_serv.c: We only want to send dnsbl info to the linking
+	server.
+
 2005-02-21  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_err.c: Oops, forgot to remove the old entries.
