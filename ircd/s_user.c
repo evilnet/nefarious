@@ -2309,6 +2309,9 @@ lsc(struct Client *cptr, char *target, const char *prepend,
   char *kludge;
   int x; 
 
+  if (!IsRegistered(cptr))
+    return 0;
+
   if (feature_bool(FEAT_IDLE_FROM_MSG))
     cli_user(cptr)->last = CurrentTime;
   

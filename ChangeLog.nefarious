@@ -1,5 +1,9 @@
 2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/s_user.c: Dont let unregistered users send B:Line'd commands.
+
+2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
+
 	* include/channel.h: Bumped up the size of topic_nick more so it can hold a
 	a users ident and a !.
 
