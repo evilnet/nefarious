@@ -20,6 +20,8 @@
 	* Add FEAT_OPER_LOCAL_CHANNELS so when local channels are
 	disabled, opers can still join.
 
+	* ircd/channel.c: Fix modestuff in /list (thanks IK).
+
 	* ircd/m_clearmode.c, ircd/m_opmode.c: Use
 	cli_user(tmp->user)->server instead.
 

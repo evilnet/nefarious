@@ -1233,7 +1233,7 @@ void list_next_channels(struct Client *cptr, int nr)
 {
   char modebuf[MODEBUFLEN];
   char parabuf[MODEBUFLEN];
-  char modestuff[TOPICLEN + MODEBUFLEN + 4];
+  char modestuff[TOPICLEN + MODEBUFLEN + 5];
   struct ListingArgs *args = cli_listing(cptr);
   struct Channel *chptr = args->chptr;
   chptr->mode.mode &= ~MODE_LISTED;
@@ -1251,17 +1251,14 @@ void list_next_channels(struct Client *cptr, int nr)
           chptr->topic_time < args->max_topic_time)))
       {
         if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr)) {
-	  modebuf[0] = '\0';
-	  parabuf[0] = '\0';
+	  modebuf[0] = parabuf[0] = modestuff[0] = 0;
 	  channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
 	  if (modebuf[1] != '\0') {
 	    strcat(modestuff, "[");
+	    strcat(modestuff, modebuf);
 	    if (*parabuf) {
-	      strcat(modestuff, modebuf);
 	      strcat(modestuff, " ");
 	      strcat(modestuff, parabuf);
-	    } else {
-	      strcat(modestuff, modebuf);
 	    }
 	    strcat(modestuff, "] ");
 	  }
