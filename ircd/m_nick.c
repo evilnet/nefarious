@@ -207,7 +207,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
    /* Don't let users use X<numerics here> so they can't fake X2 -reed */
    if(!IsAnOper(sptr) && nick[0] == 'X' && IsDigit(nick[1])
-      && !IsAlpha(*nick))
+      && !IsAlpha(nick))
    {
      send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
      return 0;

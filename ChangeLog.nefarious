@@ -6,6 +6,8 @@
 
 	* Added topicburst from asuka.
 
+	* Added badnicks for X<numerics here> and fixed it.
+
 2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
 
 	* ircd/gline.c: fixed the counting bug in gline_memory_count
