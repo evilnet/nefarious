@@ -653,9 +653,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
           loc_exempt = 0;
           class_exempt = 0;
         } else
-          return exit_client_msg(cptr, cptr, &me, "%s",
+          return exit_client_msg(cptr, sptr, &me, "%s",
                                  format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-                                                  cli_user(sptr)->realhost, cli_username(sptr), 
+                                                  cli_user(sptr)->realhost, cli_username(sptr),
                                                   cli_name(sptr), cli_dnsblformat(sptr))
                                  );
       }

@@ -18,9 +18,13 @@
 	using a it just wont get a auto voice if its +m.
 
 	* ircd/s_user.c: If DNSBL_LOC_EXEMPT is TRUE then if a user who
-	gets a positive match on a DNSBL check logs in using LOC they
-	will get past the DNSBL rejection. Also adjusted the format
-	message to use realhost instead of host.
+			  gets a positive match on a DNSBL check logs in
+			  using LOC they will get past the DNSBL
+			  rejection.
+			 Adjusted the format message to use realhost
+			  instead of host.
+			 Modified exit_client_msg, other servers wont
+			  return protocol errors now.
 
 2004-10-18  Reed Loden  <reed@reedloden.com>
 
