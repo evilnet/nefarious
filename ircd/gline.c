@@ -238,7 +238,7 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	    }
 	  }
 	} else { 
-	  if (chptr=FindChannel(gline->gl_user)) { 
+	  if ((chptr=FindChannel(gline->gl_user))) { 
 	    for (member=chptr->members;member;member=nmember) { 
 	      nmember=member->next_member;
 	      if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user)) 
