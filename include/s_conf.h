@@ -195,6 +195,15 @@ struct svcline {
   char *prepend;
 };
 
+struct blline {
+  struct blline *next;
+  char *server;
+  char *replies;
+  char *url;
+  char *name;
+};
+
+
 /*
  * GLOBALS
  */
@@ -208,6 +217,7 @@ extern struct qline*	GlobalQuarantineList;
 extern struct sline*	GlobalSList;
 extern struct csline*	GlobalConnStopList;
 extern struct svcline*	GlobalServicesList;
+extern struct blline*	GlobalBLList;
 
 /*
  * Proto types
@@ -247,6 +257,9 @@ extern int str2prefix(char *s, struct prefix *p);
 extern int find_csline(struct Client* sptr, const char* mask);
 extern void conf_add_csline(const char* const* fields, int count);
 extern void clear_cslines(void);
+extern void conf_add_dnsbl_line(const char* const* fields, int count);
+extern void clear_dnsbl_lines(void);
+extern int find_blline(struct Client* sptr, const char* replyip, char *checkhost);
 extern void conf_add_svcline(const char * const* fields, int count); 
 extern void clear_svclines(void);
 extern struct svcline *find_svc(const char *cmd);

@@ -77,6 +77,12 @@ static struct {
   unsigned int length;
 } HeaderMessages [] = {
   /* 123456789012345678901234567890123456789012345678901234567890 */
+  { "NOTICE AUTH :*** Checking your IP against DNS ban " \
+    "lists\r\n",                                           58 },
+  { "NOTICE AUTH :*** IP passed DNS ban list check\r\n",   47 },
+  { "NOTICE AUTH :*** IP passed DNS ban list check (cached)\r\n", 56 },
+  { "NOTICE AUTH :*** IP found on DNS ban list\r\n",       43 },
+  { "NOTICE AUTH :*** IP found on DNS ban list (cached)\r\n", 52 },
   { "NOTICE AUTH :*** Looking up your hostname\r\n",       43 },
   { "NOTICE AUTH :*** Found your hostname\r\n",            38 },
   { "NOTICE AUTH :*** Found your hostname, cached\r\n",    46 },
@@ -90,6 +96,11 @@ static struct {
 };
 
 typedef enum {
+  REPORT_DO_DNSBL,
+  REPORT_FIN_DNSBL,
+  REPORT_FIN_DNSBLC,
+  REPORT_FAIL_DNSBL,
+  REPORT_FAIL_DNSBLC,
   REPORT_DO_DNS,
   REPORT_FIN_DNS,
   REPORT_FIN_DNSC,
@@ -116,6 +127,108 @@ static void release_auth_client(struct Client* client);
 static void unlink_auth_request(struct AuthRequest* request,
                                 struct AuthRequest** list);
 void free_auth_request(struct AuthRequest* auth);
+
+
+static void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
+{
+
+  struct AuthRequest* auth = (struct AuthRequest*) vptr;
+
+  assert(0 != auth);
+  /*
+   * need to do this here so auth_kill_client doesn't
+   * try have the resolver delete the query it's about
+   * to delete anyways. --Bleep
+   */
+  ClearDNSBLPending(auth);
+
+  if (reply) {
+    const struct hostent* hp = reply->hp;
+
+    int pass = 0;
+    int i;
+
+    assert(0 != hp);
+
+    for (i = 0; hp->h_addr_list[i]; ++i) {
+        if (!find_blline(auth->client, ircd_ntoa((char*) hp->h_addr_list[i]), hp->h_name))
+          pass = 1;
+        else {
+          pass = 0;
+          break;
+        }
+    }
+
+    if (!pass) {
+      if (IsUserPort(auth->client))
+        sendheader(auth->client, REPORT_FAIL_DNSBL);
+    } else {
+      if (IsUserPort(auth->client))
+        sendheader(auth->client, REPORT_FIN_DNSBL);
+    }
+  } else {
+    if (IsUserPort(auth->client))
+      sendheader(auth->client, REPORT_FIN_DNSBL);
+  }
+}
+
+
+static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
+{
+  u_long ip;
+  u_char *ipo = (u_char *) &ip;
+
+  static char hname[HOSTLEN + 1] = "";
+
+  struct blline *blline;
+  struct DNSQuery query;
+
+  int pass = 0, i = 0;
+
+  if (!feature_bool(FEAT_DNSBL_CHECKS))
+    return 0;
+
+  query.vptr     = auth;
+  query.callback = auth_dnsbl_callback;
+
+  ip = cli_ip(auth->client).s_addr;
+
+  if (IsUserPort(auth->client))
+    sendheader(client, REPORT_DO_DNSBL);
+
+  for (blline = GlobalBLList; blline; blline = blline->next) {
+    ircd_snprintf(0, hname, HOSTLEN + 1, "%d.%d.%d.%d.%s", ipo[3],
+                  ipo[2], ipo[1], ipo[0], blline->server);
+
+    cli_dnsbl_reply(client) = gethost_byname(hname, &query);
+
+    if (cli_dnsbl_reply(client)) {
+      ++(cli_dnsbl_reply(client))->ref_count;
+      for (i = 0; cli_dnsbl_reply(client)->hp->h_addr_list[i]; ++i) {
+          if (!find_blline(auth->client, ircd_ntoa((char*)
+               cli_dnsbl_reply(client)->hp->h_addr_list[i]), cli_dnsbl_reply(client)->hp->h_name))
+            pass = 1;
+          else {
+            pass = 0;
+            break;
+          }
+      }
+  
+      if (pass == 1) {
+        if (IsUserPort(auth->client))
+          sendheader(client, REPORT_FIN_DNSBLC);
+      } else {
+        if (IsUserPort(auth->client))
+          sendheader(client, REPORT_FAIL_DNSBLC);
+      }
+    } else
+      SetDNSBLPending(auth);
+  }
+
+  return 0;
+}
+
+
 
 /*
  * auth_timeout - timeout a given auth request
@@ -215,6 +328,12 @@ void destroy_auth_request(struct AuthRequest* auth, int send_reports)
       sendheader(auth->client, REPORT_FAIL_DNS);
   }
 
+  if (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)) {
+    delete_resolver_queries(auth);
+    if (send_reports && IsUserPort(auth->client))
+      sendheader(auth->client, REPORT_FIN_DNS);
+  }
+
   if (send_reports) {
     log_write(LS_RESOLVER, L_INFO, 0, "DNS/AUTH timeout %s",
 	      get_client_name(auth->client, HIDE_IP));
@@ -310,7 +429,7 @@ static void auth_kill_client(struct AuthRequest* auth)
 
   unlink_auth_request(auth, (IsDoingAuth(auth)) ? &AuthPollList : &AuthIncompleteList);
 
-  if (IsDNSPending(auth))
+  if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)))
     delete_resolver_queries(auth);
   IPcheck_disconnect(auth->client);
   Count_unknowndisconnects(UserStats);
@@ -434,7 +553,7 @@ static void auth_error(struct AuthRequest* auth, int kill)
   ClearAuth(auth);
   unlink_auth_request(auth, &AuthPollList);
 
-  if (IsDNSPending(auth))
+  if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)))
     link_auth_request(auth, &AuthIncompleteList);
   else {
     release_auth_client(auth->client);
@@ -637,11 +756,13 @@ void start_auth(struct Client* client)
     }
   }
 
+  start_dnsblcheck(auth, client);
+
   if (start_auth_query(auth)) {
     Debug((DEBUG_LIST, "identd query for %p initiated successfully",
 	   auth->client));
     link_auth_request(auth, &AuthPollList);
-  } else if (IsDNSPending(auth)) {
+  } else if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS))) {
     Debug((DEBUG_LIST, "identd query for %p not initiated successfully; "
 	   "waiting on DNS", auth->client));
     link_auth_request(auth, &AuthIncompleteList);
@@ -736,10 +857,11 @@ void read_auth_reply(struct AuthRequest* auth)
   }
   unlink_auth_request(auth, &AuthPollList);
 
-  if (IsDNSPending(auth))
+  if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)))
     link_auth_request(auth, &AuthIncompleteList);
   else {
     release_auth_client(auth->client);
     free_auth_request(auth);
   }
 }
+

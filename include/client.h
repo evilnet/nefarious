@@ -156,6 +156,7 @@ enum Flag {
     FLAG_NOIDLE,                    /* ASUKA_I: hide idle time */
     FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
     FLAG_VERIFIED,                  /* Verified user */
+    FLAG_DNSBL,                     /* Client in DNSBL */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -200,6 +201,8 @@ struct Connection {
   HandlerType         con_handler; /* message index into command table
 				      for parsing */
   struct DNSReply*    con_dns_reply; /* DNS reply used during client
+					registration */
+  struct DNSReply*    con_dnsbl_reply; /* DNSBL reply used during client
 					registration */
   struct ListingArgs* con_listing;
   unsigned int        con_max_sendq; /* cached max send queue for client */
@@ -252,6 +255,8 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
+  char cli_dnsblurl[BUFSIZE + 1];
+  char cli_dnsblname[BUFSIZE + 1];
 };
 
 #define CLIENT_MAGIC 0x4ca08286
@@ -281,6 +286,8 @@ struct Client {
 #define cli_name(cli)		((cli)->cli_name)
 #define cli_username(cli)	((cli)->cli_username)
 #define cli_info(cli)		((cli)->cli_info)
+#define cli_dnsblurl(cli)       ((cli)->cli_dnsblurl)
+#define cli_dnsblname(cli)      ((cli)->cli_dnsblname)
 
 #define cli_count(cli)		((cli)->cli_connect->con_count)
 #define cli_fd(cli)		((cli)->cli_connect->con_fd)
@@ -302,6 +309,7 @@ struct Client {
 #define cli_confs(cli)		((cli)->cli_connect->con_confs)
 #define cli_handler(cli)	((cli)->cli_connect->con_handler)
 #define cli_dns_reply(cli)	((cli)->cli_connect->con_dns_reply)
+#define cli_dnsbl_reply(cli)	((cli)->cli_connect->con_dnsbl_reply)
 #define cli_listing(cli)	((cli)->cli_connect->con_listing)
 #define cli_max_sendq(cli)	((cli)->cli_connect->con_max_sendq)
 #define cli_ping_freq(cli)	((cli)->cli_connect->con_ping_freq)
@@ -341,6 +349,7 @@ struct Client {
 #define con_confs(con)		((con)->con_confs)
 #define con_handler(con)	((con)->con_handler)
 #define con_dns_reply(con)	((con)->con_dns_reply)
+#define con_dnsbl_reply(con)	((con)->con_dnsbl_reply)
 #define con_listing(con)	((con)->con_listing)
 #define con_max_sendq(con)	((con)->con_max_sendq)
 #define con_ping_freq(con)	((con)->con_ping_freq)
@@ -451,6 +460,7 @@ struct Client {
 #define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
 #define IsVerified(x)		HasFlag(x, FLAG_VERIFIED)
+#define IsDNSBL(x)              HasFlag(x, FLAG_DNSBL)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -483,6 +493,7 @@ struct Client {
 #define SetNoChan(x)		SetFlag(x, FLAG_NOCHAN)
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
 #define SetVerified(x)		SetFlag(x, FLAG_VERIFIED)
+#define SetDNSBL(x)             SetFlag(x, FLAG_DNSBL)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)

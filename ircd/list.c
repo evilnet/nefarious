@@ -156,6 +156,8 @@ static void dealloc_connection(struct Connection* con)
 
   if (con_dns_reply(con))
     --(con_dns_reply(con)->ref_count);
+  if (con_dnsbl_reply(con))
+    --(con_dnsbl_reply(con)->ref_count);
   if (-1 < con_fd(con))
     close(con_fd(con));
   MsgQClear(&(con_sendQ(con)));

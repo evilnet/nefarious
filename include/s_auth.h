@@ -46,11 +46,16 @@ struct AuthRequest {
 #define AM_AUTH_CONNECTING   0x01
 #define AM_AUTH_PENDING      0x02
 #define AM_DNS_PENDING       0x04
+#define AM_DNSBL_PENDING     0x08
 
 #define AM_SOCKET            0x40 /* socket structure not destroyed */
 #define AM_TIMEOUT           0x80 /* timer structure not destroyed */
 
 #define AM_FREE_MASK         (AM_SOCKET | AM_TIMEOUT)
+
+#define SetDNSBLPending(x)   ((x)->flags |= AM_DNSBL_PENDING)
+#define ClearDNSBLPending(x) ((x)->flags &= ~AM_DNSBL_PENDING)
+#define IsDNSBLPending(x)    ((x)->flags &  AM_DNSBL_PENDING)
 
 #define SetDNSPending(x)     ((x)->flags |= AM_DNS_PENDING)
 #define ClearDNSPending(x)   ((x)->flags &= ~AM_DNS_PENDING)

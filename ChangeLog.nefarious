@@ -1,6 +1,46 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added X:Lines stuff.
+			    Added features, DNSBL_CHECKS.
+					    DNSBL_EXEMPT_CLASS.
+					    HIS_STATS_X.
+
+	* include/client.h: Misc DNSBL client declerations.
+
+	* include/ircd_features.h: Added new features (see example.conf).
+
+	* include/ircd_struct.h: Couple of new entries in the User
+	struct for dnsbl url and name if a user is matched on a DNSBL.
+
+	* include/numeric.h: Added numeric for stats X (240).
+
+	* include/s_auth.h: DNSBL pending set/is/clear stuff.
+
+	* include/s_bsd.h: release_dnsbl_reply decleration.
+
+	* include/s_conf.h: blline struct and declerations.
+
+	* ircd/ircd_features.c: Added new features (see example.conf).
+
+	* ircd/list.c: DNSBL tweaks.
+
+	* ircd/s_auth.c: Main functions for checking hosts if they
+	are active on a DNSBL.
+
+	* ircd/s_conf.c: Functions for building and clearing the
+	blline struct. Also a function for searching the blline
+	struct.
+
+	* ircd/s_err.c: Added numeric for stats X (240).
+
+	* ircd/s_stats.c: Added /stats X.
+
+	* ircd/s_user.c: Check if a user is marked as ab active dnsbl,
+	if so then reject them.
+
 2004-09-08  Reed Loden  <reed@reedloden.com>
 
 	* configure: Ran autoconf.

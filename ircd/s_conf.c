@@ -75,6 +75,7 @@ struct qline*    GlobalQuarantineList = 0;
 struct sline*    GlobalSList = 0;
 struct csline*   GlobalConnStopList = 0;
 struct svcline*  GlobalServicesList = 0;
+struct blline*   GlobalBLList = 0;
 
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
@@ -798,6 +799,81 @@ void clear_cslines(void)
   }
 }
 
+
+void conf_add_dnsbl_line(const char* const* fields, int count)
+{
+  struct blline *blline;
+
+  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
+     EmptyString(fields[3]) || EmptyString(fields[4]))
+    return;
+
+  blline = (struct blline *) MyMalloc(sizeof(struct blline));
+  DupString(blline->server, fields[1]);
+  DupString(blline->replies, fields[2]);
+  DupString(blline->url, fields[3]);
+  DupString(blline->name, fields[4]);
+  blline->next = GlobalBLList;
+  GlobalBLList = blline;
+}
+
+void clear_dnsbl_list(void)
+{
+  struct blline *blline;
+  while ((blline = GlobalBLList)) {
+    GlobalBLList = blline->next;
+    MyFree(blline->server);
+    MyFree(blline->replies);
+    MyFree(blline->url);
+    MyFree(blline->name);
+    MyFree(blline);
+  }
+}
+
+int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
+{
+  struct blline *blline;
+
+  static char dhname[HOSTLEN + 1] = "";
+  static char rname[HOSTLEN + 1] = "";
+
+  char* rep;
+  char* p = 0;
+  char* repb;
+  char* q = 0;
+
+  int c = 0;
+  int a = 0;
+
+
+  for (rep = ircd_strtok(&p, checkhost, "."); rep; rep = ircd_strtok(&p, 0, ".")) {
+    if (c == 4) {
+      ircd_snprintf(0, dhname, HOSTLEN + 1, "%s", rep);
+    } else if (c > 4) {
+      ircd_snprintf(0, dhname, HOSTLEN + 1, "%s.%s", dhname,rep);
+    }
+    c++;
+  }
+
+  for (blline = GlobalBLList; blline; blline = blline->next) {
+    for (repb = ircd_strtok(&q, blline->replies, ","); repb; repb = ircd_strtok(&q, 0, ",")) {
+      ircd_snprintf(0, rname, HOSTLEN + 1, "127.0.0.%s", repb);
+      if (!ircd_strcmp(rname, replyip)) {
+        SetDNSBL(sptr);
+        ircd_strncpy(cli_dnsblurl(sptr), blline->url, HOSTLEN);
+        ircd_strncpy(cli_dnsblname(sptr), blline->name, HOSTLEN);
+        a = 1;
+      }
+    }
+  }
+
+  if (a == 1)
+    return 1;
+  else
+    return 0;
+
+}
+
 void conf_add_local(const char* const* fields, int count)
 {
   if (count < 6 || EmptyString(fields[1]) || EmptyString(fields[5])) {
@@ -1259,6 +1335,11 @@ int read_configuration_file(void)
     case 'u':      /* *Every* server on the net must define the same !!! */
       aconf->status = CONF_UWORLD;
       break;
+    case 'X':
+    case 'x':
+      conf_add_dnsbl_line(field_vector, field_count);
+      aconf->status = CONF_ILLEGAL;
+      break;
     case 'Y':
     case 'y':      /* CONF_CLASS */
       conf_add_class(field_vector, field_count);
@@ -1438,6 +1519,7 @@ int rehash(struct Client *cptr, int sig)
   clear_quarantines();
   clear_slines();
   clear_cslines();
+  clear_dnsbl_list();
   clear_svclines();
 
   if (sig != 2)

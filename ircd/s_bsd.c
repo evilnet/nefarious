@@ -429,6 +429,20 @@ void release_dns_reply(struct Client* cptr)
   }
 }
 
+
+void release_dnsbl_reply(struct Client* cptr)
+{
+  assert(0 != cptr);
+  assert(MyConnect(cptr));
+
+  if (cli_dnsbl_reply(cptr)) {
+    assert(0 < cli_dnsbl_reply(cptr)->ref_count);
+    --(cli_dnsbl_reply(cptr))->ref_count;
+    cli_dnsbl_reply(cptr) = 0;
+  }
+}
+
+
 /*
  * completed_connection
  *

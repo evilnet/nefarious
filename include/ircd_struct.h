@@ -81,6 +81,8 @@ struct User {
   time_t	     acc_create;
   char               virtip[SOCKIPLEN + 30];
   char               virthost[HOSTLEN + 1];
+  char               dnsblurl[255];
+  char               dnsblname[255];
 };
 
 #endif /* INCLUDED_ircd_struct_h */

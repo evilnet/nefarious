@@ -302,6 +302,15 @@ stats_cslines(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_dnsbl(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct blline *blline;
+
+  for (blline = GlobalBLList; blline; blline = blline->next)
+    send_reply(to, RPL_STATSXLINE, blline->server, blline->replies, blline->url, blline->name);
+}
+
+static void
 stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   struct qline *qline;
@@ -520,10 +529,13 @@ struct StatDesc statsinfo[] = {
     calc_load, 0,
     "Userload statistics." },
 #ifdef DEBUGMODE
-  { 'x', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_x,
+  { 'x', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_x,
     stats_meminfo, 0,
     "List usage information (Debug only)." },
 #endif
+  { 'X', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_X,
+    stats_dnsbl, 0,
+    "Configured DNSBL hosts." },
   { 'y', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_y,
     report_classes, 0,
     "Connection classes." },

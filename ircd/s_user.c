@@ -598,6 +598,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
     cli_handler(sptr) = CLIENT_HANDLER;
     release_dns_reply(sptr);
 
+    if (feature_bool(FEAT_DNSBL_CHECKS)) {
+      release_dnsbl_reply(sptr);
+
+      if (IsDNSBL(sptr) && (get_client_class(sptr) != feature_int(FEAT_DNSBL_EXEMPT_CLASS)))
+        return exit_client_msg(cptr, sptr, &me, "Your IP (%s) has been found in %s. See %s%s for further information.",
+                              (char*)ircd_ntoa((const char*) &(cli_ip(sptr))), cli_dnsblname(sptr), cli_dnsblurl(sptr),
+                              (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
+    }
+
   /*
    * even though a client isnt auto +x'ing we still do a virtual 
    * ip of the client so we dont have to do it each time the client +x's 
