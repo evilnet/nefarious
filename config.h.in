@@ -112,6 +112,9 @@
 /* Path to data directory */
 #undef DPATH
 
+/* Define to implement epoll system calls */
+#undef EPOLL_NEED_BODY
+
 /* Force inlining for a few critical functions */
 #undef FORCEINLINE
 

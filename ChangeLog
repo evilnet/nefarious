@@ -1,3 +1,43 @@
+2004-05-14  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* ircd/ircd_features.c: per CFV-0243, NICKLEN default is increased
+	to 12
+
+	* ircd/s_user.c: process account creation timestamp if present in
+	user mode portion of a N protocol message; add account creation
+	timestamp to outgoing N protocol messages if that timestamp is
+	non-zero
+
+	* ircd/m_account.c: process account creation timestamp if present
+	in AC protocol message
+
+	* include/struct.h: add account creation timestamp
+
+2004-03-20  Isomer <isomer@undernet.org>
+	* ircd/m_invite.c: Disallow invites to non existant channels
+
+2004-02-27  Entrope <entrope@clan-dk.org>
+        * ircd/ircd.c: Move the PID file acquisition after reading
+        the config file, so that F:PPATH works.
+
+2004-02-27  Entrope <entrope@clan-dk.org>
+
+        * doc/readme.who: Describe the support for matching on and
+        showing account names.
+
+2004-02-16  Entrope <entrope@gamesurge.net>
+
+        * configure.in: Check for missing epoll functions.
+
+        * ircd/engine_epoll.c: Use the results.
+
+        * config.h.in, configure: Regenerate.
+
+2004-03-07  Kevin L Mitchell  <klmitch@mit.edu>
+
+	* ircd/gline.c (gline_stats): gotta have an else here or we end up
+	with some nice server crashes
+
 2004-01-31  Kevin L Mitchell  <klmitch@mit.edu>
 
 	* include/patchlevel.h (PATCHLEVEL): update patchlevel...

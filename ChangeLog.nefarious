@@ -1,18 +1,25 @@
+2004-06-01  Reed Loden  <reed@reedloden.com>
+
+	* Sync with u2.10.11.07(pre1).
+
+	* Add beware's (Bas Steendijk) fix for ban matching.
+
 2004-04-11  Neil Spierling  <sirvulcan@sirvulcan.org>
 
-	* aclocal.m4: Added some extra macros for checking for the executable
-		        extension (handy for windows) + reran autoconf
+	* aclocal.m4: Added some extra macros for checking for the
+	executable extension (handy for windows) + reran autoconf.
 
-	* configure.in: If the host is a cygwin system then hide autoimport stuff,
-                          also reran autoconf.
+	* configure.in: If the host is a cygwin system then hide
+	autoimport stuff; also reran autoconf.
 
-	* ircd/Makefile.in: Use the extension found via the exta aclocal macros,
-			      chmod ircd properly in windows.
+	* ircd/Makefile.in: Use the extension found via the exta
+	aclocal macros, chmod ircd properly in windows.
 
 2004-04-05  Neil Spierling  <sirvulcan@sirvulcan.org>
 
-	* ircd/ircd.c: Added a few more optional paramaters to the ircd, they will
-		       make life easier for users using the ircd under windows.
+	* ircd/ircd.c: Added a few more optional parameters to the
+	ircd, they will make life easier for users using the ircd under
+	windows.
 
 2004-02-16  Neil Spierling  <sirvulcan@sirvulcan.org>
 
@@ -23,9 +30,8 @@
 	* ircd/hosthiding.c: Functions required for HOST_HIDING_STYLE 2.
 
         * ircd/ircd_features.c: Added FEAT_QUOTES, FEAT_POLICY_NOTICE,
-       				FEAT_CMD_RULES, FEAT_HOST_HIDING_STYLE,
-				and FEAT_CMD_OPERMOTD.
-				Took read only status off a new path F:Lines.
+	FEAT_CMD_RULES, FEAT_HOST_HIDING_STYLE,	and FEAT_CMD_OPERMOTD.
+	Took read only status off a new path F:Lines.
 
 	* ircd/m_oper: FEAT_CMD_OPERMOTD support added.
 
@@ -33,11 +39,14 @@
 
 	* ircd/m_rules.c: FEAT_CMD_RULES support added.
 
-	* ircd/m_server.c: Display IP in unauthorised connection notices.
+	* ircd/m_server.c: Display IP in unauthorised connection
+	notices.
 
-	* ircd/m_svsnoop.c: Services only command, can completly disable all O:Lines.
+	* ircd/m_svsnoop.c: Services only command, can completely
+	disable all O:Lines.
 
-	* ircd/s_user.c: FEAT_QUOTES and FEAT_POLICY_NOTICE support added.
+	* ircd/s_user.c: FEAT_QUOTES and FEAT_POLICY_NOTICE support
+	added.
 
 2004-02-15  Reed Loden  <reed@reedloden.com>
 
