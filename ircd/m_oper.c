@@ -299,6 +299,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		"Failed OPER attempt by %s (%s@%s) (No O:line)", 
 		parv[0], cli_user(sptr)->realusername,
 		cli_user(sptr)->realhost);
+	 send_reply(sptr, ERR_NOOPERHOST);
 	 return 0;
 	 break;
 	case ERR_PASSWDMISMATCH:
@@ -306,6 +307,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		"Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
 		parv[0], cli_user(sptr)->realusername,
 		cli_user(sptr)->realhost);
+	 send_reply(sptr, ERR_PASSWDMISMATCH);
 	 return 0;
 	 break;
 	case 0: /* Authentication successful */

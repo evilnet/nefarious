@@ -185,6 +185,7 @@ struct Connection {
   int                 con_fd;    /* >= 0, for local clients */
   int                 con_freeflag; /* indicates if connection can be freed */
   int                 con_error; /* last socket level error for client */
+  int                 con_sentalong; /**< sentalong marker for connection */
   unsigned int        con_snomask; /* mask for server messages */
   time_t              con_nextnick; /* Next time a nick change is allowed */
   time_t              con_nexttarget;/* Next time a target change is allowed */
@@ -322,6 +323,7 @@ struct Client {
 #define cli_sock_ip(cli)	((cli)->cli_connect->con_sock_ip)
 #define cli_sockhost(cli)	((cli)->cli_connect->con_sockhost)
 #define cli_passwd(cli)		((cli)->cli_connect->con_passwd)
+#define cli_sentalong(cli)      ((cli)->cli_connect->con_sentalong)
 #define cli_buffer(cli)		((cli)->cli_connect->con_buffer)
 #define cli_socket(cli)		((cli)->cli_connect->con_socket)
 #define cli_proc(cli)		((cli)->cli_connect->con_proc)
@@ -337,6 +339,7 @@ struct Client {
 #define con_fd(con)		((con)->con_fd)
 #define con_freeflag(con)	((con)->con_freeflag)
 #define con_error(con)		((con)->con_error)
+#define con_sentalong(con)      ((con)->con_sentalong)
 #define con_snomask(con)	((con)->con_snomask)
 #define con_nextnick(con)	((con)->con_nextnick)
 #define con_nexttarget(con)	((con)->con_nexttarget)

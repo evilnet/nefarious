@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-11-01  Neil Spierling  <sirvulcan@gmail.com>
+
+	README.Cygwin: Updated instructions.
+
+	ircd/m_oper.c: Added some missing send_reply's for remote
+	opering.
+
+2004-10-23  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Code by Entrope.
+
+	* include/client.h: Move sentalong from send.c to struct
+	Connection.
+
+	* ircd/m_invite.c: Modified the way invites are sent with
+	announcments enabled.
+
+	* ircd/send.c: Delete sentalong array and replace with references
+	to con_sentalong().
+
+
+2004-10-23  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Tagged stable for Afternet (Afternet-0_4_0-Stable).
 
 2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
 

@@ -33,22 +33,19 @@ nameserver NAMESERVER_IP
 
 10. wget Nefarious IRCu from http://sf.net/projects/evilnet and untar it
 11. cd ircu2.10 ; ./configure --with-maxcon=50
-12. cd ircd and open up Makefile
-13. find "${CHMOD} ${IRCDMODE} ircd" (line 244 ish)
-14. change "ircd" on that line to "ircd.exe"
-15. type make (at the end of make you should get a auto-import "error", dont worry)
-16. make install
-17. proceed with normal ircd configuration and execution
+12. type make
+13. make install
+14. proceed with normal ircd configuration and execution
 
 notes:
 
-- i do realise that you dont need all of the stuff in the cygwin installation... i only included my setup that i used 
-so that  the libs/apps etc that you do need are there (alot arnt in the default installation options)
-- yes this is an old version of bind, its the only one ive tested it with.. it works fine with boxen ircu as far as i 
-can tell. i tried to compile bind 9 with cygwin patches with no luck
-- i cant distribute binaries due to the way the ircd configures its paths and the stuff it depends on in cygwin
-- maxcon is set to 50 due to cygwin defaults FD_SETSIZE to 64
-- this howto should work with the normal undernet-ircu and other people's undernet-ircu mods
+- I have done some testing with later versions of bind but the process is a lot more complicated, atleast the way
+  i done it. It may work if you compile a later version of bind to /usr. Ive only tested with compiling bind
+  completly into the ircd to see if i could create an .exe of the ircd that i could put on the site so people
+  did not have to compile it. The resolver thing is just one of the reasons why i cannot distrubute exe's the
+  other thing is due to the way paths are compiled into the ircd.
+- Maxcon is set to 50 due to cygwin defaults FD_SETSIZE to 64
+- This howto should work with the normal undernet-ircu and other people's undernet-ircu mods
 
 credits:
 
