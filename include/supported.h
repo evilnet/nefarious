@@ -49,8 +49,10 @@
 #define FEATURES2 "TOPICLEN=%i" \
                 " AWAYLEN=%i" \
                 " KICKLEN=%i" \
+                " CHANNELLEN=%i" \
 		" CHANTYPES=%s" \
                 " PREFIX=%s" \
+                " STATUSMSG=%s" \
                 " CHANMODES=%s" \
                 " CASEMAPPING=%s" \
                 " NETWORK=%s"
@@ -61,9 +63,9 @@
 			feature_int(FEAT_MAXEXCEPTS), \
 			feature_int(FEAT_NICKLEN), NICKLEN
 
-#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, \
+#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, CHANNELLEN, \
 			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
-			"(ohv)@%+", "b,e,k,l,cimnprstzCLMNOQST", \
+			"(ohv)@%+", "@%+", "b,e,k,l,cimnprstzCLMNOQST", \
 			"rfc1459", feature_str(FEAT_NETWORK)
 
 #define infochanmodes "bcehiklmnoprstvzCLMNOQST"

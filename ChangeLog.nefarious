@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-12  Neil Spierling <vulcan@linux-boxen.org>
+
+	* include/supported.h: Added STATUSMSG (isupport), and
+	CHANNELLEN.
+
 2004-09-11  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/s_auth.c: Small bug fix, was sending the wrong header.
