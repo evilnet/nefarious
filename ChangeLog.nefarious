@@ -2,6 +2,8 @@
 
 	* ircd/match.c, ircd/m_ircops.c, ircd/s_user.c: Fixed bugs.
 
+	* ircd/m_ircops.c: Formatting changes.
+
 2003-09-29  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_user.c: Send out a connexit notice for the
