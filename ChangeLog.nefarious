@@ -3,6 +3,10 @@
 
 2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* Last 2 commits removed (one with no changelog).
+
+2004-08-23  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* include/map.h: Added an extra var to map_update for removing a
 	server.
 

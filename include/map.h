@@ -46,7 +46,7 @@ struct Map {
   struct Map *prev;
 };
 
-extern void map_update(struct Client *server, int remove);
+extern void map_update(struct Client *server);
 extern void map_dump_links_head_in_sand(struct Client *sptr, char *mask);
 extern void map_dump_head_in_sand(struct Client *cptr);
 extern void map_dump(struct Client *cptr, struct Client *server, char *mask, int prompt_length);

@@ -96,7 +96,7 @@ static void map_remove(struct Map *cptr)
 
 /* Update a server in the list. Called when a server connects
  * splits, or we haven't checked in more than a week. */
-void map_update(struct Client *cptr, int remove)
+void map_update(struct Client *cptr)
 {
   struct Map *map = 0;
 
@@ -114,8 +114,6 @@ void map_update(struct Client *cptr, int remove)
       if(map->maxclients < cli_serv(cptr)->clients)
         map->maxclients = cli_serv(cptr)->clients;
       break;
-    } else if ((ircd_strcmp(cli_name(cptr), map->name)) && (remove == 1)) {
-      map_remove(map);
     }
   }
 
@@ -159,7 +157,7 @@ void map_dump_head_in_sand(struct Client *cptr)
         continue;
       }
       else
-        map_update(acptr, 0);
+        map_update(acptr);
     }
     send_reply(cptr, RPL_MAP, smap ? "|" : "`", "-", map->name, "", map->maxclients);
   }
@@ -186,7 +184,7 @@ void map_dump_links_head_in_sand(struct Client *sptr, char *mask)
         continue;
       }
       else
-        map_update(acptr, 0);
+        map_update(acptr);
     }
     if (!BadPtr(mask) && match(mask, link->name))
       continue;

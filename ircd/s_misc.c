@@ -508,7 +508,7 @@ int exit_client(struct Client *cptr,    /* Connection being handled by
   /* Then remove the client structures */
   if (IsServer(victim)) {
     exit_downlinks(victim, killer, comment1);
-    map_update(victim, 1);
+    map_update(victim);
   }
   exit_one_client(victim, comment);
 
