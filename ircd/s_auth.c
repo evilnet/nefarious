@@ -157,9 +157,12 @@ void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
       ClearDNSBLPending(auth);
       if (IsUserPort(auth->client))
         sendheader(auth->client, REPORT_FIN_DNSBL);
+
       Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]",
 	     cli_username(auth->client), cli_sockhost(auth->client),
 	     cli_sock_ip(auth->client)));
+      log_write(LS_DNSBL, L_INFO, 0, "DNSBL Checks Complete %p", auth->client);
+
       release_auth_client(auth->client);
       unlink_auth_request(auth, &AuthIncompleteList);
       free_auth_request(auth);
@@ -167,6 +170,7 @@ void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
       if (IsUserPort(auth->client))
         sendheader(auth->client, REPORT_FIN_DNSBL);
       ClearDNSBLPending(auth);
+      log_write(LS_DNSBL, L_INFO, 0, "DNSBL Checks Complete %p", auth->client);
     }
   }
   return;
@@ -192,6 +196,8 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   if (IsUserPort(auth->client))
     sendheader(client, REPORT_DO_DNSBL);
 
+  log_write(LS_DNSBL, L_INFO, 0, "Beginning DNSBL Checks %p [%s] (t %u)", auth->client,
+            cli_sockhost(auth->client), GlobalBLCount);
   Debug((DEBUG_DEBUG, "DNSBL t: %u", GlobalBLCount));
 
   cli_dnsblcount(auth->client) = GlobalBLCount;
@@ -204,6 +210,8 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
     cli_dnsbl_reply(client) = gethost_byname(hname, &query);
 
     if (cli_dnsbl_reply(client)) {
+      log_write(LS_DNSBL, L_INFO, 0, "DNSBL entry for %p was cached (%s %s)", auth->client,
+                cli_dnsbl_reply(client)->hp->h_name, hname);
       Debug((DEBUG_DEBUG, "DNSBL entry for %p was cached (%s %s)", auth->client,  
             cli_dnsbl_reply(client)->hp->h_name, hname));
       ++(cli_dnsbl_reply(client))->ref_count;
@@ -219,6 +227,7 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
     if (IsUserPort(auth->client))
       sendheader(client, REPORT_FIN_DNSBL);
     ClearDNSBLPending(auth);
+    log_write(LS_DNSBL, L_INFO, 0, "DNSBL Checks Complete (none left to check) %s", auth->client);
   }
 
   return 0;

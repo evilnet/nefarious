@@ -116,6 +116,9 @@ higher will be logged.
    logging subsystem was first created.  Log messages to this
    subsystem go nowhere.
 
+ * DNSBL - Used to report dnsbl checking, marking, and exemption. Use
+   the INFO level for most of the dnsbl logging information.
+
 Configuration
 
 The true power of the logging subsystem comes from its extremely

@@ -33,6 +33,7 @@
 #include "ircd_alloc.h"
 #include "ircd_chattr.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
@@ -80,6 +81,8 @@ int add_exempt(struct Client* sptr, char* host, char* netburst)
   if (!IsServer(sptr) && (0 != ircd_strcmp(netburst, "nb")))
     sendto_opmask_butone(0, SNO_GLINE, "%C adding DNSBL Exemption for %s", sptr, host);
 
+  log_write(LS_DNSBL, L_INFO, 0, "%C adding DNSBL Exemption for %s", sptr, host);
+
   dnsblexempts = (struct dnsblexempts *)MyMalloc(sizeof(struct dnsblexempts));
 
   DupString(dnsblexempts->host, host);
@@ -108,10 +111,12 @@ int del_exempt(struct Client* sptr, char* host)
     if (!match(dnsblexempts->host, host)) {
       sendto_opmask_butone(0, SNO_GLINE, "%C Removing DNSBL Exemption for %s", sptr, host);
 
-     *dnsblexempts->prev = dnsblexempts->next;
+      log_write(LS_DNSBL, L_INFO, 0, "%C Removing DNSBL Exemption for %s", sptr, host);
 
-     if (dnsblexempts->next)
-       dnsblexempts->next->prev = dnsblexempts->prev;
+      *dnsblexempts->prev = dnsblexempts->next;
+
+      if (dnsblexempts->next)
+        dnsblexempts->next->prev = dnsblexempts->prev;
 
       MyFree(dnsblexempts->host);
       MyFree(dnsblexempts);

@@ -1026,6 +1026,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 
   /* Weird sanity checks :) */
   if (!sptr || !replyip || !checkhost) {
+    log_write(LS_DNSBL, L_INFO, 0, "find_blline missing parameter(s) aborting check.");
     Debug((DEBUG_DEBUG, "find_blline missing parameter(s) aborting check."));
     return 0;
   }
@@ -1043,6 +1044,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       }
   }
   if(!*oct) {
+      log_write(LS_DNSBL, L_INFO, 0, "find_blline passed invalid replyip %s.", replyip);
       Debug((DEBUG_DEBUG, "find_blline passed invalid replyip %s.", replyip));
       return 0; /* malformed replyip */
   }
@@ -1055,6 +1057,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       }
   dhname++;
   if(c!=4 || !*dhname) {
+          log_write(LS_DNSBL, L_INFO, 0, "find_blline passed invalid checkhost %s.", checkhost);
 	  Debug((DEBUG_DEBUG, "find_blline passed invalid checkhost %s.", checkhost));
 	  return 0;
   }
@@ -1080,6 +1083,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
               }
                  
           if (total & atoi(oct)) { /* bitwise AND */
+            log_write(LS_DNSBL, L_INFO, 0, "DNSBL Matched %p %s (B)", sptr, blline->name);
             SetDNSBL(sptr);
 
             if (x_flag & DFLAG_MARK)
@@ -1100,6 +1104,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
             for (;csep >= cstr; csep--)
                 if(*csep == ',' || csep==cstr) {
                   if (!ircd_strcmp(csep+1, oct)) {
+                    log_write(LS_DNSBL, L_INFO, 0, "DNSBL Matched %p %s (R)", sptr, blline->name);
                     SetDNSBL(sptr);
 
                     if (x_flag & DFLAG_MARK)

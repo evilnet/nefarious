@@ -1,6 +1,24 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-04-03  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/readme.log: Added DNSBL Section.
+
+	* include/ircd_log.h: Added DNSBL logging type.
+
+	* ircd/ircd_log.c: See above.
+
+	* ircd/m_exempt.c: Log dnsbl stuff.
+
+	* ircd/m_mark.c: As above.
+
+	* ircd/s_auth.c: As above.
+
+	* ircd/s_conf.c: As above.
+
+	* ircd/s_user.c: As above.
+
 2005-04-02  Reed Loden  <reed@reedloden.com>
 
 	* include/s_auth.h: Added prototypes for DNSReply struct and 

@@ -604,7 +604,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ircd_snprintf(0, chkhosti, NICKLEN+USERLEN+SOCKIPLEN+3, "%s!%s@%s", cli_name(sptr), user->username, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
     ircd_snprintf(0, chkhosth, NICKLEN+USERLEN+HOSTLEN+3, "%s!%s@%s", cli_name(sptr), user->username, cli_sockhost(sptr));
 
+    if (IsDNSBL(sptr))
+      log_write(LS_DNSBL, L_INFO, 0, "Client %s - %p", cli_name(sptr), sptr);
+
     if (IsDNSBL(sptr) && ((dhost = find_dnsblexempt(chkhosti)) || (dhost = find_dnsblexempt(chkhosth)))) {
+      log_write(LS_DNSBL, L_INFO, 0, "Client %s is exempted, marking and allowing.", cli_name(sptr));
       SetDNSBLAllowed(sptr);
       SetDNSBLMarked(sptr);
     }
@@ -618,17 +622,22 @@ int register_user(struct Client *cptr, struct Client *sptr,
         int class_exempt = 0, loc_exempt = 0;
 
         if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
-  	   (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0))
+  	   (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0)) {
     	  class_exempt = 1;
+          log_write(LS_DNSBL, L_INFO, 0, "Client %s is class exempted.", cli_name(sptr));
+        }
 
-        if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+        if (IsAccount(sptr) && feature_bool(FEAT_DNSBL_LOC_EXEMPT)) {
   	  loc_exempt = 1;
+          log_write(LS_DNSBL, L_INFO, 0, "Client %s is loc exempted.", cli_name(sptr));
+        }
 
         if ((class_exempt == 1) || (loc_exempt == 1)) {
 	  loc_exempt = 0;
 	  class_exempt = 0;
         } else
           if (feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) {
+            log_write(LS_DNSBL, L_INFO, 0, "Offering loc exemption to %s", cli_name(sptr));
             sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr,
                                    format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
                                                     cli_user(sptr)->realhost, user->username,
@@ -639,12 +648,14 @@ int register_user(struct Client *cptr, struct Client *sptr,
             MyFree(cli_loc(sptr));
             return 0;
           } else
-            if ((feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) || !feature_bool(FEAT_DNSBL_LOC_EXEMPT))
+            if ((feature_bool(FEAT_DNSBL_LOC_EXEMPT) && !IsAccount(sptr)) || !feature_bool(FEAT_DNSBL_LOC_EXEMPT)) {
+              log_write(LS_DNSBL, L_INFO, 0, "Rejecting DNSBL infected client %s", chkhosth);
               return exit_client_msg(sptr, cptr, &me, "%s",
        		                     format_dnsbl_msg((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
  			  	     	  	      cli_user(sptr)->realhost, user->username,
 						      cli_name(sptr), cli_dnsblformat(sptr))
 		                                      );
+            }
       }
     }
   }
@@ -817,6 +828,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         strcat(flagbuf, "m");
 
         if (feature_bool(FEAT_FAKEHOST) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST)) {
+          log_write(LS_DNSBL, L_INFO, 0, "Marking client %s", cli_name(sptr));
           SetFakeHost(sptr);
           SetHiddenHost(sptr);
           ircd_snprintf(0, cli_user(sptr)->fakehost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
@@ -829,8 +841,10 @@ int register_user(struct Client *cptr, struct Client *sptr,
         }
       }
 
-      if (IsDNSBLMarked(sptr) && IsAccount(sptr))
+      if (IsDNSBLMarked(sptr) && IsAccount(sptr)) {
+        log_write(LS_DNSBL, L_INFO, 0, "Clearing mark on client %s", cli_name(sptr));
         ClearDNSBLMarked(sptr);
+      }
 
       strcat(flagbuf, "a");
 
@@ -843,6 +857,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
       Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
             cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
             IsDNSBL(sptr) ? "1" : "0", IsDNSBLMarked(sptr) ? "1" : "0", IsDNSBLAllowed(sptr) ? "1" : "0"));
+      log_write(LS_DNSBL, L_INFO, 0, "MARK Sent %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
+                cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
+                IsDNSBL(sptr) ? "1" : "0", IsDNSBLMarked(sptr) ? "1" : "0", IsDNSBLAllowed(sptr) ? "1" : "0");
     }
 
     /*

@@ -87,6 +87,7 @@
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
@@ -121,6 +122,8 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
 
     Debug((DEBUG_DEBUG, "Receiving MARK"));
     if ((acptr = FindUser(parv[1]))) {
+      log_write(LS_DNSBL, L_INFO, 0, "Received DNSBL Mark %s d: %s flags: %s host: %s reason: %s",
+                cli_name(acptr), parv[3], parv[4], parv[5], parv[6]);
       Debug((DEBUG_DEBUG, "Marking: %s d: %s flags: %s host: %s reason: %s", cli_name(acptr), parv[3], parv[4], parv[5], parv[6]));
 
       x_flag = dflagstr(parv[4]);
