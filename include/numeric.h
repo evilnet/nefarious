@@ -217,7 +217,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_WHOISHELPER	     309	austnet */
 /*      RPL_WHOISSVCMSG      310         Dalnet */
 /*	RPL_WHOISHELPOP	     310	unreal */
-#define	RPL_WHOISSERVICE     310	/* austnet/AfterNET */
+#define	RPL_WHOISSERVICE     310	/* austnet/evilnet */
 #define RPL_WHOISUSER        311        /* See also RPL_ENDOFWHOIS */
 #define RPL_WHOISSERVER      312
 #define RPL_WHOISOPERATOR    313
@@ -248,6 +248,8 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_LISTUSAGE        334        /* Undernet extension */
 /*	RPL_COMMANDSYNTAX    334	   Dalnet */
 /*	RPL_LISTSYNTAX	     334	   unreal */
+#define RPL_WHOISACCOUNTONLY 335	/* evilnet extension */
+#define RPL_WHOISBOT         336	/* evilnet extension */
 /*      RPL_CHANPASSOK       338           IRCnet extension (?)*/
 #define	RPL_WHOISACTUALLY    338	/* Undernet extension, dalnet */
 /*      RPL_BADCHANPASS      339           IRCnet extension (?)*/
@@ -294,6 +296,8 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_YOURSERVICE	     383	   Numeric List: various */
 #define RPL_MYPORTIS         384	/* not used */
 #define RPL_NOTOPERANYMORE   385        /* Extension to RFC1459, not used */
+#define RPL_IRCOPS           386
+#define RPL_ENDOFIRCOPS      387
 /*	RPL_QLIST	     386	unreal */
 /*	RPL_ENDOFQLIST	     387	unreal */
 /*	RPL_ALIST	     388	unreal */
@@ -322,6 +326,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_TOOMANYTARGETS   407
 /*      ERR_NOSUCHSERVICE    408  IRCnet */
 /*	ERR_NOCOLORSONCHAN   408  Dalnet */
+#define ERR_NOCOLORSONCHAN   408	/* evilnet extension */
 #define ERR_NOORIGIN         409
 
 #define ERR_NORECIPIENT      411

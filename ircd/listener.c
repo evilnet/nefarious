@@ -314,7 +314,7 @@ static int connection_allowed(const char* addr, const char* mask)
  * the format "255.255.255.255"
  */
 void add_listener(int port, const char* vhost_ip, const char* mask,
-                  int is_server, int is_hidden) 
+                  int is_server, int is_hidden, int is_ssl)
 {
   struct Listener* listener;
   struct in_addr   vaddr;
@@ -342,6 +342,7 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
     set_listener_mask(listener, mask);
     listener->hidden = is_hidden;
     listener->server = is_server;
+    listener->ssl = is_ssl;
     return;
   }
 
@@ -352,6 +353,7 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
     set_listener_mask(listener, mask);
     listener->hidden = is_hidden;
     listener->server = is_server;
+    listener->ssl = is_ssl;
     listener->next   = ListenerPollList;
     ListenerPollList = listener; 
   }
@@ -515,7 +517,11 @@ static void accept_connection(struct Event* ev)
       ++ServerStats->is_ac;
       /* nextping = CurrentTime; */
 
-      add_connection(listener, fd);
+      if (listener->ssl)
+	ssl_add_connection(listener, fd);
+      else
+	add_connection(listener, fd, NULL);
+
     }
   }
 }

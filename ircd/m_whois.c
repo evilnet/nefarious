@@ -152,7 +152,7 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     {
        chptr = chan->channel;
        
-       if (!ShowChannel(sptr, chptr))
+       if (!ShowChannel(sptr, chptr) && !IsOper(sptr))
           continue;
           
        if (acptr != sptr && IsZombie(chan))
@@ -224,8 +224,13 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
      *       probably a good place to add them :)
      */
     if (IsChannelService(acptr))
-	send_reply(sptr, RPL_WHOISSERVICE, name,
-		   feature_str(FEAT_NETWORK));
+      send_reply(sptr, RPL_WHOISSERVICE, name, feature_str(FEAT_NETWORK));
+
+    if (IsAccountOnly(acptr))
+      send_reply(sptr, RPL_WHOISACCOUNTONLY, name);
+
+    if (IsBot(acptr))
+      send_reply(sptr, RPL_WHOISBOT, name);
 
     if (MyConnect(acptr) && (!feature_bool(FEAT_HIS_WHOIS_IDLETIME) ||
 			     sptr == acptr || IsAnOper(sptr) || parc >= 3))

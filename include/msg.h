@@ -86,6 +86,10 @@ struct Client;
 #define TOK_INVITE              "I"
 #define CMD_INVITE		MSG_INVITE, TOK_INVITE
 
+#define MSG_IRCOPS             "IRCOPS"
+#define TOK_IRCOPS             "IR"
+#define CMD_IRCOPS             MSG_IRCOPS, TOK_IRCOPS
+
 #define MSG_VERSION             "VERSION"       /* VERS */
 #define TOK_VERSION             "V"
 #define CMD_VERSION		MSG_VERSION, TOK_VERSION
@@ -333,6 +337,10 @@ struct Client;
 #define MSG_ACCOUNT		"ACCOUNT"	/* ACCO */
 #define TOK_ACCOUNT		"AC"
 #define CMD_ACCOUNT		MSG_ACCOUNT, TOK_ACCOUNT
+
+#define MSG_MKPASSWD           "MKPASSWD"
+#define TOK_MKPASSWD           "MKPASSWD"
+#define CMD_MKPASSWD           MSG_MKPASSWD, TOK_MKPASSWD
 
 #define MSG_ASLL		"ASLL"		/* ASLL */
 #define TOK_ASLL		"LL"

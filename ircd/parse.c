@@ -177,6 +177,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_invite, ms_invite, m_invite, m_ignore }
   },
   {
+    MSG_IRCOPS,
+    TOK_IRCOPS,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_ircops, m_ignore, m_ircops, m_ignore }
+  },
+  {
     MSG_KICK,
     TOK_KICK,
     0, MAXPARA, MFLG_SLOW, 0,
@@ -574,6 +581,13 @@ struct Message msgtab[] = {
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_ignore, m_ignore, ms_account, m_ignore, m_ignore }
+  },
+  {
+    MSG_MKPASSWD,
+    TOK_MKPASSWD,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_mkpasswd, m_ignore, m_mkpasswd, m_ignore }
   },
   {
     MSG_ASLL,

@@ -1,3 +1,28 @@
+2003-06-12  Reed Loden  <reed@reedloden.com>
+
+	* Added asuka's noquitparts.
+
+	* Added OUTsider's botsupport.
+	(no targetlimits/floodlimits/chanlimits)
+
+	* Allow opers to see all channels in /whois.
+	
+	* Added chanmode +O (oper only).
+
+	* Modified asuka's +c to reply with 480 on nocolour.
+
+	* Added whoisservice (shows if client is +k).
+
+	* Added whoisaccountonly (shows if client is +R).
+
+	* Modified some FEAT_EVILNET stuff.
+
+	* Added asuka's opersendq patch (which was made by me).
+
+2003-06-11  Reed Loden  <reed@reedloden.com>
+
+	* Added SiRVulCaN's modified patch of Vampire-'s SSL patch.
+
 2003-06-08  Reed Loden  <reed@reedloden.com>
 
 	* Added two patches from ULtimaTe_.

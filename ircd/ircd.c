@@ -51,6 +51,7 @@
 #include "s_misc.h"
 #include "s_stats.h"
 #include "send.h"
+#include "ssl.h"
 #include "sys.h"
 #include "uping.h"
 #include "userload.h"
@@ -652,6 +653,8 @@ int main(int argc, char **argv) {
   init_server_identity();
 
   uping_init();
+
+  ssl_init();
 
   stats_init();
 

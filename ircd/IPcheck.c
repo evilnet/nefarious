@@ -34,6 +34,7 @@
 #include "s_debug.h"        /* Debug */
 #include "s_user.h"         /* TARGET_DELAY */
 #include "send.h"
+#include "ssl.h"
 
 #include <assert.h>
 #include <string.h>

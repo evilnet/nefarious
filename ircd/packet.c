@@ -27,6 +27,7 @@
 #include "ircd_chattr.h"
 #include "parse.h"
 #include "s_bsd.h"
+#include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
 
@@ -68,9 +69,9 @@ static void update_messages_received(struct Client* cptr)
  */
 int server_dopacket(struct Client* cptr, const char* buffer, int length)
 {
-  const char* src;
-  char*       endp;
-  char*       client_buffer;
+  const char*	src;
+  char*		endp;
+  char*		client_buffer;
   
   assert(0 != cptr);
 
@@ -182,5 +183,3 @@ int client_dopacket(struct Client *cptr, unsigned int length)
 
   return 1;
 }
-
-

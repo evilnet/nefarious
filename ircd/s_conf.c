@@ -680,6 +680,7 @@ void conf_add_listener(const char* const* fields, int count)
 {
   int is_server = 0;
   int is_hidden = 0;
+  int is_ssl = 0;
 
   /*
    * need a port
@@ -690,13 +691,14 @@ void conf_add_listener(const char* const* fields, int count)
   if (!EmptyString(fields[3])) {
     const char* x = fields[3];
     if ('S' == ToUpper(*x))
-      is_server = 1;
-    ++x;
+      is_server = 1, ++x;
     if ('H' == ToUpper(*x))
-      is_hidden = 1;
+      is_hidden = 1, ++x;
+    if ('E' == ToUpper(*x))
+      is_ssl = 1, ++x;
   }
   /*           port             vhost      mask  */
-  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden);
+  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_ssl);
 }
 
 void conf_add_quarantine(const char* const* fields, int count)

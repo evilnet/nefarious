@@ -239,7 +239,6 @@ static struct FeatureDesc {
   F_I(BUFFERPOOL, 0, 27000000, 0),
   F_B(HAS_FERGUSON_FLUSHER, 0, 0, 0),
   F_I(CLIENT_FLOOD, 0, 1024, 0),
-  F_I(BOT_CLASS, 0, 0, 0),
   F_I(SERVER_PORT, FEAT_OPER, 4400, 0),
   F_B(NODEFAULTMOTD, 0, 1, 0),
   F_S(MOTD_BANNER, FEAT_NULL, 0, 0),
@@ -259,6 +258,7 @@ static struct FeatureDesc {
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
   F_B(TOPIC_BURST, 0, 1, 0),
   F_B(REMOTE_OPER, 0, 1, 0),
+  F_I(BOT_CLASS, 0, 0, 0),
   F_B(EVILNET, FEAT_NODISP, 0, 0),
 
   /* features that probably should not be touched */
@@ -269,7 +269,7 @@ static struct FeatureDesc {
   F_I(MAXSILES, 0, 15, 0),
   F_I(HANGONGOODLINK, 0, 300, 0),
   F_I(HANGONRETRYDELAY, 0, 10, 0),
-  F_I(CONNECTTIMEOUT, 0, 90, 0),
+  F_I(CONNECTTIMEOUT, 0, 60, 0),
   F_I(TIMESEC, 0, 60, 0),
   F_I(MAXIMUM_LINKS, 0, 1, init_class), /* reinit class 0 as needed */
   F_I(PINGFREQUENCY, 0, 120, init_class),
@@ -564,6 +564,36 @@ feature_set(struct Client* from, const char* const* fields, int count)
 
     if (change && feat->notify) /* call change notify function */
       (*feat->notify)();
+
+    if (change && from) {
+      
+      if(!IsServer(from) && !IsMe(from))
+        send_reply(from, SND_EXPLICIT | RPL_FEATURE, ":Value of %s changed",
+                   feat->type);
+
+      switch (feat->flags & FEAT_MASK) {
+        case FEAT_NONE:
+          sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s",
+                               from, feat->type);
+          break;
+        case FEAT_INT:
+          sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s to %d",
+                               from, feat->type, feat->v_int);
+          break;
+        case FEAT_BOOL:
+          sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s to %s", from,
+                               feat->type, (feat->v_int ? "TRUE" : "FALSE"));
+          break;
+        case FEAT_STR:
+          if(feat->v_str)
+            sendto_opmask_butone(from, SNO_OLDSNO, "%C changed %s to: %s",
+                                 from, feat->type, feat->v_str);
+          else
+            sendto_opmask_butone(from, SNO_OLDSNO, "%C unset %s",
+                                 from, feat->type);
+          break;
+      } /* switch */
+    } /* if (change) */
   }
 
   return 0;
@@ -622,6 +652,14 @@ feature_reset(struct Client* from, const char* const* fields, int count)
 
     if (change && feat->notify) /* call change notify function */
       (*feat->notify)();
+
+    if(from && !IsServer(from) && !IsMe(from))
+      send_reply(from, SND_EXPLICIT | RPL_FEATURE, ":Value of %s reset to "
+                 "default", feat->type);
+      
+    if(change)
+      sendto_opmask_butone(from, SNO_OLDSNO, "%C reset %s to its default",
+                           from, feat->type);
   }
 
   return 0;

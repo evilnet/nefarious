@@ -50,6 +50,7 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
+#include "ssl.h"
 #include "struct.h"
 #include "sys.h"               /* TRUE bleah */
 
@@ -99,7 +100,7 @@ typedef enum {
 } ReportType;
 
 #define sendheader(c, r) \
-   send(cli_fd(c), HeaderMessages[(r)].message, HeaderMessages[(r)].length, 0)
+   ssl_send(c, HeaderMessages[(r)].message, HeaderMessages[(r)].length)
 
 struct AuthRequest* AuthPollList = 0; /* GLOBAL - auth queries pending io */
 static struct AuthRequest* AuthIncompleteList = 0;

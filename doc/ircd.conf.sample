@@ -380,6 +380,7 @@ o:*@piglatin.coolisp.nl:eUi5trgahhTyp:MsPiggy::30
 #		<status> can be either or both of 'C' for clients, or 'S'
 #		for servers. Optionally a trailing 'H' can be specified,
 #		denoting that this port is hidden (will not show up in /STATS P).
+#		An 'E' can be specified for encrypted ssl connections.
 #		If the 'H' flag is used, it must be the last character listed.
 # <port>	A port number to listen on, this must be greater than 1024.
 # - P: lines are required to connect any server or client to your server.

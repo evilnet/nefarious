@@ -68,6 +68,8 @@ const char* const PartFmt2     = ":%s " MSG_PART " %s :%s";
 const char* const PartFmt1serv = "%s%s " TOK_PART " %s";
 const char* const PartFmt2serv = "%s%s " TOK_PART " %s :%s";
 
+char modebuf[MODEBUFLEN];
+char parabuf[MODEBUFLEN];
 
 static struct SLink* next_ban;
 static struct SLink* prev_ban;
@@ -726,6 +728,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'c';
   if (chptr->mode.mode & MODE_NOCTCP)
     *mbuf++ = 'C';
+  if (chptr->mode.mode & MODE_NOQUITPARTS)
+    *mbuf++ = 'u'; 
   if (chptr->mode.limit) {
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
@@ -1188,6 +1192,8 @@ void del_invite(struct Client *cptr, struct Channel *chptr)
 /* List and skip all channels that are listen */
 void list_next_channels(struct Client *cptr, int nr)
 {
+  char tempbuff[KEYLEN + 8 + 3 + 1 + 3 + 6];
+  char modestuff[TOPICLEN + 3 + KEYLEN + 8 + 3 + 1 + 6];
   struct ListingArgs *args = cli_listing(cptr);
   struct Channel *chptr = args->chptr;
   chptr->mode.mode &= ~MODE_LISTED;
@@ -1204,9 +1210,15 @@ void list_next_channels(struct Client *cptr, int nr)
           chptr->topic_time > args->min_topic_time &&
           chptr->topic_time < args->max_topic_time)))
       {
-        if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr))
+        if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr)) {
+	  *modebuf = *parabuf = '\0';
+	  modebuf[1] = '\0';
+	  channel_modes(cptr, modebuf, parabuf, sizeof(parabuf), chptr);
+	  ircd_snprintf(0, tempbuff, MODEBUFLEN, "[%s %s]", modebuf, parabuf);
+	  ircd_snprintf(0, modestuff, MODEBUFLEN + TOPICLEN + 4, "%s %s", tempbuff, chptr->topic);
 	  send_reply(cptr, RPL_LIST, chptr->chname, chptr->users,
-		     chptr->topic);
+		     modestuff);
+	}
         chptr = chptr->next;
         break;
       }
@@ -1370,6 +1382,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_LIMIT,		'l', */
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
+    MODE_NOQUITPARTS	'u',
     0x0, 0x0
   };
   int i;
@@ -1728,7 +1741,7 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
 
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
-	   MODE_NOCOLOUR | MODE_NOCTCP);
+	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_NOQUITPARTS);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1834,6 +1847,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
+    MODE_NOQUITPARTS	'u',
     0x0, 0x0
   };
   unsigned int add;
@@ -2502,6 +2516,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
     MODE_NOCTCP,	'C',
+    MODE_NOQUITPARTS,	'u',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0
@@ -2718,11 +2733,13 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
     /* Send notification to channel */
     if (!(flags & CHFL_ZOMBIE))
       sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL,
-				(flags & CHFL_BANNED || !jbuf->jb_comment) ?
-				"%H" : "%H :%s", chan, jbuf->jb_comment);
+				       ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
+					|| !jbuf->jb_comment) ?
+				       "%H" : "%H :%s", chan, jbuf->jb_comment);
     else if (MyUser(jbuf->jb_source))
       sendcmdto_one(jbuf->jb_source, CMD_PART, jbuf->jb_source,
-		    (flags & CHFL_BANNED || !jbuf->jb_comment) ?
+		    ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
+		     || !jbuf->jb_comment) ?
 		    "%H" : "%H :%s", chan, jbuf->jb_comment);
     /* XXX: Shouldn't we send a PART here anyway? */
     /* to users on the channel?  Why?  From their POV, the user isn't on

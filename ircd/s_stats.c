@@ -49,6 +49,7 @@
 #include "s_serv.h"
 #include "s_user.h"
 #include "send.h"
+#include "ssl.h"
 #include "struct.h"
 #include "userload.h"
 

@@ -46,6 +46,7 @@ struct Listener {
   unsigned char    active;             /* current state of listener */
   unsigned char    hidden;             /* hidden in stats output for clients */
   unsigned char    server;             /* 1 if port is a server listener */
+  unsigned char    ssl;                /* 1 if we're using SSL */
   int              index;              /* index into poll array */
   time_t           last_accept;        /* last time listener accepted */
   struct in_addr   addr;               /* virtual address or INADDR_ANY */
@@ -57,7 +58,7 @@ extern struct Listener* ListenerPollList; /* GLOBAL - listener list */
 
 extern void        add_listener(int port, const char* vaddr_ip, 
                                 const char* mask, int is_server, 
-                                int is_hidden);
+                                int is_hidden, int is_ssl);
 extern void        close_listener(struct Listener* listener);
 extern void        close_listeners(void);
 extern void        count_listener_memory(int* count_out, size_t* size_out);

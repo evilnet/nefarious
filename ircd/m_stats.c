@@ -91,6 +91,7 @@
 #include "numeric.h"
 #include "s_user.h"
 #include "send.h"
+#include "ssl.h"
 #include "struct.h"
 
 #include <assert.h>

@@ -125,6 +125,22 @@ static void client_timer_callback(struct Event* ev);
 #endif
 #endif
 
+/* Helper routines */
+static IOResult client_recv(struct Client *cptr, char *buf, unsigned int length, unsigned int* count_out)
+{
+  if (cli_socket(cptr).ssl)
+    return ssl_recv(&cli_socket(cptr), buf, length, count_out);
+  else
+    return os_recv_nonb(cli_fd(cptr), buf, length, count_out);
+}
+
+static IOResult client_sendv(struct Client *cptr, struct MsgQ *buf, unsigned int *count_in, unsigned int *count_out)
+{
+  if (cli_socket(cptr).ssl)
+    return ssl_sendv(&cli_socket(cptr), buf, count_in, count_out);
+  else
+    return os_sendv_nonb(cli_fd(cptr), buf, count_in, count_out);
+}
 
 /*
  * Cannot use perror() within daemon. stderr is closed in
@@ -354,7 +370,7 @@ unsigned int deliver_it(struct Client *cptr, struct MsgQ *buf)
   unsigned int bytes_count = 0;
   assert(0 != cptr);
 
-  switch (os_sendv_nonb(cli_fd(cptr), buf, &bytes_count, &bytes_written)) {
+  switch (client_sendv(cptr, buf, &bytes_count, &bytes_written)) {
   case IO_SUCCESS:
     ClrFlag(cptr, FLAG_BLOCKED);
 
@@ -584,7 +600,7 @@ int net_close_unregistered_connections(struct Client* source)
  * The client is not added to the linked list of clients, it is
  * passed off to the auth handler for dns and ident queries.
  *--------------------------------------------------------------------------*/
-void add_connection(struct Listener* listener, int fd) {
+void add_connection(struct Listener* listener, int fd, void *ssl) {
   struct sockaddr_in addr;
   struct Client      *new_client;
   time_t             next_target = 0;
@@ -605,7 +621,7 @@ void add_connection(struct Listener* listener, int fd) {
    */
   if (!os_get_peername(fd, &addr) || !os_set_nonblocking(fd)) {
     ++ServerStats->is_ref;
-    close(fd);
+    ssl_murder(ssl, fd, NULL);
     return;
   }
   /*
@@ -626,8 +642,7 @@ void add_connection(struct Listener* listener, int fd) {
    */
   if (!IPcheck_local_connect(addr.sin_addr, &next_target) && !listener->server) {
     ++ServerStats->is_ref;
-     write(fd, throttle_message, strlen(throttle_message));
-     close(fd);
+     ssl_murder(ssl, fd, throttle_message);
      return;
   }
 
@@ -651,11 +666,12 @@ void add_connection(struct Listener* listener, int fd) {
   if (!socket_add(&(cli_socket(new_client)), client_sock_callback,
 		  (void*) cli_connect(new_client), SS_CONNECTED, 0, fd)) {
     ++ServerStats->is_ref;
-    write(fd, register_message, strlen(register_message));
-    close(fd);
+    ssl_murder(ssl, fd, register_message);
     cli_fd(new_client) = -1;
     return;
   }
+  if (ssl)
+    cli_socket(new_client).ssl = ssl;
   cli_freeflag(new_client) |= FREEFLAG_SOCKET;
   cli_listener(new_client) = listener;
   ++listener->ref_count;
@@ -698,11 +714,9 @@ read_packet(struct Client *cptr, int socket_ready)
   unsigned int length = 0;
 
   if (socket_ready &&
-      !(IsUser(cptr) && (feature_bool(FEAT_EVILNET) && !IsOper(cptr)) &&
-	(feature_int(FEAT_BOT_CLASS) == 0 ||
-	get_client_class(cptr) != feature_int(FEAT_BOT_CLASS)) &&
+      !(IsUser(cptr) && !IsOper(cptr) && !IsBot(cptr) &&
 	DBufLength(&(cli_recvQ(cptr))) > feature_int(FEAT_CLIENT_FLOOD))) {
-    switch (os_recv_nonb(cli_fd(cptr), readbuf, sizeof(readbuf), &length)) {
+    switch (client_recv(cptr, readbuf, sizeof(readbuf), &length)) {
     case IO_SUCCESS:
       if (length) {
         if (!IsServer(cptr))
@@ -742,8 +756,7 @@ read_packet(struct Client *cptr, int socket_ready)
 
     if (IsUser(cptr)) {
       if (DBufLength(&(cli_recvQ(cptr))) > feature_int(FEAT_CLIENT_FLOOD)
-        && (feature_bool(FEAT_EVILNET) && !IsOper(cptr)) &&
-	(get_client_class(cptr) != feature_int(FEAT_BOT_CLASS)))
+        && !IsOper(cptr) && !IsBot(cptr))
       return exit_client(cptr, cptr, &me, "Excess Flood");
     }
 
@@ -1009,6 +1022,7 @@ static void client_sock_callback(struct Event* ev)
 
     if (!con_freeflag(con) && !cptr)
       free_connection(con);
+    ssl_free(ev_socket(ev));
     break;
 
   case ET_CONNECT: /* socket connection completed */

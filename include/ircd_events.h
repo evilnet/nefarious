@@ -28,6 +28,9 @@
 #include <sys/types.h>	/* time_t */
 #define INCLUDED_sys_types_h
 #endif
+#ifndef INCLUDED_ssl_h
+#include "ssl.h"
+#endif
 
 struct Event;
 
@@ -90,6 +93,7 @@ struct Socket {
   enum SocketState s_state;	/* state socket's in */
   unsigned int	   s_events;	/* events socket is interested in */
   int		   s_fd;	/* file descriptor for socket */
+  SSL*		   ssl;		/* if not NULL, use SSL routines on socket */
 };
 
 #define SOCK_EVENT_READABLE	0x0001	/* interested in readable */

@@ -93,6 +93,7 @@ extern int m_help(struct Client*, struct Client*, int, char*[]);
 extern int m_ignore(struct Client*, struct Client*, int, char*[]);
 extern int m_info(struct Client*, struct Client*, int, char*[]);
 extern int m_invite(struct Client*, struct Client*, int, char*[]);
+extern int m_ircops(struct Client*, struct Client*, int, char*[]);
 extern int m_ison(struct Client*, struct Client*, int, char*[]);
 extern int m_join(struct Client*, struct Client*, int, char*[]);
 extern int m_jupe(struct Client*, struct Client*, int, char*[]);
@@ -223,6 +224,8 @@ extern int ms_wallvoices(struct Client*, struct Client*, int, char*[]);
 extern int ms_wallops(struct Client*, struct Client*, int, char*[]);
 extern int ms_wallusers(struct Client*, struct Client*, int, char*[]);
 extern int ms_whois(struct Client*, struct Client*, int, char*[]);
+extern int m_mkpasswd(struct Client*, struct Client*, int, char*[]);
+ 
 
 #endif /* INCLUDED_handlers_h */
 

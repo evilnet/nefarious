@@ -73,24 +73,25 @@ struct Client;
 
 /* Channel Visibility macros */
 
-#define MODE_CHANOP     CHFL_CHANOP
-#define MODE_VOICE      CHFL_VOICE
-#define MODE_PRIVATE    0x0004
-#define MODE_SECRET     0x0008
-#define MODE_MODERATED  0x0010
-#define MODE_TOPICLIMIT 0x0020
-#define MODE_INVITEONLY 0x0040
-#define MODE_NOPRIVMSGS 0x0080
-#define MODE_KEY        0x0100
-#define MODE_BAN        0x0200
-#define MODE_LIMIT      0x0400
-#define MODE_REGONLY    0x0800  /* Only +r users may join */
-#define MODE_NOCOLOUR   0x1000
-#define MODE_NOCTCP     0x2000
-#define MODE_LISTED     0x10000
-#define MODE_SAVE	0x20000	/* save this mode-with-arg 'til later */
-#define MODE_FREE	0x40000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED	0x80000	/* channel was created by a BURST */
+#define MODE_CHANOP		CHFL_CHANOP
+#define MODE_VOICE		CHFL_VOICE
+#define MODE_PRIVATE		0x0004 /* don't show channel in list */
+#define MODE_SECRET		0x0008 /* don't show channel in whois/list */
+#define MODE_MODERATED		0x0010 /* only +v/+o may speak */
+#define MODE_TOPICLIMIT		0x0020 /* topic only settable by +o */
+#define MODE_INVITEONLY		0x0040 /* require invite to join */
+#define MODE_NOPRIVMSGS		0x0080 /* member must be in chan to send */
+#define MODE_KEY		0x0100 /* require key to join */
+#define MODE_BAN		0x0200 /* filter ppl able to join/speak */
+#define MODE_LIMIT		0x0400 /* limit # of users able to join */
+#define MODE_REGONLY		0x0800 /* only +r users may join */
+#define MODE_NOCOLOUR		0x1000 /* no color allowed in chan */
+#define MODE_NOCTCP		0x2000 /* no ctcp allowed towards chan */
+#define MODE_NOQUITPARTS	0x4000 /* no quit/parts in chan */
+#define MODE_LISTED		0x10000
+#define MODE_SAVE		0x20000	/* save this mode-with-arg 'til later */
+#define MODE_FREE		0x40000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x80000	/* channel was created by a BURST */
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */

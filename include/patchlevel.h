@@ -18,7 +18,7 @@
  * $Id$
  *
  */
-#define PATCHLEVEL "05+evilnet(1.0.3)"
+#define PATCHLEVEL "05+evilnet(1.0.4)"
 
 #define RELEASE ".11."
 

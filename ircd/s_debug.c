@@ -45,6 +45,7 @@
 #include "s_conf.h"
 #include "s_stats.h"
 #include "send.h"
+#include "ssl.h"
 #include "struct.h"
 #include "sys.h"
 #include "whowas.h"
@@ -323,7 +324,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
     cl++;
 
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
-	     ":Clients %d(%zu) Connections %d(%zu)", c, cm, cn, cnm);
+	     ":Clients %d(%zu) Connections %d(%zu) SSL %d", c, cm, cn, cnm, ssl_count());
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
 	     ":Users %d(%zu) Accounts %d(%zu) Invites %d(%zu)",
 	     us, us * sizeof(struct User), acc, acc * (ACCOUNTLEN + 1),

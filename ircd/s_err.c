@@ -36,7 +36,7 @@ static Numeric replyTable[] = {
 /* 003 */
   { RPL_CREATED, ":This server was created %s", "003" },
 /* 004 */
-  { RPL_MYINFO, "%s %s dhioswkgxBR bciklmnopstvrCR bklov", "004" },
+  { RPL_MYINFO, "%s %s dhioswkgxBR bciklmnopstuvrCR bklov", "004" },
 /* 005 */
   { RPL_ISUPPORT, "%s :are supported by this server", "005" },
 /* 006 */
@@ -804,9 +804,9 @@ static Numeric replyTable[] = {
 /* 385 */
   { RPL_NOTOPERANYMORE, 0, "385" }, /* not used */
 /* 386 */
-  { 0 },
+  { RPL_IRCOPS, ":%s", "386" },
 /* 387 */
-  { 0 },
+  { RPL_ENDOFIRCOPS, ":End of /IRCOPS", "387" },
 /* 388 */
   { 0 },
 /* 389 */
@@ -972,7 +972,7 @@ static Numeric replyTable[] = {
 /* 469 */
   { 0 },
 /* 470 */
-  { ERR_OPERONLYCHAN, "%s :Cannot join channel (+O)", "470" },
+  { 0 },
 /* 471 */
   { ERR_CHANNELISFULL, "%s :Cannot join channel (+l)", "471" },
 /* 472 */
@@ -998,7 +998,7 @@ static Numeric replyTable[] = {
 /* 482 */
   { ERR_CHANOPRIVSNEEDED, "%s :You're not channel operator", "482" },
 /* 483 */
-  { ERR_CANTKILLSERVER, ":You cant kill a server!", "483" },
+  { ERR_CANTKILLSERVER, ":You can't kill a server!", "483" },
 /* 484 */
   { ERR_ISCHANSERVICE, "%s %s :Cannot kill, kick or deop a network service", "484" },
 /* 485 */
@@ -1036,7 +1036,7 @@ static Numeric replyTable[] = {
 /* 501 */
   { ERR_UMODEUNKNOWNFLAG, ":Unknown MODE flag", "501" },
 /* 502 */
-  { ERR_USERSDONTMATCH, ":Cant change mode for other users", "502" },
+  { ERR_USERSDONTMATCH, ":Can't change mode for other users", "502" },
 /* 503 */
   { 0 },
 /* 504 */

@@ -679,7 +679,8 @@ static const struct UserMode {
   { FLAG_ACCOUNT,     'r' },
   { FLAG_HIDDENHOST,  'x' },
   { FLAG_SETHOST,     'h' },
-  { FLAG_ACCOUNTONLY, 'R' }
+  { FLAG_ACCOUNTONLY, 'R' },
+  { FLAG_BOT,         'B' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -921,13 +922,8 @@ int check_target_limit(struct Client *sptr, void *target, const char *name,
   if (IsChannelName(name) && IsInvited(sptr, target))
     return 0;
 
-  /* If feature evilnet is true and user is an oper, he/she always has a
-     free target -reed */
-  if (feature_bool(FEAT_EVILNET) && IsOper(sptr))
-    return 0;
-
-  /* If user is in the BOT_CLASS, he/she always has a free target */
-  if (get_client_class(sptr) == feature_int(FEAT_BOT_CLASS))
+  /* If user is an oper or bot, he/she/it always has a free target */
+  if (IsOper(sptr) || IsBot(sptr))
     return 0;
 
   /*
@@ -1512,6 +1508,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         else
           ClearAccountOnly(acptr);
         break;
+      case 'B':
+       if (what == MODE_ADD
+           && feature_int(FEAT_BOT_CLASS) > 0
+           && get_client_class(sptr) == feature_int(FEAT_BOT_CLASS))
+         SetBot(sptr);
+       break;
       default:
         break;
       }
