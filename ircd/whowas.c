@@ -293,9 +293,9 @@ void add_history(struct Client *cptr, int still_on)
   DupString(ww->name, cli_name(cptr));
   DupString(ww->username, cli_user(cptr)->username);
   DupString(ww->hostname, cli_user(cptr)->host);
-  if ((HasHiddenHost (cptr) && (feature_int (FEAT_HOST_HIDING_STYLE) == 1))
-      || (IsHiddenHost (cptr) && (feature_int (FEAT_HOST_HIDING_STYLE) == 2)))
-    DupString (ww->realhost, cli_user (cptr)->realhost);
+  if ((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ? HasHiddenHost(cptr) 
+      : IsHiddenHost(cptr))
+    DupString (ww->realhost, cli_user(cptr)->realhost);
   DupString(ww->servername, cli_name(cli_user(cptr)->server));
   DupString(ww->realname, cli_info(cptr));
   if (cli_user(cptr)->away)

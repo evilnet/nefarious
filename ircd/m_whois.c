@@ -212,18 +212,17 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (user->away)
        send_reply(sptr, RPL_AWAY, name, user->away);
 
-    if (SeeOper(sptr,acptr))
+    if (SeeOper(sptr, acptr))
        send_reply(sptr, RPL_WHOISOPERATOR, name);
 
     if (IsAccount(acptr))
       send_reply(sptr, RPL_WHOISACCOUNT, name, user->account);
 
-    if ((HasHiddenHost(acptr) || HasSetHost(acptr)) && (IsAnOper(sptr) || acptr == sptr)) {
-       send_reply(sptr, RPL_WHOISACTUALLY, name, user->realusername,
-         user->realhost, ircd_ntoa((const char*) &(cli_ip(acptr))));
-    } else if ((feature_int(FEAT_HOST_HIDING_STYLE) == 2) && (IsHiddenHost(acptr) || HasSetHost(acptr)) && (IsAnOper(sptr) || acptr == sptr)) {
+    if ((((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ?
+	  HasHiddenHost(acptr) : IsHiddenHost(acptr)) ||
+	 HasSetHost(acptr)) && (IsAnOper(sptr) || acptr == sptr)) {
       send_reply(sptr, RPL_WHOISACTUALLY, name, user->realusername,
-        user->realhost, ircd_ntoa((const char*) &(cli_ip(acptr))));
+		 user->realhost, ircd_ntoa((const char*) &(cli_ip(acptr))));
     }
 
     /* Hint: if your looking to add more flags to a user, eg +h, here's

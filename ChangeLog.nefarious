@@ -1,3 +1,14 @@
+2004-06-08  Reed Loden  <reed@reedloden.com>
+
+	* ircd/m_check.c, ircd/m_userhost.c, ircd/m_userip.c, 
+	ircd/m_whois.c, ircd/s_user.c, ircd/whowas.c: Clean-up of
+	FEAT_HOST_HIDING_STYLE code and various other code clean-ups.
+
+	* ircd/m_ircops.c: Quick fix for weird behavior due to 
+	uninitialized variable; disable use of ms_ircops() for now.
+
+	* tools/linesync/linesync.conf: Add 'F' to ALLOWED_LINES.
+
 2004-06-07  Reed Loden  <reed@reedloden.com>
 
 	* ChangeLog.nefarious: Correct a couple of things.

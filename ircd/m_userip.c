@@ -96,21 +96,15 @@ static void userip_formatter(struct Client* cptr, struct Client *sptr, struct Ms
 {
   assert(IsUser(cptr));
 
-  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
-    msgq_append(0, mb, "%s%s=%c%s@%s", cli_name(cptr),
-                  SeeOper(sptr,cptr) ? "*" : "",
-                  cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
-                  (HasHiddenHost(cptr) || HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
-                  feature_str(FEAT_HIDDEN_IP) :
-                  ircd_ntoa((const char*) &(cli_ip(cptr))));
-  } else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-    msgq_append(0, mb, "%s%s=%c%s@%s", cli_name(cptr),
-                  SeeOper(sptr,cptr) ? "*" : "",
-                  cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
-                  (IsHiddenHost(cptr) || HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
-                  cli_user(cptr)->virtip :
-                  ircd_ntoa((const char*) &(cli_ip(cptr))));
-  }
+  msgq_append(0, mb, "%s%s=%c%s@%s", cli_name(cptr),
+	      SeeOper(sptr,cptr) ? "*" : "",
+	      cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
+	      (((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ?
+		HasHiddenHost(cptr) : IsHiddenHost(cptr)) || 
+	       HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
+	       ((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ? 
+		feature_str(FEAT_HIDDEN_IP) : cli_user(cptr)->virtip) :
+		ircd_ntoa((const char*) &(cli_ip(cptr))));
 }
 
 /*

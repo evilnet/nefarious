@@ -116,7 +116,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
   struct Client *acptr;
   struct Client *server = 0;
-  char buf[BUFSIZE];
+  char buf[BUFSIZE] = NULL;
   int ircops = 0;
 
   if (!MyUser(sptr))
@@ -156,6 +156,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		       IsNoIdle(acptr)) ? 0 :
 		       CurrentTime - acptr->cli_user->last);
 	ircops++;
+	send_reply(sptr, RPL_IRCOPS, buf);
       } else if (parc == 1) {
 	ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
 		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
@@ -165,8 +166,8 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		       IsNoIdle(acptr)) ? 0 :
 		       CurrentTime - acptr->cli_user->last);
 	ircops++;
+	send_reply(sptr, RPL_IRCOPS, buf);
       }
-      send_reply(sptr, RPL_IRCOPS, buf);
     }
   }
 
@@ -184,9 +185,12 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
  */
 int ms_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
-  if (hunt_server_cmd(sptr, CMD_IRCOPS, cptr, 0, "%C", 1, parc, parv) !=
-      HUNTED_ISME)
-    return 0;
-
-  return m_ircops(cptr, sptr, parc, parv);
+/**
+ *  if (hunt_server_cmd(sptr, CMD_IRCOPS, cptr, 0, "%C", 1, parc, parv) !=
+ *    HUNTED_ISME)
+ *  return 0;
+ *
+ *  return m_ircops(cptr, sptr, parc, parv);
+ */
+  return 0;
 }
