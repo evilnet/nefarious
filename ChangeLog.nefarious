@@ -1,3 +1,13 @@
+2004-06-23  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Changed spambot check feature to FALSE.
+
+	* include/patchlevel.h: Bumped patchlevel- 0.2.0.
+
+	* include/supported.h: Added L to CHANMODES.
+
+	* ircd/ircd_features.c: Changed spambot check feature to FALSE.
+
 2004-06-21  Neil Spierling <vulcan@linux-boxen.org>
 
 	* ircd/m_rehash.c: Added new flag "s" so that an ircd.pem file can be reloaded.
