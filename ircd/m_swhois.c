@@ -159,11 +159,6 @@ int ms_swhois(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!feature_bool(FEAT_SWHOIS))
     return 0;
 
-  if (parc < 3) {
-    protocol_violation(sptr, "Too few arguments for SWHOIS");
-    return need_more_params(sptr, "SWHOIS");
-  }
-
   if (!(acptr = findNUser(parv[1])))
     return 0;
 

@@ -6,6 +6,9 @@
 	* ircd/channel.c: Removed broken code and replaced it with
 	boring, but working!, code. Cleaned up whitespacing.
 
+	* ircd/m_swhois.c: Removed parameter checking as it is
+	unnecessary.
+
 2005-01-28  Reed Loden  <reed@reedloden.com>
 
 	* include/ircd_features.h: Added FEAT_HIS_USERIP.
