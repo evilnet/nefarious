@@ -3,6 +3,11 @@
 
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/m_whois.c: Small bug fix, display +s channels for opers
+	now in WHOIS's (prefixed with *).
+
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
 	* doc/example.conf: Renamed OPLEVELS to OPERLEVELS.
 
 	* include/ircd_features.h: See above.

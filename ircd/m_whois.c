@@ -153,7 +153,7 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
        chptr = chan->channel;
        
        if (!(IsOper(sptr) && IsLocalChannel(chptr->chname))
-			       && !ShowChannel(sptr, chptr))
+			       && (!ShowChannel(sptr, chptr) && !IsOper(sptr)))
           continue;
           
        if (acptr != sptr && IsZombie(chan))
