@@ -3,6 +3,15 @@
 
 2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
 
+        * ircd/m_exempt.c: If we are recieving new exemptions during a
+	netburst then dont spit out notices over adding.. this could
+	cause a large flood. (nb = netburst, nm = normal).
+
+	* ircd/s_serv.c: send along nb on the end of a cmd_exempt when
+	bursting exemptions.
+
+2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
+
 	* include/handlers.h: Added new handlers for exempt command.
 
 	* include/ircd_struct.h: Structure for exemptions plus a function

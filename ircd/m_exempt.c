@@ -66,7 +66,7 @@ char* find_dnsblexempt(const char* host)
   return 0;
 }
 
-int add_exempt(struct Client* sptr, char* host)
+int add_exempt(struct Client* sptr, char* host, char* netburst)
 {
   struct dnsblexempts *dnsblexempts;
   char *dhost;
@@ -74,7 +74,7 @@ int add_exempt(struct Client* sptr, char* host)
   if ((dhost = find_dnsblexempt(host)))
     return 0;
 
-  if (!IsServer(sptr))
+  if (!IsServer(sptr) && (0 != ircd_strcmp(netburst, "nb")))
     sendto_opmask_butone(0, SNO_GLINE, "%C Adding DNSBL Exemption on %s", sptr, host);
 
   dnsblexempts = (struct dnsblexempts *)MyMalloc(sizeof(struct dnsblexempts));
@@ -96,8 +96,7 @@ int del_exempt(struct Client* sptr, char* host)
 
   for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next) {
     if (!match(dnsblexempts->host, host)) {
-      if (!IsServer(sptr))
-        sendto_opmask_butone(0, SNO_GLINE, "%C Removing DNSBL Exemption on %s", sptr, host);
+      sendto_opmask_butone(0, SNO_GLINE, "%C Removing DNSBL Exemption on %s", sptr, host);
 
      *dnsblexempts->prev = dnsblexempts->next;
 
@@ -144,7 +143,7 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   cp = pretty_mask(cp);
 
-  if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp)))
+  if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp, "nm")))
     sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %c%s", sptr, c, cp);
 
   return 0;
@@ -165,7 +164,7 @@ int ms_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else
     c = '+';
 
-  if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp)))
+  if ((c == '-' && !del_exempt(sptr, cp)) || (c != '-' && !add_exempt(sptr, cp, parv[3] ? parv[3] : "nm")))
     sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s", sptr, parv[2]);
 
   return 0;
