@@ -1,3 +1,30 @@
+2004-06-18   <vulcan@linux-boxen.org>
+
+	* doc/example.conf: Added features NOTVERIFIED (string msg) and VERIFIED_ACCOUNTS
+	(default: FALSE).
+
+	* include/client.h: Added FLAG_VERIFIED, IsVerified and SetVerified.
+
+	* include/ircd_features.h: Added features NOTVERIFIED and VERIFIED_ACCOUNTS.
+
+	* include/numeric.h: Added RPL_WHOISVERIFIED (340) and ERR_NOTVERIFIED (538).
+
+	* ircd/ircd_features.c: Added features NOTVERIFIED and VERIFIED_ACCOUNTS.
+
+	* ircd/m_account.c: Added new paramater to AC, "v" aka verified, syntax:
+	sNumeric AC tNumeric account timestamp v. Note the code will have to change
+	once we start having the need for more than one flag, ie "vgra".
+
+	* ircd/m_whois.c: Spit out weather a user is or isnt verified in the WHOIS
+	output.
+
+	* ircd/s_err.c: Added RPL_WHOISVERIFIED (340) and ERR_NOTVERIFIED (538).
+			Fixed a few numbers i never noticed before.
+
+	* ircd/s_user.c: Only allow +x'ing for users who are verified when
+	VERIFIED_ACCOUNTS is TRUE. Note that VERIFIED_ACCOUNTS only works with
+	hosthiding style 1.
+
 2004-06-17  Neil Spierling <vulcan@linux-boxen.org>
 
 	* tools/zBounce/*: Major synch of zBounce off the main zBounce project cvs.

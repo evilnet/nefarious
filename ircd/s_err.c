@@ -718,7 +718,7 @@ static Numeric replyTable[] = {
 /* 338 */
   { RPL_WHOISACTUALLY, "%s %s@%s %s :Actual user@host, Actual IP", "338" },
 /* 339 */
-  { 0 },
+  { RPL_WHOISVERIFIED, "%s :is using an %s account", "339" },
 /* 340 */
   { RPL_USERIP, ":", "340" },
 /* 341 */
@@ -1104,19 +1104,19 @@ static Numeric replyTable[] = {
 /* 531 */
   { ERR_HOSTUNAVAIL, "%s :sethost not found", "531" },
 /* 532 */
-  { RPL_RULESSTART, ":- %s Network Rules - ", "530" },
+  { RPL_RULESSTART, ":- %s Network Rules - ", "532" },
 /* 533 */
-  { RPL_RULES, ":- %s", "531" },
+  { RPL_RULES, ":- %s", "533" },
 /* 534 */
-  { RPL_ENDOFRULES, ":End of /RULES list.", "532" },
+  { RPL_ENDOFRULES, ":End of /RULES list.", "534" },
 /* 535 */
-  { RPL_OMOTDSTART, ":%s IRC Operator MOTD", "533" },
+  { RPL_OMOTDSTART, ":%s IRC Operator MOTD", "535" },
 /* 536 */
-  { RPL_OMOTD, ":- %s", "534" },
+  { RPL_OMOTD, ":- %s", "536" },
 /* 537 */
-  { RPL_ENDOFOMOTD, ":End of IRC Operator MOTD.", "535" },
+  { RPL_ENDOFOMOTD, ":End of IRC Operator MOTD.", "537" },
 /* 538 */
-  { 0 },
+  { ERR_NOTVERIFIED, ":%s", "538" },
 /* 539 */
   { 0 },
 /* 540 */

@@ -90,6 +90,7 @@
 #include "s_debug.h"
 #include "s_user.h"
 #include "send.h"
+#include "support.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -101,6 +102,9 @@
  * parv[0] = sender prefix
  * parv[1] = numeric of client to act on
  * parv[2] = account name (12 characters or less)
+ * parv[3] = timestamp
+ * parv[4] = verified account, can also be parv[3] when the timestamp
+ *           isnt not specified.
  */
 int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	       char* parv[])
@@ -128,10 +132,33 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
   if (strlen(parv[2]) > ACCOUNTLEN)
     return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.", parv[2], ACCOUNTLEN, cli_name(acptr));
 
-  if (parc > 3) {
-    cli_user(acptr)->acc_create = atoi(parv[3]);
-    Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
-	   "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
+  if (parc == 4) {
+    if (is_timestamp(parv[3])) {
+      cli_user(acptr)->acc_create = atoi(parv[3]);
+      Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
+             "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
+    } else {
+      if (feature_bool(FEAT_VERIFIED_ACCOUNTS) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
+        if (0 == ircd_strcmp("v", parv[3])) {
+	  Debug((DEBUG_DEBUG, "Account Verified (without stamp)"));
+          SetVerified(acptr);
+        }
+      }
+    }
+  } else if (parc == 5) {
+    if (is_timestamp(parv[3])) {
+      cli_user(acptr)->acc_create = atoi(parv[3]);
+      Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
+             "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
+    }
+    if (feature_bool(FEAT_VERIFIED_ACCOUNTS) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
+      if (0 == ircd_strcmp("v", parv[4])) {
+	Debug((DEBUG_DEBUG, "Account Verified (with stamp)"));
+        SetVerified(acptr);
+      }
+    }
+  } else {
+    /* this should only happen if there is no timestamp and no verification */
   }
 
   hidden = HasHiddenHost(acptr);
@@ -144,9 +171,9 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     hide_hostmask(acptr);
 
   sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr,
-			cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s",
+			cli_user(acptr)->acc_create ? "%C %s %Tu" : "%C %s %s",
 			acptr, cli_user(acptr)->account,
-			cli_user(acptr)->acc_create);
+			cli_user(acptr)->acc_create, parv[4]);
 
   return 0;
 }

@@ -265,6 +265,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      RPL_CHANPASSOK       338           IRCnet extension (?)*/
 #define	RPL_WHOISACTUALLY    338	/* Undernet extension, dalnet */
 /*      RPL_BADCHANPASS      339           IRCnet extension (?)*/
+#define RPL_WHOISVERIFIED    339
 #define RPL_USERIP           340        /* Undernet extension */
 #define RPL_INVITING         341
 /*      RPL_SUMMONING        342           removed from RFC1459 */
@@ -484,8 +485,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_OMOTDSTART       535
 #define RPL_OMOTD            536
 #define RPL_ENDOFOMOTD       537
+#define ERR_NOTVERIFIED      538
 
-#define ERR_LASTERROR        538
+#define ERR_LASTERROR        539
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal
