@@ -25,8 +25,10 @@
 	* ircd/m_pass.c: Warning cleanup.
 
 	* ircd/s_auth.c: Only send "Checking your IP against DNS ban lists"
-			 done this as a way to get around the multiple
-			 notice issue with more than one DNSBL.
+			  done this as a way to get around the multiple
+			  notice issue with more than one DNSBL.
+			 Adjusted the length of the DNSBL auth notice,
+			  was getting blank lines in xchat.
 
 	* ircd/s_conf.c: Warning cleanup.
 			 Drop url and name and just use reply.

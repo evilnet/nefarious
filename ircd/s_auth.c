@@ -88,7 +88,7 @@ static struct {
     "ignoring hostname.\r\n",                              80 },
   { "NOTICE AUTH :*** Invalid hostname\r\n",               35 },
   { "NOTICE AUTH :*** Checking your IP against DNS ban " \
-    "lists\r\n",                                           58 },
+    "lists\r\n",                                           57 },
 };
 
 typedef enum {
