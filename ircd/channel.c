@@ -3507,15 +3507,15 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       case 'Q': /* MODE_NOQUITPARTS */
       case 'S': /* MODE_STRIP */
       case 'T': /* MODE_NOAMSG */
-	strcpy(cur_chmode, "FEAT_CHMODE_");
+/*	strcpy(cur_chmode, "FEAT_CHMODE_");
 	strcat(cur_chmode, modestr);
         if (feature_bool((enum Feature)cur_chmode) || IsServer(sptr) ||
-	    IsOper(sptr)) {
+	    IsOper(sptr)) {*/
           mode_parse_mode(&state, flag_p);
-        } else {
-          send_reply(sptr, ERR_NOPRIVILEGES);
-        }
-        break;
+/*	} else {
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	}*/
+	break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);
