@@ -1,5 +1,9 @@
 2004-06-21  Neil Spierling <vulcan@linux-boxen.org>
 
+	* ircd/m_rehash.c: Added new flag "s" so that an ircd.pem file can be reloaded.
+
+2004-06-21  Neil Spierling <vulcan@linux-boxen.org>
+
 	* ircd/m_topic.c: Fixed potential crash, dont want to do the user@host for a
 	topic comming from a server (in topic bursts).
 

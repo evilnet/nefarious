@@ -92,6 +92,7 @@
 #include "s_conf.h"
 #include "s_user.h"
 #include "send.h"
+#include "ssl.h"
 
 #include <assert.h>
 
@@ -120,6 +121,10 @@ int mo_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     } else if (*parv[1] == 'l') {
       send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening log files");
       log_reopen(); /* reopen log files */
+      return 0;
+    } else if (*parv[1] == 's') {
+      send_reply(sptr, SND_EXPLICIT | RPL_REHASHING, ":Reopening SSL pem file");
+      ssl_init();
       return 0;
     } else if (*parv[1] == 'q')
       flag = 2;
