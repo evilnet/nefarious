@@ -1094,7 +1094,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 {
   char** p;
   char*  m;
-  struct Client *acptr;
+  struct Client *acptr = NULL; /* Stupid Compiler Warning (tm) */
   int what;
   int i;
   struct Flags setflags;
@@ -1103,13 +1103,17 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
   char buf[BUFSIZE];
   int prop = 0;
   int do_host_hiding = 0;
+  int force = 0;
 
   what = MODE_ADD;
 
   if (parc < 2)
     return need_more_params(sptr, "MODE");
 
-  if (!(acptr = FindUser(parv[1])))
+  if (IsServer(cptr))
+    acptr = findNUser(parv[1]);
+  
+  if (!acptr && !(acptr = FindUser(parv[1])))
   {
     if (MyConnect(sptr))
       send_reply(sptr, ERR_NOSUCHCHANNEL, parv[1]);
@@ -1118,13 +1122,23 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
   if (IsServer(sptr) || sptr != acptr)
   {
-    if (IsServer(cptr))
-      sendwallto_group_butone(&me, WALL_WALLOPS, 0, 
-	  		    "MODE for User %s from %s!%s", parv[1],
-                            cli_name(cptr), cli_name(sptr));
-    else
+    if (IsServer(sptr)) {
+      if (!MyConnect(acptr)) {
+        /* Just propagate and ignore */
+        char buf[512] = ""; /* A P10 message can NEVER be longer than 512 */
+        for (i=1;i<parc;i++) {
+          strcat(buf, " ");
+          strcat(buf, parv[i]);
+        }
+        sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s", buf);
+        return 0;
+      }
+      force = 1;
+    }
+    else {
       send_reply(sptr, ERR_USERSDONTMATCH);
-    return 0;
+      return 0;
+    }
   }
 
   if (parc < 3)
@@ -1132,16 +1146,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     m = buf;
     *m++ = '+';
     for (i = 0; i < USERMODELIST_SIZE; ++i) {
-      if (HasFlag(sptr, userModeList[i].flag) &&
+      if (HasFlag(acptr, userModeList[i].flag) &&
 	  (userModeList[i].flag != FLAG_ACCOUNT))
         *m++ = userModeList[i].c;
     }
     *m = '\0';
-    send_reply(sptr, RPL_UMODEIS, buf);
-    if (HasFlag(sptr, FLAG_SERVNOTICE) && MyConnect(sptr)
-        && cli_snomask(sptr) !=
-        (unsigned int)(IsOper(sptr) ? SNO_OPERDEFAULT : SNO_DEFAULT))
-      send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
+    send_reply(acptr, RPL_UMODEIS, buf);
+    if (HasFlag(acptr, FLAG_SERVNOTICE) && MyConnect(acptr)
+        && cli_snomask(acptr) !=
+        (unsigned int)(IsOper(acptr) ? SNO_OPERDEFAULT : SNO_DEFAULT))
+      send_reply(acptr, RPL_SNOMASK, cli_snomask(acptr), cli_snomask(acptr));
     return 0;
   }
 
@@ -1149,10 +1163,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * find flags already set for user
    * why not just copy them?
    */
-  setflags = cli_flags(sptr);
+  setflags = cli_flags(acptr);
 
-  if (MyConnect(sptr))
-    tmpmask = cli_snomask(sptr);
+  if (MyConnect(acptr))
+    tmpmask = cli_snomask(acptr);
 
   /*
    * parse mode change string(s)
@@ -1170,69 +1184,75 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         if (*(p + 1) && is_snomask(*(p + 1))) {
           snomask_given = 1;
           tmpmask = umode_make_snomask(tmpmask, *++p, what);
-          tmpmask &= (IsAnOper(sptr) ? SNO_ALL : SNO_USER);
+          tmpmask &= (IsAnOper(acptr) ? SNO_ALL : SNO_USER);
         }
         else
           tmpmask = (what == MODE_ADD) ?
-              (IsAnOper(sptr) ? SNO_OPERDEFAULT : SNO_DEFAULT) : 0;
+              (IsAnOper(acptr) ? SNO_OPERDEFAULT : SNO_DEFAULT) : 0;
         if (tmpmask)
-	  SetServNotice(sptr);
+	  SetServNotice(acptr);
         else
-	  ClearServNotice(sptr);
+	  ClearServNotice(acptr);
         break;
       case 'w':
         if (what == MODE_ADD)
-          SetWallops(sptr);
+          SetWallops(acptr);
         else
-          ClearWallops(sptr);
+          ClearWallops(acptr);
         break;
       case 'o':
-        if (what == MODE_ADD)
-          SetOper(sptr);
+        if (what == MODE_ADD) {
+          if (force)
+            cli_handler(acptr) = OPER_HANDLER;
+          SetOper(acptr);
+        }
         else {
-          ClrFlag(sptr, FLAG_OPER);
-          ClrFlag(sptr, FLAG_LOCOP);
-          if (MyConnect(sptr)) {
-            tmpmask = cli_snomask(sptr) & ~SNO_OPER;
+          ClrFlag(acptr, FLAG_OPER);
+          ClrFlag(acptr, FLAG_LOCOP);
+          if (MyConnect(acptr)) {
+            tmpmask = cli_snomask(acptr) & ~SNO_OPER;
             cli_handler(sptr) = CLIENT_HANDLER;
           }
         }
         break;
       case 'O':
-        if (what == MODE_ADD)
-          SetLocOp(sptr);
+        if (what == MODE_ADD) {
+          SetLocOp(acptr);
+          if (force && MyConnect(acptr))
+            cli_handler(acptr) = OPER_HANDLER;
+        }
         else {
-          ClrFlag(sptr, FLAG_OPER);
-          ClrFlag(sptr, FLAG_LOCOP);
-          if (MyConnect(sptr)) {
-            tmpmask = cli_snomask(sptr) & ~SNO_OPER;
-            cli_handler(sptr) = CLIENT_HANDLER;
+          ClrFlag(acptr, FLAG_OPER);
+          ClrFlag(acptr, FLAG_LOCOP);
+          if (MyConnect(acptr)) {
+            tmpmask = cli_snomask(acptr) & ~SNO_OPER;
+            cli_handler(acptr) = CLIENT_HANDLER;
           }
         }
         break;
       case 'i':
         if (what == MODE_ADD)
-          SetInvisible(sptr);
+          SetInvisible(acptr);
         else
-          ClearInvisible(sptr);
+          ClearInvisible(acptr);
         break;
       case 'd':
         if (what == MODE_ADD)
-          SetDeaf(sptr);
+          SetDeaf(acptr);
         else
-          ClearDeaf(sptr);
+          ClearDeaf(acptr);
         break;
       case 'k':
         if (what == MODE_ADD)
-          SetChannelService(sptr);
+          SetChannelService(acptr);
         else
-          ClearChannelService(sptr);
+          ClearChannelService(acptr);
         break;
       case 'g':
         if (what == MODE_ADD)
-          SetDebug(sptr);
+          SetDebug(acptr);
         else
-          ClearDebug(sptr);
+          ClearDebug(acptr);
         break;
       case 'x':
         if (what == MODE_ADD)
@@ -1248,68 +1268,70 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * Stop users making themselves operators too easily:
    */
   if (!IsServer(cptr)) {
-    if (!FlagHas(&setflags, FLAG_OPER) && IsOper(sptr))
-      ClearOper(sptr);
-    if (!FlagHas(&setflags, FLAG_LOCOP) && IsLocOp(sptr))
-      ClearLocOp(sptr);
+    if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
+      ClearOper(acptr);
+    if (!FlagHas(&setflags, FLAG_LOCOP) && IsLocOp(acptr))
+      ClearLocOp(acptr);
     /*
      * new umode; servers can set it, local users cannot;
      * prevents users from /kick'ing or /mode -o'ing
      */
     if (!FlagHas(&setflags, FLAG_CHSERV))
-      ClearChannelService(sptr);
+      ClearChannelService(acptr);
     /*
      * only send wallops to opers
      */
-    if (feature_bool(FEAT_WALLOPS_OPER_ONLY) && !IsAnOper(sptr) &&
+    if (feature_bool(FEAT_WALLOPS_OPER_ONLY) && !IsAnOper(acptr) &&
 	!FlagHas(&setflags, FLAG_WALLOP))
-      ClearWallops(sptr);
+      ClearWallops(acptr);
 
-    if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(sptr) && 
-	!IsAnOper(sptr) && !FlagHas(&setflags, FLAG_SERVNOTICE)) {
-      ClearServNotice(sptr);
-      set_snomask(sptr, 0, SNO_SET);
+    if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(acptr) && 
+	!IsAnOper(acptr) && !FlagHas(&setflags, FLAG_SERVNOTICE)) {
+      ClearServNotice(acptr);
+      set_snomask(acptr, 0, SNO_SET);
     }
 
-    if (feature_bool(FEAT_HIS_DEBUG_OPER_ONLY) && !IsAnOper(sptr) && 
+    if (feature_bool(FEAT_HIS_DEBUG_OPER_ONLY) && !IsAnOper(acptr) && 
 	!FlagHas(&setflags, FLAG_DEBUG))
-      ClearDebug(sptr);
+      ClearDebug(acptr);
   }
 
-  if (MyConnect(sptr)) {
+  if (MyConnect(acptr)) {
     if ((FlagHas(&setflags, FLAG_OPER) || FlagHas(&setflags, FLAG_LOCOP)) &&
-        !IsAnOper(sptr))
-      det_confs_butmask(sptr, CONF_CLIENT & ~CONF_OPS);
+        !IsAnOper(acptr))
+      det_confs_butmask(acptr, CONF_CLIENT & ~CONF_OPS);
 
-    if (SendServNotice(sptr)) {
-      if (tmpmask != cli_snomask(sptr))
-	set_snomask(sptr, tmpmask, SNO_SET);
-      if (cli_snomask(sptr) && snomask_given)
-	send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
+    if (SendServNotice(acptr)) {
+      if (tmpmask != cli_snomask(acptr))
+	set_snomask(acptr, tmpmask, SNO_SET);
+      if (cli_snomask(acptr) && snomask_given)
+	send_reply(acptr, RPL_SNOMASK, cli_snomask(acptr), cli_snomask(acptr));
     } else
-      set_snomask(sptr, 0, SNO_SET);
+      set_snomask(acptr, 0, SNO_SET);
   }
   /*
    * Compare new flags with old flags and send string which
    * will cause servers to update correctly.
    */
-  if (!FlagHas(&setflags, FLAG_OPER) && IsOper(sptr)) { /* user now oper */
+  if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr)) { /* user now oper */
     ++UserStats.opers;
-    client_set_privs(sptr); /* may set propagate privilege */
+    client_set_privs(acptr); /* may set propagate privilege */
   }
-  if (HasPriv(sptr, PRIV_PROPAGATE)) /* remember propagate privilege setting */
+  if (HasPriv(acptr, PRIV_PROPAGATE)) /* remember propagate privilege setting */
     prop = 1;
-  if (FlagHas(&setflags, FLAG_OPER) && !IsOper(sptr)) { /* user no longer oper */
+  if (FlagHas(&setflags, FLAG_OPER) && !IsOper(acptr)) { /* user no longer oper */
     --UserStats.opers;
-    client_set_privs(sptr); /* will clear propagate privilege */
+    client_set_privs(acptr); /* will clear propagate privilege */
   }
-  if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(sptr))
+  if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(acptr))
     --UserStats.inv_clients;
-  if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(sptr))
+  if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))
     ++UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding)
-    hide_hostmask(sptr, FLAG_HIDDENHOST);
-  send_umode_out(cptr, sptr, &setflags, prop);
+    hide_hostmask(acptr, FLAG_HIDDENHOST);
+  send_umode_out(cptr, acptr, &setflags, prop);
+  if (force) /* Let the user know */
+    send_umode_out(acptr, acptr, &setflags, 1);
 
   return 0;
 }
