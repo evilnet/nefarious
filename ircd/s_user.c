@@ -1165,7 +1165,10 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
       /* If they are +rx, we need to return to their +x host, not their "real" host */
       if (HasHiddenHost(cptr))
         ircd_snprintf(0, cli_user(cptr)->host, HOSTLEN, "%s.%s",
-          cli_user(cptr)->account, feature_str(FEAT_HIDDEN_HOST));
+          cli_user(cptr)->account, (IsAnOper(cptr) &&
+          feature_bool(FEAT_OPERHOST_HIDING)) ?
+          feature_str(FEAT_HIDDEN_OPERHOST) :
+          feature_str(FEAT_HIDDEN_HOST));
       else
         strncpy(cli_user(cptr)->host, cli_user(cptr)->realhost, HOSTLEN);
       strncpy(cli_user(cptr)->username, cli_user(cptr)->realusername, USERLEN);

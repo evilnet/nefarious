@@ -1,3 +1,9 @@
+2003-07-05  Reed Loden  <reed@reedloden.com>
+
+	* ircd/s_user.c: Fixed a problem of when an oper was +xh and
+	did -h, it gave the oper FEAT_HIDDEN_HOST and not
+	FEAT_HIDDEN_OPERHOST.
+
 2003-07-04  Reed Loden  <reed@reedloden.com>
 
 	* Happy Fourth of July!
