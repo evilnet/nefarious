@@ -218,7 +218,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_WHOISHELPER	     309	austnet */
 /*      RPL_WHOISSVCMSG      310         Dalnet */
 /*	RPL_WHOISHELPOP	     310	unreal */
-#define	RPL_WHOISSERVICE     310	/* austnet/AbleNET */
+#define	RPL_WHOISSERVICE     310	/* austnet/AfterNET */
 #define RPL_WHOISUSER        311        /* See also RPL_ENDOFWHOIS */
 #define RPL_WHOISSERVER      312
 #define RPL_WHOISOPERATOR    313

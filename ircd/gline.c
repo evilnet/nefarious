@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include "gline.h"
-#include "channel.h"
+#inclide "channel.h"
 #include "client.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -180,66 +180,73 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
   if (!GlineIsActive(gline)) /* no action taken on inactive glines */
     return 0;
 
-  if (GlineIsBadChan(gline)) {
-    /* Handle BADCHAN gline */
-    struct Channel *chptr,*nchptr;
-    struct Membership *member,*nmember;
-    
-    for(chptr=GlobalChannelList;chptr;chptr=nchptr) {
-      nchptr=chptr->next;
-      if (match(gline->gl_user, chptr->chname))
-	continue;
-      for (member=chptr->members;member;member=nmember) {
-	nmember=member->next_member;
-	if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
-	  continue;
-	sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
-	make_zombie(member, member->user, &me, &me, chptr);
-	retval=1;
-       }
+  for (fd = HighestFd; fd >= 0; --fd) {
+    /*
+     * get the users!
+     */
+    if ((acptr = LocalClientArray[fd])) {
+      if (!cli_user(acptr))
+        continue;
+
+
+      if (gline->gl_flags & GLINE_REALNAME) { /* Realname Gline */
+	Debug((DEBUG_DEBUG,"Realname Gline: %s %s",(cli_info(acptr)),
+					gline->gl_user+2));
+        if (match(gline->gl_user+2, cli_info(acptr)) != 0)
+            continue;
+        Debug((DEBUG_DEBUG,"Matched!"));
+
+      } else if (gline->gl_flags & GLINE_BADCHAN) { /* Badchan Gline */
+        struct Channel *chptr,*nchptr;
+        struct Membership *member,*nmember;
+
+        for(chptr=GlobalChannelList;chptr;chptr=nchptr) {
+	  nchptr=chptr->next;
+	  if (match(gline->gl_user, chptr->chname))
+	    continue;
+	  for (member=chptr->members;member;member=nmember) {
+	    nmember=member->next_member;
+	  if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
+	    continue;
+	  sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+	  sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, "%H %C :Badchanneled (%s)", chptr, member->user, gline->gl_reason);
+	  make_zombie(member, member->user, &me, &me, chptr);
+	  retval=1;
+	}
+      } else { /* Host/IP gline */
+	      if (cli_user(acptr)->username && 
+			      match (gline->gl_user, (cli_user(acptr))->username) != 0)
+		      continue;
+
+	      if (GlineIsIpMask(gline)) {
+		      Debug((DEBUG_DEBUG,"IP gline: %08x %08x/%i",(cli_ip(cptr)).s_addr,
+                 gline->ipnum.s_addr,gline->bits));
+		      if (((cli_ip(acptr)).s_addr & NETMASK(gline->bits)) 
+              != gline->ipnum.s_addr)
+			      continue;
+	      }
+	      else {
+		      if (match(gline->gl_host, cli_sockhost(acptr)) != 0)
+			      continue;
+	      }
+      } /* of Host/IP Gline */
+
+      /* ok, here's one that got G-lined */
+      send_reply(acptr, SND_EXPLICIT | ERR_YOUREBANNEDCREEP, ":%s",
+      	   gline->gl_reason);
+
+      /* let the ops know about it */
+      sendto_opmask_butone(0, SNO_GLINE, "G-line active for %s",
+      		     get_client_name(acptr, TRUE));
+
+      /* and get rid of him */
+      if ((tval = exit_client_msg(cptr, acptr, &me,
+	  feature_bool(FEAT_HIS_GLINE) ? "G-lined" : "G-lined (%s)", gline->gl_reason)))
+        retval = tval; /* retain killed status */
     }
-  } else {
-    /* Handle normal gline */ 
-    for (fd = HighestFd; fd >= 0; --fd) {
-      /*
-       * get the users!
-       */
-      if ((acptr = LocalClientArray[fd])) {
-	if (!cli_user(acptr))
-	  continue;
-
-	if (cli_user(acptr)->username && 
-	  match (gline->gl_user, (cli_user(acptr))->username) != 0)
-	       continue;
-
-        if (GlineIsIpMask(gline)) {
-	  Debug((DEBUG_DEBUG,"IP gline: %08x %08x/%i",(cli_ip(cptr)).s_addr,gline->ipnum.s_addr,gline->bits));
-	  if (((cli_ip(acptr)).s_addr & NETMASK(gline->bits)) != gline->ipnum.s_addr)
-	    continue;
-	}
-	else {
-	  if (match(gline->gl_host, cli_sockhost(acptr)) != 0)
-	    continue;
-	}
-
-	/* ok, here's one that got G-lined */
-	send_reply(acptr, SND_EXPLICIT | ERR_YOUREBANNEDCREEP, ":%s",
-	      gline->gl_reason);
-
-	/* let the ops know about it */
-	sendto_opmask_butone(0, SNO_GLINE, "G-line active for %s",
-		      get_client_name(acptr, TRUE));
-
-	/* and get rid of him */
-	if ((tval = exit_client_msg(cptr, acptr, &me, "G-lined (%s)",
-	    gline->gl_reason)))
-	  retval = tval; /* retain killed status */
-       }
-     }
-   }
-   return retval;
   }
+  return retval;
+}
 
 /*
  * This routine implements the mask checking applied to local
@@ -265,7 +272,8 @@ gline_checkmask(char *mask)
     } else if (*mask == '*' || *mask == '?')
       flags |= MASK_WILD_0 | MASK_WILDS; /* found a wildcard */
     else if (*mask == '/') { /* n.n.n.n/n notation; parse bit specifier */
-      ipmask = strtoul(++mask, &mask, 10);
+      mask++;
+      ipmask = strtoul(mask, &mask, 10);
 
       if (*mask || dots != 3 || ipmask > 32 || /* sanity-check to date */
 	  (flags & (MASK_WILDS | MASK_IP)) != MASK_IP)
@@ -312,8 +320,8 @@ gline_propagate(struct Client *cptr, struct Client *sptr, struct Gline *gline)
   if (gline->gl_lastmod)
     sendcmdto_serv_butone(sptr, CMD_GLINE, cptr, "* %c%s%s%s %Tu %Tu :%s",
 			  GlineIsRemActive(gline) ? '+' : '-', gline->gl_user,
-			  GlineIsBadChan(gline) ? "" : "@",
-			  GlineIsBadChan(gline) ? "" : gline->gl_host,
+			  GlineIsBadChan(gline)||GlineIsRealName(gline) ? "" : "@",
+			  GlineIsBadChan(gline)||GlineIsRealName(gline) ? "" : gline->gl_host,
 			  gline->gl_expire - CurrentTime, gline->gl_lastmod,
 			  gline->gl_reason);
   else
@@ -356,6 +364,18 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
 # endif /* OLD_GLINE */
       user = userhost;
     host = 0;
+  } else if (*userhost == '$' 
+# ifndef NO_OLD_GLINE
+	|| userhost[2] == '$'
+# endif /* OLD_GLINE */
+	) {
+	  switch (*userhost == '$' ? userhost[1] : userhost[3]) {
+		  case 'R': flags |= GLINE_REALNAME; break;
+		  default:
+			    /* uh, what to do here? */
+			    break;
+	  }
+	  user = (*userhost =='$' ? userhost : userhost+2);
   } else {
     canon_userhost(userhost, &user, &host, "*");
     if (sizeof(uhmask) <
@@ -398,8 +418,8 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
 		       flags & GLINE_LOCAL ? "local" : "global",
 		       flags & GLINE_BADCHAN ? "BADCHAN" : "GLINE", user,
-		       flags & GLINE_BADCHAN ? "" : "@",
-		       flags & GLINE_BADCHAN ? "" : host,
+		       flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : "@",
+		       flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : host,
 		       expire + TSoffset, reason);
 
   /* and log it */
@@ -611,18 +631,27 @@ gline_lookup(struct Client *cptr, unsigned int flags)
     if ((flags & GLINE_GLOBAL && gline->gl_flags & GLINE_LOCAL) ||
 	     (flags & GLINE_LASTMOD && !gline->gl_lastmod))
       continue;
-     
-    if (match(gline->gl_user, (cli_user(cptr))->username) != 0)
-      continue;
-    	 
-    if (GlineIsIpMask(gline)) {
-      Debug((DEBUG_DEBUG,"IP gline: %08x %08x/%i",(cli_ip(cptr)).s_addr,gline->ipnum.s_addr,gline->bits));
-      if (((cli_ip(cptr)).s_addr & NETMASK(gline->bits)) != gline->ipnum.s_addr)
-        continue;
+
+    if (GlineIsRealName(gline)) {
+       Debug((DEBUG_DEBUG,"realname gline: '%s' '%s'",gline->gl_user,cli_info(cptr)));
+      if (match(gline->gl_user+2, cli_info(cptr)) != 0)
+	continue;
+ 
+      return gline;
     }
     else {
-      if (match(gline->gl_host, (cli_user(cptr))->realhost) != 0) 
+      if (match(gline->gl_user, (cli_user(cptr))->username) != 0)
         continue;
+    	 
+      if (GlineIsIpMask(gline)) {
+        Debug((DEBUG_DEBUG,"IP gline: %08x %08x/%i",(cli_ip(cptr)).s_addr,gline->ipnum.s_addr,gline->bits));
+        if (((cli_ip(cptr)).s_addr & NETMASK(gline->bits)) != gline->ipnum.s_addr)
+          continue;
+      }    
+      else {
+        if (match(gline->gl_host, (cli_user(cptr))->realhost) != 0) 
+          continue;
+      }
     }
     return gline;
   }
@@ -753,7 +782,7 @@ gline_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
 
     if (gline->gl_expire <= CurrentTime)
       gline_free(gline);
-    else
+    else if (!GlineIsRealName(gline))
       send_reply(sptr, RPL_STATSGLINE, 'G', gline->gl_user, gline->gl_host,
 		 gline->gl_expire + TSoffset, gline->gl_reason);
   }

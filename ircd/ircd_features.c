@@ -234,7 +234,7 @@ static struct FeatureDesc {
   /* Misc. features */
   F_N(LOG, FEAT_MYOPER, feature_log_set, feature_log_reset, feature_log_get,
       0, log_feature_unmark, log_feature_mark, log_feature_report),
-  F_S(DOMAINNAME, 0, "AbleNET.org", 0),
+  F_S(DOMAINNAME, 0, "AfterNET.org", 0),
   F_B(RELIABLE_CLOCK, 0, 0, 0),
   F_I(BUFFERPOOL, 0, 27000000, 0),
   F_B(HAS_FERGUSON_FLUSHER, 0, 0, 0),
@@ -253,7 +253,7 @@ static struct FeatureDesc {
   F_S(DEFAULT_LIST_PARAM, FEAT_NULL, 0, list_set_default),
   F_I(NICKNAMEHISTORYLENGTH, 0, 800, whowas_realloc),
   F_B(HOST_HIDING, 0, 1, 0),
-  F_S(HIDDEN_HOST, FEAT_CASE, "Users.AbleNET.org", 0),
+  F_S(HIDDEN_HOST, FEAT_CASE, "users.afternet.org", 0),
   F_S(HIDDEN_IP, 0, "127.0.0.1", 0),
   F_B(AUTOHIDE, 0, 1, 0),
   F_B(CONNEXIT_NOTICES, 0, 0, 0),
@@ -275,7 +275,9 @@ static struct FeatureDesc {
   F_I(CONNECTFREQUENCY, 0, 600, init_class),
   F_I(DEFAULTMAXSENDQLENGTH, 0, 40000, init_class),
   F_I(GLINEMAXUSERCOUNT, 0, 20, 0),
-
+  F_I(SOCKSENDBUF, 0, 61440, 0),
+  F_I(SOCKRECVBUF, 0, 61440, 0),
+  
   /* Some misc. default paths */
   F_S(MPATH, FEAT_CASE | FEAT_MYOPER, "ircd.motd", motd_init),
   F_S(RPATH, FEAT_CASE | FEAT_MYOPER, "remote.motd", motd_init),
@@ -376,13 +378,13 @@ static struct FeatureDesc {
   F_B(HIS_REWRITE, 0, 1, 0),
   F_I(HIS_REMOTE, 0, 1, 0),
   F_B(HIS_NETSPLIT, 0, 1, 0),
-  F_S(HIS_SERVERNAME, 0, "*.AbleNET.org", 0),
-  F_S(HIS_SERVERINFO, 0, "The AbleNET AbleWorld", 0),
-  F_S(HIS_URLSERVERS, 0, "http://www.AbleNET.org/servers.php", 0),
+  F_S(HIS_SERVERNAME, 0, "*.AfterNET.Org", 0),
+  F_S(HIS_SERVERINFO, 0, "The AfterNET", 0),
+  F_S(HIS_URLSERVERS, 0, "http://www.afternet.org/servers.php", 0),
 
   /* Misc. random stuff */
-  F_S(NETWORK, 0, "AbleNET", 0),
-  F_S(URL_CLIENTS, 0, "http://www.AbleNET.org/clients.php", 0),
+  F_S(NETWORK, 0, "AfterNET", 0),
+  F_S(URL_CLIENTS, 0, "http://www.afternet.org/clients.php", 0),
 
 #undef F_S
 #undef F_B

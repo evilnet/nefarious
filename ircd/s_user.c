@@ -362,6 +362,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   short            badid = 0;
   short            digitgroups = 0;
   struct User*     user = cli_user(sptr);
+  int              killreason;
   char             ip_base64[8];
 
   user->last = CurrentTime;
@@ -462,10 +463,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
     /*
      * following block for the benefit of time-dependent K:-lines
      */
-    if (find_kill(sptr)) {
+    if (killreason=find_kill(sptr)) {
       ServerStats->is_ref++;
       IPcheck_connect_fail(cli_ip(sptr));
-      return exit_client(cptr, sptr, &me, "K-lined");
+      return exit_client(cptr, sptr, &me,
+        killreason == -1 ? "K-lined" : "G-lined");
     }
     /*
      * Check for mixed case usernames, meaning probably hacked.  Jon2 3-94
@@ -569,6 +571,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 	feature_str(FEAT_PROVIDER) ? " via " : "",
 	feature_str(FEAT_PROVIDER) ? feature_str(FEAT_PROVIDER) : "",
 	nick);
+
     /*
      * This is a duplicate of the NOTICE but see below...
      */
