@@ -83,6 +83,4 @@ struct User {
   char               virthost[HOSTLEN + 1];
 };
 
-#define MAX_DATE_STRING 32
-
 #endif /* INCLUDED_struct_h */

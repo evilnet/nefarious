@@ -95,11 +95,11 @@ struct Client;
 #define MODE_NONOTICE		0x40000 /* no notice allowed towards chan */
 #define MODE_STRIP		0x80000 /* strip color from text */
 #define MODE_NOAMSG		0x100000 /* no multi target messages/notices */
-#define MODE_LISTED		0x200000
-#define MODE_SAVE		0x400000 /* save this mode-with-arg 'til later */
-#define MODE_FREE		0x800000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED		0x1000000 /* channel was created by a BURST */
-#define MODE_NOLISTMODES        0x2000000 /* channel modes hidden in LIST output */
+#define MODE_NOLISTMODES	0x200000 /* channel modes hidden in LIST output */
+#define MODE_LISTED		0x400000
+#define MODE_SAVE		0x800000 /* save this mode-with-arg 'til later */
+#define MODE_FREE		0x1000000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x2000000 /* channel was created by a BURST */
 
 /*
  * mode flags which take another parameter (With PARAmeterS)

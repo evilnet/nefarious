@@ -342,29 +342,29 @@ void ssl_init(void)
 	Debug((DEBUG_DEBUG, "SSL: init ok"));
 }
 
-char    *ssl_get_cipher(SSL *ssl)
+char *ssl_get_cipher(SSL *ssl)
 {
-        static char buf[400];
-        int bits;
-        SSL_CIPHER *c;
+  static char buf[400];
+  int bits;
+  SSL_CIPHER *c;
 
-        buf[0] = '\0';
-        strcpy(buf, SSL_get_version(ssl));
-        strcat(buf, "-");
-        strcat(buf, SSL_get_cipher(ssl));
-        c = SSL_get_current_cipher(ssl);
-        SSL_CIPHER_get_bits(c, &bits);
-        strcat(buf, "-");
-        strcat(buf, (char *)my_itoa(bits));
-        strcat(buf, "bits");
-        return (buf);
+  buf[0] = '\0';
+  strcpy(buf, SSL_get_version(ssl));
+  strcat(buf, "-");
+  strcat(buf, SSL_get_cipher(ssl));
+  c = SSL_get_current_cipher(ssl);
+  SSL_CIPHER_get_bits(c, &bits);
+  strcat(buf, "-");
+  strcat(buf, (char *)my_itoa(bits));
+  strcat(buf, "bits");
+  return (buf);
 }
 
-char    *my_itoa(int i)
+char *my_itoa(int i)
 {
-        static char buf[128];
-        ircd_snprintf(0, buf, sizeof(buf), "%d", i);
-        return (buf);
+  static char buf[128];
+  ircd_snprintf(0, buf, sizeof(buf), "%d", i);
+  return (buf);
 }
 
 #endif /* USE_SSL */

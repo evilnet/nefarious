@@ -133,7 +133,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     else
       server = find_match_server(parv[1]);
 
-    if (!server || (!IsOper(sptr) && IsService(server)))
+    if (!server || IsService(server))
       return send_reply(sptr, ERR_NOSUCHSERVER, parv[1]);
   }   
 
@@ -142,32 +142,29 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr))
   {
-    if (acptr->cli_user && IsOper(acptr))
+    if (acptr->cli_user && IsOper(acptr) && !IsChannelService(acptr)
+	&& !IsService(acptr->cli_user->server)))
     {
-      if (IsOper(sptr) || (!IsOper(sptr) && !IsChannelService(acptr) 
-	  && !IsService(acptr->cli_user->server)))
+      if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
       {
-	if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
-	{
-	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
-			acptr->cli_name ? acptr->cli_name : "<Unknown>",
-			acptr->cli_user->away ? " (AWAY)" : "",
-			(feature_bool(FEAT_ASUKA_HIDEIDLE) &&
-			 IsNoIdle(acptr)) ? 0 :
-			 CurrentTime - acptr->cli_user->last);
-	  ircops++;
-	  send_reply(sptr, RPL_IRCOPS, buf);
-	} else if (parc == 1) {
-	  ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
-			acptr->cli_name ? acptr->cli_name : "<Unknown>",
-			acptr->cli_user->away ? " (AWAY)" : "",
-			cli_name(acptr->cli_user->server),
-			(feature_bool(FEAT_ASUKA_HIDEIDLE) &&
-			 IsNoIdle(acptr)) ? 0 :
-			 CurrentTime - acptr->cli_user->last);
-	  ircops++;
-	  send_reply(sptr, RPL_IRCOPS, buf);
-	}
+	ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
+		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
+		      acptr->cli_user->away ? " (AWAY)" : "",
+		      (feature_bool(FEAT_ASUKA_HIDEIDLE) &&
+		       IsNoIdle(acptr)) ? 0 :
+		       CurrentTime - acptr->cli_user->last);
+	ircops++;
+	send_reply(sptr, RPL_IRCOPS, buf);
+      } else if (parc == 1) {
+	ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
+		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
+		      acptr->cli_user->away ? " (AWAY)" : "",
+		      cli_name(acptr->cli_user->server),
+		      (feature_bool(FEAT_ASUKA_HIDEIDLE) &&
+		       IsNoIdle(acptr)) ? 0 :
+		       CurrentTime - acptr->cli_user->last);
+	ircops++;
+	send_reply(sptr, RPL_IRCOPS, buf);
       }
     }
   }

@@ -26,17 +26,9 @@ sumircd=`$sum ircd.c 2> /dev/null`;
 
 creation=`date | \
 awk '{if (NF == 6) \
-	 { print $1 " "	 $2 " " $3 " "	$6 " at " $4 " " $5 } \
+	 { print $1 " " $2 " " $3 " " $6 " at " $4 " " $5 } \
 else \
-	 { print $1 " "	 $2 " " $3 " " $7 " at " $4 " " $5 " " $6 }}'`
-
-# cvsversion=`cat ../.patches | \
-#     awk -F. '{ \
-#         if ($(NF)~/\+$/) \
-# 	    printf(".0"); \
-# 	else \
-# 	    printf(".%s", $(NF)); \
-#     }'`
+	 { print $1 " " $2 " " $3 " " $7 " at " $4 " " $5 " " $6 }}'`
 
 /bin/cat >version.c <<!SUB!THIS!
 /*
@@ -74,21 +66,27 @@ const char *infotext[] = {
     "This program is free software; see LICENSE in the distribution",
     "",
     "Based on the original code written by Jarkko Oikarinen, version 2.6:",
-    "Wiz	  Jarkko Oikarinen	   <jto@tolsun.oulu.fi>",
+    "Wiz          Jarkko Oikarinen         <jto@tolsun.oulu.fi>",
     "",
     "The main developer of version u2.9 and u2.10 was:",
     "Run	  Carlo Wood		   <carlo@runaway.xs4all.nl>",
     "",
-    "The current head developer of the u2.10 source tree is:",
+    "The head developer of the u2.10 source tree was:",
     "Bleep        Thomas Helvey            <tomh@inxpress.net>",
     "",
-    "Head contributors to nefarious (evilnet development):",
-    "[http://sourceforge.net/projects/evilnet/]",
-    "reed	  Reed Loden		   <reed@reedloden.com>",
-    "Math	  Mathieu Rene		   <math@rootservices.net>",
-    "SiRVulcaN	  Neil Spierling	   <sirvulcan@sirvulcan.org>",
+    "The current maintainers of the u2.10 source tree are:",
+    "Isomer       Perry Lorier             <perry@coders.net>",
+    "Kev          Kevin L. Mitchell        <klmitch@mit.edu>",
     "",
-    "Other contributors to nefarious:",
+    "Head contributors to Nefarious (evilnet development):",
+    "[http://sourceforge.net/projects/evilnet/]",
+    "reed         Reed Loden               <reed@reedloden.com>",
+    "Math         Mathieu Rene             <math@rootservices.net>",
+    "SiRVulcaN    Neil Spierling           <vulcan@linux-boxen.org>",
+    "",
+    "Other contributors to Nefarious:",
+    "ULtimaTe_    Matthias Crauwels        <ultimate_@wol.be>",
+    "Spike        Jochen Meesters          <spike@undernet.org>",
     "clsk	  Alan Alvarez		   <clsk@users.sourceforge.net>",
     "",
     "Contributors to this release:",

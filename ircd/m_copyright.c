@@ -41,14 +41,13 @@
  * parv[1] - servername
  *
  */
-
 int m_copyright(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   const char **text = copyrighttext;
 
-  if (hunt_server_cmd(sptr, CMD_COPYRIGHT, cptr, 1, ":%C", 1, parc, parv) !=
-      HUNTED_ISME)
-        return 0;
+  if (hunt_server_cmd(sptr, CMD_COPYRIGHT, cptr, 1, ":%C", 1, parc, parv)
+      != HUNTED_ISME)
+    return 0;
 
   while (text[0])
   {
@@ -76,8 +75,8 @@ int ms_copyright(struct Client* cptr, struct Client* sptr, int parc, char* parv[
   if (IsServer(sptr))
     return 0;
 
-  if (hunt_server_cmd(sptr, CMD_COPYRIGHT, cptr, 1, ":%C", 1, parc, parv) !=
-      HUNTED_ISME)
+  if (hunt_server_cmd(sptr, CMD_COPYRIGHT, cptr, 1, ":%C", 1, parc, parv)
+      != HUNTED_ISME)
     return 0;
 
   while (text[2])

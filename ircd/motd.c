@@ -184,11 +184,11 @@ motd_cache(struct Motd *motd)
   MotdList.cachelist = motd->cache;
 
   if (cache->modtime.tm_year)
-    sprintf (motd_last_changed_date,
-             "%d/%d/%d %d:%02d",
-             cache->modtime.tm_year + 1900, cache->modtime.tm_mon + 1,
-             cache->modtime.tm_mday, cache->modtime.tm_hour,
-             cache->modtime.tm_min);
+    sprintf(motd_last_changed_date,
+	     "%d/%d/%d %d:%02d",
+	     cache->modtime.tm_year + 1900, cache->modtime.tm_mon + 1,
+	     cache->modtime.tm_mday, cache->modtime.tm_hour,
+	     cache->modtime.tm_min);
 
   return motd->cache;
 }

@@ -56,6 +56,8 @@ struct Motd {
 #define MOTD_MAXLINES	100
 #define MOTD_MAXREMOTE	5
 
+#define MAX_DATE_STRING 32
+
 struct MotdCache {
   struct MotdCache*	next; /* these fields let us read MOTDs only once */
   struct MotdCache**	prev_p;

@@ -1,52 +1,96 @@
-2004-06-23  Neil Spierling <vulcan@linux-boxen.org>
+2004-07-02  Reed Loden  <reed@reedloden.com>
+
+	* ChangeLog.nefarious: Various indent, spacing, etc. changes.
+
+	* config.guess: Updated to timestamp 2004-06-11.
+
+	* config.sub: Updated to timestamp 2004-03-12.
+
+	* include/channel.h: Move MODE_NOLISTMODES to 0x200000.
+
+	* include/ircd_defs.h: Move #define AUTOJOIN_CHANNEL to bottom
+	part of file.
+
+	* include/motd.h, include/struct.h: Moved MAX_DATE_STRING from
+	struct.h to motd.h.
+
+	* include/msg.h: Correct indent/spacing with CREDITS and 
+	COPYRIGHT.
+
+	* include/patchlevel.h: Bump patchlevel (0.2.1).
+
+	* include/supported.h: Correct chmode 'L' placement.
+
+	* ircd/channel.c: Fix bug related to +O and +z chmodes that 
+	caused the IRCd to call send_notoper().
+
+	* ircd/m_copyright.c: Correct indent/spacing.
+
+	* ircd/m_ircops.c: Revert to version in which opers cannot see
+	services (works better for now until I figure out another way).
+
+	* ircd/motd.c: Correct indent/spacing.
+
+	* ircd/s_user.c: Correct indent/spacing.
+
+	* ircd/ssl.c: Correct indent/spacing.
+
+	* ircd/version.c.SH: Correct indent/spacing and add current 
+	maintainers of IRCu.
+
+2004-06-23  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Changed spambot check feature to FALSE.
 
-	* include/patchlevel.h: Bumped patchlevel- 0.2.0.
+	* include/patchlevel.h: Bumped patchlevel (0.2.0).
 
 	* include/supported.h: Added L to CHANMODES.
 
 	* ircd/ircd_features.c: Changed spambot check feature to FALSE.
 
-2004-06-21  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-21  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/m_rehash.c: Added new flag "s" so that an ircd.pem file can be reloaded.
+	* ircd/m_rehash.c: Added new flag "s" so that an ircd.pem file
+	can be reloaded.
 
-2004-06-21  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-21  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/m_topic.c: Fixed potential crash, dont want to do the user@host for a
-	topic comming from a server (in topic bursts).
+	* ircd/m_topic.c: Fixed potential crash; don't want to do the
+	user@host for a topic coming from a server (in topic bursts).
 
-2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-20  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* tools/makepem: Added basic support for users who already have an existing SSL
-	certificate they wish to use.
+	* tools/makepem: Added basic support for users who already have 
+	an existing SSL certificate they wish to use.
 
-2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-20  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/s_user.c: Dont let unregistered users send B:Line'd commands.
+	* ircd/s_user.c: Don't let unregistered users send B:Line'd 
+	commands.
 
-2004-06-20  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-20  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* include/channel.h: Bumped up the size of topic_nick more so it can hold a
-	a users ident and a !.
+	* include/channel.h: Bumped up the size of topic_nick more so
+	it can hold a user's ident and a !.
 
-	* ircd/m_topic.c: Must of been tried when i done the host in topic stuff. Added
-	the display of a users ident, so now the output looks like this:
-	[03:03] * Set by gandalf!BigDaddy@306cb8dc.15ce75d4.jet.net.nz on Sun Jun 20 02:28:41
+	* ircd/m_topic.c: Must of been tried when I done the host in
+	topic stuff. Added the display of a users ident, so now the
+	output looks like this:
+	[03:03] * Set by gandalf!BigDaddy@306cb8dc.15ce75d4.jet.net.nz
+	on Sun Jun 20 02:28:41
 
-2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added new F:Line.
 
 	* include/ircd_features.h: Added FEAT_TIME_IN_TIMEOUT.
 
-	* ircd/ircd_features.h: Added FEAT_TIME_IN_TIMEOUT  (Default FALSE).
+	* ircd/ircd_features.c: Added FEAT_TIME_IN_TIMEOUT (default FALSE).
 
-	* ircd/ircd.c: Display the amount of time since the last ping in the
-	time in the Ping Timeout message.
+	* ircd/ircd.c: Display the amount of time since the last ping
+	in the time in the Ping Timeout message.
 
-2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added new F:Line.
 
@@ -54,135 +98,151 @@
 
 	* ircd/ircd_features.c: Added FEAT_HOST_IN_TOPIC (Default TRUE).
 
-	* ircd/m_topic: Made FEAT_HOST_IN_TOPIC useful, if its enabled the host
-	will be added to topic_nick (See Below). RFE 975655.
+	* ircd/m_topic: Made FEAT_HOST_IN_TOPIC useful, if it's enabled
+	the host will be added to topic_nick (See Below). RFE 975655.
 
-2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* include/channel.h: Bump up the size of topic_nick so it can hold a host.
+	* include/channel.h: Bump up the size of topic_nick so it can
+	hold a host.
 
-	* ircd/m_topic.c: When a topic is set, add the host into topic_nick so that
-	when a topic is displayed the full user@host is in the Set by part. Eg,
-	[09:45] * Set by gandalf@36df16fa.25b5c948.jet.net.nz on Sat Jun 19 09:34:55
+	* ircd/m_topic.c: When a topic is set, add the host into
+	topic_nick so that when a topic is displayed the full user@host
+	is in the Set by part. Eg:
+	[09:45] * Set by gandalf@36df16fa.25b5c948.jet.net.nz
+	on Sat Jun 19 09:34:55
 
-2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added feature DEFAULT_UMODE.
 
 	* doc/readme.features: Documented new feature.
 
-	* include/ircd_features.h: Replaced feature AUTOHIDE with DEFAULT_UMODE.
-
-	* ircd/ircd_features.c: Replaced feature AUTOHIDE with DEFAULT_UMODE (default "+").
-
-	* ircd/s_user.c: Took out the AUTOHIDE stuff and put in some code to handle
+	* include/ircd_features.h: Replaced feature AUTOHIDE with
 	DEFAULT_UMODE.
 
-2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+	* ircd/ircd_features.c: Replaced feature AUTOHIDE with
+	DEFAULT_UMODE (default "+").
+
+	* ircd/s_user.c: Took out the AUTOHIDE stuff and put in some
+	code to handle DEFAULT_UMODE.
+
+2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* include/channel.h: Added MODE_NOLISTMODES (+L).
 
-	* include/supported.h: Added new mode into the string of channel modes.
+	* include/supported.h: Added new mode into the string of 
+	channel modes.
 
 	* ircd/channel.c: Added fluff for the new mode.
-			  If the user doing the /list is not an oper and the channel
-			   currently being processed has +L set then the modes will
-			   not be displayed beside the topic.
-			  Feature idea/request from Bell (AfterNet).
+	If the user doing the /list is not an oper and the channel
+	currently being processed has +L set then the modes will
+	not be displayed beside the topic.
+	Feature idea/request from Bell (AfterNET).
 
 	* ircd/m_clearmode.c: Added fluff for MODE_NOLISTMODES.
 
-2004-06-19  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-19  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/res.c: Send out a notice for a resolver restart.
 
-	* ircd/s_user.c: Restart the resolver upon a rehash, patch from Fredrik Söderblom (froo).
+	* ircd/s_user.c: Restart the resolver upon a rehash;
+	patch from Fredrik Söderblom (froo).
 
-2004-06-18  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-18  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/m_account.c: Fixed small issue.
 
-2004-06-18  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-18  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Added features NOTVERIFIED (string msg) and VERIFIED_ACCOUNTS
-	(default: FALSE).
+	* doc/example.conf: Added features NOTVERIFIED (string msg) and
+	VERIFIED_ACCOUNTS (default: FALSE).
 
 	* include/client.h: Added FLAG_VERIFIED, IsVerified and SetVerified.
 
-	* include/ircd_features.h: Added features NOTVERIFIED and VERIFIED_ACCOUNTS.
+	* include/ircd_features.h: Added features NOTVERIFIED and
+	VERIFIED_ACCOUNTS.
 
-	* include/numeric.h: Added RPL_WHOISVERIFIED (340) and ERR_NOTVERIFIED (538).
+	* include/numeric.h: Added RPL_WHOISVERIFIED (340) and
+	ERR_NOTVERIFIED (538).
 
-	* ircd/ircd_features.c: Added features NOTVERIFIED and VERIFIED_ACCOUNTS.
+	* ircd/ircd_features.c: Added features NOTVERIFIED and
+	VERIFIED_ACCOUNTS.
 
-	* ircd/m_account.c: Added new paramater to AC, "v" aka verified, syntax:
-	sNumeric AC tNumeric account timestamp v. Note the code will have to change
-	once we start having the need for more than one flag, ie "vgra".
+	* ircd/m_account.c: Added new paramater to AC, "v" aka verified;
+	syntax: "sNumeric AC tNumeric account timestamp v"
+	Note: the code will have to change once we start having the
+	need for more than one flag, ie "vgra".
 
-	* ircd/m_whois.c: Spit out weather a user is or isnt verified in the WHOIS
-	output.
+	* ircd/m_whois.c: Spit out whether a user is or isn't verified
+	in the WHOIS output.
 
-	* ircd/s_err.c: Added RPL_WHOISVERIFIED (340) and ERR_NOTVERIFIED (538).
-			Fixed a few numbers i never noticed before.
+	* ircd/s_err.c: Added RPL_WHOISVERIFIED (340) and 
+	ERR_NOTVERIFIED (538). Fixed a few numbers I never noticed
+	before.
 
-	* ircd/s_user.c: Only allow +x'ing for users who are verified when
-	VERIFIED_ACCOUNTS is TRUE. Note that VERIFIED_ACCOUNTS only works with
-	hosthiding style 1.
+	* ircd/s_user.c: Only allow +x'ing for users who are verified 
+	when VERIFIED_ACCOUNTS is TRUE. Note that VERIFIED_ACCOUNTS 
+	only works with hosthiding style 1.
 
-2004-06-17  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-17  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* tools/zBounce/*: Major synch of zBounce off the main zBounce project cvs.
+	* tools/zBounce/*: Major sync of zBounce off the main zBounce
+	project CVS.
 
-2004-06-17  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-17  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* README: Updated my email address + bumped date.
 
 	* doc/example.conf: Added feature SPAMBOT_CHECKS, defaults to TRUE.
 
-	* include/channel.h: Added spambot check settings, will look into making
-	some of these F:Lines at some point.
+	* include/channel.h: Added spambot check settings, will look
+	into making some of these F:Lines at some point.
 
-	* include/client.h: Stuff for spambot checks added into the Client structure.
+	* include/client.h: Stuff for spambot checks added into the
+	Client structure.
 
 	* include/ircd_features.h: Added feature SPAMBOT_CHECKS.
 
-	* ircd/channel.c: Added main function for the spam bot checks. RFE 972232. Note,
-	this patch was written by Diane Bruce <db@db.net>.
+	* ircd/channel.c: Added main function for the spam bot checks. 
+	RFE 972232. Note: patch was written by Diane Bruce <db@db.net>.
 
-	* ircd/ircd_features.c: Added feature SPAMBOT_CHECKS, defaults to TRUE.
+	* ircd/ircd_features.c: Added feature SPAMBOT_CHECKS, defaults
+	to TRUE.
 
 	* ircd/m_join.c: Bump up the counts for the spambot checks.
 
 	* ircd/m_nick.c: Unrelated change, remove a var not in use.
 
-	* ircd/m_part.c: If SPAMBOT_CHECKS is TRUE and the client isnt an oper then
-	check for spambot warnings.
+	* ircd/m_part.c: If SPAMBOT_CHECKS is TRUE and the client isnt
+	an oper then check for spambot warnings.
 
-2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* ircd/s_user.c: Only send the cipher notice to SSL users only!
 
-2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* configure: Regenerated configure.
 
-2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* configure.in: Added a macro to for kerberos includes. Should fix SSL errors.
-	configure will be regenerated and committed in 5 mins on another box.
+	* configure.in: Added a macro to for kerberos includes. Should
+	fix SSL errors. configure will be regenerated and committed in
+	5 mins on another box.
 
-	* include/ssl.h: Cleaned up a bit and added in declerations for some new
-	functions.
+	* include/ssl.h: Cleaned up a bit and added in declerations for 
+	some new functions.
 
 	* ircd/IPcheck.c: SSL Clean up.
 
-	* ircd/s_user.c: Notice a connecting user with SSL what cipher they are
-	connected via.
+	* ircd/s_user.c: Notice a connecting user with SSL what cipher 
+	they are connected via.
 
-	* ircd/ssl.c: Added functions used for fetching ciphers for a client who
-	is connected via SSL.
+	* ircd/ssl.c: Added functions used for fetching ciphers for a 
+	client who is connected via SSL.
 
-2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* include/handlers.h: Add copyright function declerations.
 
@@ -192,52 +252,56 @@
 
 	* ircd/Makefile.in: Added in m_copyright.c
 
-	* ircd/m_copyright.c: File containing nessecary code for copyright command.
+	* ircd/m_copyright.c: File containing nessecary code for
+	copyright command.
 
 	* ircd/parse.c: Added in COPYRIGHT command fluff.
 
 	* ircd/version.c.SH: Added GPL/Copyright text.
 
-2004-06-16  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-16  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* include/msg.h: Added CREDITS fluff.
 
-	* ircd/parse.c: Added CREDITS command, simply calls the m_info etc
-	functions.
+	* ircd/parse.c: Added CREDITS command, simply calls the m_info,
+	etc. functions.
 
-2004-06-15  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-15  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* doc/example.conf: Added in feature MOTD_LAST_CHANGED (default FALSE).
+	* doc/example.conf: Added in feature MOTD_LAST_CHANGED
+	(default FALSE).
 
 	* include/ircd_features.h: Added in feature MOTD_LAST_CHANGED.
 
-	* include/struct.h: Added in MAX_DATE_STRING, will possible change to a
-	different .h file.
+	* include/struct.h: Added in MAX_DATE_STRING, will possible 
+	change to a different .h file.
 
 	* ircd/ircd_features.c: Added in feature MOTD_LAST_CHANGED.
 
-	* ircd/motd.c: Set the last modified date of ircd.motd into a char for
-	use in s_user.c.
+	* ircd/motd.c: Set the last modified date of ircd.motd into a 
+	char for use in s_user.c.
 
-	* ircd/s_user.c: if MOTD_LAST_CHANGED is enabled then send out a notice to
-	connecting users before the motd is displayed. The notice contains the date
-	of when the motd was last modified (RFE 972238).
+	* ircd/s_user.c: if MOTD_LAST_CHANGED is enabled then send out
+	a notice to connecting users before the motd is displayed. The
+	notice contains the date of when the motd was last modified
+	(RFE 972238).
 
-2004-06-15  Neil Spierling <vulcan@linux-boxen.org>
+2004-06-15  Neil Spierling  <vulcan@linux-boxen.org>
 
 	* doc/readme.features: Documented FEAT_GEO_LOCATION.
 
 	* include/ircd_features.h: Added in FEAT_GEO_LOCATION.
 
-	* ircd/ircd_features.c: Added in FEAT_GEO_LOCATION (default NULL).
+	* ircd/ircd_features.c: Added in FEAT_GEO_LOCATION
+	(default NULL).
 
 	* ircd/s_err.c: Modified RPL_CREATION, reworded it a bit and
 	added in GEO_LOCATION.
 
-	* ircd/s_user.c: Modifed RPL_CREATION so it sends out GEO_LOCATION
-	if its defined in ircd.conf (RFE 972237).
+	* ircd/s_user.c: Modifed RPL_CREATION so it sends out 
+	GEO_LOCATION if its defined in ircd.conf (RFE 972237).
 
-2004-06-11  Rubin <rubin@afternet.org>
+2004-06-11  Rubin  <rubin@afternet.org>
 
 	* ircd/m_nick.c: Removed X* nick blocking code for AfterNET
 

@@ -2709,14 +2709,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	mode_parse_client(&state, flag_p);
 	break;
 
-      case 'O':
-	/* If they're not an chan op and oper, they can't
-	 * +/- MODE_OPERONLY
-	 */
-	if (state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) {
-	  send_notoper(&state);
-	  break;
-	}
+      case 'O': /* deal with operonly */
+	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
 	if (!IsOper(sptr)) {
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	  break;
@@ -2725,14 +2719,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  break;
 	}
 
-      case 'z':
-        /* If they're not an chan op and SSL user, they can't
-	 * +/- MODE_SSLONLY.
-	 */
-        if (state.flags & (MODE_PARSE_NOTOPER | MODE_PARSE_NOTMEMBER)) {
-          send_notoper(&state);
-          break;
-        }
+      case 'z': /* deal with sslonly */
+        /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
         if (!IsSSL(sptr)) {
           send_reply(sptr, ERR_NOPRIVILEGES);
           break;

@@ -114,13 +114,13 @@ struct Client;
 #define TOK_INFO                "F"
 #define CMD_INFO		MSG_INFO, TOK_INFO
 
-#define MSG_CREDITS		"CREDITS"	/* CREDITS */
-#define TOK_CREDITS             "F"
+#define MSG_CREDITS		"CREDITS"	/* CRED */
+#define TOK_CREDITS		"F"
 #define CMD_CREDITS		MSG_CREDITS, TOK_CREDITS
 
-#define MSG_COPYRIGHT           "COPYRIGHT"	/* COPYRIGHT */
-#define TOK_COPYRIGHT           "CR"
-#define CMD_COPYRIGHT           MSG_COPYRIGHT, TOK_CREDITS
+#define MSG_COPYRIGHT		"COPYRIGHT"	/* COPY */
+#define TOK_COPYRIGHT		"CR"
+#define CMD_COPYRIGHT		MSG_COPYRIGHT, TOK_COPYRIGHT
 
 #define MSG_LINKS               "LINKS"         /* LINK */
 #define TOK_LINKS               "LI"

@@ -368,7 +368,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   struct User*     user = cli_user(sptr);
   int              killreason;
   char             ip_base64[8];
-  extern char motd_last_changed_date[];
+  extern char      motd_last_changed_date[];
 
   user->last = CurrentTime;
   parv[0] = cli_name(sptr);
@@ -625,14 +625,14 @@ int register_user(struct Client *cptr, struct Client *sptr,
 #ifdef USE_SSL
     if (IsSSL(sptr))
       sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are connected to %s with %s", sptr,
- 	 	    cli_name(&me), ssl_get_cipher(cli_socket(sptr).ssl));
+		    cli_name(&me), ssl_get_cipher(cli_socket(sptr).ssl));
 #endif
 
     m_lusers(sptr, sptr, 1, parv);
     update_load();
     if (feature_bool(FEAT_MOTD_LAST_CHANGED))
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- motd was last changed at %s", sptr, motd_last_changed_date);
-
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- motd was last changed at %s",
+		    sptr, motd_last_changed_date);
     motd_signon(sptr);
 /*      nextping = CurrentTime; */
     if (cli_snomask(sptr) & SNO_NOISY)
