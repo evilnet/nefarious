@@ -1015,13 +1015,12 @@ void clear_dnsbl_list(void)
 int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 {
   struct blline *blline;
-  char dhname[HOSTLEN + 1];
+  char *dhname;
   char* rep = NULL;
   char* p = NULL;
   char *csep;
   char oct[4]; /* last bit of replyip, and a null */
   char ipinvert[HOSTLEN + 1];
-  char* ip_inv[4];
   char cstr_buf[HOSTLEN +1];
   char *cstr = cstr_buf;
   char ipl[80];
@@ -1044,8 +1043,9 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   /* Pull the last octet out of the reply ip into oct */
   for(j=strlen(replyip);j>0;j--) {
       if(replyip[j] == '.') {
-          ircd_strncpy(oct, replyip+j, 3);
+          ircd_strncpy(oct, replyip+j+1, 3);
           oct[3] = 0;
+	  break;
       }
   }
   if(!*oct) {
@@ -1054,22 +1054,18 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   }
           
   /* Find the users IP address from the dnsbl reply msg */
-  memset(ipinvert, 0, HOSTLEN+1);
-  ircd_strncpy(ipinvert, checkhost, HOSTLEN);
-  ip_inv[0] = checkhost;
-  for(csep = ipinvert,c=1;*csep && c<4;csep++)
-      if(*csep == '.') {
-          ip_inv[c++] = csep;
-          *csep = 0;
+  for(dhname = checkhost,c=0;*dhname;dhname++)
+      if(*dhname == '.') {
+            if(++c >= 4)
+	      break;
       }
-  csep = 0;
-  if(c<4) {
-      Debug((DEBUG_DEBUG, "find_blline passed invalid checkhost %s.", checkhost));
-      return 0;
+  dhname++;
+  if(c!=4 || !*dhname) {
+	  Debug((DEBUG_DEBUG, "find_blline passed invalid checkhost %s.", checkhost));
+	  return 0;
   }
-  ircd_snprintf(0, dhname, HOSTLEN, "%s.%s.%s.%s", ip_inv[3],ip_inv[2],ip_inv[1],ip_inv[0]);
-  dhname[HOSTLEN]= 0; /* better safe than sorry */
 
+  
   /* Walk the whole list of X lines */
   for (blline = GlobalBLList; blline; blline = blline->next) {
     if (!ircd_strcmp(dhname, blline->server)) {
@@ -1082,11 +1078,11 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
           int total = 0; /* bits are added together */
 
           /* For each int in the replies, add its bits to total */
-          for (csep = cstr; *cstr; cstr++)
-              if(*cstr == ',') {
-                  *cstr = 0;
-                  total += atoi(csep);
-                  csep = cstr+1;
+	  for(csep = cstr; *(csep+1); csep++); /* set csep to the end */
+          for (;csep >= cstr; csep--)
+              if(*csep == ',' || csep==cstr) {
+                  total += atoi(csep+1);
+                  *csep = 0;
               }
                  
           if (total & atoi(oct)) { /* bitwise AND */
@@ -1105,10 +1101,11 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
             return 1;
           }
         } else if (x_flag & DFLAG_REPLY) {
-            for (csep = cstr; *cstr; cstr++)
-                if(*cstr == ',') {
-                  *cstr = 0;
-                  if (!ircd_strcmp(csep, oct)) {
+	    for(csep = cstr; *(csep+1); csep++); /* set csep to the end */
+
+            for (;csep >= cstr; csep--)
+                if(*csep == ',' || csep==cstr) {
+                  if (!ircd_strcmp(csep+1, oct)) {
                     SetDNSBL(sptr);
 
                     if (x_flag & DFLAG_MARK)
@@ -1123,7 +1120,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
                       ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
                     return 1;
                   }
-                  csep = cstr+1;
+		  *csep = 0;
                 }
         }
     }
