@@ -415,6 +415,8 @@ if test x"$unet_cv_enable_ssl" = xyes; then
 
     LIBS="$LIBS -L$unet_cv_with_openssl_prefix $OPENSSL_LDFLAGS"
     CFLAGS="$CFLAGS -I$unet_cv_with_openssl_inc_prefix -I$unet_cv_with_kerberos_prefix"
+  else
+    AC_MSG_ERROR([Unable to find OpenSSL, Use --with-openssl-includes and --with-openssl-libs if you have it installed in a different location])
   fi
 fi
 

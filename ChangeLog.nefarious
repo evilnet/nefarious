@@ -1,7 +1,28 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2005-02-265  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-27  Neil Spierling  <sirvulcan@gmail.com>
+
+	* configure: Regenerated.
+
+	* configure.in: Stop configure if the user doesnt have SSL when
+	trying to enable it.
+
+	* doc/Configure.help: Removed, old.
+
+	* doc/exaconf.2: Removed, not in use.
+
+	* doc/iauth.txt: Removed, not in use.
+
+	* doc/linux-poll.patch: Removed, old.
+
+	* doc/readme.cvs: Updated with our cvs information.
+
+	* doc/readme.indent: Removed, not needed.
+
+	* doc/readme.www: Removed, not needed.
+
+2005-02-26  Neil Spierling  <sirvulcan@gmail.com>
 
         * ircd/m_whois.c: Display dnsbl status even if its disabled on the
 	local server.
