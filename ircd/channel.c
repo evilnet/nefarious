@@ -2719,7 +2719,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'z': /* deal with sslonly */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
-        if (IsSSL(sptr) || IsServer(sptr)) {
+        if (IsSSL(sptr) || IsServer(sptr))
           mode_parse_mode(&state, flag_p);
 	else
 	  send_reply(sptr, ERR_NOPRIVILEGES);
