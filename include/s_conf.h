@@ -263,5 +263,6 @@ extern int find_blline(struct Client* sptr, const char* replyip, char *checkhost
 extern void conf_add_svcline(const char * const* fields, int count); 
 extern void clear_svclines(void);
 extern struct svcline *find_svc(const char *cmd);
+extern char *oflagstr(long);
 
 #endif /* INCLUDED_s_conf_h */

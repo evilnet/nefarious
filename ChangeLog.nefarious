@@ -3,6 +3,42 @@
 
 2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
 
+	* doc/example.conf: New F:lines added OPLEVELS, WHOIS_OPER,
+	WHOIS_ADMIN, and WHOIS_SERVICE.
+
+	* include/client.h: Fluff for oper levels added.
+
+	* include/ircd_features.h: see example.conf entry.
+
+	* include/s_conf.h: Some more fluff.
+
+	* include/supported.h: Added A to usermode string.
+
+	* ircd/client.c: Modified privs, give admins certain privs
+	if OPLEVELS is enabled, if it isnt then give the privs to
+	global opers.
+
+	* ircd/ircd_features.c: See example.conf entry.
+
+	* ircd/m_oper.c: Make the client an admin if they are
+	supposed to be an admin. Only works for local opering, not
+	remote opering.
+
+	* ircd/m_whois.c: Use the WHOIS_ output.
+
+	* ircd/s_conf.c: Fluff for reading the flags from the conf.
+
+	* ircd/s_err.c: Small tweak to STATSOLINE for displaying
+	oper flags.
+
+	* ircd/s_stats.c: Display the flags if needed or otherwise
+	the port (used for other lines).
+
+	* ircd/s_user.c: Clear the admin flag if OPLEVELS is disabled.
+	This is also done in m_oper.c.
+
+2004-09-13  Neil Spierling <vulcan@linux-boxen.org>
+
 	* configure: Reran autoconf.
 
 	* configure.in: Add -Wno-long-long to CFLAGS on BSD systems.

@@ -769,7 +769,8 @@ static const struct UserMode {
   { FLAG_BOT,         'B' },
   { FLAG_XTRAOP,      'X' },
   { FLAG_NOCHAN,      'n' },
-  { FLAG_NOIDLE,      'I' }
+  { FLAG_NOIDLE,      'I' },
+  { FLAG_ADMIN,       'A' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -1658,6 +1659,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         else
           ClearWallops(acptr);
         break;
+      case 'A':
+        if (what == MODE_ADD)
+          SetAdmin(sptr);
+        else
+          ClrFlag(sptr, FLAG_ADMIN);
+        break;
       case 'o':
         if (what == MODE_ADD) {
           if (force)
@@ -1665,11 +1672,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           SetOper(acptr);
         }
         else {
+          ClrFlag(sptr, FLAG_ADMIN);
           ClrFlag(acptr, FLAG_OPER);
           ClrFlag(acptr, FLAG_LOCOP);
           if (MyConnect(acptr)) {
             tmpmask = cli_snomask(acptr) & ~SNO_OPER;
             cli_handler(acptr) = CLIENT_HANDLER;
+            cli_oflags(sptr) = 0;
           }
         }
         break;
@@ -1794,6 +1803,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * Stop users making themselves operators too easily:
    */
   if (!IsServer(cptr)) {
+    if ((!FlagHas(&setflags, FLAG_ADMIN) && IsAnAdmin(sptr)) || !feature_bool(FEAT_OPLEVELS))
+      ClearAdmin(sptr);
     if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
       ClearOper(acptr);
     if (!FlagHas(&setflags, FLAG_LOCOP) && IsLocOp(acptr))

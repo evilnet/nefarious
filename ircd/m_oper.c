@@ -211,7 +211,17 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
        * prevent someone from being both oper and local oper
        */
       ClearLocOp(sptr);
-      SetOper(sptr);
+      if (!feature_bool(FEAT_OPLEVELS) || !(aconf->port & OFLAG_ADMIN))
+      {        /* Global Oper  */
+           SetOper(sptr);
+           ClearAdmin(sptr);
+      }
+      else
+      {     /* Admin */
+            SetOper(sptr);
+            OSetGlobal(sptr);
+            SetAdmin(sptr);
+      }
       ++UserStats.opers;
     }
     cli_handler(cptr) = OPER_HANDLER;
@@ -220,15 +230,21 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     SetFlag(sptr, FLAG_SERVNOTICE);
     SetFlag(sptr, FLAG_DEBUG);
 
-    set_snomask(sptr, SNO_OPERDEFAULT, SNO_ADD);
+    if(!IsAnAdmin(sptr)) cli_oflags(sptr) = aconf->port;
+
+    set_snomask(sptr, IsAnAdmin(sptr) ? SNO_ALL : SNO_OPERDEFAULT, SNO_ADD); 
     client_set_privs(sptr);
     cli_max_sendq(sptr) = 0; /* Get the sendq from the oper's class */
     send_umode_out(cptr, sptr, &old_mode, HasPriv(sptr, PRIV_PROPAGATE));
     send_reply(sptr, RPL_YOUREOPER);
 
-    sendto_opmask_butone(0, SNO_OLDSNO, "%s (%s@%s) is now operator (%c)",
-			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr),
-			 IsOper(sptr) ? 'O' : 'o');
+    if(IsAnAdmin(sptr))
+      sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
+                           parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+    else
+      sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c)",
+                           parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
+                           IsOper(sptr) ? 'O' : 'o'); 
 
     if (feature_bool(FEAT_OPERMOTD))
       m_opermotd(sptr, sptr, 1, parv);

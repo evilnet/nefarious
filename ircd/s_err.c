@@ -518,7 +518,7 @@ static Numeric replyTable[] = {
 /* 242 */
   { RPL_STATSUPTIME, ":Server Up %d days, %d:%02d:%02d", "242" },
 /* 243 */
-  { RPL_STATSOLINE, "%c %s * %s %d %d", "243" },
+  { RPL_STATSOLINE, "%c %s * %s %s %d", "243" },
 /* 244 */
   { RPL_STATSHLINE, "%c %s * %s %d %d", "244" },
 /* 245 */
@@ -660,13 +660,13 @@ static Numeric replyTable[] = {
 /* 309 */
   { 0 },
 /* 310 */
-  { RPL_WHOISSERVICE, "%s :is a Network Service", "310" },
+  { RPL_WHOISSERVICE, "%s :%s", "310" },
 /* 311 */
   { RPL_WHOISUSER, "%s %s %s * :%s", "311" },
 /* 312 */
   { RPL_WHOISSERVER, "%s %s :%s", "312" },
 /* 313 */
-  { RPL_WHOISOPERATOR, "%s :is an IRC Operator", "313" },
+  { RPL_WHOISOPERATOR, "%s :%s", "313" },
 /* 314 */
   { RPL_WHOWASUSER, "%s %s %s * :%s", "314" },
 /* 315 */

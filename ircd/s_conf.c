@@ -82,6 +82,36 @@ static struct CRuleConf*  cruleConfList;
 static struct ServerConf* serverConfList;
 static struct DenyConf*   denyConfList;
 
+
+static int oper_access[] = {
+        OFLAG_GLOBAL,    'O',
+        OFLAG_ADMIN,     'A',
+        0, 0
+};
+
+char oflagbuf[128];
+
+char *oflagstr(long oflag)
+{
+        int *i;
+        int flag;
+        char m;
+        char *p = oflagbuf;
+
+        for (i = &oper_access[0], m = *(i + 1); (flag = *i);
+            i += 2, m = *(i + 1))
+        {
+                if (oflag & flag)
+                {
+                        *p = m;
+                        p++;
+                }
+        }
+        *p = '\0';
+        return oflagbuf;
+}
+
+
 /*
  * output the reason for being k lined from a file  - Mmmm
  * sptr is client being dumped
@@ -1369,8 +1399,22 @@ int read_configuration_file(void)
     if (field_count > 3 && !EmptyString(field_vector[3]))
         DupString(aconf->name, field_vector[3]);
 
-    if (field_count > 4 && !EmptyString(field_vector[4]))
-        aconf->port = atoi(field_vector[4]); 
+    if (field_count > 4 && !EmptyString(field_vector[4])) {
+      if (aconf->status & CONF_OPERATOR) {
+        int* i;
+        int flag;
+        char *m = "O";
+        if(*field_vector[4]) DupString(m, field_vector[4]);
+        for (; *m; m++) {
+          for (i = oper_access; (flag = *i); i += 2)
+           if (*m == (char)(*(i + 1))) {
+             aconf->port |= flag;
+             break;
+           }
+        }
+      } else
+        aconf->port = atoi(field_vector[4]);
+    }
 
     if (field_count > 5 && !EmptyString(field_vector[5]))
       aconf->conn_class = find_class(atoi(field_vector[5]));

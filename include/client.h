@@ -58,6 +58,24 @@ struct hostent;
 struct Privs;
 struct AuthRequest;
 
+
+/*
+ * Oper Flags
+ */
+
+#define OFLAG_ADMIN      0x008
+#define OFLAG_GLOBAL     0x010
+
+#define OSetGlobal(x)           (cli_oflags(x) |= OFLAG_GLOBAL)
+#define OSetAdmin(x)            (cli_oflags(x) |= OFLAG_ADMIN)
+
+#define OpIsGlobal(x)           (cli_oflags(x) & OFLAG_GLOBAL)
+#define OpIsAdmin(x)            (cli_oflags(x) & OFLAG_ADMIN)
+
+#define OClearGlobal(x)         (cli_oflags(x) &= ~OFLAG_GLOBAL)
+#define OClearAdmin(x)          (cli_oflags(x) &= ~OFLAG_ADMIN)
+
+
 /*
  * Structures
  *
@@ -157,6 +175,7 @@ enum Flag {
     FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
     FLAG_VERIFIED,                  /* Verified user */
     FLAG_DNSBL,                     /* Client in DNSBL */
+    FLAG_ADMIN,                     /* Client is an admin */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -247,6 +266,7 @@ struct Client {
   time_t         cli_lastnick;  /* TimeStamp on nick */
   int            cli_marker;    /* /who processing marker */
   struct Flags   cli_flags;     /* client flags */
+  unsigned int   cli_oflags;    /* oper flags */
   unsigned int   cli_hopcount;  /* number of servers to this 0 = local */
   struct in_addr cli_ip;        /* Real ip# NOT defined for remote servers! */
   short          cli_status;    /* Client type */
@@ -288,6 +308,7 @@ struct Client {
 #define cli_info(cli)		((cli)->cli_info)
 #define cli_dnsblurl(cli)       ((cli)->cli_dnsblurl)
 #define cli_dnsblname(cli)      ((cli)->cli_dnsblname)
+#define cli_oflags(cli)         ((cli)->cli_oflags)
 
 #define cli_count(cli)		((cli)->cli_connect->con_count)
 #define cli_fd(cli)		((cli)->cli_connect->con_fd)
@@ -461,6 +482,7 @@ struct Client {
 #define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
 #define IsVerified(x)		HasFlag(x, FLAG_VERIFIED)
 #define IsDNSBL(x)              HasFlag(x, FLAG_DNSBL)
+#define IsAnAdmin(x)            HasFlag(x, FLAG_ADMIN)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -494,6 +516,7 @@ struct Client {
 #define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
 #define SetVerified(x)		SetFlag(x, FLAG_VERIFIED)
 #define SetDNSBL(x)             SetFlag(x, FLAG_DNSBL)
+#define SetAdmin(x)             SetFlag(x, FLAG_ADMIN)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)
@@ -518,6 +541,7 @@ struct Client {
 #define ClearXtraOp(x)		ClrFlag(x, FLAG_XTRAOP)
 #define ClearNoChan(x)		ClrFlag(x, FLAG_NOCHAN)
 #define ClearNoIdle(x)		ClrFlag(x, FLAG_NOIDLE)
+#define ClearAdmin(x)           ClrFlag(x, FLAG_ADMIN)
 
 #define SeeOper(sptr,acptr) (IsAnOper(acptr) && (HasPriv(acptr, PRIV_DISPLAY) \
                             || HasPriv(sptr, PRIV_SEE_OPERS)))

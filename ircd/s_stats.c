@@ -114,12 +114,15 @@ stats_configured_links(struct Client* sptr, struct StatDesc* sd, int stat,
        */
       /* Special-case 'k' or 'K' lines as appropriate... -Kev */
       if ((tmp->status & CONF_UWORLD))
-	send_reply(sptr, p[1], c, host, pass, name, port, get_conf_class(tmp));
+        send_reply(sptr, p[1], c, host, pass, name, 0, get_conf_class(tmp)); 
       else if ((feature_bool(FEAT_STATS_C_IPS) && !IsOper(sptr))
 	       && (tmp->status & (CONF_SERVER)))
-	send_reply(sptr, p[1], c, "*", name, port, get_conf_class(tmp));
+        send_reply(sptr, p[1], c, "*", name, 0, get_conf_class(tmp));
       else
-	send_reply(sptr, p[1], c, host, name, port, get_conf_class(tmp));
+        if ((tmp->status & (CONF_OPERATOR)) || (tmp->status & (CONF_LOCOP)))
+          send_reply(sptr, p[1], c, host, name, oflagstr(port), get_conf_class(tmp));
+	else
+	  send_reply(sptr, p[1], c, host, name, port, get_conf_class(tmp));
     }
   }
 }
