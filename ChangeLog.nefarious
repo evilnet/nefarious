@@ -1,3 +1,9 @@
+2003-07-04  Reed Loden  <reed@reedloden.com>
+
+	* Happy Fourth of July!
+
+	* Changed some of Math's REMOTEOPER code to use macros.
+
 2003-07-01  Martijn Smit  <detsaw@users.sourceforge.net>
 
 	* Added OPERHOST_HIDING and HIDDEN_OPERHOST.

@@ -274,8 +274,9 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
 			     return 0;
 		     }
-		     FlagSet(&cli_flags(sptr), FLAG_REMOTEOPER); /* Tell client_set_privs to
-								    send privileges to the user*/
+		     SetFlag(sptr, FLAG_REMOTEOPER);
+		     /* Tell client_set_privs to send privileges
+			to the user */
 		     client_set_privs(sptr);
 		     sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
 				     "+oiwsg");
