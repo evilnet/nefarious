@@ -1331,6 +1331,8 @@ int hide_hostmask(struct Client *cptr)
 
   if (!HasHiddenHost(cptr))
     return 0;
+  else
+    SetHiddenHost(cptr);
 
   /* Invalidate all bans against the user so we check them again */
   for (chan = (cli_user(cptr))->channel; chan;

@@ -20,6 +20,8 @@
 	* ircd/ircd_reply.c: Added a new function from BOPM for
 	formatting a message (replacing %i with an IP for example).
 
+	* ircd/m_account.c: Auto host hide with LOC fixed.
+
 	* ircd/m_pass.c: Warning cleanup.
 
 	* ircd/s_auth.c: Only send "Checking your IP against DNS ban lists"

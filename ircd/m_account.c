@@ -252,11 +252,8 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
       SetAccount(acptr);
       ircd_strncpy(cli_user(acptr)->account, cli_loc(acptr)->account, ACCOUNTLEN);
       if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
-        hidden = HasHiddenHost(acptr);
-        if (!hidden) {
-          SetHiddenHost(acptr);
-          hide_hostmask(acptr);
-        }
+        SetHiddenHost(acptr);
+        hide_hostmask(acptr);
       }
     }
     
