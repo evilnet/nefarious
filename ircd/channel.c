@@ -3672,6 +3672,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
           break;
         else if (state.dir == '-')
           destroyed = 1;
+        else if (state.dir == '+')
+          destroyed = 0;
         mode_parse_mode(&state, flag_p);
         break;
 
