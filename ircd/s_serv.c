@@ -317,7 +317,5 @@ int m_randquote(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
   if (line != NULL)
     sendcmdto_one(&me, CMD_NOTICE, sptr, "%C \2Quote:\2 %s", sptr, line);
 
-  close(fd);
-
   return close(fd);
 }

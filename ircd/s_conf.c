@@ -544,8 +544,8 @@ const struct LocalConf* conf_get_local(void)
  * attach_confs_byname
  *
  * Attach a CONF line to a client if the name passed matches that for
- * the conf file (for non-C/N lines) or is an exact match (C/N lines
- * only).  The difference in behaviour is to stop C:*::* and N:*::*.
+ * the conf file (for non-C lines) or is an exact match (C lines
+ * only).  The difference in behaviour is to stop C:*::*.
  */
 struct ConfItem* attach_confs_byname(struct Client* cptr, const char* name,
                                      int statmask)
@@ -1887,10 +1887,10 @@ enum AuthorizationCheckResult conf_check_client(struct Client *cptr)
  * check_server()
  *
  * Check access for a server given its name (passed in cptr struct).
- * Must check for all C/N lines which have a name which matches the
+ * Must check for all C lines which have a name which matches the
  * name given and a host which matches. A host alias which is the
  * same as the server name is also acceptable in the host field of a
- * C/N line.
+ * C line.
  *
  * Returns
  *  0 = Success
@@ -1906,13 +1906,13 @@ int conf_check_server(struct Client *cptr)
         cli_name(cptr), cli_sockhost(cptr)));
 
   if (IsUnknown(cptr) && !attach_confs_byname(cptr, cli_name(cptr), CONF_SERVER)) {
-    Debug((DEBUG_DNS, "No C/N lines for %s", cli_sockhost(cptr)));
+    Debug((DEBUG_DNS, "No C:line for %s", cli_sockhost(cptr)));
     return -1;
   }
   lp = cli_confs(cptr);
   /*
-   * We initiated this connection so the client should have a C and N
-   * line already attached after passing through the connect_server()
+   * We initiated this connection so the client should have a C line
+   * already attached after passing through the connect_server()
    * function earlier.
    */
   if (IsConnecting(cptr) || IsHandshake(cptr)) {
@@ -1933,7 +1933,7 @@ int conf_check_server(struct Client *cptr)
       struct hostent* hp = cli_dns_reply(cptr)->hp;
       const char*     name = hp->h_name;
       /*
-       * If we are missing a C or N line from above, search for
+       * If we are missing a C line from above, search for
        * it under all known hostnames we have for this ip#.
        */
       for (i = 0; name; name = hp->h_aliases[i++]) {
@@ -1970,16 +1970,15 @@ int conf_check_server(struct Client *cptr)
    */
   det_confs_butmask(cptr, 0);
   /*
-   * if no C or no N lines, then deny access
+   * if no C line, then deny access
    */
   if (!c_conf) {
     Debug((DEBUG_DNS, "sv_cl: access denied: %s[%s@%s]",
           cli_name(cptr), cli_username(cptr), cli_sockhost(cptr)));
     return -1;
   }
-  ircd_strncpy(cli_name(cptr), c_conf->name, HOSTLEN);
   /*
-   * attach the C and N lines to the client structure for later use.
+   * attach the C line to the client structure for later use.
    */
   attach_conf(cptr, c_conf);
   attach_confs_byname(cptr, cli_name(cptr), CONF_HUB | CONF_LEAF | CONF_UWORLD);

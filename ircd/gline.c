@@ -1137,7 +1137,7 @@ gline_list(struct Client *sptr, char *userhost)
 	gline_free(gline);
       else
 #ifdef NICKGLINES
-        send_reply(sptr, RPL_GLIST, "", "", gline->gl_user, "", "",
+        send_reply(sptr, RPL_GLIST, gline->gl_user, "", "", "", "",
                    gline->gl_expire + TSoffset,
 #else
 	send_reply(sptr, RPL_GLIST, gline->gl_user, "", "",

@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-11-19  Reed Loden  <reed@reedloden.com>
+
+	* configure.in: Changed AC_PREREQ's dnl to correctly say '2.57'.
+
+	* include/channel.h: Changed the order of the memory locations.
+
+	* ircd/gline.c: Incorporated fix from QuakeNet in gline_list()
+	(vulcan already had it semi-fixed, but just not completely).
+
+	* ircd/ircd_features.c: Changed FEAT_ANNOUNCE_INVITES default
+	to FALSE.
+
+	* ircd/m_server.c: Removed unnecessary assignment of 'host'.
+
+	* ircd/m_whois.c: Fixed problem where opers could see all +s
+	channels in WHOIS (opers get too curious/lazy; use services!),
+	did miscellaneous whitespacing changes, and some optimizations.
+
+	* ircd/s_conf.c: Fixed problem where the C:line name was being
+	used instead of the M:line name and removed all mentions of
+	"N:lines".
+
+	* ircd/s_serv.c: Removed unnecessary close(fd).
+
 2004-11-14  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/client.h: Fix for 64bit systems, from QuakeNet.
@@ -9,9 +33,9 @@
 
 2004-11-01  Neil Spierling  <sirvulcan@gmail.com>
 
-	README.Cygwin: Updated instructions.
+	* README.Cygwin: Updated instructions.
 
-	ircd/m_oper.c: Added some missing send_reply's for remote
+	* ircd/m_oper.c: Added some missing send_reply's for remote
 	opering.
 
 2004-10-23  Neil Spierling  <sirvulcan@gmail.com>
@@ -27,10 +51,9 @@
 	* ircd/send.c: Delete sentalong array and replace with references
 	to con_sentalong().
 
-
 2004-10-23  Neil Spierling  <sirvulcan@gmail.com>
 
-	* Tagged stable for Afternet (Afternet-0_4_0-Stable).
+	* Tagged stable for AfterNET (Afternet-0_4_0-Stable).
 
 2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
 

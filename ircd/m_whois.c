@@ -152,20 +152,20 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     {
        chptr = chan->channel;
        
-       if (!(IsOper(sptr) && IsLocalChannel(chptr->chname))
-			       && (!ShowChannel(sptr, chptr) && !IsOper(sptr)))
-          continue;
+       if (!ShowChannel(sptr, chptr)
+           && !(IsOper(sptr) && IsLocalChannel(chptr->chname)))
+         continue;
           
        if (acptr != sptr && IsZombie(chan))
-          continue;
+         continue;
           
-       /* Don't show local channels when FEAT_HIS_WHOIS_LOCALCHAN is
-        * defined, unless it's a remote WHOIS. --ULtimaTe_
+       /* Don't show local channels when HIS is defined, unless it's a
+	* remote WHOIS --ULtimaTe_
 	*/
-       if (IsLocalChannel(chptr->chname) && (parc == 2)
-	   && feature_bool(FEAT_HIS_WHOIS_LOCALCHAN)
-	   && (acptr != sptr) && !IsAnOper(sptr))
-	  continue; 
+       if (IsLocalChannel(chptr->chname) && (parc == 2) &&
+	   feature_bool(FEAT_HIS_WHOIS_LOCALCHAN) && (acptr != sptr) &&
+	   !IsAnOper(sptr))
+	 continue; 
 
        if (len+strlen(chptr->chname) + mlen > BUFSIZE - 5) 
        {
@@ -176,20 +176,15 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
        if (IsDeaf(acptr))
          *(buf + len++) = '-';
        if (IsOper(sptr) && !ShowChannel(sptr,chptr))
-	  *(buf + len++) = '*';
+	 *(buf + len++) = '*';
        if (IsZombie(chan))
-       {
          *(buf + len++) = '!';
-       }
-       else
-       {
-         if (IsChanOp(chan))
-           *(buf + len++) = '@';
-         else if (IsHalfOp(chan))
-           *(buf + len++) = '%';
-         else if (HasVoice(chan))
-           *(buf + len++) = '+';
-       }
+       else if (IsChanOp(chan))
+         *(buf + len++) = '@';
+       else if (IsHalfOp(chan))
+         *(buf + len++) = '%';
+       else if (HasVoice(chan))
+         *(buf + len++) = '+';
        if (len)
           *(buf + len) = '\0';
        strcpy(buf + len, chptr->chname);

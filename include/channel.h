@@ -106,12 +106,12 @@ struct Client;
 #define MODE_STRIP		0x80000 /* strip color from text */
 #define MODE_NOAMSG		0x100000 /* no multi target messages/notices */
 #define MODE_NOLISTMODES	0x200000 /* channel modes hidden in LIST output */
-#define MODE_LISTED		0x400000
-#define MODE_SAVE		0x800000 /* save this mode-with-arg 'til later */
-#define MODE_FREE		0x1000000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED		0x2000000 /* channel was created by a BURST */
-#define MODE_EXCEPT		0x4000000
-#define MODE_ADMINONLY		0x8000000 /* admin only */
+#define MODE_EXCEPT		0x400000 /* ban exceptions */
+#define MODE_ADMINONLY		0x800000 /* only admins may join */
+#define MODE_LISTED		0x1000000
+#define MODE_SAVE		0x2000000 /* save this mode-with-arg 'til later */
+#define MODE_FREE		0x4000000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x8000000 /* channel was created by a BURST */
 
 /*
  * mode flags which take another parameter (With PARAmeterS)

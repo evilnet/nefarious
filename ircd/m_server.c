@@ -324,8 +324,6 @@ int mr_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return exit_client(cptr, cptr, &me, "No C:line");
     }
 
-    host = cli_name(cptr);
-
     update_load();
 
     if (!(aconf = find_conf_byname(cli_confs(cptr), host, CONF_SERVER))) {
