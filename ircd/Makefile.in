@@ -153,6 +153,7 @@ IRCD_SRC = \
 	m_rpong.c \
 	m_server.c \
 	m_set.c \
+	m_sethost.c \
 	m_settime.c \
 	m_silence.c \
 	m_squit.c \

@@ -36,7 +36,7 @@ static Numeric replyTable[] = {
 /* 003 */
   { RPL_CREATED, ":This server was created %s", "003" },
 /* 004 */
-  { RPL_MYINFO, "%s %s dioswkgxR biklmnopstvrRcC bklov", "004" },
+  { RPL_MYINFO, "%s %s dioswkgxRh biklmnopstvrRcC bklov", "004" },
 /* 005 */
   { RPL_ISUPPORT, "%s :are supported by this server", "005" },
 /* 006 */
@@ -828,9 +828,9 @@ static Numeric replyTable[] = {
 /* 397 */
   { 0 },
 /* 398 */
-  { 0 },
+  { RPL_STATSSLINE, "%d %s %s %s %s", "398" },
 /* 399 */
-  { 0 },
+  { RPL_USINGSLINE, ":Using S-line privilege", "399" },
 /* 400 */
   { ERR_FIRSTERROR, "", "400" },
 /* 401 */
@@ -1092,9 +1092,9 @@ static Numeric replyTable[] = {
 /* 529 */
   { 0 },
 /* 530 */
-  { 0 },
+  { ERR_BADHOSTMASK, "%s :Invalid username/hostmask", "530" },
 /* 531 */
-  { 0 },
+  { ERR_HOSTUNAVAIL, "%s :sethost not found", "531" },
 /* 532 */
   { 0 },
 /* 533 */

@@ -300,6 +300,10 @@ static struct FeatureDesc {
   F_B(UNLIMIT_OPER_QUERY, 0, 0, 0),
   F_B(LOCAL_KILL_ONLY, 0, 0, 0),
   F_B(CONFIG_OPERCMDS, 0, 1, 0),
+  F_B(SETHOST, 0, 0, 0),
+  F_B(SETHOST_FREEFORM, 0, 0, 0),
+  F_B(SETHOST_USER, 0, 0, 0),
+  F_B(SETHOST_AUTO, 0, 0, 0),
 
   /* features that affect global opers on this server */
   F_B(OPER_KILL, 0, 1, 0),
@@ -357,6 +361,7 @@ static struct FeatureDesc {
   F_B(HIS_STATS_p, 0, 1, 0),
   F_B(HIS_STATS_q, 0, 1, 0),
   F_B(HIS_STATS_r, 0, 1, 0),
+  F_B(HIS_STATS_s, 0, 1, 0),
   F_B(HIS_STATS_d, 0, 1, 0),
   F_B(HIS_STATS_e, 0, 1, 0),
   F_B(HIS_STATS_t, 0, 1, 0),

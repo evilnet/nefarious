@@ -6,6 +6,8 @@
 
 	* Removed S:lines to get ready for ASUKA's sethost.
 
+	* Added ASUKA's sethost (not tested!!).
+
 	* include/ircd_features.h, ircd/ircd_features.c: Added HIS_GLINE
 	(default off).
 

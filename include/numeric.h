@@ -305,6 +305,8 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      RPL_END_USERS        394        Dalnet/EFnet/IRCnet */
 /*      RPL_NOUSERS          395        Dalnet/EFnet/IRCnet */
 #define RPL_HOSTHIDDEN       396	/* UMODE +x completed succesfuly */
+#define RPL_STATSSLINE       398	/* QuakeNet extension -froo */
+#define RPL_USINGSLINE       399	/* QuakeNet extension -froo */
 
 /*
  * Errors are in the range from 400-599 currently and are grouped by what
@@ -448,8 +450,10 @@ extern const struct Numeric* get_error_numeric(int err);
 	ERR_WHOSYNTAX	     522        dalnet
 	ERR_WHOLIMEXCEED     523	dalnet */
 #define ERR_QUARANTINED      524	/* Undernet extension -Vampire */
+#define ERR_BADHOSTMASK      530	/* QuakeNet extension -froo */
+#define ERR_HOSTUNAVAIL      531	/* QuakeNet extension -froo */
 
-#define ERR_LASTERROR        525
+#define ERR_LASTERROR        532
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

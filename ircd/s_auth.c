@@ -46,6 +46,7 @@
 #include "querycmds.h"
 #include "res.h"
 #include "s_bsd.h"
+#include "s_conf.h"
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"

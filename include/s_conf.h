@@ -154,6 +154,32 @@ struct qline {
   char *reason;
 };
 
+struct sline {
+  struct sline *next;
+  char *spoofhost;
+  char *passwd;
+  char *realhost;
+  char *username;
+  struct in_addr address;
+  unsigned int flags;
+  char bits; /* Number of bits for CIDR match on realhost */
+};
+
+#define SLINE_FLAGS_HOSTNAME 0x0001 /* S-line by hostname */
+#define SLINE_FLAGS_IP       0x0002 /* S-line by IP address/CIDR */
+
+/*
+ * str2prefix() - converts a string to in_addr and bits.
+ */
+
+#define IPV4_MAX_BITLEN 32
+
+struct prefix
+{
+    struct in_addr address;
+    unsigned char bits;
+};
+
 /*
  * GLOBALS
  */
@@ -164,6 +190,7 @@ extern struct MotdItem* motd;
 extern struct MotdItem* rmotd;
 extern struct TRecord*  tdata;
 extern struct qline*	GlobalQuarantineList;
+extern struct sline*	GlobalSList;
 
 /*
  * Proto types
@@ -196,5 +223,8 @@ extern int find_kill(struct Client *cptr);
 extern int find_restrict(struct Client *cptr);
 extern struct MotdItem* read_motd(const char* motdfile);
 extern char* find_quarantine(const char* chname);
-extern int conf_check_slines(struct Client *cptr);
+extern void conf_add_sline(const char* const* fields, int count);
+extern void clear_slines(void);
+extern int str2prefix(char *s, struct prefix *p);
+
 #endif /* INCLUDED_s_conf_h */

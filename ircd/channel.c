@@ -410,10 +410,12 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   struct SLink* tmp;
   char          tmphost[HOSTLEN + 1];
   char          nu_host[NUH_BUFSIZE];
+  char          nu_accthost[NUH_BUFSIZE];
   char          nu_realhost[NUH_BUFSIZE];
   char          nu_ip[NUI_BUFSIZE];
   char*         s;
   char*         sr = NULL;
+  char*         sa = NULL;
   char*         ip_s = NULL;
 
   if (!IsUser(cptr))
@@ -422,18 +424,28 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   if (member && IsBanValid(member))
     return IsBanned(member);
 
+  /* This is horrible code.  s is always set to the apparent host */
+  /* If the user is sethosted, sr is set to the real host */
+  /* If the user is authed and +x (and not +h), then sa is set to the real host */
+  /* If the user is authed and -x (or +h), then sa is set to the "account" host */
+
   s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->username,
 			  (cli_user(cptr))->host);
 
-  if (IsAccount(cptr)) {
-     if (HasHiddenHost(cptr))
+  if (HasSetHost(cptr))
         sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+				 cli_user(cptr)->username,
+				 cli_user(cptr)->realhost);
+
+  if (IsAccount(cptr)) {
+     if (HasHiddenHost(cptr) && !HasSetHost(cptr))
+        sa = make_nick_user_host(nu_accthost, cli_name(cptr),
                                 cli_user(cptr)->username,
                                 cli_user(cptr)->realhost);
      else {
         ircd_snprintf(0, tmphost, HOSTLEN, "%s.%s",
                       cli_user(cptr)->account, feature_str(FEAT_HIDDEN_HOST));
-        sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+        sa = make_nick_user_host(nu_accthost, cli_name(cptr),
                                  cli_user(cptr)->username,
                                  tmphost);
      }
@@ -450,6 +462,8 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     else if (match(tmp->value.ban.banstr, s) == 0)
       break;
     else if (sr && match(tmp->value.ban.banstr, sr) == 0)
+      break;
+    else if (sa && match(tmp->value.ban.banstr, sa) == 0)
       break;
   }
 

@@ -216,7 +216,7 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	}
       } else { /* Host/IP gline */
 	      if (cli_user(acptr)->username && 
-			      match (gline->gl_user, (cli_user(acptr))->username) != 0)
+			      match (gline->gl_user, (cli_user(acptr))->realusername) != 0)
 		      continue;
 
 	      if (GlineIsIpMask(gline)) {
@@ -641,7 +641,7 @@ gline_lookup(struct Client *cptr, unsigned int flags)
       return gline;
     }
     else {
-      if (match(gline->gl_user, (cli_user(cptr))->username) != 0)
+      if (match(gline->gl_user, (cli_user(cptr))->realusername) != 0)
         continue;
     	 
       if (GlineIsIpMask(gline)) {

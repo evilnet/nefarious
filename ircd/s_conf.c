@@ -72,6 +72,7 @@
 struct ConfItem* GlobalConfList  = 0;
 int              GlobalConfCount = 0;
 struct qline*    GlobalQuarantineList = 0;
+struct sline*    GlobalSList = 0;
 
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
@@ -1010,6 +1011,12 @@ int read_configuration_file(void)
       continue;
     }
 
+    for (field_count = 0; field_count <= MAX_FIELDS; field_count++)
+      field_vector[field_count] = NULL;
+
+    for (field_count = 0; field_count <= MAX_FIELDS; field_count++)
+      field_vector[field_count] = NULL;
+
     /*
      * do escapes, quoting, comments, and field breakup in place
      * in one pass with a poor mans state machine
@@ -1184,6 +1191,11 @@ int read_configuration_file(void)
       conf_add_class(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
+    case 'S':      /* Super Spoof line */
+    case 's':
+      conf_add_sline(field_vector, field_count);
+      aconf->status = CONF_ILLEGAL;
+      break;
     default:
       Debug((DEBUG_ERROR, "Error in config file: %s", line));
       sendto_opmask_butone(0, SNO_OLDSNO, "Unknown prefix in config file: %c",
@@ -1351,6 +1363,7 @@ int rehash(struct Client *cptr, int sig)
   clearNickJupes();
 
   clear_quarantines();
+  clear_slines();
 
   if (sig != 2)
     flush_resolver_cache();
@@ -1648,4 +1661,171 @@ int conf_check_server(struct Client *cptr)
 
   Debug((DEBUG_DNS, "sv_cl: access ok: %s[%s]", cli_name(cptr), cli_sockhost(cptr)));
   return 0;
+}
+
+void conf_add_sline(const char* const* fields, int count)
+{
+  struct prefix *p;
+  struct sline *sline;
+
+  if (count < 2 || EmptyString(fields[1]))
+    return;
+
+  if (!EmptyString(fields[3]))
+    if (EmptyString(fields[4])) {
+      log_write(LS_CONFIG, L_CRIT, 0, "S-line: (%s) If third field is present, 4:th field must not be empty.", fields[1]);
+      return;
+    }
+
+  if (!EmptyString(fields[4]))
+    if (EmptyString(fields[3])) {
+      log_write(LS_CONFIG, L_CRIT, 0, "S-line: (%s) If fourth field is present, 3:rd field must not be empty.", fields[1]);
+      return;
+    }
+ 
+  p = (struct prefix *) MyMalloc(sizeof(struct prefix));
+  sline = (struct sline *) MyMalloc(sizeof(struct sline));
+  DupString(sline->spoofhost, fields[1]);
+  if (!EmptyString(fields[2]))
+    DupString(sline->passwd, fields[2]);
+  else
+    sline->passwd = NULL;
+  if (!EmptyString(fields[3])) {
+    DupString(sline->realhost, fields[3]);
+    if (check_if_ipmask(sline->realhost)) {
+      if (str2prefix(sline->realhost, p) == 0) {
+        Debug((DEBUG_FATAL, "S-Line: \"%s\" appears not to be a valid IP address."));
+        MyFree(p);
+        MyFree(sline);
+        return;
+      }
+      sline->address = p->address;
+      sline->bits = p->bits;
+      Debug((DEBUG_DEBUG, "S-Line: %s = %08x/%i (%08x)", sline->realhost,
+             sline->address, sline->bits, NETMASK(sline->bits)));
+      sline->flags = SLINE_FLAGS_IP;
+    }
+    else
+      sline->flags = SLINE_FLAGS_HOSTNAME;
+  } else {
+    sline->realhost = NULL;
+    sline->flags = 0;
+  }
+  if (!EmptyString(fields[4]))
+    DupString(sline->username, fields[4]);
+  else
+    sline->username = NULL;
+
+  sline->next = GlobalSList;
+  GlobalSList = sline;
+  MyFree(p);
+}
+
+void clear_slines(void)
+{
+  struct sline *sline;
+  while ((sline = GlobalSList)) {
+    GlobalSList = sline->next;
+    MyFree(sline->spoofhost);
+    if (!EmptyString(sline->passwd))
+      MyFree(sline->passwd);
+    if (!EmptyString(sline->realhost))
+      MyFree(sline->realhost);
+    if (!EmptyString(sline->username))
+      MyFree(sline->username);
+    MyFree(sline);
+  }
+}
+
+/*
+ * conf_check_slines()
+ *
+ * Check S lines for the specified client, passed in cptr struct.
+ * If the client's IP is S-lined, process the substitution here.
+ *
+ * Precondition
+ *  cptr != NULL
+ *
+ * Returns
+ *  0 = No S-line found
+ *  1 = S-line found and substitution done.
+ *
+ * -mbuna 9/2001
+ * -froo 1/2003
+ *
+ */
+
+int
+conf_check_slines(struct Client *cptr)
+{
+  struct sline *sconf;
+  char *hostonly;
+
+  for (sconf = GlobalSList; sconf; sconf = sconf->next) {
+    if (sconf->flags == SLINE_FLAGS_IP) {
+      if (((cli_ip(cptr)).s_addr & NETMASK(sconf->bits)) != sconf->address.s_addr)
+        continue;
+    } else if (sconf->flags == SLINE_FLAGS_HOSTNAME) {
+        if (match(sconf->realhost, cli_sockhost(cptr)) != 0)
+          continue;
+    } else {
+        continue;
+    }
+
+    if (match(sconf->username, cli_user(cptr)->username) == 0) {
+     /* Ignore user part if u@h. */
+     if ((hostonly = strchr(sconf->spoofhost, '@')))
+        hostonly;
+      else
+        hostonly = sconf->spoofhost;
+
+      if(!*hostonly)
+        continue;
+
+      ircd_strncpy(cli_user(cptr)->host, hostonly, HOSTLEN);
+      log_write(LS_USER, L_INFO, LOG_NOSNOTICE, "S-Line (%s@%s) by (%#R)",
+          cli_user(cptr)->username, hostonly, cptr);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/*
+ * str2prefix() - converts a string to in_addr and bits.
+ * based on str2prefix_ipv4() from Kunihiro Ishiguro's Zebra
+ *
+ * -froo 1/2003
+ */
+int str2prefix(char *str, struct prefix *p)
+{
+  int ret;
+  char *ptr, *cp;
+
+  /* Find slash inside string. */
+  if ((ptr = (char *)strchr(str, '/')) == NULL) { /* String doesn't contail slash. */
+    /* Convert string to prefix. */
+    if ((ret = inet_aton(str, &p->address)) == 0)
+        return 0;
+
+    /* If address doesn't contain slash we assume it host address. */
+    p->bits = IPV4_MAX_BITLEN;
+
+    return ret;
+  } else {
+    cp = (char *)MyMalloc((ptr - str)  1);
+    ircd_strncpy(cp, str, ptr - str);
+    *(cp  (ptr - str)) = '\0';
+    ret = inet_aton(cp, &p->address);
+    MyFree(cp);
+
+    /* Get prefix length. */
+    ret = (unsigned char) atoi(ptr);
+    if (ret > 32)
+        return 0;
+
+    p->bits = ret;
+  }
+
+  return ret;
 }

@@ -355,6 +355,10 @@ struct Client;
 #define TOK_PRIVS		"PRIVS"
 #define CMD_PRIVS		MSG_PRIVS, TOK_PRIVS
 
+#define MSG_SETHOST		"SETHOST"	/* SETHOST */
+#define TOK_SETHOST		"SH"
+#define CMD_SETHOST		MSG_SETHOST, TOK_SETHOST
+
 /*
  * Constants
  */

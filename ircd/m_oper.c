@@ -176,13 +176,13 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     switch (can_oper(sptr, name, password, &aconf)) {
     case ERR_NOOPERHOST:
      sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
-			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
      send_reply(sptr, ERR_NOOPERHOST);
      return 0;
      break;
     case ERR_PASSWDMISMATCH:
      sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
-			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
      send_reply(sptr, ERR_PASSWDMISMATCH);
      return 0;
      break;
@@ -213,10 +213,10 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_reply(sptr, RPL_YOUREOPER);
 
     sendto_opmask_butone(0, SNO_OLDSNO, "%s (%s@%s) is now operator (%c)",
-			 parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
+			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr),
 			 IsOper(sptr) ? 'O' : 'o');
 
-    log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#C)", name, sptr);
+    log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#R)", name, sptr);
   return 0;
 }
 
@@ -256,14 +256,14 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
 	     case ERR_NOOPERHOST:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
-		    "Failed OPER attempt by %s (%s@%s) (No O:line)", 
-		    parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
+		     "Failed OPER attempt by %s (%s@%s) (No O:line)", 
+		     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
 		     return 0;
 		     break;
 	     case ERR_PASSWDMISMATCH:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 	             "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
-		     parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
+		     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
 		     return 0;
 		     break;
 	     case 0: /* Authentication successful */
@@ -271,7 +271,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			     send_reply(sptr, ERR_NOOPERHOST);
 		             sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 			     "Failed OPER attempt by %s (%s@%s) (Local Oper)",
-			     parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
+			     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
 			     return 0;
 		     }
 		     FlagSet(&cli_flags(sptr), FLAG_REMOTEOPER); /* Tell client_set_privs to
@@ -282,7 +282,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		     send_reply(sptr, RPL_YOUREOPER);
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		         "%s (%s@%s) is now operator (O)",
-                         parv[0], cli_user(sptr)->username, cli_user(sptr)->host);
+                         parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
 		     return 0;
 		     break;
 	     default:

@@ -300,6 +300,44 @@ stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_sline(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  int y = 1, i = 1;
+  struct sline *sline;
+
+  if (IsAnOper(to))
+    send_reply(to, SND_EXPLICIT | RPL_TEXT, "# Type Spoofhost Realhost Ident");
+  else
+    send_reply(to, SND_EXPLICIT | RPL_TEXT, "# Type Spoofhost");
+
+  for (sline = GlobalSList; sline; sline = sline->next) {
+    if (param && match(param, sline->spoofhost)) { /* narrow search */
+      if (IsAnOper(to))
+          y++;
+      else
+        if (!EmptyString(sline->passwd))
+          y++;
+      continue;
+    }
+
+    if (IsAnOper(to)) {
+      send_reply(to, RPL_STATSSLINE, (param) ? y : i, 
+         (EmptyString(sline->passwd)) ? "oper" : "user",
+         sline->spoofhost, 
+         (EmptyString(sline->realhost)) ? "" : sline->realhost,
+         (EmptyString(sline->username)) ? "" : sline->username);
+      i++;
+    } else {
+      if (!EmptyString(sline->passwd)) {
+        send_reply(to, RPL_STATSSLINE, (param) ? y : i, "user", sline->spoofhost,
+           "", "", "");
+        i++;
+      }
+    }
+  }
+}
+
+static void
 stats_uptime(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   time_t nowr;
@@ -431,6 +469,9 @@ struct StatDesc statsinfo[] = {
     send_usage, 0,
     "System resource usage (Debug only)." },
 #endif
+  { 's', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_s,
+    stats_sline, 0,
+    "Spoofed hosts information." },
   { 'T', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_T,
     motd_report, 0,
     "Configured Message Of The Day files." },

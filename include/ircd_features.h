@@ -93,6 +93,10 @@ enum Feature {
   FEAT_UNLIMIT_OPER_QUERY,
   FEAT_LOCAL_KILL_ONLY,
   FEAT_CONFIG_OPERCMDS,
+  FEAT_SETHOST,
+  FEAT_SETHOST_FREEFORM,
+  FEAT_SETHOST_USER,
+  FEAT_SETHOST_AUTO,
 
   /* features that affect global opers on this server */
   FEAT_OPER_KILL,
@@ -150,6 +154,7 @@ enum Feature {
   FEAT_HIS_STATS_p,
   FEAT_HIS_STATS_q,
   FEAT_HIS_STATS_r,
+  FEAT_HIS_STATS_s,
   FEAT_HIS_STATS_d,
   FEAT_HIS_STATS_e,
   FEAT_HIS_STATS_t,

@@ -122,7 +122,7 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
 
   if (fields & WHO_FIELD_NIP)
   {
-    const char* p2 = HasHiddenHost(acptr) && !IsAnOper(sptr) ?
+    const char* p2 = (HasHiddenHost(acptr) || HasSetHost(acptr)) && !IsAnOper(sptr) ?
       feature_str(FEAT_HIDDEN_IP) :
       ircd_ntoa((const char*) &(cli_ip(acptr)));
     *(p1++) = ' ';
@@ -192,6 +192,8 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
         *(p1++) = 'w';
       if (SendDebug(acptr))
         *(p1++) = 'g';
+      if (HasSetHost(acptr))
+        *(p1++) = 'h';
     }
     if (HasHiddenHost(acptr))
       *(p1++) = 'x';
