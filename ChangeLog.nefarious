@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-10-18  Neil Spierling <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Applied a small fix posted on sourceforge for
+	CIDR bans and freebsd (also applied to exempts).
+
 2004-10-17  Neil Spierling <sirvulcan@gmail.com>
 
         * ircd/ircd_relay.c: Dont block bold and underline for +c, as +c
