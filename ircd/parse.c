@@ -595,6 +595,13 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_quit, m_ignore, m_ignore, m_ignore, m_ignore }
   },
+  {
+  MSG_SVSNICK,
+  TOK_SVSNICK,
+  0, MAXPARA, MFLG_SLOW, 0,
+  /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+  { m_ignore, m_ignore, ms_svsnick, m_ignore, m_ignore }
+  },
   { 0 }
 };
 

@@ -1695,6 +1695,9 @@ conf_check_slines(struct Client *cptr)
   struct in_addr iptemp;
   char* hostonly;
 
+  if (IsUser(cptr))
+    continue;
+
   for (aconf = GlobalConfList; aconf; aconf = aconf->next) {
     if (aconf->status != CONF_SPOOF)
       continue;
