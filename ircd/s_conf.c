@@ -129,7 +129,7 @@ const char dflagstr(const char* dflags)
 
   flagstr = dflags;
 
-  for (; *flagstr; flagstr++) {
+  for (; flagstr && *flagstr; flagstr++) {
     for (flag_p = (unsigned int*)dnsbl_flags; flag_p[0];
          flag_p += 2)
       if (flag_p[1] == *flagstr)
