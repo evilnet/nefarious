@@ -112,14 +112,16 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
   if (!IsServer(sptr))
     return protocol_violation(sptr, "MARK from non-server %s", cli_name(sptr));
 
-  if (strcmp(parv[1], MARK_DNSBL)) {
+  if (!strcmp(parv[2], MARK_DNSBL)) {
     unsigned int x_flag = 0;
     struct Client* acptr;
 
+    if(parc < 7)
+        return protocol_violation(sptr, "MARK recieved too few paramiters (%u)", parc);;
+
     Debug((DEBUG_DEBUG, "Recieving Mark"));
     if ((acptr = FindUser(parv[1]))) {
-      Debug((DEBUG_DEBUG, "Marking: %s d: %s f: %s r: %s", cli_name(acptr), parv[3],
-             parv[4], parv[parc-1]));
+      Debug((DEBUG_DEBUG, "Marking: %s d: %s flags: %s host: %s reason: %s", cli_name(acptr), parv[3], parv[4], parv[5], parv[6]));
 
       x_flag = dflagstr(parv[4]);
 
@@ -134,18 +136,17 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
       ircd_strncpy(cli_dnsbl(acptr), parv[3], BUFSIZE);
 
       /* not used yet so no real need to fuss around with parv/parv */
-      ircd_strncpy(cli_dnsblformat(acptr), "reason", BUFSIZE);
+      ircd_strncpy(cli_dnsblformat(acptr), parv[6], BUFSIZE);
 
-      ircd_snprintf(0, cli_user(acptr)->dnsblhost, HOSTLEN, "%s", parv[5]);
+      ircd_strncpy(cli_user(acptr)->dnsblhost, parv[5], HOSTLEN);
 
       sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s %s :%s", cli_name(acptr), MARK_DNSBL,
                             cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
     } else
-      Debug((DEBUG_DEBUG, "Mark Cant Find %s", parv[1]));
+      Debug((DEBUG_DEBUG, "Mark Cant Find user %s", parv[1]));
 
     return 0;
   } else
-    return protocol_violation(sptr, "Unknown MARK recieved [%s]", parv[1]);
-
+    return protocol_violation(sptr, "Unknown MARK recieved [%s]", parv[2]);
   return 0;
 }

@@ -129,7 +129,10 @@ const char dflagstr(const char* dflags)
 
   flagstr = dflags;
 
-  for (; flagstr && *flagstr; flagstr++) {
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
     for (flag_p = (unsigned int*)dnsbl_flags; flag_p[0];
          flag_p += 2)
       if (flag_p[1] == *flagstr)
