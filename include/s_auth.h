@@ -28,6 +28,7 @@
 #endif
 
 struct Client;
+struct DNSReply;
 
 struct AuthRequest {
   struct AuthRequest* next;      /* linked list node ptr */
@@ -79,6 +80,7 @@ extern void start_auth(struct Client *);
 extern void read_auth_reply(struct AuthRequest* req);
 extern void send_auth_query(struct AuthRequest* req);
 extern void destroy_auth_request(struct AuthRequest *req, int send_reports);
+extern void auth_dnsbl_callback(void* vptr, struct DNSReply* reply);
 
 #endif /* INCLUDED_s_auth_h */
 

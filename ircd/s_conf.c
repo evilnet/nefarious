@@ -966,7 +966,7 @@ void clear_cslines(void)
     MyFree(csline->port);
     MyFree(csline);
   }
-  GlobalConnStopList=0;
+  GlobalConnStopList = 0;
 }
 
 
@@ -1024,7 +1024,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   int j = 0;
   unsigned int x_flag = 0;
 
-  /* Wierd sanity checks :) */
+  /* Weird sanity checks :) */
   if (!sptr || !replyip || !checkhost) {
     Debug((DEBUG_DEBUG, "find_blline missing parameter(s) aborting check."));
     return 0;
@@ -2166,7 +2166,7 @@ void clear_svclines(void)
 	   MyFree(svc->prepend);
 	 MyFree(svc);
   }
-  GlobalServicesList=0;
+  GlobalServicesList = 0;
 }
 
 struct svcline *find_svc(const char *cmd)
@@ -2250,7 +2250,7 @@ void clear_slines(void)
       MyFree(sline->username);
     MyFree(sline);
   }
-  GlobalSList=0;
+  GlobalSList = 0;
 }
 
 /*

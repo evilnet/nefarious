@@ -123,6 +123,7 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   ClrFlag(sptr, FLAG_TS8);
 
+  member = find_member_link(chptr, sptr);
 
   if (parc < 3) {
     char modebuf[MODEBUFLEN];
@@ -136,7 +137,8 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     return 0;
   }
 
-  if ((!(member = find_member_link(chptr, sptr)) &&  !IsChannelService(sptr) || (!IsChanOp(member) && !IsHalfOp(member)))) {
+  if ((!member && !IsChannelService(sptr)) ||
+      (!IsChanOp(member) && !IsHalfOp(member))) {
     if (IsLocalChannel(chptr->chname) && HasPriv(sptr, PRIV_MODE_LCHAN)) {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_CHANNEL | /* Send mode to channel */

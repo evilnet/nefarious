@@ -315,7 +315,7 @@ static struct FeatureDesc {
   F_B(OPER_LJUPE, 0, 1, 0),
   F_B(OPER_OPMODE, 0, 1, 0),
   F_B(OPER_LOPMODE, 0, 1, 0),
-  F_B(OPER_FORCE_OPMODE, 0, 0, 0),
+  F_B(OPER_FORCE_OPMODE, 0, 1, 0),
   F_B(OPER_FORCE_LOPMODE, 0, 1, 0),
   F_B(OPER_BADCHAN, 0, 0, 0),
   F_B(OPER_LBADCHAN, 0, 0, 0),

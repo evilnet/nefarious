@@ -67,12 +67,12 @@
 			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
 			feature_bool(FEAT_HALFOPS) ? "(ohv)@%+" : "(ov)@+", \
 			feature_bool(FEAT_HALFOPS) ? "@%+" : "@+", \
-			"be,k,l,cimnprstzACLMNOQSTZ", "rfc1459", \
+			"be,k,l,acimnprstzCLMNOQSTZ", "rfc1459", \
 			feature_str(FEAT_NETWORK)
 
-#define infochanmodes "bcehiklmnoprstvzACLMNOQSTZ"
-#define clearchanmodes "bcehiklmoprsvzACLMNOQSTZ" /* ditto except for +nt */
+#define infochanmodes "abcehiklmnoprstvzCLMNOQSTZ"
+#define clearchanmodes "abcehiklmoprsvzCLMNOQSTZ" /* ditto except for +nt */
 #define infochanmodeswithparams "behklov"
-#define infousermodes "dfghiknoswxABIRWX"
+#define infousermodes "adfghiknoswxBIRWX"
 
 #endif /* INCLUDED_supported_h */

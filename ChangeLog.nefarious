@@ -1,6 +1,31 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-04-02  Reed Loden  <reed@reedloden.com>
+
+	* include/s_auth.h: Added prototypes for DNSReply struct and 
+	auth_dnsbl_callback() function (used in ircd/res.c).
+
+	* include/supported.h: Renamed +A to +a.
+
+	* ircd/ircd_features.c: Made the FEAT_OPER_FORCE_OPMODE default 
+	to TRUE (people were having a hard time figuring this out).
+
+	* ircd/m_account.c: Performed some miscellaneous whitespacing.
+	Removed some unnecessary lines at EOF.
+
+	* ircd/m_mode.c: Fixed a GCC warning and made the logic in an 
+	if statement a lot more readable.
+
+	* ircd/m_svsnick.c: Performed some miscellaneous whitespacing.
+
+	* ircd/res.c: Removed unneeded prototype now that it is
+	handled in include/s_auth.h (where it should have been done
+	earlier). Performed some miscellaneous whitespacing.
+
+	* ircd/s_conf.c: Performed some miscellaneous whitespacing and
+	grammatical changes.
+
 2005-04-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/client.h: Added ClearDNSBLMarked().
@@ -9,23 +34,23 @@
 	marking their host and unmark them. Their normal hidden host
 	(style 1) should kick in and work fine.
 
-2005-04-01  Alex Schumann <rubin@afternet.org>
-
-	* ircd/m_mode.c: Fixed a core when +k users set bans. Thanks to
-	jaden for discovering this on the production net... :/
-
-	* ircd/m_account.c: Redid m_account() to move backward compatability
-	code to an F line. The old way was overrunning the parv array. Added
-	tons of protocol validity checks.
+2005-04-01  Alex Schumann  <rubin@afternet.org>
 
 	* doc/example.conf: added F:EXTENDED_ACCOUNTS
 
 	* doc/readme.features: added F:EXTENDED_ACCOUNTS
 
-2005-03-31  Alex Schumann <rubin@afternet.org>
+	* ircd/m_account.c: Redid m_account() to move backward compatability
+	code to an F line. The old way was overrunning the parv array. Added
+	tons of protocol validity checks.
 
-	* ircd/m_account.c: check for null in decode_auth_id (crash on playa's
-	net)
+	* ircd/m_mode.c: Fixed a core when +k users set bans. Thanks to
+	Jaden for discovering this on the production net... :/
+
+2005-03-31  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/m_account.c: check for null in decode_auth_id
+	(crash on pLaYa's net)
 
 2005-03-31  Neil Spierling  <sirvulcan@gmail.com>
 
@@ -34,13 +59,7 @@
 
 	* ircd/s_conf.c: Few unused vars removed.
 
-2005-03-29  Alex Schumann <rubin@afternet.org>
-
-	* ircd/s_conf.c: Rewrite of find_blline from nearly scratch.
-	not yet well tested but committed to put on air* and look at.
-
-	* ircd/s_conf.c: tested all but the bitmap part, and here
-	made it work.
+2005-03-29  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/ircd_alloc.c: remove test code never ment to be 
 	committed.
@@ -49,6 +68,12 @@
 	when the lookup is for an rbl. This appears to solve
 	the false positives with sorbs. (and added): Also dont find them either.
 	The cache appears to be working right now. gonna upgrade afternet.
+
+	* ircd/s_conf.c: Rewrite of find_blline from nearly scratch.
+	not yet well tested but committed to put on air* and look at.
+
+	* ircd/s_conf.c: tested all but the bitmap part, and here
+	made it work.
 
 	* ircd/ssl.c: added EBUSY and EAGAIN to errno's not to die on.
 
@@ -75,12 +100,12 @@
 
 2005-03-28  Alex Schumann  <rubin@afternet.org>
 
+	* ircd/s_auth.c: reformatted some stuff so i could read it. Trying
+	to figure out why RBL stuff is so broken :/
+
 	* ircd/s_conf.c: Several conf line clear_* functions were freeing
 	memory but not re-terminating the global head. Someone please look
 	at this and tell me if im missing something...
-
-	* ircd/s_auth.c: reformatted some stuff so i could read it. Trying
-	to figure out why RBL stuff is so broken :/
 
 2005-03-27  Alex Schumann  <rubin@afternet.org>
 
@@ -92,6 +117,17 @@
 
 	* ircd/querycmds.c: Fixed the reading of the tune file, LUSERS will
 	come out properly now.
+
+2005-03-26  Reed Loden  <reed@reedloden.com>
+
+	* include/numeric.h: Swap RPL_STATSSLINE to numeric 245
+	(other IRCds use this).
+
+	* ircd/m_oper.c: Renamed +A to +a.
+
+	* ircd/s_err.c: Renamed +A to +a.
+
+	* ircd/s_user.c: Renamed "b:line" to "B:line" in a comment.
 
 2005-03-26  Neil Spierling  <sirvulcan@gmail.com>
 

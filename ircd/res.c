@@ -25,10 +25,10 @@
 #include "ircd_string.h"
 #include "msg.h"
 #include "numeric.h"
+#include "s_auth.h"
 #include "s_bsd.h"
 #include "s_debug.h"
 #include "s_misc.h"
-#include "s_auth.h"
 #include "send.h"
 #include "ircd_struct.h"
 #include "support.h"
@@ -1525,21 +1525,21 @@ static void update_list(struct ResRequest* request, struct CacheEntry* cachep, i
    * Do the same again for IP#'s.
    */
   *addrs = 0;
-  if(!is_rbl) { /* But not for RBL ips */
+  if (!is_rbl) { /* But not for RBL ips */
     ap = addrs;
     for (i = 0; (s = request->he.h.h_addr_list[i]); i++) {
       for (j = 0; (t = cp->he.h.h_addr_list[j]); j++) {
-        if (!memcmp(t, s, sizeof(struct in_addr)))
-          break;
+	if (!memcmp(t, s, sizeof(struct in_addr)))
+	  break;
       }
       if (!t) {
-        *ap++ = s;
-        *ap = 0;
+	*ap++ = s;
+	*ap = 0;
       }
     }
   }
-    if (*addrs || *aliases)
-      update_hostent(&cp->he, addrs, aliases);
+  if (*addrs || *aliases)
+    update_hostent(&cp->he, addrs, aliases);
 }
 
 /*
@@ -1582,8 +1582,6 @@ static struct CacheEntry* find_cache_name(const char* name)
   }
   return NULL;
 }
-
-void auth_dnsbl_callback(void* vptr, struct DNSReply* reply);
 
 /*
  * find_cache_number - find a cache entry by ip# and update its expire time

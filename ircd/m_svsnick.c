@@ -120,7 +120,7 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!(acptr = findNUser(parv[1])))
     return 0; /* Ignore SVSNICK for a user that has quit */
 
-  if(ircd_strcmp(cli_name(acptr), parv[2])==0)
+  if (ircd_strcmp(cli_name(acptr), parv[2]) == 0)
     return 0; /* Nick already set to what SVSNICK wants, ignoring... */
 
   /*
