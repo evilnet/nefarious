@@ -1610,13 +1610,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      * ASUKA: Allow opers to set +k.  Also, restrict +XnI to
      * opers only also.
      */
-    if (!FlagHas(&setflags, FLAG_CHSERV) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_XTRAOP))
+    if (!FlagHas(&setflags, FLAG_CHSERV) && !(feature_bool(FEAT_ASUKA_XTRAOP) && IsOper(acptr)))
       ClearChannelService(acptr);
-    if (!FlagHas(&setflags, FLAG_XTRAOP) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_XTRAOP))
+    if (!FlagHas(&setflags, FLAG_XTRAOP) && !(feature_bool(FEAT_ASUKA_XTRAOP) && IsOper(acptr)))
       ClearXtraOp(acptr);
-    if (!FlagHas(&setflags, FLAG_NOCHAN) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_HIDECHANS))
+    if (!FlagHas(&setflags, FLAG_NOCHAN) && !(feature_bool(FEAT_ASUKA_HIDECHANS) && IsOper(acptr)))
       ClearNoChan(acptr);
-    if (!FlagHas(&setflags, FLAG_NOIDLE) && !IsOper(acptr) && !feature_bool(FEAT_ASUKA_HIDEIDLE))
+    if (!FlagHas(&setflags, FLAG_NOIDLE) && !(feature_bool(FEAT_ASUKA_HIDEIDLE) && IsOper(acptr)))
       ClearNoIdle(acptr);
     
     /*
@@ -1628,7 +1628,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
     if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(acptr) && 
 	!IsAnOper(acptr) && !FlagHas(&setflags, FLAG_SERVNOTICE) &&
-	(get_client_class(acptr) != feature_int(FEAT_BOT_CLASS))) {
+	!IsBot(acptr)) {
       ClearServNotice(acptr);
       set_snomask(acptr, 0, SNO_SET);
     }
@@ -1638,7 +1638,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearDebug(acptr);
 
     if (!FlagHas(&setflags, FLAG_BOT) && (feature_int(FEAT_BOT_CLASS) > 0)
-	&& (get_client_class(acptr) == feature_int(FEAT_BOT_CLASS)))
+	&& (get_client_class(acptr) != feature_int(FEAT_BOT_CLASS)))
       ClearBot(acptr);
   }
 
