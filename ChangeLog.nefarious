@@ -1,3 +1,8 @@
+2003-10-07  Reed Loden  <reed@reedloden.com>
+
+	* ircd/gline.c: New way of doing gline quit reasons as
+	requested by Rubin. (made by clsk, modified by myself)
+
 2003-10-02  Reed Loden  <reed@reedloden.com>
 
 	* include/handlers.h, ircd/m_rehash.c, ircd/parse.c: Added

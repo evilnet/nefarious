@@ -198,7 +198,9 @@ static int
 do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 {
   struct Client *acptr;
-  int fd, retval = 0, tval;
+  int fd, retval = 0, tval, i;
+  char *reason = "";
+  char tmp[] = "";
 
   if (!GlineIsActive(gline)) /* no action taken on inactive glines */
     return 0;
@@ -276,9 +278,31 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       sendto_opmask_butone(0, SNO_GLINE, "G-line active for %s",
       		     get_client_name(acptr, TRUE));
 
+      /* decide about the gline reason */
+      if (feature_bool(FEAT_HIS_GLINE)) {
+	if (IsService(sptr) && strchr(gline->gl_reason, ' ') &&
+	    (gline->gl_reason[0] == '<') &&
+	    (strchr(gline->gl_reason, '>') < strchr(gline->gl_reason, ' ')))
+	{
+	  strcpy(reason, "G-lined by ");
+	  for (i = 0; i < strlen(gline->gl_reason); i++) {
+	    if (gline->gl_reason[i] != ' ') {
+	      ircd_snprintf(0, tmp, sizeof(tmp), "%c", gline->gl_reason[i]);
+	      strcat(reason, tmp);
+	    }
+	    else
+	      break;
+	  }
+        } else {
+	  ircd_snprintf(0, reason, sizeof(reason), "G-lined (<%s> %s)",
+			sptr->cli_name, gline->gl_reason);
+	}
+      } else {
+	strcat(reason, gline->gl_reason);
+      }
+
       /* and get rid of him */
-      if ((tval = exit_client_msg(cptr, acptr, &me,
-	  feature_bool(FEAT_HIS_GLINE) ? "G-lined" : "G-lined (%s)", gline->gl_reason)))
+      if ((tval = exit_client_msg(cptr, acptr, &me, reason)))
         retval = tval; /* retain killed status */
     }
   }
