@@ -12,6 +12,10 @@
 	* ircd/ircd_alloc.c: remove test code never ment to be 
 	committed.
 
+	* ircd/res.c: do not cache certain types of ip aliases
+	when the lookup is for an rbl. This appears to solve
+	the false positives with sorbs.
+
 2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Woops changed the wrong one.

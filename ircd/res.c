@@ -1524,8 +1524,8 @@ static void update_list(struct ResRequest* request, struct CacheEntry* cachep, i
   /*
    * Do the same again for IP#'s.
    */
+  *addrs = 0;
   if(!is_rbl) { /* But not for RBL ips */
-    *addrs = 0;
     ap = addrs;
     for (i = 0; (s = request->he.h.h_addr_list[i]); i++) {
       for (j = 0; (t = cp->he.h.h_addr_list[j]); j++) {
@@ -1538,8 +1538,8 @@ static void update_list(struct ResRequest* request, struct CacheEntry* cachep, i
       }
     }
   }
-  if (*addrs || *aliases)
-    update_hostent(&cp->he, addrs, aliases);
+    if (*addrs || *aliases)
+      update_hostent(&cp->he, addrs, aliases);
 }
 
 /*
