@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-08-27  Reed Loden  <reed@reedloden.com>
+
+	* Sync with u2.10.11.07(pre1) as per 2004-08-27.
+
 2004-08-25  Reed Loden  <reed@reedloden.com>
 
 	* doc/example.conf: Renamed FEAT_EXTENDED_CHECKCMD to
@@ -102,7 +106,7 @@
 
 2004-08-21  Neil Spierling  <vulcan@linux-boxen.org>
 
-	* ircd/m_ircops: Tweak to IRCOPS HIS stuff.
+	* ircd/m_ircops.c: Tweak to IRCOPS HIS stuff.
 
 	* ircd/m_oper.c: Small tweak to yesterdays bug fix.
 
