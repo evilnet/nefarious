@@ -1563,7 +1563,8 @@ int SetAutoChanModes(struct Channel *chptr)
   modestr = feature_str(FEAT_AUTOCHANMODES_LIST);
 
   for (; *modestr; modestr++) {
-    for (flag_p = chan_flags; flag_p[0]; flag_p += 2) /* look up flag */
+    for (flag_p = (unsigned int*)chan_flags; flag_p[0];
+	 flag_p += 2) /* look up flag */
       if (flag_p[1] == *modestr)
         break;
 

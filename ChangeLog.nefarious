@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-11-20  Reed Loden  <reed@reedloden.com>
+
+	* ircd/channel.c (SetAutoChanModes): Fixed a warning in
+	QuakeNet's code by casting (int)chan_flags to (unsigned int*).
+
 2004-11-19  Reed Loden  <reed@reedloden.com>
 
 	* configure.in: Changed AC_PREREQ's dnl to correctly say '2.57'.
