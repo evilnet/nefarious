@@ -437,7 +437,7 @@ P:192.168.10.12:SH:4400
 P:192.168.10.*:192.168.10.11:C:7000
 
 
-# [q:lines]
+# [R:lines]
 #
 # These are redirection lines, when a client connects and his/her host
 # matches a q:line then a 010 reply is sent with the redir server and
@@ -446,11 +446,11 @@ P:192.168.10.*:192.168.10.11:C:7000
 # 010 reply. Other clients will get a message saying what server and
 # port to connect to. Aswell as a unauthorised connection quit.
 #
-# q:<mask>:<redirection server>:<redirection port>
+# R:<mask>:<redirection server>:<redirection port>
 #
-# q:*.aol.com:irc.aol.com:6667
-# q:*.us:us.undernet.org:6667
-# q:*.nz:nz.undernet.org:6667
+# R:*.aol.com:irc.aol.com:6667
+# R:*.us:us.undernet.org:6667
+# R:*.nz:nz.undernet.org:6667
 
 
 # [Q:lines]
@@ -577,12 +577,14 @@ Q:\#coder-com:"What the hell do you think you are doing?!"
 #F:LOCOP_SEE_IN_SECRET_CHANNELS:FALSE
 #F:LOCOP_WIDE_GLINE:FALSE
 #F:HIS_MAP:TRUE
+#F:HIS_MAP_CRIPPLED:TRUE
 #F:HIS_SNOTICES:TRUE
 #F:HIS_SNOTICES_OPER_ONLY:TRUE
 #F:HIS_DESYNCS:TRUE
 #F:HIS_DEBUG_OPER_ONLY:TRUE
 #F:HIS_WALLOPS:TRUE
 #F:HIS_LINKS:TRUE
+#F:HIS_LINKS_CRIPPLED:TRUE
 #F:HIS_TRACE:TRUE
 #F:HIS_STATS_l:TRUE
 #F:HIS_STATS_c:TRUE
@@ -597,7 +599,7 @@ Q:\#coder-com:"What the hell do you think you are doing?!"
 #F:HIS_STATS_o:TRUE
 #F:HIS_STATS_p:TRUE
 #F:HIS_STATS_q:TRUE
-#F:HIS_STATS_Q:TRUE
+#F:HIS_STATS_R:TRUE
 #F:HIS_STATS_r:TRUE
 #F:HIS_STATS_d:TRUE
 #F:HIS_STATS_e:TRUE

@@ -1229,12 +1229,14 @@ int read_configuration_file(void)
       conf_add_listener(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'q':        /* CONF_CONNSTOP */
-      conf_add_csline(field_vector, field_count);
+    case 'Q':        /* CONF_QUARANTINE */
+    case 'q':
+      conf_add_quarantine(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'Q':        /* CONF_QUARANTINE */
-      conf_add_quarantine(field_vector, field_count);
+    case 'R':        /* CONF_CONNSTOP */
+    case 'r':
+      conf_add_csline(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
     case 'T':                /* print out different motd's */

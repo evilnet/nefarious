@@ -791,8 +791,8 @@ read_packet(struct Client *cptr, int socket_ready)
     }
 
     while (DBufLength(&(cli_recvQ(cptr))) && !NoNewLine(cptr) && 
-           (IsTrusted(cptr) || IsBot(cptr) || cli_since(cptr) -
-	    CurrentTime < 10))
+           (IsTrusted(cptr) || IsOper(cptr) || IsBot(cptr) ||
+	    cli_since(cptr) - CurrentTime < 10))
     {
       dolen = dbuf_getmsg(&(cli_recvQ(cptr)), cli_buffer(cptr), BUFSIZE);
       /*
