@@ -1,5 +1,9 @@
 2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/m_topic.c: Possibly fixed that crash with HOST_IN_TOPIC.
+
+2004-07-08  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* ircd/m_wallchops.c: Fixed an issue where notices that you sent would be
 	echoed back to you.
 
