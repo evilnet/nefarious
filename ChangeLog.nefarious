@@ -3,6 +3,13 @@
 
 2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/channel.c: Fixed a small issue with -z'ing an empty channel. 
+	(Non crash bug). Wont know for sure till the rest of the test net is
+	updated, currently ive done testing with 2 servers seperatly and the
+	bug is fixed.
+
+2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/channel.c: Added a missing check for persist (doesnt fix a known
 	non critical bug)
 

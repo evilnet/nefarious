@@ -3667,13 +3667,11 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	break;
 
       case 'z': /* deal with persistant (MODE_PERSIST) channels */
-	if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
-	    (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
-	  break;
-	else if (state.dir == '-')
-	  destroy_unregistered_channel(chptr);
-	mode_parse_mode(&state, flag_p);
-	break;
+  if (!IsBurst(sptr) && ((IsServer(sptr) && !IsService(sptr)) ||
+      (!IsServer(sptr) && !IsService(cli_user(sptr)->server))))
+    break;
+  mode_parse_mode(&state, flag_p);
+  break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);
@@ -3738,6 +3736,11 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       mode_invite_clear(state.chptr);
 
     state.chptr->mode.mode = t_mode;
+
+    if (!(chptr->mode.mode & MODE_PERSIST)) {
+      if (chptr->users <= 0)
+        destroy_unregistered_channel(chptr);
+    }
   }
 
   if (state.flags & MODE_PARSE_WIPEOUT) {
