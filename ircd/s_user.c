@@ -674,6 +674,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ++UserStats.inv_clients;
   if (IsOper(sptr))
     ++UserStats.opers;
+  if (feature_bool(FEAT_LUSERS_AUTHED) && IsAccount(sptr))
+    ++UserStats.authed;
 
   if (MyConnect(sptr))
     Count_unknownbecomesclient(sptr, UserStats);
@@ -2032,6 +2034,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     --UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))
     ++UserStats.inv_clients;
+  if (feature_bool(FEAT_LUSERS_AUTHED) &&
+      (FlagHas(&setflags, FLAG_ACCOUNT) && !IsAccount(acptr)))
+    --UserStats.authed;
+  if (feature_bool(FEAT_LUSERS_AUTHED) &&
+      (!FlagHas(&setflags, FLAG_ACCOUNT) && IsAccount(acptr)))
+    ++UserStats.authed;
   if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding) {
     if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
       if (do_host_hiding)

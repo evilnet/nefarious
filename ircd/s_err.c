@@ -534,7 +534,7 @@ static Numeric replyTable[] = {
 /* 250 */
   { RPL_STATSCONN, ":Highest connection count: %d (%d clients)", "250" },
 /* 251 */
-  { RPL_LUSERCLIENT, ":There are %d users and %d invisible on %d servers", "251" },
+  { RPL_LUSERCLIENT, ":There are %d users and %d %s on %d servers", "251" },
 /* 252 */
   { RPL_LUSEROP, "%d :operator(s) online", "252" },
 /* 253 */

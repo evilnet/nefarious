@@ -65,11 +65,13 @@
 
 #define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, CHANNELLEN, \
 			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
-			"(ohv)@%+", "@%+", "be,k,l,cimnprstzACLMNOQST", \
-			"rfc1459", feature_str(FEAT_NETWORK)
+			feature_bool(FEAT_HALFOPS) ? "(ohv)@%+" : "(ov)@+", \
+			feature_bool(FEAT_HALFOPS) ? "@%+" : "@+", \
+			"be,k,l,cimnprstzACLMNOQSTZ", "rfc1459", \
+			feature_str(FEAT_NETWORK)
 
-#define infochanmodes "bcehiklmnoprstvzACLMNOQST"
-#define clearchanmodes "bcehiklmoprsvzACLMNOQST" /* ditto except for +nt */
+#define infochanmodes "bcehiklmnoprstvzACLMNOQSTZ"
+#define clearchanmodes "bcehiklmoprsvzACLMNOQSTZ" /* ditto except for +nt */
 #define infochanmodeswithparams "behklov"
 #define infousermodes "dfghiknoswxABIRX"
 

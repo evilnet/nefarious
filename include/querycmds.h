@@ -31,6 +31,7 @@ struct UserStatistics {
   /* Global user mode changes: */
   unsigned int inv_clients;     /* IsUser() && IsInvisible() */
   unsigned int opers;           /* IsUser() && IsOper() */
+  unsigned int authed;		/* IsUser() && IsAccount() */
 
   /* Misc: */
   unsigned int channels;

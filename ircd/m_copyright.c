@@ -61,7 +61,6 @@ int m_copyright(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
   return 0;
 }
 
-
 /*
  * ms_copyright - server message handler
  *
@@ -87,6 +86,22 @@ int ms_copyright(struct Client* cptr, struct Client* sptr, int parc, char* parv[
 
   send_reply(sptr, RPL_INFO, "");
   send_reply(sptr, RPL_ENDOFINFO);
+
+  return 0;
+}
+
+/*
+ * m_isnef - generic message handler
+ *
+ * parv[0] - sender prefix
+ *
+ */
+int m_isnef(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+{
+
+  send_reply(sptr, SND_EXPLICIT | RPL_INFO,
+	     "This is Nefarious IRCu version %s [%s].",
+	     version, cvs_version);
 
   return 0;
 }

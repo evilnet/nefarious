@@ -156,7 +156,7 @@ const char* debug_serveropts(void)
     AddC('v');
 
 #ifdef USE_SSL
-  AddC('z');
+  AddC('Z');
 #endif /* USE_SSL */
 
   serveropts[i] = '\0';

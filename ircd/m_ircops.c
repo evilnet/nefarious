@@ -154,8 +154,7 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 			(IsAdmin(acptr) ? "[A]" : "[O]") : "*",
 		        acptr->cli_name ? acptr->cli_name : "<Unknown>",
 		        acptr->cli_user->away ? " (AWAY)" : "",
-                        IsAdmin(acptr) ? "IRC Administrator" :
-                        "IRC Operator", (feature_bool(FEAT_OPER_HIDEIDLE) &&
+			(feature_bool(FEAT_OPER_HIDEIDLE) &&
 			 IsNoIdle(acptr) && !oper) ?
 			 0 : CurrentTime - acptr->cli_user->last);
 	  ircops++;
@@ -197,11 +196,12 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 int ms_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
 /**
- *  if (hunt_server_cmd(sptr, CMD_IRCOPS, cptr, 0, "%C", 1, parc, parv) !=
- *    HUNTED_ISME)
- *  return 0;
+ * if (parc > 2)
+ *   if (hunt_server_cmd(sptr, CMD_IRCOPS, cptr, 0, "%s :%C", 2, parc, parv) !=
+ *       HUNTED_ISME)
+ *     return 0;
  *
- *  return m_ircops(cptr, sptr, parc, parv);
+ * return m_ircops(cptr, sptr, parc, parv);
  */
   return 0;
 }

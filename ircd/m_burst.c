@@ -127,14 +127,14 @@ netride_modes(int parc, char **parv, const char *curr_key)
     case 'r':
       result |= MODE_REGONLY;
       break;
-    case 'z':
-      result |= MODE_SSLONLY;
+    case 'A':
+      result |= MODE_ADMINONLY;
       break;
     case 'O':
       result |= MODE_OPERONLY;
       break;
-    case 'A':
-      result |= MODE_ADMINONLY;
+    case 'Z':
+      result |= MODE_SSLONLY;
       break;
     }
   }

@@ -111,8 +111,12 @@ int m_lusers(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			"%s :%C", 2, parc, parv) != HUNTED_ISME)
       return 0;
 
-  send_reply(sptr, RPL_LUSERCLIENT, UserStats.clients - UserStats.inv_clients,
-	     UserStats.inv_clients, UserStats.servers);
+  if (feature_bool(FEAT_LUSERS_AUTHED))
+    send_reply(sptr, RPL_LUSERCLIENT, UserStats.clients - UserStats.authed,
+	       UserStats.authed, "authed", UserStats.servers);
+  else
+    send_reply(sptr, RPL_LUSERCLIENT, UserStats.clients - UserStats.inv_clients,
+	       UserStats.inv_clients, "invisible", UserStats.servers);
   if (longoutput && UserStats.opers)
     send_reply(sptr, RPL_LUSEROP, UserStats.opers);
   if (UserStats.unknowns > 0)
@@ -147,8 +151,12 @@ int ms_lusers(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         HUNTED_ISME)
       return 0;
 
-  send_reply(sptr, RPL_LUSERCLIENT, UserStats.clients - UserStats.inv_clients,
-	     UserStats.inv_clients, UserStats.servers);
+  if (feature_bool(FEAT_LUSERS_AUTHED))
+    send_reply(sptr, RPL_LUSERCLIENT, UserStats.clients - UserStats.authed,
+	       UserStats.authed, "authed", UserStats.servers);
+  else
+    send_reply(sptr, RPL_LUSERCLIENT, UserStats.clients - UserStats.inv_clients,
+	       UserStats.inv_clients, "invisible", UserStats.servers);
   if (longoutput && UserStats.opers)
     send_reply(sptr, RPL_LUSEROP, UserStats.opers);
   if (UserStats.unknowns > 0)

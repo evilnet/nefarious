@@ -1,6 +1,54 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-01-29  Reed Loden  <reed@reedloden.com>
+
+	* include/ircd_features.h: Added FEAT_CHMODE_Z and
+	FEAT_LUSERS_AUTHED.
+
+	* include/querycmds.h: Added UserStats.authed for stats on all
+	authenticated (IsAccount()) users.
+
+	* include/supported.h: Added some checks for the halfops stuff.
+	Added Z to the list of chmodes.
+
+	* ircd/channel.c: Renamed MODE_SSLONLY (orig +z) to +Z. +z will 
+	now become MODE_PERSIST (from GameSurge).
+
+	* ircd/ircd_features.c: Marked FEAT_HALFOPS, FEAT_EXCEPTS, and
+	FEAT_BREAK_P10 as FEAT_READ (read-only feature). Added
+	FEAT_CHMODE_Z (default: TRUE) and FEAT_LUSERS_AUTHED
+	(read-only feature with default: FALSE).
+
+	* ircd/m_burst.c: Renamed MODE_SSLONLY (orig +z) to +Z. 
+	Put uppercase modes in alphabetical order.
+
+	* ircd/m_clearmode.c: Renamed MODE_SSLONLY (orig +z) to +Z.
+
+	* ircd/m_ircops.c: Removed unneeded reply. Swapped out some
+	commented code for remote IRCOPS (not yet used).
+
+	* ircd/m_join.c: Renamed MODE_SSLONLY (orig +z) to +Z.
+	Put uppercase modes in alphabetical order.
+
+	* ircd/m_lusers.c: Added support for an alternate form of the
+	/LUSERS reply as requested by Rubin (RFE 1112215). Instead of 
+	showing invisible clients, authed (+r) clients are now shown.
+	This, of course, is default FALSE with FEAT_LUSERS_AUTHED.
+
+	* ircd/m_oper.c: Cleaned up whitespacing. Added comment.
+
+	* ircd/s_debug.c: Renamed the USE_SSL notifier ('z') to 'Z'.
+
+	* ircd/s_err.c: Allowed the word "invisible" to be dynamically
+	changed (now a variable -- %s).
+
+	* ircd/s_misc.c: Added support for the new FEAT_LUSERS_AUTHED.
+
+	* ircd/s_user.c: Added support for the new FEAT_LUSERS_AUTHED.
+
+	* ircd/version.c.SH: Updated copyright date to 2002-2005.
+
 2005-01-28  Reed Loden  <reed@reedloden.com>
 
 	* include/supported.h: Reordered modes (specifically admin [A]).
@@ -15,6 +63,8 @@
 	unnecessary. Correctly forward swhois messages.
 
 	* ircd/s_serv.c: Burst swhois messages.
+
+	* ircd/send.c: Updated file location.
 
 2005-01-28  Reed Loden  <reed@reedloden.com>
 

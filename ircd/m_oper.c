@@ -320,18 +320,19 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	   return 0;
 	 }
 
-  	 SetRemoteOper(sptr);
+	 /* This must be called before client_set_privs() */
+	 SetRemoteOper(sptr);
 
 	 /* Tell client_set_privs to send privileges to the user */
 	 client_set_privs(sptr);
 
-         if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
-           ClearAdmin(sptr);
-         } else {
-           OSetGlobal(sptr);
-           SetAdmin(sptr);
-         }
-         sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
+	 if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN))
+	   ClearAdmin(sptr);
+	 else {
+	   OSetGlobal(sptr);
+	   SetAdmin(sptr);
+	 }
+	 sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
 		       (IsAdmin(sptr)) ? "+Aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
 	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 

@@ -1080,7 +1080,7 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
   if (chptr->mode.mode & MODE_NOQUITPARTS)
     *mbuf++ = 'Q';
   if (chptr->mode.mode & MODE_SSLONLY)
-    *mbuf++ = 'z';
+    *mbuf++ = 'Z';
   if (chptr->mode.mode & MODE_NOAMSG)
     *mbuf++ = 'T';
   if (chptr->mode.mode & MODE_NOLISTMODES)
@@ -1544,7 +1544,7 @@ int SetAutoChanModes(struct Channel *chptr)
     MODE_OPERONLY,	'O',
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'z',
+    MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L'
   };
@@ -1889,7 +1889,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
     MODE_OPERONLY,	'O',
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'z',
+    MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
     0x0, 0x0
@@ -2391,7 +2391,7 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_OPERONLY,	'O',
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'z',
+    MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
     0x0, 0x0
@@ -3361,7 +3361,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_OPERONLY,	'O',
     MODE_ADMINONLY,     'A',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'z',
+    MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
     MODE_NOLISTMODES,	'L',
     MODE_ADD,		'+',
@@ -3473,16 +3473,6 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  send_reply(sptr, ERR_NOPRIVILEGES);
 	break;
 
-      case 'z': /* deal with SSL only */
-        /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
-        if (((feature_bool(FEAT_CHMODE_z) && MyConnect(sptr) &&
-	      IsSSL(sptr)) || !MyConnect(sptr)) ||
-	    IsServer(sptr) || IsChannelService(sptr))
-          mode_parse_mode(&state, flag_p);
-	else
-	  send_reply(sptr, ERR_NOPRIVILEGES);
-	break;
-
       case 'A': /* deal with admin only */
 	/* If they're not an admin, they can't +/- MODE_ADMINONLY. */
 	if ((feature_bool(FEAT_CHMODE_A) && IsAdmin(sptr)) || 
@@ -3552,6 +3542,16 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       case 'T': /* MODE_NOAMSG */
         if (feature_bool(FEAT_CHMODE_T) || IsServer(sptr) ||
 	    IsOper(sptr))
+          mode_parse_mode(&state, flag_p);
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
+
+      case 'Z': /* deal with SSL only */
+        /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
+        if (((feature_bool(FEAT_CHMODE_Z) && MyConnect(sptr) &&
+	      IsSSL(sptr)) || !MyConnect(sptr)) ||
+	    IsServer(sptr) || IsChannelService(sptr))
           mode_parse_mode(&state, flag_p);
 	else
 	  send_reply(sptr, ERR_NOPRIVILEGES);

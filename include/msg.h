@@ -122,6 +122,10 @@ struct Client;
 #define TOK_COPYRIGHT		"CR"
 #define CMD_COPYRIGHT		MSG_COPYRIGHT, TOK_COPYRIGHT
 
+#define MSG_ISNEF		"ISNEF"		/* ISNE */
+#define TOK_ISNEF		"ISNEF"
+#define CMD_ISNEF		MSG_ISNEF, TOK_ISNEF
+
 #define MSG_LINKS               "LINKS"         /* LINK */
 #define TOK_LINKS               "LI"
 #define CMD_LINKS		MSG_LINKS, TOK_LINKS
