@@ -4,10 +4,10 @@
 2005-03-22  Alex Schumann   <rubin@afternet.org>
 
 	* ircd/s_user.c: Dont send null host in mark, send "notmarked" to 
-	keep param count right.
+	keep param count right. ..now with works!
 
 	* ircd/s_serv.c: Dont send null host in mark, send "notmarked" to
-	keep param count right.
+	keep param count right. ...now with works!
 
 2005-03-23  Neil Spierling  <sirvulcan@gmail.com>
 

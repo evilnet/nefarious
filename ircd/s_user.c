@@ -809,6 +809,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
       char flagbuf[BUFSIZE];
+      char* dnsblhost;
       memset(flagbuf, 0, BUFSIZE);
 
       if (IsDNSBLMarked(sptr)) {
@@ -830,8 +831,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
       strcat(flagbuf, "a");
 
+      dnsblhost = cli_user(sptr)->dnsblhost;
+      if(!dnsblhost[0])
+          dnsblhost = "notmarked";
       sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s %s %s %s :%s", cli_name(sptr), MARK_DNSBL, 
-                            cli_dnsbl(sptr), flagbuf, cli_user(sptr)->dnsblhost[0]?cli_user(sptr)->dnsblhost : "notmarked" , cli_dnsblformat(sptr));
+                            cli_dnsbl(sptr), flagbuf, dnsblhost , cli_dnsblformat(sptr));
 
       Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
             cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
