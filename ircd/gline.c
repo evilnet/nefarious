@@ -276,10 +276,15 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
       		     get_client_name(acptr, TRUE));
 
       /* decide about the gline reason */
-      tmp = (char *)MyMalloc(sizeof(gline->gl_reason));
-      reason = (char *)MyMalloc(sizeof(gline->gl_reason));
+      tmp = (char *)MyMalloc(strlen(gline->gl_reason)+1);
+      reason = (char *)MyMalloc(strlen(gline->gl_reason)+1);
+      
       assert(0 != tmp);
       assert(0 != reason);
+
+      /* Initialize strings */
+      strcpy(reason, "");
+      strcpy(tmp, "");
 
       if (feature_bool(FEAT_HIS_GLINE)) {
 	if (IsService(sptr) && strchr(gline->gl_reason, ' ') &&
@@ -300,7 +305,7 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 			sptr->cli_name, gline->gl_reason);
 	}
       } else {
-	strcpy(reason, gline->gl_reason);
+	strcat(reason, gline->gl_reason);
       }
 
       /* and get rid of him */
