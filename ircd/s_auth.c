@@ -176,7 +176,7 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
 {
   u_long ip;
   u_char *ipo = (u_char *) &ip;
-  char hname[HOSTLEN + 1] = "";
+  static char hname[HOSTLEN + 1] = "";
   struct blline *blline;
   struct DNSQuery query;
   int i;

@@ -1009,7 +1009,7 @@ void clear_dnsbl_list(void)
 int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
 {
   struct blline *blline;
-  static char dhname[HOSTLEN + 1] = "";
+  char dhname[HOSTLEN + 1] = "";
   char* rep = NULL;
   char* p = NULL;
   char *csep, *brkt, *brktb, *oct;
@@ -1041,7 +1041,10 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
       break;
   }
 
-  for (rep = ircd_strtok(&p, checkhost, "."); rep; rep = ircd_strtok(&p, 0, ".")) {
+  for (rep = strtok_r(checkhost, ".", &p);
+       rep;
+       rep = strtok_r(NULL, ".", &p))
+  {
     if (c == 4)
       ircd_snprintf(0, dhname, HOSTLEN + 1, "%s", rep);
     else if (c > 4)
