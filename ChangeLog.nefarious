@@ -2,6 +2,10 @@
 
 	* Synced to current u2_10_11_05.
 
+	* ircd/gline.c: Reverted to original till I can fix it.
+
+	* ircd/s_user.c: Fixed gcc warning.
+
 2003-01-21  Reed Loden  <reed@reedloden.com>
 
 	* ircd/gline.c: Fixed nasty error due to missing ending bracket.
