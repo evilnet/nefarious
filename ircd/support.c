@@ -22,6 +22,7 @@
 
 #include "support.h"
 #include "fileio.h"
+#include "h.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
 #include "ircd_snprintf.h"
@@ -76,3 +77,162 @@ extern void write_log(const char *filename, const char *pattern, ...)
     fbclose(logfile);
   }
 }
+
+/*
+ * read a string terminated by \r or \n in from a fd
+ *
+ * Originally From: Ultimate IRCd
+ * Originally Created: Sat Dec 12 06:29:58 EST 1992 by avalon
+ * Returns:
+ *     0 - EOF
+ *     -1 - error on read
+ *     >0 - number of bytes returned (<=num)
+ * After opening a fd, it is necessary to init dgets() by calling it as
+ *     dgets(x,y,0);
+ * to mark the buffer as being empty.
+ */
+int    dgets(fd, buf, num)
+int    fd, num;
+char   *buf;
+{
+       static  char    dgbuf[8192];
+       static  char    *head = dgbuf, *tail = dgbuf;
+       register char   *s, *t;
+       register int    n, nr;
+
+       /*
+        * Sanity checks.
+        */
+       if (head == tail)
+               *head = '\0';
+       if (!num)
+           {
+               head = tail = dgbuf;
+               *head = '\0';
+               return 0;
+           }
+       if (num > sizeof(dgbuf) - 1)
+               num = sizeof(dgbuf) - 1;
+dgetsagain:
+       if (head > dgbuf)
+           {
+               for (nr = tail - head, s = head, t = dgbuf; nr > 0; nr--)
+                       *t++ = *s++;
+               tail = t;
+               head = dgbuf;
+           }
+       /*
+        * check input buffer for EOL and if present return string.
+        */
+       if (head < tail &&
+           ((s = index(head, '\n')) || (s = index(head, '\r'))) && s < tail)
+           {
+               n = MIN(s - head + 1, num);     /* at least 1 byte */
+dgetsreturnbuf:
+               bcopy(head, buf, n);
+               head += n;
+               if (head == tail)
+                       head = tail = dgbuf;
+               return n;
+           }
+
+       if (tail - head >= num)         /* dgets buf is big enough */
+           {
+               n = num;
+               goto dgetsreturnbuf;
+           }
+
+       n = sizeof(dgbuf) - (tail - dgbuf) - 1;
+       nr = read(fd, tail, n);
+       if (nr == -1)
+           {
+               head = tail = dgbuf;
+               return -1;
+           }
+       if (!nr)
+           {
+               if (head < tail)
+                   {
+                       n = MIN(tail - head, num);
+                       goto dgetsreturnbuf;
+                   }
+               head = tail = dgbuf;
+               return 0;
+           }
+       tail += nr;
+       *tail = '\0';
+       for (t = head; (s = index(t, '\n')); )
+           {
+               if ((s > head) && (s > dgbuf))
+                   {
+                       t = s-1;
+                       for (nr = 0; *t == '\\'; nr++)
+                               t--;
+                       if (nr & 1)
+                           {
+                               t = s+1;
+                               s--;
+                               nr = tail - t;
+                               while (nr--)
+                                       *s++ = *t++;
+                               tail -= 2;
+                               *tail = '\0';
+                           }
+                       else
+                               s++;
+                   }
+               else
+                       s++;
+               t = s;
+           }
+       *tail = '\0';
+       goto dgetsagain;
+}
+
+
+static long
+TypeLength(char type)
+{
+    switch (type) {
+    case 'y': return 365*24*60*60;
+    case 'M': return 31*24*60*60;
+    case 'w': return 7*24*60*60;
+    case 'd': return 24*60*60;
+    case 'h': return 60*60;
+    case 'm': return 60;
+    case 's': return 1;
+    default: return 0;
+    }
+}
+
+
+unsigned long
+ParseInterval(const unsigned char *interval)
+{
+    unsigned long seconds = 0;
+    int partial = 0;
+    char c;
+
+    /* process the string, resetting the count if we find a unit character */
+    while ((c = *interval++)) {
+        if (isdigit((int)c)) {
+            partial = partial*10 + c - '0';
+        } else {
+            seconds += TypeLength(c) * partial;
+            partial = 0;
+        }
+    }
+    /* assume the last chunk is seconds (the normal case) */
+    return seconds + partial;
+}
+
+
+int is_timestamp(char *str)
+{
+
+  while ( isdigit(*str) || *str == '.' )
+    ++str;
+
+  return *str == '\0';
+}
+

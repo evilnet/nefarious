@@ -82,6 +82,7 @@
 #include "config.h"
 
 #include "client.h"
+#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_features.h"
@@ -221,6 +222,8 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     sendto_opmask_butone(0, SNO_OLDSNO, "%s (%s@%s) is now operator (%c)",
 			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr),
 			 IsOper(sptr) ? 'O' : 'o');
+
+    opermotd_send(sptr);
 
     log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#R)", name, sptr);
   return 0;

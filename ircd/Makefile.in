@@ -140,6 +140,7 @@ IRCD_SRC = \
 	m_nick.c \
 	m_notice.c \
 	m_oper.c \
+	m_opermotd.c \
 	m_opmode.c \
 	m_part.c \
 	m_pass.c \
@@ -154,6 +155,7 @@ IRCD_SRC = \
 	m_restart.c \
 	m_rping.c \
 	m_rpong.c \
+	m_rules.c \
 	m_server.c \
 	m_set.c \
 	m_sethost.c \
@@ -281,6 +283,11 @@ install-with-symlink: build mkbindir
 	@${RM} /tmp/ircd.tag
 	${INSTALL} -s -m 700 -o ${IRCDOWN} -g ${IRCDGRP} chkconf ${BINDIR}
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example.conf ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.quotes ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}	
+	${top_srcdir}/tools/makepem/makepem ${DPATH} ${top_srcdir}
 # 	( cd ${DPATH}; \
 # 	  ${TOUCH} ${MPATH}; \
 # 	  ${TOUCH} ${RPATH}; \
@@ -299,6 +306,10 @@ install-no-symlink: build mkbindir
 	${INSTALL} -m ${IRCDMODE} -o ${IRCDOWN} -g ${IRCDGRP} ircd ${BINDIR}/ircd
 	${INSTALL} -s -m 700 -o ${IRCDOWN} -g ${IRCDGRP} chkconf ${BINDIR}
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example.conf ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.quotes ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
+	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}
 # 	( cd ${DPATH}; \
 # 	  ${TOUCH} ${MPATH}; \
 # 	  ${TOUCH} ${RPATH}; \
@@ -642,7 +653,7 @@ m_gline.o: m_gline.c ../config.h ../include/client.h \
  ../include/ircd_string.h ../include/ircd_chattr.h ../include/match.h \
  ../include/msg.h ../include/numeric.h ../include/numnicks.h \
  ../include/s_conf.h ../include/s_misc.h ../include/send.h \
- ../include/support.h
+ ../include/support.h ../include/h.h
 m_help.o: m_help.c ../config.h ../include/client.h \
  ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
  ../include/ircd_events.h ../include/ircd_handler.h ../include/hash.h \
@@ -698,7 +709,7 @@ m_jupe.o: m_jupe.c ../config.h ../include/client.h \
  ../include/ircd_string.h ../include/ircd_chattr.h ../include/match.h \
  ../include/msg.h ../include/numeric.h ../include/numnicks.h \
  ../include/s_conf.h ../include/s_misc.h ../include/send.h \
- ../include/support.h
+ ../include/support.h ../include/h.h
 m_kick.o: m_kick.c ../config.h ../include/channel.h \
  ../include/ircd_defs.h ../include/client.h ../include/dbuf.h \
  ../include/msgq.h ../include/ircd_events.h ../include/ircd_handler.h \
@@ -1278,7 +1289,7 @@ support.o: support.c ../config.h ../include/support.h \
  ../include/fileio.h ../include/ircd.h ../include/struct.h \
  ../include/ircd_defs.h ../include/ircd_chattr.h \
  ../include/ircd_snprintf.h ../include/s_bsd.h ../include/s_debug.h \
- ../include/send.h ../include/sys.h
+ ../include/send.h ../include/sys.h ../include/h.h
 uping.o: uping.c ../config.h ../include/uping.h ../include/ircd_defs.h \
  ../include/ircd_events.h ../include/client.h ../include/dbuf.h \
  ../include/msgq.h ../include/ircd_handler.h ../include/ircd.h \

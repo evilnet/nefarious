@@ -84,6 +84,7 @@
 
 #include "client.h"
 #include "jupe.h"
+#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_features.h"
@@ -210,12 +211,20 @@ int mo_jupe(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return send_reply(sptr, ERR_DISABLED, "JUPE");
 
   if (parc == 4) {
-    expire_off = atoi(parv[2]);
+    if (is_timestamp(parv[2])) {
+      expire_off = atoi(parv[2]);
+    } else {
+      expire_off = ParseInterval(parv[3]);
+    }
     reason = parv[3];
     flags |= JUPE_LOCAL;
   } else if (parc > 4) {
     target = parv[2];
-    expire_off = atoi(parv[3]);
+    if (is_timestamp(parv[3])) {
+      expire_off = atoi(parv[3]);
+    } else {
+      expire_off = ParseInterval(parv[3]);
+    }
     reason = parv[4];
   } else
     return need_more_params(sptr, "JUPE");

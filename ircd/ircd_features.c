@@ -281,6 +281,9 @@ static struct FeatureDesc {
 
   /* Some misc. default paths */
   F_S(MPATH, FEAT_CASE | FEAT_MYOPER, "ircd.motd", motd_init),
+  F_S(OMPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.opermotd", 0),
+  F_S(QPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.quotes", 0),
+  F_S(EPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.rules", 0),
   F_S(RPATH, FEAT_CASE | FEAT_MYOPER, "remote.motd", motd_init),
   F_S(PPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.pid", 0),
 
@@ -414,6 +417,9 @@ static struct FeatureDesc {
   F_B(HIS_STATS_s, 0, 1, 0),
   F_B(HIS_WHOIS_LOCALCHAN, 0, 1, 0),
   F_B(HIS_GLINE, 0, 1, 0),
+  F_B(AUTOJOIN, 0, 0, 0),
+  F_B(AUTOJOIN_NOTICE, 0, 1, 0),
+  F_S(AUTOJOIN_NOTICE_VALUE, 0, "*** Notice -- You are now being autojoined into #nefarious", 0),
 
 #undef F_S
 #undef F_B

@@ -56,6 +56,12 @@
 /* Define if you are using OpenSSL */
 #undef USE_SSL
 
+/* Path name used as a base for the ssl lib files. */
+#undef SSL_LIBS_PATH
+
+/* Path name used as a base for the ssl include files. */
+#undef SSL_INCLUDES_PATH
+
 /* Define to enable various debugging code in the server; DO NOT USE
  * THIS ON PRODUCTION SERVERS ON PAIN OF DELINKING!
  */

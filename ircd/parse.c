@@ -25,6 +25,7 @@
 #include "client.h"
 #include "channel.h"
 #include "handlers.h"
+#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -657,7 +658,18 @@ struct Message msgtab[] = {
     0, MAXPARA, MFLG_SLOW, 0,
     { m_unregistered, m_not_oper, mo_check, mo_check, m_ignore }
   },
-
+  {
+    MSG_RULES,
+    TOK_RULES,
+    0, MAXPARA, MFLG_SLOW, 0,
+    { m_unregistered, m_rules, ms_rules, m_rules, m_ignore }
+  },
+  {
+    MSG_OPERMOTD,
+    TOK_OPERMOTD,
+    0, MAXPARA, MFLG_SLOW, 0,
+    { m_unregistered, m_not_oper, ms_opermotd, m_opermotd, m_ignore }
+  },
   /* This command is an alias for QUIT during the unregistered part of
    * of the server.  This is because someone jumping via a broken web
    * proxy will send a 'POST' as their first command - which we will

@@ -362,6 +362,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_NONICKNAMEGIVEN  431
 #define ERR_ERRONEUSNICKNAME 432
 #define ERR_NICKNAMEINUSE    433
+#define ERR_NORULES          434
 /*      ERR_SERVICENAMEINUSE 434 ? */
 /*	ERR_NORULES	     434   unreal */
 /*      ERR_SERVICECONFUSED  435 ? */
@@ -477,7 +478,14 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_BADHOSTMASK      530	/* QuakeNet extension -froo */
 #define ERR_HOSTUNAVAIL      531	/* QuakeNet extension -froo */
 
-#define ERR_LASTERROR        532
+#define RPL_RULESSTART       532
+#define RPL_RULES            532
+#define RPL_ENDOFRULES       534
+#define RPL_OMOTDSTART       535
+#define RPL_OMOTD            536
+#define RPL_ENDOFOMOTD       537
+
+#define ERR_LASTERROR        538
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

@@ -1,3 +1,51 @@
+2004-02-15  Neil Spierling <sirvulcan@sirvulcan.org>
+
+	* configure.in: Added in some humor.
+			Epoll checks fixed.
+			OpenSSL checks improved.
+
+	* configure: Regenerated off configure.in.
+
+	* doc/example.conf: Updated with new F:lines.
+
+	* doc/ircd.quotes: Random quote file.
+
+	* doc/ircd.opermotd: OPERMOTD template.
+
+	* doc/ircd.rules: RULES template.
+
+	* doc/ircd.motd: MOTD template.
+
+	* include/h.h: Added file for new declarations etc.
+
+	* ircd/Makefile.in: Run makepem at the end of make,
+	makepem will exit if SSL is disabled.
+
+	* ircd/ircd_features.c: New F:lines for AUTOJOIN and a few more paths.
+
+	* ircd/m_gline.c: Allow for gline lengths to be specified
+	as ie 1d2m1s.
+
+	* ircd/m_jupe.c: Allow for jupe lengths to be specified as
+	ie 1d2m1s.
+
+	* ircd/m_opermotd.c: MOTD for opers only.
+
+	* ircd/m_rules.c: Network Rules output.
+
+	* ircd/s_err.c: Various replies added for RULES and OPERMOTD.
+
+	* ircd/s_user.c: AUTOJOIN functionality added (off by default).
+			 Random quotes added.
+			 Policy notice added.
+
+	* ircd/s_serv.c: Various functions added for rules, opermotd and
+	random quotes.
+
+	* ircd/support.c: Added dgets function.
+			  Added is_timestamp.
+			  Added ParseInterval.
+
 2003-12-07  Reed Loden  <reed@reedloden.com>
 
 	* include/patchlevel.h: Bump patchlevel.

@@ -74,6 +74,9 @@ enum Feature {
 
   /* Some misc. default paths */
   FEAT_MPATH,
+  FEAT_OMPATH,
+  FEAT_QPATH,
+  FEAT_EPATH,
   FEAT_RPATH,
   FEAT_PPATH,
 
@@ -207,6 +210,9 @@ enum Feature {
   FEAT_HIS_STATS_s,
   FEAT_HIS_WHOIS_LOCALCHAN,
   FEAT_HIS_GLINE,
+  FEAT_AUTOJOIN,
+  FEAT_AUTOJOIN_NOTICE,
+  FEAT_AUTOJOIN_NOTICE_VALUE,
   FEAT_LAST_F
 };
 

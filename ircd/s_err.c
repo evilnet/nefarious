@@ -900,7 +900,7 @@ static Numeric replyTable[] = {
 /* 433 */
   { ERR_NICKNAMEINUSE, "%s :Nickname is already in use.", "433" },
 /* 434 */
-  { 0 },
+  { ERR_NORULES, ":RULES File is missing", "434" },
 /* 435 */
   { 0 },
 /* 436 */
@@ -1096,17 +1096,17 @@ static Numeric replyTable[] = {
 /* 531 */
   { ERR_HOSTUNAVAIL, "%s :sethost not found", "531" },
 /* 532 */
-  { 0 },
+  { RPL_RULESSTART, ":- %s Network Rules - ", "530" },
 /* 533 */
-  { 0 },
+  { RPL_RULES, ":- %s", "531" },
 /* 534 */
-  { 0 },
+  { RPL_ENDOFRULES, ":End of /RULES list.", "532" },
 /* 535 */
-  { 0 },
+  { RPL_OMOTDSTART, ":%s IRC Operator MOTD", "533" },
 /* 536 */
-  { 0 },
+  { RPL_OMOTD, ":- %s", "534" },
 /* 537 */
-  { 0 },
+  { RPL_ENDOFOMOTD, ":End of IRC Operator MOTD.", "535" },
 /* 538 */
   { 0 },
 /* 539 */

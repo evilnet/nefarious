@@ -29,6 +29,7 @@
 #include "channel.h"
 #include "client.h"
 #include "gline.h"
+#include "h.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -58,6 +59,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 
 unsigned int max_connection_count = 0;
 unsigned int max_client_count = 0;
@@ -257,3 +261,137 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
   return 0;
 }
 
+/*
+ * m_randquote - ported from Ultimate IRCd
+ */
+int m_randquote(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
+    int fd, linenum=0, randnum;
+    char line[300];
+    char *tmp;
+    char qfile[1024];
+
+    ircd_snprintf(0, qfile, sizeof(qfile), "%s/%s", DPATH, feature_str(FEAT_QPATH));
+
+    srand(time(NULL)+getpid()+rand() % 9999);
+    fd = open(qfile, O_RDONLY);
+
+    if (fd == -1) {
+      return 0;
+    }
+
+    dgets(-1, NULL, 0);
+    while (dgets(fd, line, sizeof(line)-1) > 0) {
+      if ((tmp = (char *)index(line,'\n')))
+        *tmp = '\0';
+      if ((tmp = (char *)index(line,'\r')))
+        *tmp = '\0';
+      linenum++;
+    }
+
+    /* We have an empty file.. bail */
+    if (linenum == 0) {
+      return 0;
+
+    }
+
+    randnum = (rand() % linenum)-1;
+
+    close(fd);
+    alarm(3);
+    fd = open(qfile, O_RDONLY);
+    linenum = 0;
+
+    while (dgets(fd, line, sizeof(line)-1) > 0) {
+      if ((tmp = (char *)index(line,'\n')))
+        *tmp = '\0';
+      if ((tmp = (char *)index(line,'\r')))
+        *tmp = '\0';
+      linenum++;
+      if (linenum==randnum)
+        break;
+    }
+
+    if (line != NULL) {
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C \2Quote:\2 %s", sptr, line);
+    }
+    close(fd);
+
+    return close(fd);
+}
+
+
+/*
+ * rules_send ported from Ultimate IRCd
+ */
+
+int rules_send(struct Client* cptr) {
+  int fd, nr;
+  char line[100], s_rules[1024], *tmp;
+
+  alarm(3);
+  ircd_snprintf(0, s_rules, sizeof(s_rules), "%s/%s", DPATH, feature_str(FEAT_EPATH));
+  fd = open (s_rules, O_RDONLY);
+  alarm(0);
+
+  if (fd == -1) {
+    send_reply(cptr, ERR_NORULES);
+    return 0;
+  }
+
+  send_reply(cptr, RPL_RULESSTART, feature_str(FEAT_NETWORK));
+
+  dgets(-1, NULL, 0);
+  while ((nr = dgets (fd, line, sizeof (line) - 1)) > 0)
+    {
+      line[nr] = '\0';
+      if ((tmp = (char *) index (line, '\n')))
+        *tmp = '\0';
+      if ((tmp = (char *) index (line, '\r')))
+        *tmp = '\0';
+      send_reply(cptr, RPL_RULES, line);
+    }
+  dgets (-1, NULL, 0);
+  send_reply(cptr, RPL_ENDOFRULES);
+  close(fd);
+  return 0;
+}
+
+
+/*
+ * opermotd_send()
+ *  - Ported From Ultimate IRCd
+ *
+ *      parv[0] = sender prefix
+ *      parv[1] = servername
+ */
+int opermotd_send(struct Client* cptr) {
+  int fd, nr;
+  char line[80], omotd[1024], *tmp;
+
+  alarm(3);
+  ircd_snprintf(0, omotd, sizeof(omotd), "%s/%s", DPATH, feature_str(FEAT_OMPATH));
+  fd = open(omotd, O_RDONLY);
+  alarm(0);
+  if (fd == -1)
+     return 0;
+
+  send_reply(cptr, RPL_OMOTDSTART, cli_name(&me));
+
+  dgets (-1, NULL, 0);
+  while ((nr = dgets (fd, line, sizeof (line) - 1)) > 0)
+    {
+      line[nr] = '\0';
+      if ((tmp = (char *) index (line, '\n')))
+        *tmp = '\0';
+      if ((tmp = (char *) index (line, '\r')))
+        *tmp = '\0';
+      send_reply(cptr, RPL_OMOTD, line);
+    }
+
+  dgets (-1, NULL, 0);
+
+  send_reply(cptr, RPL_ENDOFOMOTD);
+  close(fd);
+
+  return 0;
+}

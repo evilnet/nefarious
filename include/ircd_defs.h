@@ -30,6 +30,12 @@
  */
 
 /*
+ * AUTOJOIN is the channel whhich a client will autojoin if autojoin
+ * is enabled.
+ */
+#define AUTOJOIN_CHANNEL       "#nefarious"
+
+/*
  * NICKLEN is the maximum length allowed for a nickname
  *
  * Because certain networks are very helpful in finding bugs, the below
