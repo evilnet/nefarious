@@ -18,6 +18,8 @@
 
 	* ircd/m_account.c: Only use hide_hostmask if we are using style 1.
 			    Fixed a bug with AC's being transit'ed.
+			    Only set a hidden host if they dont already have
+			      one set and only set it if we are using style 1.
 
 2004-10-17  Reed Loden  <reed@reedloden.com>
 
