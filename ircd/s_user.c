@@ -541,15 +541,22 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ircd_strncpy(user->username, username, USERLEN);
     Count_newremoteclient(UserStats, user->server);
   }
+
   if(MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
     if (conf_check_slines(sptr)) {
       send_reply(sptr, RPL_USINGSLINE);
       SetSetHost(sptr);
     }
   }
+
+#ifdef USE_SSL
+  if (MyConnect(sptr) && cli_socket(sptr).ssl)
+    SetSSL(sptr);
+#endif /* USE_SSL */
+
   SetUser(sptr);
 
-  /* incrememnt global count if needed */
+  /* increment global count if needed */
   if (UserStats.globalclients < UserStats.clients && IsUser(sptr)) {
     if (UserStats.globalclients >= 0) {
       ++UserStats.globalclients;

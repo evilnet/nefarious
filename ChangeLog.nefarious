@@ -30,6 +30,8 @@
 	* As per Math's recommendation, removed umode +S. Now, SSL users
 	are only kept track of via FLAG_SSL.
 
+	* Actually do SetSSL() on SSL users.
+
 2003-07-05  Reed Loden  <reed@reedloden.com>
 
 	* ircd/s_user.c: Fixed a problem of when an oper was +xh and
