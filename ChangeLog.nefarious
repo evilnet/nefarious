@@ -3,6 +3,12 @@
 
 2004-08-11  Neil Spierling  <vulcan@linux-boxen.org>
 
+	* ircd/channel.c: This should fix the issue with parting a +M
+	channel while your not logged in. Previously it would return a
+	cannot send to channel error with some data beside it.
+
+2004-08-11  Neil Spierling  <vulcan@linux-boxen.org>
+
 	* patches: Added new directory for services patches
 
 	* patches/README: General patches readme plus listings of all

@@ -914,15 +914,6 @@ int member_can_send_to_channel(struct Membership* member)
   if (member->channel->mode.mode & MODE_MODERATED)
     return 0;
 
- /*
-  * If it's ACCONLY, and you aren't logged in, you can't speak.
-  */
-  if (member->channel->mode.mode & MODE_ACCONLY)
-    if (!IsAccount(member->user)) {
-	send_reply(member->user, ERR_NEEDACCCHAN, member->channel);
-	return 0;
-    }
-
   /*
    * If you're banned then you can't speak either.
    * but because of the amount of CPU time that is_banned chews
@@ -956,6 +947,16 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
     else
       return !is_banned(cptr, chptr, NULL);
   }
+
+ /*
+  * If it's ACCONLY, and you aren't logged in, you can't speak.
+  */
+  if ((member->channel->mode.mode & MODE_ACCONLY) && !IsVoicedOrOpped(member))
+    if (!IsAccount(cptr)) {
+	send_reply(cptr, ERR_NEEDACCCHAN, member->channel);
+	return 0;
+    }
+
   return member_can_send_to_channel(member); 
 }
 
