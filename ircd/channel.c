@@ -2674,7 +2674,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   modestr = state.parv[state.args_used++];
   state.parc--;
 
-  while (*modestr) {
+v  while (*modestr) {
     for (; *modestr; modestr++) {
       for (flag_p = chan_flags; flag_p[0]; flag_p += 2) /* look up flag */
 	if (flag_p[1] == *modestr)
@@ -2711,23 +2711,19 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
       case 'O': /* deal with operonly */
 	/* If they're not an oper, they can't +/- MODE_OPERONLY. */
-	if (!IsOper(sptr)) {
-	  send_reply(sptr, ERR_NOPRIVILEGES);
-	  break;
-	} else {
+	if (IsOper(sptr) || IsServer(sptr))
 	  mode_parse_mode(&state, flag_p);
-	  break;
-	}
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
 
       case 'z': /* deal with sslonly */
         /* If they're not a SSL user, they can't +/- MODE_SSLONLY. */
-        if (!IsSSL(sptr)) {
-          send_reply(sptr, ERR_NOPRIVILEGES);
-          break;
-        } else {
+        if (IsSSL(sptr) || IsServer(sptr)) {
           mode_parse_mode(&state, flag_p);
-          break;
-        }
+	else
+	  send_reply(sptr, ERR_NOPRIVILEGES);
+	break;
 
       default: /* deal with other modes */
 	mode_parse_mode(&state, flag_p);

@@ -1,3 +1,9 @@
+2004-07-03  Reed Loden  <reed@reedloden.com>
+	    Neil Spierling  <vulcan@linux-boxen.org>
+
+	* ircd/channel.c: Actually fixed the problem with MODE_OPERONLY 
+	and MODE_SSLONLY not bursting correctly.
+
 2004-07-02  Reed Loden  <reed@reedloden.com>
 
 	* ChangeLog.nefarious: Various indent, spacing, etc. changes.
