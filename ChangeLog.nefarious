@@ -1,4 +1,8 @@
-2004-06-18   <vulcan@linux-boxen.org>
+2004-06-18  Neil Spierling <vulcan@linux-boxen.org>
+
+	* ircd/m_account.c: Fixed small issue.
+
+2004-06-18  Neil Spierling <vulcan@linux-boxen.org>
 
 	* doc/example.conf: Added features NOTVERIFIED (string msg) and VERIFIED_ACCOUNTS
 	(default: FALSE).
