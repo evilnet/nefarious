@@ -1067,8 +1067,10 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
           if (x_flag & DFLAG_ALLOW)
             SetDNSBLAllowed(sptr);
 
-          ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
-          ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
+          if (EmptyString(cli_dnsbl(sptr)))
+            ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
+          if (EmptyString(cli_dnsblformat(sptr)))
+            ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
           a = 1;
         }
       }
@@ -1087,8 +1089,10 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
             if (x_flag & DFLAG_ALLOW)
               SetDNSBLAllowed(sptr);
 
-            ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
-            ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
+            if (EmptyString(cli_dnsbl(sptr)))
+              ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
+            if (EmptyString(cli_dnsblformat(sptr)))
+              ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
             a = 1;
             break;
           }

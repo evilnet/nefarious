@@ -1,7 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2005-02-25  Alex Schumann  <rubin@afternet.org>
+2005-03-02  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_conf.c: Added some sanity checks.
+
+2005-03-01  Alex Schumann  <rubin@afternet.org>
 
         * ircd/ssl.c: Added some Debug() info to try and track down
 	the Write error: 0 during netsplit bug for ssl users.
