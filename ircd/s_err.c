@@ -36,7 +36,7 @@ static Numeric replyTable[] = {
 /* 003 */
   { RPL_CREATED, ":This server was created %s", "003" },
 /* 004 */
-  { RPL_MYINFO, "%s %s dioswkgxRh biklmnopstvrRcC bklov", "004" },
+  { RPL_MYINFO, "%s %s dhioswkgxBR bciklmnopstvrCR bklov", "004" },
 /* 005 */
   { RPL_ISUPPORT, "%s :are supported by this server", "005" },
 /* 006 */
@@ -652,7 +652,7 @@ static Numeric replyTable[] = {
 /* 309 */
   { 0 },
 /* 310 */
-  { RPL_WHOISSERVICE, "%s :is a %s Network Service", "310" },
+  { RPL_WHOISSERVICE, "%s :is an %s Network Service", "310" },
 /* 311 */
   { RPL_WHOISUSER, "%s %s %s * :%s", "311" },
 /* 312 */
@@ -702,9 +702,9 @@ static Numeric replyTable[] = {
 /* 334 */
   { RPL_LISTUSAGE, ":%s", "334" },
 /* 335 */
-  { 0 },
+  { RPL_WHOISACCOUNTONLY, "%s :Only accepts messages from registered users", "335" },
 /* 336 */
-  { 0 },
+  { RPL_WHOISBOT, "%s :is a bot", "336" },
 /* 337 */
   { 0 },
 /* 338 */
@@ -848,7 +848,7 @@ static Numeric replyTable[] = {
 /* 407 */
   { ERR_TOOMANYTARGETS, "%s :Duplicate recipients. No message delivered", "407" },
 /* 408 */
-  { 0 },
+  { ERR_NOCOLORSONCHAN, "%s :No colors allowed. (+c)", "408" },
 /* 409 */
   { ERR_NOORIGIN, ":No origin specified", "409" },
 /* 410 */
@@ -972,7 +972,7 @@ static Numeric replyTable[] = {
 /* 469 */
   { 0 },
 /* 470 */
-  { 0 },
+  { ERR_OPERONLYCHAN, "%s :Cannot join channel (+O)", "470" },
 /* 471 */
   { ERR_CHANNELISFULL, "%s :Cannot join channel (+l)", "471" },
 /* 472 */

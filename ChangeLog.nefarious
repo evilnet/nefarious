@@ -4,9 +4,15 @@
 
 	* Added some IRCu fixes from asuka.
 
-	* Added topicburst from asuka.
+	* Added asuka's topicburst (which in turn was made by Vampire-).
 
-	* Added badnicks for X<numerics here> and fixed it.
+	* Added badnicks for X<numerics here> and then fixed it.
+	(thanks IceKarma and Rubin)
+
+	* Added support for FEAT_HIS_STATS_u and FEAT_HIS_STATS_w.
+
+	* Added several of my own patches that are still waiting to be
+	committed to main IRCu CVS repository.
 
 2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
 
@@ -16,17 +22,17 @@
 
 2003-06-08  Matthias Crauwels  <ultimate_@wol.be>
 
+	* doc/ircd.conf.sample: default value for
+	FEAT_HIS_WHOIS_LOCALCHAN
+
+	* doc/readme.features: documented FEAT_HIS_WHOIS_LOCALCHAN
+
 	* include/ircd_features.h: new feature FEAT_HIS_WHOIS_LOCALCHAN
 
 	* ircd/ircd_features.c: new feature FEAT_HIS_WHOIS_LOCALCHAN
 
 	* ircd/m_whois.c: hide local channels in local WHOIS, this
 	breaks HEAD_IN_SAND.
-
-	* doc/readme.features: documented FEAT_HIS_WHOIS_LOCALCHAN
-
-	* doc/ircd.conf.sample: default value for
-	FEAT_HIS_WHOIS_LOCALCHAN
 
 2003-05-10  Reed Loden  <reed@reedloden.com>
 

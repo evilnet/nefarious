@@ -267,8 +267,13 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	  }
 
 	  /* send accountability notice */
-	  sendto_opmask_butone(0, SNO_HACK4, "OPER JOIN: %C JOIN %H "
-			       "(overriding +%c)", sptr, chptr, i);
+	  if (IsGlobalChannel(chptr->chname))
+	    sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+				    "OPER JOIN: %s JOIN %s (overriding +%c)",
+				    sptr->cli_name, chptr->chname, i);
+	  else
+	    sendto_opmask_butone(0, SNO_HACK4, "OPER JOIN: %C JOIN %H "
+				 "(overriding +%c)", sptr, chptr, i);
 	} else {
 	  send_reply(sptr, i, chptr->chname);
 	  continue;

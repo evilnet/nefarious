@@ -182,16 +182,17 @@ param_parse(struct Client *sptr, const char *param, struct ListingArgs *args,
     return LPARAM_SUCCESS;
 
   while (1) {
+    is_time = 0;
     switch (*param) {
     case 'T':
     case 't':
-      is_time++;
+      is_time = 1;
       args->flags |= LISTARG_TOPICLIMITS;
       /*FALLTHROUGH*/
 
     case 'C':
     case 'c':
-      is_time++;
+      is_time = 2;
       param++;
       if (*param != '<' && *param != '>')
 	return show_usage(sptr);

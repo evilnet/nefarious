@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_tmpl.c
+ * IRC - Internet Relay Chat, ircd/m_opmode.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  * Copyright (C) 2000 Kevin L. Mitchell <klmitch@mit.edu>
@@ -170,8 +170,11 @@ int mo_opmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   for (tmp = chptr->members; tmp; tmp = tmp->next_member)
     if (IsChannelService(tmp->user)) {
       /* Impersonate the abuser */
-      sendwallto_group_butone(&me, WALL_DESYNCH, NULL, "Failed OPMODE for registered channel %s by %C", chptr->chname, sptr);
-      return send_reply(sptr, ERR_QUARANTINED, chptr->chname, "This channel is registered.");
+      sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+			      "Failed OPMODE for registered channel %s by %s",
+			      chptr->chname, sptr->cli_name);
+      return send_reply(sptr, ERR_QUARANTINED, chptr->chname,
+			"This channel is registered.");
     }
 
   modebuf_init(&mbuf, sptr, cptr, chptr,

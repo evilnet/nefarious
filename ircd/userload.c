@@ -30,6 +30,7 @@
 #include "userload.h"
 #include "client.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "msg.h"
 #include "numnicks.h"
 #include "querycmds.h"
@@ -203,6 +204,9 @@ void update_load(void)
 
 void calc_load(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
 {
+  if (feature_bool(FEAT_HIS_STATS_w) && !IsAnOper(sptr))
+    return 0;
+
   /* *INDENT-OFF* */
   static const char *header =
   /*   ----.-  ----.-  ----  ----  ----   ------------ */

@@ -10,6 +10,8 @@
 #          details of the encoding.
 #
 # --Liandrin
+#
+# $Id$
 
 @convert2n = (
 	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
