@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-03-22  Alex Schumann   <rubin@afternet.org>
+
+	* ircd/channel.c: sv: You cant destroy that chptr its used more
+	down farther in that function... (as state.chptr)
+
 2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Fixed a small issue with -z'ing an empty channel. 

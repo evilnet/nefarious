@@ -3737,10 +3737,12 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 
     state.chptr->mode.mode = t_mode;
 
+    /* YOU CANNOT DESTROY CHPTR IF ITS USED BELOW!! WTF.
     if (!(chptr->mode.mode & MODE_PERSIST)) {
       if (chptr->users <= 0)
         destroy_unregistered_channel(chptr);
     }
+    */
   }
 
   if (state.flags & MODE_PARSE_WIPEOUT) {
