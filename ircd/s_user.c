@@ -809,6 +809,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
       char flagbuf[BUFSIZE];
+      memset(flagbuf, 0, BUFSIZE);
 
       if (IsDNSBLMarked(sptr)) {
         ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));

@@ -10,6 +10,8 @@
 
 	* ircd/s_conf.c: added an assert for flags
 
+	* ircd/s_user.c: properly initalise flagbuf.
+
 2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Fixed a small issue with -z'ing an empty channel. 
