@@ -142,7 +142,7 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
 		   cli_info(acptr));
 
   /* Display the channels this user is on. */
-  if (!IsChannelService(acptr))
+  if ((!IsChannelService(acptr) && !IsNoChan(acptr)) || (acptr==sptr))
   {
     struct Membership* chan;
     mlen = strlen(cli_name(&me)) + strlen(cli_name(sptr)) + 12 + strlen(name);
@@ -152,7 +152,8 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     {
        chptr = chan->channel;
        
-       if (!ShowChannel(sptr, chptr) && !IsOper(sptr))
+       if (!(IsOper(sptr) && IsLocalChannel(chptr->chname))
+			       && !ShowChannel(sptr, chptr))
           continue;
           
        if (acptr != sptr && IsZombie(chan))
@@ -174,6 +175,8 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
        }
        if (IsDeaf(acptr))
          *(buf + len++) = '-';
+       if (IsOper(sptr) && !ShowChannel(sptr,chptr))
+	  *(buf + len++) = '*';
        if (IsZombie(chan))
        {
          *(buf + len++) = '!';
@@ -235,8 +238,10 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (IsBot(acptr))
       send_reply(sptr, RPL_WHOISBOT, name);
 
-    if (MyConnect(acptr) && (!feature_bool(FEAT_HIS_WHOIS_IDLETIME) ||
-			     sptr == acptr || IsAnOper(sptr) || parc >= 3))
+    if (MyConnect(acptr) &&
+	(IsAnOper(sptr) ||
+	 (!IsNoIdle(acptr) && (!feature_bool(FEAT_HIS_WHOIS_IDLETIME) ||
+			       sptr == acptr || parc >= 3))))
       send_reply(sptr, RPL_WHOISIDLE, name, CurrentTime - user->last, 
 		 cli_firsttime(acptr));
   }

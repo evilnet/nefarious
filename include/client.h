@@ -151,6 +151,9 @@ enum Flag {
     FLAG_REMOTEOPER,                /* Remote operator */
     FLAG_BOT,                       /* Bot */
     FLAG_SSL,                       /* SSL user */
+    FLAG_NOCHAN,                    /* ASUKA_n: hide channels */
+    FLAG_NOIDLE,                    /* ASUKA_I: hide idle time */
+    FLAG_XTRAOP,                    /* ASUKA_X: oper special powers */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -441,6 +444,9 @@ struct Client {
 #define IsRemoteOper(x)		HasFlag(x, FLAG_REMOTEOPER)
 #define IsBot(x)		HasFlag(x, FLAG_BOT)
 #define IsSSL(x)		HasFlag(x, FLAG_SSL)
+#define IsXtraOp(x)		HasFlag(x, FLAG_XTRAOP)
+#define IsNoChan(x)		HasFlag(x, FLAG_NOCHAN)
+#define IsNoIdle(x)		HasFlag(x, FLAG_NOIDLE)
 
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 
@@ -468,6 +474,9 @@ struct Client {
 #define SetRemoteOper(x)	SetFlag(x, FLAG_REMOTEOPER)
 #define SetBot(x)		SetFlag(x, FLAG_BOT)
 #define SetSSL(x)		SetFlag(x, FLAG_SSL)
+#define SetXtraOp(x)		SetFlag(x, FLAG_XTRAOP)
+#define SetNoChan(x)		SetFlag(x, FLAG_NOCHAN)
+#define SetNoIdle(x)		SetFlag(x, FLAG_NOIDLE)
 
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
 #define ClearBurst(x)           ClrFlag(x, FLAG_BURST)
@@ -488,6 +497,9 @@ struct Client {
 #define ClearRemoteOper(x)	ClrFlag(x, FLAG_REMOTEOPER)
 #define ClearBot(x)		ClrFlag(x, FLAG_BOT)
 #define ClearSSL(x)		ClrFlag(x, FLAG_SSL)
+#define ClearXtraOp(x)		ClrFlag(x, FLAG_XTRAOP)
+#define ClearNoChan(x)		ClrFlag(x, FLAG_NOCHAN)
+#define ClearNoIdle(x)		ClrFlag(x, FLAG_NOIDLE)
 
 #define SeeOper(sptr,acptr) (IsAnOper(acptr) && (HasPriv(acptr, PRIV_DISPLAY) \
                             || HasPriv(sptr, PRIV_SEE_OPERS)))
@@ -565,4 +577,3 @@ extern int client_report_privs(struct Client* to, struct Client* client);
 extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
 
 #endif /* INCLUDED_client_h */
-

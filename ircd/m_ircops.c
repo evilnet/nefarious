@@ -23,6 +23,64 @@
  * $Id$
  */
 
+/*
+ * m_functions execute protocol messages on this server:
+ *
+ *    cptr    is always NON-NULL, pointing to a *LOCAL* client
+ *            structure (with an open socket connected!). This
+ *            identifies the physical socket where the message
+ *            originated (or which caused the m_function to be
+ *            executed--some m_functions may call others...).
+ *
+ *    sptr    is the source of the message, defined by the
+ *            prefix part of the message if present. If not
+ *            or prefix not found, then sptr==cptr.
+ *
+ *            (!IsServer(cptr)) => (cptr == sptr), because
+ *            prefixes are taken *only* from servers...
+ *
+ *            (IsServer(cptr))
+ *                    (sptr == cptr) => the message didn't
+ *                    have the prefix.
+ *
+ *                    (sptr != cptr && IsServer(sptr) means
+ *                    the prefix specified servername. (?)
+ *
+ *                    (sptr != cptr && !IsServer(sptr) means
+ *                    that message originated from a remote
+ *                    user (not local).
+ *
+ *            combining
+ *
+ *            (!IsServer(sptr)) means that, sptr can safely
+ *            taken as defining the target structure of the
+ *            message in this server.
+ *
+ *    *Always* true (if 'parse' and others are working correct):
+ *
+ *    1)      sptr->from == cptr  (note: cptr->from == cptr)
+ *
+ *    2)      MyConnect(sptr) <=> sptr == cptr (e.g. sptr
+ *            *cannot* be a local connection, unless it's
+ *            actually cptr!). [MyConnect(x) should probably
+ *            be defined as (x == x->from) --msa ]
+ *
+ *    parc    number of variable parameter strings (if zero,
+ *            parv is allowed to be NULL)
+ *
+ *    parv    a NULL terminated list of parameter pointers,
+ *
+ *                    parv[0], sender (prefix string), if not present
+ *                            this points to an empty string.
+ *                    parv[1]...parv[parc-1]
+ *                            pointers to additional parameters
+ *                    parv[parc] == NULL, *always*
+ *
+ *            note:   it is guaranteed that parv[0]..parv[parc-1] are all
+ *                    non-NULL pointers.
+ */
+#include "config.h"
+
 #include "channel.h"
 #include "client.h"
 #include "handlers.h"
@@ -48,13 +106,14 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-
 /*
+ * m_ircops - generic message handler
  *
- * m_ircops (Ported From Ultimate IRCd)
- *
+ * parv[0]        = sender prefix
+ * parv[1]        = servername
  */
-int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
+int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
+{
   struct Client *acptr;
   struct Client *server = 0;
   char buf[BUFSIZE];
@@ -86,19 +145,23 @@ int m_ircops(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
     if (acptr->cli_user && !IsChannelService(acptr) && IsOper(acptr) &&
 	ircd_strrcmp(cli_name(acptr->cli_user->server), feature_str(FEAT_SERVICES_TLD)))
     {
-      if ((parc > 1) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
+      if ((parc == 2) && !ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(server)))
       {
-	ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %d",
-			acptr->cli_name ? acptr->cli_name : "<Unknown>",
-			acptr->cli_user->away ? " (AWAY)" : "",
-			CurrentTime - acptr->cli_user->last);
+	ircd_snprintf(0, buf, sizeof(buf), "* %s%s - Idle: %s",
+		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
+		      acptr->cli_user->away ? " (AWAY)" : "",
+		      (feature_bool(FEAT_ASUKA_HIDEIDLE) &&
+		       IsNoIdle(acptr)) ? "N/A" :
+		       CurrentTime - acptr->cli_user->last);
 	ircops++;
-      } else {
-	ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %d",
-			acptr->cli_name ? acptr->cli_name : "<Unknown>",
-			acptr->cli_user->away ? " (AWAY)" : "",
-			cli_name(acptr->cli_user->server),
-			CurrentTime - acptr->cli_user->last);
+      } else if (parc == 1) {
+	ircd_snprintf(0, buf, sizeof(buf), "* %s%s [%s] - Idle: %s",
+		      acptr->cli_name ? acptr->cli_name : "<Unknown>",
+		      acptr->cli_user->away ? " (AWAY)" : "",
+		      cli_name(acptr->cli_user->server),
+		      (feature_bool(FEAT_ASUKA_HIDEIDLE) &&
+		       IsNoIdle(acptr)) ? "N/A" :
+		       CurrentTime - acptr->cli_user->last);
 	ircops++;
       }
       send_reply(sptr, RPL_IRCOPS, buf);

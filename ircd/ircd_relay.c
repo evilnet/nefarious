@@ -54,7 +54,7 @@
  * to be cleaned up a bit. The idea is to factor out the common checks
  * but not introduce any IsOper/IsUser/MyUser/IsServer etc. stuff.
  */
-void relay_channel_message(struct Client* sptr, const char* name, const char* text)
+void relay_channel_message(struct Client* sptr, const char* name, const char* text, int total)
 {
   struct Channel* chptr;
   const char *ch;
@@ -73,9 +73,15 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
     send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
     return;
   }
+
   if ((chptr->mode.mode & MODE_NOPRIVMSGS) &&
       check_target_limit(sptr, chptr, chptr->chname, 0))
     return;
+
+  if ((chptr->mode.mode & MODE_NOAMSG) && (total > 1)) {
+    send_reply(sptr, ERR_NOMULTITARGET, chptr->chname);
+    return;
+  }
 
   /* +cC checks */
   if (chptr->mode.mode & MODE_NOCOLOUR)
@@ -93,11 +99,14 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
 	return;
       }
 
+  if (chptr->mode.mode & MODE_STRIP)
+    text = StripColour(text);
+
   sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
 }
 
-void relay_channel_notice(struct Client* sptr, const char* name, const char* text)
+void relay_channel_notice(struct Client* sptr, const char* name, const char* text, int total)
 {
   struct Channel* chptr;
   const char *ch;
@@ -115,10 +124,15 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
 
   if ((chptr->mode.mode & MODE_NOPRIVMSGS) &&
       check_target_limit(sptr, chptr, chptr->chname, 0))
-    return;  
+    return;
 
   if ((chptr->mode.mode & MODE_NONOTICE)) {
     send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+    return;
+  }
+
+  if ((chptr->mode.mode & MODE_NOAMSG) && (total > 1)) {
+    send_reply(sptr, ERR_NOMULTITARGET, chptr->chname);
     return;
   }
 
@@ -136,6 +150,9 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
         send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
         return;
       }
+
+  if (chptr->mode.mode & MODE_STRIP)
+    text = StripColour(text);
 
   sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);

@@ -126,17 +126,25 @@ int m_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   if (!(who = find_chasing(sptr, parv[2], 0)))
     return 0; /* find_chasing sends the reply for us */
 
-  /* check if kicked user is actually on the channel */
-  if (!(member = find_member_link(chptr, who)) || IsZombie(member))
-    return send_reply(sptr, ERR_USERNOTINCHANNEL, cli_name(who), chptr->chname);
-
   /* Don't allow the channel service to be kicked */
-  if (IsChannelService(who))
+  /*
+   * ASUKA_X:
+   * Allow +X'ed users to kick +k'ed, but not U-lined services.
+   * --Bigfoot
+   */
+  if (IsChannelService(who) && IsService(cli_user(who)->server))
+    return send_reply(sptr, ERR_ISREALSERVICE, cli_name(who), chptr->chname);
+
+  if (IsChannelService(who) && !IsXtraOp(sptr) && (who!=sptr))
     return send_reply(sptr, ERR_ISCHANSERVICE, cli_name(who), chptr->chname);
 
   /* Prevent kicking opers from local channels -DM- */
   if (IsLocalChannel(chptr->chname) && HasPriv(who, PRIV_DEOP_LCHAN))
     return send_reply(sptr, ERR_ISOPERLCHAN, cli_name(who), chptr->chname);
+
+  /* check if kicked user is actually on the channel */
+  if (!(member = find_member_link(chptr, who)) || IsZombie(member))
+    return send_reply(sptr, ERR_USERNOTINCHANNEL, cli_name(who), chptr->chname);
 
   /* We rely on ircd_snprintf to truncate the comment */
   comment = EmptyString(parv[parc - 1]) ? parv[0] : parv[parc - 1];

@@ -179,6 +179,15 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_JUPELIST         282        /* Undernet extension - jupe -Kev */
 #define RPL_ENDOFJUPELIST    283        /* Undernet extension - jupe -Kev */
 #define RPL_FEATURE	     284	/* Undernet extension - features */
+#define RPL_NEWHOSTIS        285        /* QuakeNet - Asuka / evilnet */
+#define RPL_CHKHEAD          286        /* QuakeNet - Asuka / evilnet */
+#define RPL_CHANUSER         287        /* QuakeNet - Asuka / evilnet */
+#define RPL_PATCHHEAD        288        /* QuakeNet - Asuka / evilnet */
+#define RPL_PATCHCON         289        /* QuakeNet - Asuka / evilnet */
+#define RPL_DATASTR          290        /* QuakeNet - Asuka / evilnet */
+#define RPL_ENDOFCHECK       291        /* QuakeNet - Asuka / evilnet */
+#define ERR_SEARCHNOMATCH    292	/* QuakeNet - Asuka / evilnet */
+
 /*      RPL_CHANINFO_HANDLE  285           aircd */
 /*      RPL_CHANINFO_USERS   286           aircd */
 /*      RPL_CHANINFO_CHOPS   287           aircd */
@@ -332,6 +341,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_NOCOLORSONCHAN   408  Dalnet */
 #define ERR_NOCOLORSONCHAN   408	/* evilnet extension */
 #define ERR_NOORIGIN         409
+#define EFF_NOMULTITARGET    410	/* evilnet extension */
 
 #define ERR_NORECIPIENT      411
 #define ERR_NOTEXTTOSEND     412
@@ -413,6 +423,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_CANTKILLSERVER   483
 #define ERR_ISCHANSERVICE    484        /* Undernet extension */
+#define ERR_ISREALSERVICE    485        /* QuakeNet Asuka / evilnet extension */
 /*	ERR_DESYNC	     484	 Dalnet,PTlink */
 /*	ERR_ATTACKDENY	     484	 unreal */
 /*	ERR_RESTRICTED	     484	   IRCnet extension */

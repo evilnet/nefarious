@@ -36,7 +36,7 @@ static Numeric replyTable[] = {
 /* 003 */
   { RPL_CREATED, ":This server was created %s", "003" },
 /* 004 */
-  { RPL_MYINFO, "%s %s dioswkgxBR bciklmnopstvrCMNOQS bklov", "004" },
+  { RPL_MYINFO, "%s %s %s %s %s", "004" },
 /* 005 */
   { RPL_ISUPPORT, "%s :are supported by this server", "005" },
 /* 006 */
@@ -526,7 +526,7 @@ static Numeric replyTable[] = {
 /* 246 */
   { RPL_STATSTLINE, "%c %s %s", "246" },
 /* 247 */
-  { RPL_STATSGLINE, "%c %s@%s %Tu :%s", "247" },
+  { RPL_STATSGLINE, "%c %s%s%s %Tu :%s", "247" },
 /* 248 */
   { RPL_STATSULINE, "%c %s %s %s %d %d", "248" },
 /* 249 */
@@ -602,21 +602,21 @@ static Numeric replyTable[] = {
 /* 284 */
   { RPL_FEATURE, 0, "284" },
 /* 285 */
-  { 0 },
+  { RPL_NEWHOSTIS, "%s: %s host %s - [%s@%s]" },
 /* 286 */
-  { 0 },
+  { RPL_CHKHEAD, ":Information for %s %s", "286" },
 /* 287 */
-  { 0 },
+  { RPL_CHANUSER, ":    %s%s (%s@%s)   (%s) %s", "287" },
 /* 288 */
   { 0 },
 /* 289 */
   { 0 },
 /* 290 */
-  { 0 },
+  { RPL_DATASTR, ":%s", "290" },
 /* 291 */
-  { 0 },
+  { RPL_ENDOFCHECK, ":%s", "291" },
 /* 292 */
-  { 0 },
+  { ERR_SEARCHNOMATCH, ":%s %s No matching record(s) found", "292" },
 /* 293 */
   { 0 },
 /* 294 */
@@ -704,7 +704,7 @@ static Numeric replyTable[] = {
 /* 335 */
   { RPL_WHOISACCOUNTONLY, "%s :Only accepts messages from registered users.", "335" },
 /* 336 */
-  { RPL_WHOISBOT, "%s :is a Bot", "336" },
+  { RPL_WHOISBOT, "%s :is a bot", "336" },
 /* 337 */
   { RPL_WHOISSSL, "%s :is connected via SSL", "337" },
 /* 338 */
@@ -852,7 +852,7 @@ static Numeric replyTable[] = {
 /* 409 */
   { ERR_NOORIGIN, ":No origin specified", "409" },
 /* 410 */
-  { 0 },
+  { ERR_NOMULTITARGET, "%s :Cannot send to channel (no multi target messages)", "410" },
 /* 411 */
   { ERR_NORECIPIENT, ":No recipient given (%s)", "411" },
 /* 412 */
@@ -970,7 +970,7 @@ static Numeric replyTable[] = {
 /* 468 */
   { ERR_INVALIDUSERNAME, 0, "468" },
 /* 469 */
-  { ERR_SSLONLYCHAN, "%s :Cannot join channel (+S)", "469" },
+  { ERR_SSLONLYCHAN, "%s :Cannot join channel (+z)", "469" },
 /* 470 */
   { ERR_OPERONLYCHAN, "%s :Cannot join channel (+O)", "470" },
 /* 471 */
@@ -1000,9 +1000,9 @@ static Numeric replyTable[] = {
 /* 483 */
   { ERR_CANTKILLSERVER, ":You can't kill a server!", "483" },
 /* 484 */
-  { ERR_ISCHANSERVICE, "%s %s :Cannot kill, kick or deop a network service", "484" },
+  { ERR_ISCHANSERVICE, "%s %s :Cannot kill, kick or deop an IRC operator", "484" },
 /* 485 */
-  { 0 },
+  { ERR_ISREALSERVICE, "%s %s :Cannot kill, kick or deop a network service", "485" },
 /* 486 */
   { ERR_ACCOUNTONLY, "%s :You need to login to services to %s %s", "486" },
 /* 487 */
@@ -1034,7 +1034,7 @@ static Numeric replyTable[] = {
 /* 500 */
   { 0 },
 /* 501 */
-  { ERR_UMODEUNKNOWNFLAG, ":Unknown MODE flag", "501" },
+  { ERR_UMODEUNKNOWNFLAG, "%c :Unknown User mode flag", "501" },
 /* 502 */
   { ERR_USERSDONTMATCH, ":Can't change mode for other users", "502" },
 /* 503 */

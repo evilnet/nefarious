@@ -565,7 +565,7 @@ struct Message msgtab[] = {
     TOK_DNS,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_unregistered, m_dns, m_dns, m_dns, m_ignore }
+    { m_unregistered, m_ignore, m_ignore, m_dns, m_ignore }
   },
   {
     MSG_REHASH,
@@ -651,6 +651,13 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_sethost, m_ignore, m_sethost, m_ignore }
   },
+  {
+    MSG_CHECK,
+    TOK_CHECK,
+    0, MAXPARA, MFLG_SLOW, 0,
+    { m_unregistered, m_not_oper, mo_check, mo_check, m_ignore }
+  },
+
   /* This command is an alias for QUIT during the unregistered part of
    * of the server.  This is because someone jumping via a broken web
    * proxy will send a 'POST' as their first command - which we will

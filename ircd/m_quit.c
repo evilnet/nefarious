@@ -100,6 +100,9 @@
  */
 int m_quit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  int hascolour = -1;
+  char *quitnocolour = 0;
+
   assert(0 != cptr);
   assert(0 != sptr);
   assert(cptr == sptr);
@@ -108,10 +111,19 @@ int m_quit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     struct Membership* chan;
     for (chan = cli_user(sptr)->channel; chan; chan = chan->next_channel) {
       if (!IsZombie(chan) && (!member_can_send_to_channel(chan)
-	  || (chan->channel->mode.mode & MODE_NOQUITPARTS)
-	  || ((chan->channel->mode.mode & MODE_NOCOLOUR)
-	  && IsColor(parv[parc - 1]))))
-        return exit_client(cptr, sptr, sptr, "Signed off");
+	  || (chan->channel->mode.mode & MODE_NOQUITPARTS)))
+        return exit_client(cptr, sptr, sptr, "Quit");
+      if (parc > 1 && !BadPtr(parv[parc - 1])) {
+	if (hascolour == -1) hascolour = HasColour(parv[parc - 1]);
+	if (hascolour) {
+	  if (chan->channel->mode.mode & MODE_NOCOLOUR)
+	    return exit_client(cptr, sptr, sptr, "Quit");
+	  else if (chan->channel->mode.mode & MODE_STRIP) {
+	    if (!quitnocolour) quitnocolour = (char*)StripColour(parv[parc - 1], 0);
+	    return exit_client_msg(cptr, sptr, sptr, "Quit: %s", quitnocolour);
+	  }
+	}
+      }
     }
   }
   if (parc > 1 && !BadPtr(parv[parc - 1]))

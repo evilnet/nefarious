@@ -158,7 +158,8 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
 int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Channel *chptr;
-  char *topic = 0, *name, *p = 0;
+  char *topic = 0, *name, *p = 0, *topicnocolour = 0;
+  int hascolour = -1;
 
   if (parc < 2)
     return need_more_params(sptr, "TOPIC");
@@ -193,8 +194,25 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		   chptr->topic_time);
       }
     }
-    else 
-     do_settopic(sptr,cptr,chptr,topic,0);
+    else {
+      if (chptr->mode.mode & MODE_NOCOLOUR) {
+	if (hascolour == -1) hascolour = HasColour(topic);
+	if (hascolour) {
+	  send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+	  continue;
+	}
+      }
+      else if (chptr->mode.mode & MODE_STRIP) {
+	if (hascolour == -1) hascolour = HasColour(topic);
+	if (hascolour) {
+	  if (!topicnocolour) topicnocolour = (char*)StripColour(topic, 0);
+	  do_settopic(sptr,cptr,chptr,topicnocolour,0);
+	  continue;
+	}
+      }
+      /* (kind of) fallthrough */
+      do_settopic(sptr,cptr,chptr,topic,0);
+    }
   }
   return 0;
 }

@@ -277,7 +277,15 @@ int mo_kill(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   /*
    * if the user is +k, prevent a kill from local user
    */
-  if (IsChannelService(victim))
+  /*
+   * ASUKA_X:
+   * Allow +X'ed users to kill +k'ed, but not U-lined services.
+   * --Bigfoot
+   */
+  if (IsChannelService(victim) && IsService(cli_user(victim)->server))
+    return send_reply(sptr, ERR_ISREALSERVICE, "KILL", cli_name(victim));
+
+  if (IsChannelService(victim) && !IsXtraOp(sptr) && !(victim==sptr))
     return send_reply(sptr, ERR_ISCHANSERVICE, "KILL", cli_name(victim));
 
 

@@ -257,13 +257,13 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	     case ERR_NOOPERHOST:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		     "Failed OPER attempt by %s (%s@%s) (No O:line)", 
-		     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
+		     parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
 		     return 0;
 		     break;
 	     case ERR_PASSWDMISMATCH:
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 	             "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
-		     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
+		     parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
 		     return 0;
 		     break;
 	     case 0: /* Authentication successful */
@@ -271,7 +271,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 			     send_reply(sptr, ERR_NOOPERHOST);
 		             sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
 			     "Failed OPER attempt by %s (%s@%s) (Local Oper)",
-			     parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
+			     parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
 			     return 0;
 		     }
 		     SetRemoteOper(sptr);
@@ -283,7 +283,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		     send_reply(sptr, RPL_YOUREOPER);
 		     sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
 		         "%s (%s@%s) is now operator (O)",
-                         parv[0], cli_user(sptr)->realusername, cli_user(sptr)->host);
+                         parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
 		     return 0;
 		     break;
 	     default:

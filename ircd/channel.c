@@ -68,8 +68,6 @@ const char* const PartFmt2     = ":%s " MSG_PART " %s :%s";
 const char* const PartFmt1serv = "%s%s " TOK_PART " %s";
 const char* const PartFmt2serv = "%s%s " TOK_PART " %s :%s";
 
-char modebuf[MODEBUFLEN];
-char parabuf[MODEBUFLEN];
 
 static struct SLink* next_ban;
 static struct SLink* prev_ban;
@@ -674,9 +672,9 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
   struct Membership *member;
   assert(0 != cptr); 
   /*
-   * Servers and channel services can always speak on channels.
+   * Servers, channel services, and +X can always speak on channels.
    */
-  if (IsServer(cptr) || IsChannelService(cptr))
+  if (IsServer(cptr) || IsChannelService(cptr) || IsXtraOp(cptr))
     return 1;
 
   member = find_channel_member(cptr, chptr);
@@ -741,6 +739,8 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'r';
   if (chptr->mode.mode & MODE_NOCOLOUR)
     *mbuf++ = 'c';
+  else if (chptr->mode.mode & MODE_STRIP)
+    *mbuf++ = 'S';
   if (chptr->mode.mode & MODE_NOCTCP)
     *mbuf++ = 'C';
   if (chptr->mode.mode & MODE_ACCONLY)
@@ -752,7 +752,9 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
   if (chptr->mode.mode & MODE_NOQUITPARTS)
     *mbuf++ = 'Q';
   if (chptr->mode.mode & MODE_SSLONLY)
-    *mbuf++ = 'S';
+    *mbuf++ = 'z';
+  if (chptr->mode.mode & MODE_NOAMSG)
+    *mbuf++ = 'T';
   if (chptr->mode.limit) {
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
@@ -762,7 +764,7 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'k';
     if (chptr->mode.limit)
       strcat(pbuf, " ");
-    if (is_chan_op(cptr, chptr) || IsServer(cptr)) {
+    if (is_chan_op(cptr, chptr) || IsServer(cptr) || IsOper(cptr)) {
       strcat(pbuf, chptr->mode.key);
     } else
       strcat(pbuf, "*");
@@ -1068,6 +1070,14 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
       && compall("OVERRIDE",chptr->mode.key) != 0)
     overrideJoin = MAGIC_OPER_OVERRIDE;
 
+  /*
+   * ASUKA_X:
+   * Allow XtraOpers to join all channels.
+   * --Bigfoot
+   */
+  if (IsXtraOp(sptr))
+    return 0;
+
   if (chptr->mode.mode & MODE_INVITEONLY)
   	return overrideJoin + ERR_INVITEONLYCHAN;
 
@@ -1221,8 +1231,9 @@ void del_invite(struct Client *cptr, struct Channel *chptr)
 /* List and skip all channels that are listen */
 void list_next_channels(struct Client *cptr, int nr)
 {
-  char tempbuff[KEYLEN + 8 + 3 + 1 + 3 + 6];
-  char modestuff[TOPICLEN + 3 + KEYLEN + 8 + 3 + 1 + 6];
+  char modebuf[MODEBUFLEN];
+  char parabuf[MODEBUFLEN];
+  char modestuff[TOPICLEN + MODEBUFLEN + 4];
   struct ListingArgs *args = cli_listing(cptr);
   struct Channel *chptr = args->chptr;
   chptr->mode.mode &= ~MODE_LISTED;
@@ -1240,11 +1251,21 @@ void list_next_channels(struct Client *cptr, int nr)
           chptr->topic_time < args->max_topic_time)))
       {
         if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr)) {
-	  *modebuf = *parabuf = '\0';
-	  modebuf[1] = '\0';
-	  channel_modes(cptr, modebuf, parabuf, sizeof(parabuf), chptr);
-	  ircd_snprintf(0, tempbuff, MODEBUFLEN, "[%s %s]", modebuf, parabuf);
-	  ircd_snprintf(0, modestuff, MODEBUFLEN + TOPICLEN + 4, "%s %s", tempbuff, chptr->topic);
+	  modebuf[0] = '\0';
+	  parabuf[0] = '\0';
+	  channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
+	  if (modebuf[1] != '\0') {
+	    strcat(modestuff, "[");
+	    if (*parabuf) {
+	      strcat(modestuff, modebuf);
+	      strcat(modestuff, " ");
+	      strcat(modestuff, parabuf);
+	    } else {
+	      strcat(modestuff, modebuf);
+	    }
+	    strcat(modestuff, "] ");
+	  }
+	  strcat(modestuff, chptr->topic);
 	  send_reply(cptr, RPL_LIST, chptr->chname, chptr->users,
 		     modestuff);
 	}
@@ -1410,12 +1431,14 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
 /*  MODE_BAN,		'b', */
 /*  MODE_LIMIT,		'l', */
     MODE_NOCOLOUR,	'c',
+    MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'S',
+    MODE_SSLONLY,	'z',
+    MODE_NOAMSG,	'T',
     0x0, 0x0
   };
   int i;
@@ -1777,7 +1800,8 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
   mode &= (MODE_ADD | MODE_DEL | MODE_PRIVATE | MODE_SECRET | MODE_MODERATED |
 	   MODE_TOPICLIMIT | MODE_INVITEONLY | MODE_NOPRIVMSGS | MODE_REGONLY |
 	   MODE_NOCOLOUR | MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
-	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY);
+	   MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
+	   MODE_STRIP | MODE_NOAMSG);
 
   if (!(mode & ~(MODE_ADD | MODE_DEL))) /* don't add empty modes... */
     return;
@@ -1882,12 +1906,14 @@ modebuf_extract(struct ModeBuf *mbuf, char *buf)
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
+    MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'S',
+    MODE_SSLONLY,	'z',
+    MODE_NOAMSG,	'T',
     0x0, 0x0
   };
   unsigned int add;
@@ -2452,17 +2478,28 @@ mode_process_clients(struct ParseState *state)
     if ((state->cli_change[i].flag & (MODE_DEL | MODE_CHANOP)) ==
 	(MODE_DEL | MODE_CHANOP)) {
       /* prevent +k users from being deopped */
-      if (IsChannelService(state->cli_change[i].client)) {
+      /*
+       * ASUKA_X:
+       * Allow +X'ed users to mess with +k'ed.
+       * --Bigfoot
+       */
+      if ((IsChannelService(state->cli_change[i].client) && IsService(cli_user(state->cli_change[i].client)->server)) || (IsChannelService(state->cli_change[i].client) && !IsXtraOp(state->sptr))) {
 	if (state->flags & MODE_PARSE_FORCE) /* it was forced */
 	  sendto_opmask_butone(0, SNO_HACK4, "Deop of +k user on %H by %s",
 			       state->chptr,
 			       (IsServer(state->sptr) ? cli_name(state->sptr) :
 				cli_name((cli_user(state->sptr))->server)));
 
-	else if (MyUser(state->sptr) && state->flags & MODE_PARSE_SET) {
-	  send_reply(state->sptr, ERR_ISCHANSERVICE,
-		     cli_name(state->cli_change[i].client),
-		     state->chptr->chname);
+	else if (MyUser(state->sptr) && state->flags & MODE_PARSE_SET && (state->sptr != state->cli_change[i].client)) {
+	  if(IsService(cli_user(state->cli_change[i].client)->server) && IsChannelService(state->cli_change[i].client)){
+	    send_reply(state->sptr, ERR_ISREALSERVICE,
+		       cli_name(state->cli_change[i].client),
+		       state->chptr->chname);
+	  }else{
+	    send_reply(state->sptr, ERR_ISCHANSERVICE,
+		       cli_name(state->cli_change[i].client),
+		       state->chptr->chname);
+	  }
 	  continue;
 	}
       }
@@ -2522,6 +2559,13 @@ mode_parse_mode(struct ParseState *state, int *flag_p)
       state->add &= ~MODE_SECRET;
       state->del |= MODE_SECRET;
     }
+    if (flag_p[0] & MODE_NOCOLOUR) {
+      state->add &= ~MODE_STRIP;
+      state->del |= MODE_STRIP;
+    } else if (flag_p[0] & MODE_STRIP) {
+      state->add &= ~MODE_NOCOLOUR;
+      state->del |= MODE_NOCOLOUR;
+    }
   } else {
     state->add &= ~flag_p[0];
     state->del |= flag_p[0];
@@ -2555,12 +2599,14 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
+    MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'S',
+    MODE_SSLONLY,	'z',
+    MODE_NOAMSG,	'T',
     MODE_ADD,		'+',
     MODE_DEL,		'-',
     0x0, 0x0
@@ -2656,7 +2702,7 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
 	  break;
 	}
 
-      case 'S':
+      case 'z':
         /* If they're not an chan op and SSL user, they can't
 	 * +/- MODE_SSLONLY.
 	 */
@@ -2815,12 +2861,12 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
     if (!(flags & CHFL_ZOMBIE))
       sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_PART, chan, NULL,
 				       ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
-					|| !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && IsColor(jbuf->jb_comment))) ?
+					|| !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && HasColour(jbuf->jb_comment))) ?
 				       "%H" : "%H :%s", chan, jbuf->jb_comment);
     else if (MyUser(jbuf->jb_source))
       sendcmdto_one(jbuf->jb_source, CMD_PART, jbuf->jb_source,
 		    ((flags & CHFL_BANNED) || (chan->mode.mode & MODE_NOQUITPARTS)
-		     || !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && IsColor(jbuf->jb_comment))) ?
+		     || !jbuf->jb_comment || ((chan->mode.mode & MODE_NOCOLOUR) && HasColour(jbuf->jb_comment))) ?
 		    "%H" : "%H :%s", chan, jbuf->jb_comment);
     /* XXX: Shouldn't we send a PART here anyway? */
     /* to users on the channel?  Why?  From their POV, the user isn't on
@@ -2842,7 +2888,7 @@ joinbuf_join(struct JoinBuf *jbuf, struct Channel *chan, unsigned int flags)
 			    "%H %Tu", chan, chan->creationtime);
 
     /* Send the notification to the channel */
-    sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_JOIN, chan, NULL, ":%H", chan);
+    sendcmdto_channel_butserv_butone(jbuf->jb_source, CMD_JOIN, chan, NULL, "%H", chan);
 
     /* send an op, too, if needed */
     if (!MyUser(jbuf->jb_source) && jbuf->jb_type == JOINBUF_TYPE_CREATE)
@@ -2928,7 +2974,7 @@ int IsInvited(struct Client* cptr, struct Channel* chptr)
   return 0;
 }
 
-int IsColor(char *text)
+int HasCntrl(char *text)
 {
 	int j, found = 0;
 
@@ -2940,3 +2986,51 @@ int IsColor(char *text)
 	return 0;
 }
 
+int HasColour(const char* text)
+{
+  const char *tmp;
+  for (tmp = text; (*tmp); tmp++) {
+    if (*tmp & 224) continue;
+    switch (*tmp) {
+      case COLOUR_BOLD:
+      case COLOUR_REVERSE:
+      case COLOUR_UNDERLINE:
+      case COLOUR_NORMAL:
+      case COLOUR_COLOUR:
+	return 1;
+      default:;
+    }
+  }
+  return 0;
+}
+
+const char* StripColour(const char* text)
+{
+  static char stripped[BUFSIZE];
+  const char *src;
+  char *dest;
+
+  dest = stripped;
+  for (src = text; (*src); src++) {
+    switch (*src) {
+      case COLOUR_BOLD:
+      case COLOUR_REVERSE:
+      case COLOUR_UNDERLINE:
+      case COLOUR_NORMAL:
+	break;
+      case COLOUR_COLOUR:
+	if (!IsDigit(src[1])) break;
+	src++;
+	if (IsDigit(src[1])) src++;
+	if (src[1]==',' && IsDigit(src[2])) src+=2;
+	else break;
+	if (IsDigit(src[1])) src++;
+	break;
+      default:
+	*dest++ = *src;
+    }
+  }
+
+  *dest = '\0';
+  return (const char*) stripped;
+}

@@ -194,7 +194,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       continue;
 
     /* bad channel name */
-    if ((!IsChannelName(name)) || (IsColor(name))) {
+    if ((!IsChannelName(name)) || (HasCntrl(name))) {
       send_reply(sptr, ERR_NOSUCHCHANNEL, name);
       continue;
     }
@@ -216,7 +216,9 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       flags = CHFL_CHANOP;
 
     /* disallow creating local channels */
-    if (IsLocalChannel(name) && !chptr && !feature_bool(FEAT_LOCAL_CHANNELS)) {
+    if (IsLocalChannel(name) && !chptr &&
+	(!feature_bool(FEAT_LOCAL_CHANNELS) ||
+	(feature_bool(FEAT_OPER_LOCAL_CHANNELS) && !IsAnOper(sptr))) {
 	send_reply(sptr, ERR_NOSUCHCHANNEL, name);
 	continue;
     }
@@ -258,7 +260,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    break;
 
 	  case ERR_SSLONLYCHAN:
-	    i = 'S';
+	    i = 'z';
 	    break;
 
 	  default:

@@ -143,7 +143,7 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   clean_channelname(name);
 
   /* bad channel name */
-  if ((!IsChannelName(name)) || (IsColor(name)))
+  if ((!IsChannelName(name)) || (HasCntrl(name)))
     return 0;
 
   if (chptr->users == 0) {

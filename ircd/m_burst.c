@@ -104,6 +104,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+static char* getkeyfromburst(char *parv[], int param)
+{
+  char* ch = parv[param];
+  for(;*ch;ch++) {
+    if (*ch == 'k') {param++; return parv[param]; };
+    if (*ch == 'l') param++;
+  }	
+  return 0;
+}
+
 /*
  * ms_burst - server message handler
  *
@@ -167,6 +177,9 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       if (parv[param][0] != '+')
         continue;
       if (strchr(parv[param], 'i') || strchr(parv[param], 'k')) {
+	if (strchr(parv[param], 'k') && (*chptr->mode.key) && !strchr(parv[param], 'i'))
+	  if (!ircd_strcmp(chptr->mode.key, getkeyfromburst(parv,param)))
+	    continue;
         /* Clear any outstanding rogue invites */
         mode_invite_clear(chptr);
         for (member = chptr->members; member; member = nmember) {
@@ -204,7 +217,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 			  MODE_MODERATED | MODE_TOPICLIMIT | MODE_INVITEONLY |
 			  MODE_NOPRIVMSGS | MODE_REGONLY | MODE_NOCOLOUR |
 			  MODE_NOCTCP | MODE_ACCONLY | MODE_NONOTICE |
-			  MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY);
+			  MODE_OPERONLY | MODE_NOQUITPARTS | MODE_SSLONLY |
+			  MODE_STRIP | MODE_NOAMSG);
 
     parse_flags |= (MODE_PARSE_SET | MODE_PARSE_WIPEOUT); /* wipeout keys */
 

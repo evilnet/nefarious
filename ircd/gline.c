@@ -90,9 +90,8 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
 {
   struct Gline *gline, *sgline, *after = 0;
 
-  if (!(flags & GLINE_BADCHAN)&&*user!='$') { 
-	  /* search for overlapping glines first, skipping badchans and 
-	   * special $ glines. 
+  if (!(flags & GLINE_BADCHAN)) { 
+	  /* search for overlapping glines first, skipping badchans 
 	   */
     for (gline = GlobalGlineList; gline; gline = sgline) {
       sgline = gline->gl_next;
@@ -101,15 +100,19 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
 	gline_free(gline);
       else if ((gline->gl_flags & GLINE_LOCAL) != (flags & GLINE_LOCAL))
 	continue;
-      else if (!mmatch(gline->gl_user, user) && /* gline contains new mask */
-	       !mmatch(gline->gl_host, host)) {
+      else if ( /* Both have gl_host set, or unset */
+		!((NULL == gline->gl_host) ^ (NULL==host))
+		&& !mmatch(gline->gl_user, user) /* gline contains new mask */
+		&& (gline->gl_host == NULL || !mmatch(gline->gl_host, host))) {
 	if (expire <= gline->gl_expire) /* will expire before wider gline */
 	  return 0;
 	else
 	  after = gline; /* stick new gline after this one */
-      } else if (!mmatch(user, gline->gl_user) && /* new mask contains gline */
-		 gline->gl_host && !mmatch(host, gline->gl_host) &&
-		 gline->gl_expire <= expire) /* gline expires before new one */
+      } else if (
+		 !((NULL == gline->gl_host) ^ (NULL==host))
+		 && !mmatch(user, gline->gl_user) /* new mask contains gline */
+		 && (gline->gl_host==NULL || !mmatch(host, gline->gl_host)) 
+		 && gline->gl_expire <= expire) /* old expires before new */
 	gline_free(gline); /* save some memory */
     }
   }
@@ -145,7 +148,7 @@ make_gline(char *user, char *host, char *reason, time_t expire, time_t lastmod,
       int bits2 = 0;
       char *ch;
       int seenwild;
-      int badmask = 0;
+      int badmask=0;
       
       /* Sanity check for dodgy IP masks 
        * Any mask featuring a digit after a wildcard will 
@@ -421,7 +424,7 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
   /* NO_OLD_GLINE allows *@#channel to work correctly */
   if (*userhost == '#' || *userhost == '&'
 # ifndef NO_OLD_GLINE
-      || userhost[2] == '#' || userhost[2] == '&'
+      || ((userhost[2] == '#' || userhost[2] == '&') && (userhost[1] == '@'))
 # endif /* OLD_GLINE */
       ) {
     if ((flags & GLINE_LOCAL) && !HasPriv(sptr, PRIV_LOCAL_BADCHAN))
@@ -429,7 +432,7 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
 
     flags |= GLINE_BADCHAN;
 # ifndef NO_OLD_GLINE
-    if (userhost[2] == '#' || userhost[2] == '&')
+    if ((userhost[2] == '#' || userhost[2] == '&') && (userhost[1] == '@'))
       user = userhost + 2;
     else
 # endif /* OLD_GLINE */
@@ -764,8 +767,9 @@ gline_burst(struct Client *cptr)
     if (gline->gl_expire <= CurrentTime) /* expire any that need expiring */
       gline_free(gline);
     else if (!GlineIsLocal(gline) && gline->gl_lastmod)
-      sendcmdto_one(&me, CMD_GLINE, cptr, "* %c%s@%s %Tu %Tu :%s",
+      sendcmdto_one(&me, CMD_GLINE, cptr, "* %c%s%s%s %Tu %Tu :%s",
 		    GlineIsRemActive(gline) ? '+' : '-', gline->gl_user,
+		    gline->gl_host ? "@" : "",
 		    gline->gl_host ? gline->gl_host : "", 
 		    gline->gl_expire - CurrentTime, gline->gl_lastmod, 
 		    gline->gl_reason);
@@ -860,8 +864,9 @@ gline_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
 
     if (gline->gl_expire <= CurrentTime)
       gline_free(gline);
-    else if (!GlineIsRealName(gline))
-      send_reply(sptr, RPL_STATSGLINE, 'G', gline->gl_user, gline->gl_host,
+    send_reply(sptr, RPL_STATSGLINE, 'G', gline->gl_user, 
+		 gline->gl_host ? "@" : "",
+		 gline->gl_host ? gline->gl_host : "",
 		 gline->gl_expire + TSoffset, gline->gl_reason);
   }
 }

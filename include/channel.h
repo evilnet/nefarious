@@ -93,10 +93,12 @@ struct Client;
 #define MODE_ACCONLY		0x10000 /* only +r users may speak */
 #define MODE_OPERONLY		0x20000 /* only opers may join */
 #define MODE_NONOTICE		0x40000 /* no notice allowed towards chan */
-#define MODE_LISTED		0x80000
-#define MODE_SAVE		0x100000 /* save this mode-with-arg 'til later */
-#define MODE_FREE		0x200000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED		0x400000 /* channel was created by a BURST */
+#define MODE_STRIP		0x80000 /* strip color from text */
+#define MODE_NOAMSG		0x100000 /* no multi target messages/notices */
+#define MODE_LISTED		0x200000
+#define MODE_SAVE		0x400000 /* save this mode-with-arg 'til later */
+#define MODE_FREE		0x800000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x1000000 /* channel was created by a BURST */
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
@@ -157,6 +159,14 @@ typedef enum ChannelGetType {
  * used in can_join to determine if an oper forced a join on a channel
  */
 #define MAGIC_OPER_OVERRIDE 1000
+
+
+/* Colour Characters */
+#define COLOUR_BOLD		2
+#define COLOUR_COLOUR		3
+#define COLOUR_NORMAL		15
+#define COLOUR_REVERSE		22
+#define COLOUR_UNDERLINE	31
 
 
 extern const char* const PartFmt1;
@@ -299,7 +309,9 @@ extern int             LocalChanOperMode;
 /*
  * Proto types
  */
-int IsColor(char *text);
+int HasCntrl(char* text);
+int HasColour(const char* text);
+const char* StripColour(const char* text);
 
 extern void clean_channelname(char* name);
 extern void channel_modes(struct Client *cptr, char *mbuf, char *pbuf,
@@ -346,6 +358,9 @@ extern int is_chan_op(struct Client *cptr, struct Channel *chptr);
 extern int is_zombie(struct Client *cptr, struct Channel *chptr);
 extern int has_voice(struct Client *cptr, struct Channel *chptr);
 extern int IsInvited(struct Client* cptr, struct Channel* chptr);
+extern int HasCntrl(char* text);
+extern int HasColour(const char* text);
+extern const char* StripColour(const char* text);
 extern void send_channel_modes(struct Client *cptr, struct Channel *chptr);
 extern char *pretty_mask(char *mask);
 extern void del_invite(struct Client *cptr, struct Channel *chptr);

@@ -125,12 +125,14 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
     MODE_LIMIT,		'l',
     MODE_REGONLY,	'r',
     MODE_NOCOLOUR,	'c',
+    MODE_STRIP,		'S',
     MODE_NOCTCP,	'C',
     MODE_ACCONLY,	'M',
     MODE_NONOTICE,	'N',
     MODE_OPERONLY,	'O',
     MODE_NOQUITPARTS,	'Q',
-    MODE_SSLONLY,	'S',
+    MODE_SSLONLY,	'z',
+    MODE_NOAMSG,	'T',
     0x0, 0x0
   };
   int *flag_p;
@@ -282,7 +284,7 @@ int
 mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Channel *chptr;
-  char *control = "ovpsmikblrcCMNOQS"; /* default control string */
+  char *control = "ovpsmikblrcCMNOQSTz"; /* default control string */
   char *chname, *qreason;
   struct Membership *tmp;
   int force = 0;
@@ -311,18 +313,20 @@ mo_clearmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!(chptr = FindChannel(chname)))
     return send_reply(sptr, ERR_NOSUCHCHANNEL, chname);
 
-  if (!force && (qreason = find_quarantine(chptr->chname)))
-    return send_reply(sptr, ERR_QUARANTINED, chptr->chname, qreason);
-  for (tmp = chptr->members; tmp; tmp = tmp->next_member)
-    if (IsChannelService(tmp->user)) {
-    /* Impersonate the abuser */
-    sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
-			    "Failed CLEARMODE for registered channel %s by %s",
-			    chptr->chname, sptr->cli_name);
-    return send_reply(sptr, ERR_QUARANTINED, chptr->chname,
-		      "This channel is registered.");
+  if (!force) {
+    if (qreason = find_quarantine(chptr->chname))
+      return send_reply(sptr, ERR_QUARANTINED, chptr->chname, qreason);
 
-   }
+    for (tmp = chptr->members; tmp; tmp = tmp->next_member)
+      if (IsChannelService(tmp->user)) {
+	/* Impersonate the abuser */
+	sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+				"Failed CLEARMODE for registered channel %s by %s",
+				chptr->chname, sptr->cli_name);
+	return send_reply(sptr, ERR_QUARANTINED, chptr->chname,
+			  "This channel is registered.");
+      }
+  }
     
   return do_clearmode(cptr, sptr, chptr, control);
 }

@@ -580,6 +580,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
     cli_handler(sptr) = CLIENT_HANDLER;
     release_dns_reply(sptr);
 
+    SetLocalNumNick(sptr);
+
     send_reply(
 	sptr,
 	RPL_WELCOME,
@@ -593,7 +595,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
      */
     send_reply(sptr, RPL_YOURHOST, cli_name(&me), version);
     send_reply(sptr, RPL_CREATED, creation);
-    send_reply(sptr, RPL_MYINFO, cli_name(&me), version);
+    send_reply(sptr, RPL_MYINFO, cli_name(&me), infousermodes, infochanmodes,
+	       infochanmodeswithparams, version);
     send_supported(sptr);
     m_lusers(sptr, sptr, 1, parv);
     update_load();
@@ -603,10 +606,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
       set_snomask(sptr, cli_snomask(sptr) & SNO_NOISY, SNO_ADD);
     if (feature_bool(FEAT_CONNEXIT_NOTICES))
       sendto_opmask_butone(0, SNO_CONNEXIT,
-			   "Client connecting: %s (%s@%s) [%s] {%d} [%s]",
+			   "Client connecting: %s (%s@%s) [%s] {%d} [%s] <%s%s>",
 			   cli_name(sptr), user->username, user->host,
 			   cli_sock_ip(sptr), get_client_class(sptr),
-			   cli_info(sptr)
+			   cli_info(sptr),
+			   NumNick(cptr) /* Two %'s */
 			   );
     IPcheck_connect_succeeded(sptr);
   }
@@ -686,7 +690,10 @@ static const struct UserMode {
   { FLAG_HIDDENHOST,  'x' },
   { FLAG_SETHOST,     'h' },
   { FLAG_ACCOUNTONLY, 'R' },
-  { FLAG_BOT,         'B' }
+  { FLAG_BOT,         'B' },
+  { FLAG_XTRAOP,      'X' },
+  { FLAG_NOCHAN,      'n' },
+  { FLAG_NOIDLE,      'I' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -855,7 +862,6 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       cli_user(sptr) = make_user(sptr);
       cli_user(sptr)->server = &me;
     }
-    SetLocalNumNick(sptr);
     hAddClient(sptr);
 
     /*
@@ -1518,6 +1524,24 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
         else
           ClearChannelService(acptr);
         break;
+      case 'X':
+        if (what == MODE_ADD)
+          SetXtraOp(acptr);
+        else
+          ClearXtraOp(acptr);
+        break;
+      case 'n':
+        if (what == MODE_ADD)
+          SetNoChan(acptr);
+        else
+          ClearNoChan(acptr);
+        break;
+      case 'I':
+        if (what == MODE_ADD)
+          SetNoIdle(acptr);
+        else
+          ClearNoIdle(acptr);
+        break;
       case 'g':
         if (what == MODE_ADD)
           SetDebug(acptr);
@@ -1569,7 +1593,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	  ClearBot(acptr);
 	break;
       default:
-	send_reply(acptr, ERR_UNKNOWNMODE, *m);
+	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, *m);
         break;
       }
     }
@@ -1586,9 +1610,19 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     /*
      * new umode; servers can set it, local users cannot;
      * prevents users from /kick'ing or /mode -o'ing
+     *
+     * ASUKA: Allow opers to set +k.  Also, restrict +XnI to
+     * opers only also.
      */
-    if (!FlagHas(&setflags, FLAG_CHSERV))
+    if (!FlagHas(&setflags, FLAG_CHSERV) && !IsOper(acptr))
       ClearChannelService(acptr);
+    if (!FlagHas(&setflags, FLAG_XTRAOP) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_XTRAOP)))
+      ClearXtraOp(acptr);
+    if (!FlagHas(&setflags, FLAG_NOCHAN) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_HIDECHANS)))
+      ClearNoChan(acptr);
+    if (!FlagHas(&setflags, FLAG_NOIDLE) && !(IsOper(acptr) || feature_bool(FEAT_ASUKA_HIDEIDLE)))
+      ClearNoIdle(acptr);
+    
     /*
      * only send wallops to opers
      */

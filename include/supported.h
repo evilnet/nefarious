@@ -59,8 +59,12 @@
 			AWAYLEN, TOPICLEN
 
 #define FEATURESVALUES2 feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
-			"(ov)@+", "b,k,l,imnpstrcCMNOQS", "rfc1459", \
+			"(ov)@+", "b,k,l,imnpstrcCMNOQSTz", "rfc1459", \
 			feature_str(FEAT_NETWORK)
+
+#define infochanmodes "biklmnopstvrcCMNOQSTz"
+#define infochanmodeswithparams "bklov"
+#define infousermodes "dioswkgxhBRXIn"
 
 #endif /* INCLUDED_supported_h */
 
