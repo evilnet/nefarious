@@ -70,7 +70,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
    * This first: Almost never a server/service
    */
   if (!client_can_send_to_channel(sptr, chptr)) {
-    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
     return;
   }
 
@@ -94,7 +94,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
   if ((chptr->mode.mode & MODE_NOCTCP) && ircd_strncmp(text,"\001ACTION ",8))
     for (ch=text;*ch;)
       if (*ch++==1) { 
-	send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+	send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(No CTCP's (+C))");
 	return;
       }
 
@@ -126,7 +126,7 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
     return;
 
   if ((chptr->mode.mode & MODE_NONOTICE)) {
-    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(No Notices (+N))");
     return;
   }
 
@@ -139,14 +139,14 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
   if (chptr->mode.mode & MODE_NOCOLOUR)
     for (ch=text;*ch;ch++)
       if (*ch==3 || *ch==27) {
-        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(No Colors (+c))");
         return;
       }
   
   if ((chptr->mode.mode & MODE_NOCTCP) && ircd_strncmp(text,"\001ACTION ",8))
     for (ch=text;*ch;)
       if (*ch++==1) { 
-        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(No CTCP's (+C))");
         return;
       }
 
@@ -179,7 +179,7 @@ void server_relay_channel_message(struct Client* sptr, const char* name, const c
 			     SKIP_DEAF | SKIP_BURST, "%H :%s", chptr, text);
   }
   else
-    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
 }
 
 void server_relay_channel_notice(struct Client* sptr, const char* name, const char* text)

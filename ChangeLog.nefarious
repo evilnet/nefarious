@@ -3,6 +3,26 @@
 
 2005-01-24  Neil Spierling <sirvulcan@gmail.com>
 
+        * doc/example.conf: Added missing REMOTE_OPER.
+
+	* ircd/ircd_relay.c: Extended ERR_CANNOTSENDTOCHAN replies to
+	include a reason for some replies.
+
+	* ircd/m_oper.c: Implemented remote oper for admins.
+
+	* ircd/m_topic.c: ERR_CANNOTSENDTOCHAN extension.
+
+	* ircd/m_wallchops.c: ERR_CANNOTSENDTOCHAN extension.
+
+	* ircd/m_wallhops.c: ERR_CANNOTSENDTOCHAN extension.
+
+	* ircd/m_wallvoices.c: ERR_CANNOTSENDTOCHAN extension.
+
+	* ircd/s_err.c: Allow extra information to be added to
+	ERR_CANNOTSENDTOCHAN.
+
+2005-01-24  Neil Spierling <sirvulcan@gmail.com>
+
 	* ChangeLog.nefarious: Hey its jan not decemeber :).
 
 	* doc/example.conf: Added DISALLOW_CHMODE_L to prevent normal users

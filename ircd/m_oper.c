@@ -319,14 +319,25 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		  cli_user(sptr)->realhost);
 	   return 0;
 	 }
-	 SetRemoteOper(sptr);
-	 /* Tell client_set_privs to send privileges to the user */
+
 	 client_set_privs(sptr);
-	 sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr, "+oiwsg");
+
+         if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
+  	   SetRemoteOper(sptr);
+           ClearAdmin(sptr);
+  	   sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr, "+oiwsg");
+         } else {
+           SetRemoteOper(sptr);
+           OSetGlobal(sptr);
+           SetAdmin(sptr);
+  	   sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr, "+oiwsgA");
+         }
+	 /* Tell client_set_privs to send privileges to the user */
 	 send_reply(sptr, RPL_YOUREOPER);
 	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
-		"%s (%s@%s) is now operator (O)", parv[0],
-		cli_user(sptr)->realusername, cli_user(sptr)->realhost);
+		"%s (%s@%s) is now %s", parv[0],
+		cli_user(sptr)->realusername, cli_user(sptr)->realhost,
+                IsAdmin(sptr) ? "an IRC Administrator (A)" : "an IRC Operator (O)");
 		return 0;
 		break;
 	default:

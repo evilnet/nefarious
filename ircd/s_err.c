@@ -844,7 +844,7 @@ static Numeric replyTable[] = {
 /* 403 */
   { ERR_NOSUCHCHANNEL, "%s :No such channel", "403" },
 /* 404 */
-  { ERR_CANNOTSENDTOCHAN, "%s :Cannot send to channel", "404" },
+  { ERR_CANNOTSENDTOCHAN, "%s :Cannot send to channel %s", "404" },
 /* 405 */
   { ERR_TOOMANYCHANNELS, "%s :You have joined too many channels", "405" },
 /* 406 */

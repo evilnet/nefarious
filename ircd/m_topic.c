@@ -196,13 +196,13 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       }
       /* if chan +m and user not an exception, return error and ignore */
       if (!client_can_send_to_channel(sptr, chptr)) {
-        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+        send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(Moderated channel (+m))");
         continue;
       }
       if (chptr->mode.mode & MODE_NOCOLOUR) {
 	if (hascolour == -1) hascolour = HasColour(topic);
 	if (hascolour) {
-	  send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname);
+	  send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(Colors are disallowed (+c))");
 	  continue;
 	}
       }

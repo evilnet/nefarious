@@ -122,7 +122,7 @@ int m_wallvoices(struct Client* cptr, struct Client* sptr, int parc, char* parv[
 			       "%H :+ %s", chptr, parv[parc - 1]);
     }
     else
-      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1]);
+      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1], "");
   }
   else
     send_reply(sptr, ERR_NOSUCHCHANNEL, parv[1]);
@@ -148,7 +148,7 @@ int ms_wallvoices(struct Client* cptr, struct Client* sptr, int parc, char* parv
 			       SKIP_DEAF | SKIP_BURST | SKIP_NONVOICES, 
 			       "%H :%s", chptr, parv[parc - 1]);
     } else
-      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1]);
+      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1], "");
   }
   return 0;
 }

@@ -123,7 +123,7 @@ int m_wallchops(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
 			       "%H :@ %s", chptr, parv[parc - 1]);
     }
     else
-      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1]);
+      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1], "");
   }
   else
     send_reply(sptr, ERR_NOSUCHCHANNEL, parv[1]);
@@ -149,7 +149,7 @@ int ms_wallchops(struct Client* cptr, struct Client* sptr, int parc, char* parv[
 			       SKIP_DEAF | SKIP_BURST | SKIP_NONOPS,
 			       "%H :%s", chptr, parv[parc - 1]);
     } else
-      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1]);
+      send_reply(sptr, ERR_CANNOTSENDTOCHAN, parv[1], "");
   }
   return 0;
 }
