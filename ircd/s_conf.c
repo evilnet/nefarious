@@ -1012,6 +1012,12 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   int octcount = 0;
   unsigned int x_flag = 0;
 
+  /* Wierd sanity checks :) */
+  if (!sptr || !replyip || !checkhost) {
+    Debug((DEBUG_DEBUG, "find_blline missing parameter(s) aborting check."));
+    return 0;
+  }
+
   strcpy(ipl, replyip);
   for (oct = strtok_r(ipl, ".", &brktb);
        oct;
@@ -1036,7 +1042,6 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     x_flag = dflagstr(blline->flags);
 
     if (x_flag & DFLAG_BITMASK) {
-      Debug((DEBUG_DEBUG, "Bitmask DNSBL"));
       total = 0;
       strcpy(cstr, blline->replies);
 
@@ -1062,7 +1067,6 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
         }
       }
     } else if (x_flag & DFLAG_REPLY) {
-      Debug((DEBUG_DEBUG, "Reply DNSBL"));
       strcpy(cstr, blline->replies);
 
       for (csep = strtok_r(cstr, ",", &brkt); csep;

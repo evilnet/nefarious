@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-23  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_conf.c: Somehow find_blline was being called with missing
+	parameters, the results were quite nasty.
+
 2005-02-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_serv.c: We only want to send dnsbl info to the linking
