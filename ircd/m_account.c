@@ -252,7 +252,8 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
       SetAccount(acptr);
       ircd_strncpy(cli_user(acptr)->account, cli_loc(acptr)->account, ACCOUNTLEN);
       SetHiddenHost(acptr);
-      hide_hostmask(acptr);
+      if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
+        hide_hostmask(acptr);
     }
     
     sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :AUTHENTICATION %s as %s", acptr,
