@@ -16,7 +16,7 @@
 	* ircd/s_conf.c: Added support for Bitmask dnsbl's.
 
 	* ircd/s_err.c: Extended RPL_STATSXLINE so that the type can be
-	displayed
+	displayed.
 
 	* ircd/s_stats.c: See above.
 
