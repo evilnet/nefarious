@@ -238,8 +238,8 @@ do_mangle_gline(struct Client* cptr, struct Client* acptr,
       strcpy(reason, orig_reason);
     }
   } else {
-    ircd_snprintf(0, reason, BUFSIZE, "G-lined (<%s> %s)", sptr->cli_name,
-		  orig_reason);
+    ircd_snprintf(0, reason, sizeof(reason), "G-lined (<%s> %s)",
+		  sptr->cli_name, orig_reason);
   }
   return exit_client_msg(cptr, acptr, &me, reason);
 }

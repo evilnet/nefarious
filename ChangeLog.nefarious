@@ -1,3 +1,7 @@
+2003-10-26  Reed Loden  <reed@reedloden.com>
+
+	* ircd/m_ircops.c: Fix .Services stuff.
+
 2003-10-25  Reed Loden  <reed@reedloden.com>
 
 	* Sync with u2.10.11.05pre5.(part).(whois)
