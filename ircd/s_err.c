@@ -34,7 +34,7 @@ static Numeric replyTable[] = {
 /* 002 */
   { RPL_YOURHOST, ":Your host is %s, running version %s", "002" },
 /* 003 */
-  { RPL_CREATED, ":This server was created %s", "003" },
+  { RPL_CREATED, ":This server was last re(started) on %s%s%s", "003" },
 /* 004 */
   { RPL_MYINFO, "%s %s %s %s %s", "004" },
 /* 005 */

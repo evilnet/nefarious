@@ -618,7 +618,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
      * This is a duplicate of the NOTICE but see below...
      */
     send_reply(sptr, RPL_YOURHOST, cli_name(&me), version);
-    send_reply(sptr, RPL_CREATED, creation);
+
+    send_reply(sptr, RPL_CREATED, creation,
+        feature_str(FEAT_GEO_LOCATION) ? " and is located in " : "",
+        feature_str(FEAT_GEO_LOCATION) ? feature_str(FEAT_GEO_LOCATION) : "");
+
     send_reply(sptr, RPL_MYINFO, cli_name(&me), version, infousermodes,
 	       infochanmodes, infochanmodeswithparams);
     send_supported(sptr);

@@ -135,6 +135,13 @@ PROVIDER
 This string as added to the 001 numeric prefixed with "via" before the nick.
 It's used for providing promotional space to providers as per CFV-202
 
+GEO_LOCATION
+ * Type: string
+ * Default: NULL
+
+This string as added to the 003 numeric. It's used for providing the location of
+the server, eg "Staunton, MI, United States"
+
 KILL_IPMISMATCH
  * Type: boolean
  * Default: FALSE

@@ -1,3 +1,17 @@
+2004-06-15  Neil Spierling <vulcan@linux-boxen.org>
+
+	* doc/readme.features: Documented FEAT_GEO_LOCATION.
+
+	* include/ircd_features.h: Added in FEAT_GEO_LOCATION.
+
+	* ircd/ircd_features.c: Added in FEAT_GEO_LOCATION (default NULL).
+
+	* ircd/s_err.c: Modified RPL_CREATION, reworded it a bit and
+	added in GEO_LOCATION.
+
+	* ircd/s_user.c: Modifed RPL_CREATION so it sends out GEO_LOCATION
+	if its defined in ircd.conf (RFE 972237).
+
 2004-06-11  Rubin <rubin@afternet.org>
 
 	* ircd/m_nick.c: Removed X* nick blocking code for AfterNET

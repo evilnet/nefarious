@@ -428,6 +428,7 @@ static struct FeatureDesc {
   F_S(BADCHAN_REASON, 0, "This channel has been banned", 0),
   F_B(RULES, 0, 0, 0),
   F_B(OPERMOTD, 0, 0, 0),
+  F_S(GEO_LOCATION, FEAT_NULL, 0, 0),
 
 #undef F_S
 #undef F_B
