@@ -685,6 +685,7 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
   if (!member) {
     if ((chptr->mode.mode & (MODE_NOPRIVMSGS|MODE_MODERATED)) ||
 	((chptr->mode.mode & MODE_REGONLY) && !IsAccount(cptr)) ||
+	((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(cptr)) ||
 	((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(cptr)))
       return 0;
     else
