@@ -325,6 +325,44 @@ if test x"$unet_cv_enable_inlines" = xyes; then
     AC_DEFINE([FORCEINLINE], , [Force inlining for a few critical functions])
 fi
 
+dnl Now check for --with-cloakone
+AC_MSG_CHECKING([for custom cloak key one])
+AC_ARG_WITH([cloakone],
+[  --with-cloakone         The first cloak key used for crypting hosts (random if not given)],
+[unet_cv_with_cloakone=$with_cloakone],
+[AC_CACHE_VAL(unet_cv_with_cloakone,
+[unet_cv_with_cloakone=$RANDOM])])
+
+AC_MSG_RESULT([$unet_cv_with_cloakone (random if unspecified)])
+AC_DEFINE_UNQUOTED(KEY, $unet_cv_with_cloakone,
+[First key used for crypting hostnames under host hiding syle 2 (random if not given).])
+
+
+dnl Now check for --with-cloaktwo
+AC_MSG_CHECKING([for custom cloak key two])
+AC_ARG_WITH([cloaktwo],
+[  --with-cloaktwo         The second cloak key used for crypting hosts (random if not given)],
+[unet_cv_with_cloaktwo=$with_cloaktwo],
+[AC_CACHE_VAL(unet_cv_with_cloaktwo,
+[unet_cv_with_cloaktwo=$RANDOM])])
+
+AC_MSG_RESULT([$unet_cv_with_cloaktwo (random if unspecified)])
+AC_DEFINE_UNQUOTED(KEY2, $unet_cv_with_cloaktwo,
+[Second key used for crypting hostnames under host hiding syle 2 (random if not given).])
+
+
+dnl Now check for --with-cloakthree
+AC_MSG_CHECKING([for custom cloak key three])
+AC_ARG_WITH([cloakthree],
+[  --with-cloakthree       The third cloak key used for crypting hosts (random if not given)],
+[unet_cv_with_cloakthree=$with_cloakthree],
+[AC_CACHE_VAL(unet_cv_with_cloakthree,
+[unet_cv_with_cloakthree=$RANDOM])])
+
+AC_MSG_RESULT([$unet_cv_with_cloakthree (random if unspecified)])
+AC_DEFINE_UNQUOTED(KEY3, $unet_cv_with_cloakthree,
+[Third key used for crypting hostnames under host hiding syle 2 (random if not given).])
+
 
 dnl **
 dnl **  SSL Library checks (OpenSSL)

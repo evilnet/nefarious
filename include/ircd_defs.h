@@ -71,7 +71,7 @@
  * of greater than 63 characters are rejected by the server, and most FQDN's
  * are shorter. It is possible to have a valid FQDN longer than 63 characters.
  */
-#define HOSTLEN		63
+#define HOSTLEN		75
 /*
  * ACCOUNTLEN is the maximum length for the account name, which can be set
  * with the ACCOUNT (AC) command.  This is used for keeping track of who's

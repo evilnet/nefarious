@@ -91,6 +91,14 @@
 /* Define to be the maximum number of network connections */
 #undef MAXCONNECTIONS
 
+/* Key 1 used for crypting hostnames under host hiding syle 2. */ 
+#undef KEY
+
+/* Key 2 used for crypting hostnames under host hiding syle 2. */ 
+#undef KEY2
+
+/* Key 3 used for crypting hostnames under host hiding syle 2. */ 
+#undef KEY3
 
 /* Configuration file name */
 #undef CPATH

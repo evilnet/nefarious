@@ -238,6 +238,13 @@ This selects whether local users can set umode +x, thus allowing them
 to hide their hostname if they have also registered with a channel
 service (i.e. they have the ACCOUNT flag set).
 
+HOST_HIDING_STYLE
+ * Type: integer
+ * Default: 2
+
+Value 1 will give u hidden hosts of ie users.network.tld, Value 2 will
+give you Ultimate IRCd style hosts a43sd.a3523f.isp.tld.
+
 HIDDEN_HOST
  * Type: string
  * Default: users.undernet.org

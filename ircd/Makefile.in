@@ -87,6 +87,7 @@ IRCD_SRC = \
 	fileio.c \
 	gline.c \
 	hash.c \
+	hosthiding.c \
 	ircd.c \
 	ircd_alloc.c \
 	ircd_events.c \

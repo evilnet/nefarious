@@ -82,6 +82,7 @@
 
 #include "client.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
@@ -125,7 +126,10 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.", parv[2], ACCOUNTLEN, cli_name(acptr));
 
   ircd_strncpy(cli_user(acptr)->account, parv[2], ACCOUNTLEN);
-  hide_hostmask(acptr, FLAG_ACCOUNT);
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
+    hide_hostmask(acptr, FLAG_ACCOUNT);
+  else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2)
+    SetAccount(acptr);
 
   sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C %s", acptr,
 			cli_user(acptr)->account);

@@ -437,20 +437,33 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 				 cli_user(cptr)->username,
 				 cli_user(cptr)->realhost);
 
-  if (IsAccount(cptr)) {
-     if (HasHiddenHost(cptr) && !HasSetHost(cptr))
-        sa = make_nick_user_host(nu_accthost, cli_name(cptr),
-                                cli_user(cptr)->username,
-                                cli_user(cptr)->realhost);
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    if (IsAccount(cptr)) {
+       if (HasHiddenHost(cptr) && !HasSetHost(cptr))
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                  cli_user(cptr)->username,
+                                  cli_user(cptr)->realhost);
+       else {
+          ircd_snprintf(0, tmphost, HOSTLEN, "%s.%s",
+  		      cli_user(cptr)->account, (IsAnOper(cptr) &&
+  		      feature_bool(FEAT_OPERHOST_HIDING)) ?
+ 		      feature_str(FEAT_HIDDEN_OPERHOST) :
+  		      feature_str(FEAT_HIDDEN_HOST));
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                   cli_user(cptr)->username,
+                                   tmphost);
+       }
+    }
+  } else {
+     if (IsHiddenHost(cptr) && !HasSetHost(cptr))
+       sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+                               cli_user(cptr)->username,
+                               cli_user(cptr)->realhost);
      else {
-        ircd_snprintf(0, tmphost, HOSTLEN, "%s.%s",
-		      cli_user(cptr)->account, (IsAnOper(cptr) &&
-		      feature_bool(FEAT_OPERHOST_HIDING)) ?
-		      feature_str(FEAT_HIDDEN_OPERHOST) :
-		      feature_str(FEAT_HIDDEN_HOST));
-        sa = make_nick_user_host(nu_accthost, cli_name(cptr),
-                                 cli_user(cptr)->username,
-                                 tmphost);
+       ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
+       sr = make_nick_user_host(nu_realhost, cli_name(cptr),
+                                cli_user(cptr)->username,
+                                tmphost);
      }
   }
 

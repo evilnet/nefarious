@@ -82,6 +82,7 @@
 #include "config.h"
 
 #include "client.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msgq.h"
@@ -94,12 +95,21 @@
 static void userhost_formatter(struct Client* cptr, struct Client *sptr, struct MsgBuf* mb)
 {
   assert(IsUser(cptr));
-  msgq_append(0, mb, "%s%s=%c%s@%s", cli_name(cptr),
-	      SeeOper(sptr,cptr) ? "*" : "",
-	      cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
-              (HasHiddenHost(cptr) || HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
-	      cli_user(cptr)->host :
-              cli_user(cptr)->realhost);
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    msgq_append(0, mb, "%s%s=%c%s@%s", cli_name(cptr),
+                SeeOper(sptr,cptr) ? "*" : "",
+                cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
+                (HasHiddenHost(cptr) || HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
+                cli_user(cptr)->host :
+                cli_user(cptr)->realhost);
+  } else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+    msgq_append(0, mb, "%s%s=%c%s@%s", cli_name(cptr),
+                SeeOper(sptr,cptr) ? "*" : "",
+                cli_user(cptr)->away ? '-' : '+', cli_user(cptr)->username,
+                (IsHiddenHost(cptr) || HasSetHost(cptr)) && !IsAnOper(sptr) && (sptr != cptr) ?
+                cli_user(cptr)->host :
+                cli_user(cptr)->realhost);
+  }
 }
 
 /*

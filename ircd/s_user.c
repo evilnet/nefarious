@@ -578,6 +578,21 @@ int register_user(struct Client *cptr, struct Client *sptr,
     cli_handler(sptr) = CLIENT_HANDLER;
     release_dns_reply(sptr);
 
+    if (feature_bool(FEAT_AUTOHIDE) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
+      SetHiddenHost(sptr);
+    } else if (feature_bool(FEAT_AUTOHIDE) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) {
+        make_virthost(ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->host, cli_user(sptr)->host, cli_user(sptr)->virthost);
+        SetFlag(sptr, FLAG_HIDDENHOST);
+    }
+
+    /*
+     * even tho a client isnt auto +x'ing we still do a virtual 
+     * ip of the client so we dont have to do it each time the client +x's 
+     */
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+        make_virtip(ircd_ntoa((const char*) &(cli_ip(sptr))), ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->virtip);
+    }
+
     SetLocalNumNick(sptr);
 
     send_reply(
@@ -776,12 +791,16 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     ircd_strncpy(cli_info(new_client), parv[parc - 1], REALLEN);
     if (account)
       ircd_strncpy(cli_user(new_client)->account, account, ACCOUNTLEN);
-    if (HasHiddenHost(new_client))
-      ircd_snprintf(0, cli_user(new_client)->host, HOSTLEN, "%s.%s",
-        account, (IsAnOper(new_client) &&
-	feature_bool(FEAT_OPERHOST_HIDING)) ?
-	feature_str(FEAT_HIDDEN_OPERHOST) :
-	feature_str(FEAT_HIDDEN_HOST));
+    if (HasHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) {
+        ircd_snprintf(0, cli_user(new_client)->host, HOSTLEN, "%s.%s",
+          account, (IsAnOper(new_client) &&
+  	  feature_bool(FEAT_OPERHOST_HIDING)) ?
+  	  feature_str(FEAT_HIDDEN_OPERHOST) :
+  	  feature_str(FEAT_HIDDEN_HOST));
+      } else if (IsHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) {
+        make_virthost(ircd_ntoa((const char*) &(cli_ip(new_client))), cli_user(new_client)->host, cli_user(new_client)->host, cli_user(new_client)->virthost);
+        SetFlag(new_client, FLAG_HIDDENHOST);
+      }
     if (HasSetHost(new_client)) {
       if ((host = strrchr(hostmask, '@')) != NULL) {
         *host++ = '\0';
@@ -1568,8 +1587,14 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           ClearDebug(acptr);
         break;
       case 'x':
-        if (what == MODE_ADD)
+        if (what == MODE_ADD) {
 	  do_host_hiding = 1;
+	} else {
+	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+  	    ircd_strncpy(cli_user(sptr)->host, cli_user(sptr)->realhost, HOSTLEN);
+	    ClearHiddenHost(sptr);
+	  }
+	}
 	break;
       case 'h':
         if (what == MODE_ADD) {
@@ -1692,8 +1717,14 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     --UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))
     ++UserStats.inv_clients;
-  if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding)
-    hide_hostmask(acptr, FLAG_HIDDENHOST);
+  if (!FlagHas(&setflags, FLAG_HIDDENHOST) && do_host_hiding) {
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+      hide_hostmask(acptr, FLAG_HIDDENHOST);
+    } else {
+      make_virthost(ircd_ntoa((const char*) &(cli_ip(acptr))), cli_user(acptr)->host, cli_user(acptr)->host, cli_user(acptr)->virthost);
+      SetFlag(acptr, FLAG_HIDDENHOST);
+    }
+  }
   if (do_set_host) {
     /* We clear the flag in the old mask, so that the +h will be sent */
     /* Only do this if we're SETTING +h and it succeeded */
@@ -2067,7 +2098,7 @@ int is_silenced(struct Client *sptr, struct Client *acptr)
 		user->username, user->host);
   ircd_snprintf(0, senderip, sizeof(senderip), "%s!%s@%s", cli_name(sptr),
 		user->username, ircd_ntoa((const char*) &(cli_ip(sptr))));
-  if (HasHiddenHost(sptr) || HasSetHost(sptr))
+  if ((HasHiddenHost(sptr) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1)) || (IsHiddenHost(sptr) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) || HasSetHost(sptr))
     ircd_snprintf(0, senderh, sizeof(senderh), "%s!%s@%s", cli_name(sptr),
 		  user->username, user->realhost);
   for (; lp; lp = lp->next)

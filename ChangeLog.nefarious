@@ -4,8 +4,11 @@
 
 	* include/ircd_features.c: Updated with new F:Line (see below).
 
+	* ircd/hosthiding.c: Functions required for HOST_HIDING_STYLE 2.
+
         * ircd/ircd_features.c: Added FEAT_QUOTES, FEAT_POLICY_NOTICE,
-       				  FEAT_CMD_RULES, and FEAT_CMD_OPERMOTD.
+       				FEAT_CMD_RULES, FEAT_HOST_HIDING_STYLE,
+				and FEAT_CMD_OPERMOTD.
 				Took read only status off a new path F:Lines.
 
 	* ircd/m_oper: FEAT_CMD_OPERMOTD support added.

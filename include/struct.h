@@ -77,6 +77,8 @@ struct User {
   char               realusername[USERLEN + 1];
   char               realhost[HOSTLEN + 1];
   char               account[ACCOUNTLEN + 1];
+  char               virtip[SOCKIPLEN + 30];
+  char               virthost[HOSTLEN + 1];
 };
 
 #endif /* INCLUDED_struct_h */

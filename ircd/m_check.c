@@ -294,7 +294,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    ircd_ntoa((const char*) &acptr->cli_ip));
    send_reply(sptr, RPL_DATASTR, outbuf);
 
-   if (IsSetHost(acptr) || IsAccount(acptr))
+   if ((HasHiddenHost(acptr) && (feature_int (FEAT_HOST_HIDING_STYLE) == 1)) || (IsHiddenHost (acptr) && (feature_int (FEAT_HOST_HIDING_STYLE) == 2)) || IsSetHost(acptr))
    {
       ircd_snprintf(0, outbuf, sizeof(outbuf), " Real User/Host:: %s@%s", acptr->cli_user->realusername, acptr->cli_user->realhost);
       send_reply(sptr, RPL_DATASTR, outbuf);

@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <sys/time.h>
+#include <stdio.h>
 
 
 char localkey[9] = "12345678";
@@ -233,3 +234,12 @@ unsigned int ircrandom(void)
    */
   return (c ^ d);
 }
+
+
+int cloakrand()
+{
+    int rand_seed;
+    rand_seed = rand_seed * 1103515245 +12345;
+    return (unsigned int)(rand_seed / 65536) % 32768;
+}
+
