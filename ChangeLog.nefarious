@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2004-09-20  Neil Spierling <vulcan@linux-boxen.org>
+
+	* ircd/channel.c: Only use flexable keys if its enabled and the
+	key is set and valid on a join.
+
+	* ircd/m_join.c: Send out CMD_MODE to other servers.
+
 2004-09-16  Neil Spierling <vulcan@linux-boxen.org>
 
 	* Include feature from WhatNet's IRCd 

@@ -1403,7 +1403,8 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
    */
   if (*chptr->mode.key && (EmptyString(key) || compall(chptr->mode.key, key)))
     return overrideJoin + ERR_BADCHANNELKEY;
-  else
+
+  if (*chptr->mode.key)
     keyv = 1;
 
   if ((chptr->mode.mode & MODE_INVITEONLY) && ((keyv == 0) ||
