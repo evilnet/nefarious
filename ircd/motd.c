@@ -234,7 +234,8 @@ motd_lookup(struct Client *cptr)
 
   assert(0 != cptr);
 
-  if (!MyUser(cptr)) /* not my user, always return remote motd */
+  /* not my user and no FEAT_REMOTE_MOTD, always return remote motd */
+  if (!MyUser(cptr) && !feature_bool(FEAT_REMOTE_MOTD))
     return MotdList.remote;
 
   class = get_client_class(cptr);

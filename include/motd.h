@@ -54,7 +54,7 @@ struct Motd {
 
 #define MOTD_LINESIZE	81	/* 80 chars + '\0' */
 #define MOTD_MAXLINES	100
-#define MOTD_MAXREMOTE	3
+#define MOTD_MAXREMOTE	5
 
 struct MotdCache {
   struct MotdCache*	next; /* these fields let us read MOTDs only once */

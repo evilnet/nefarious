@@ -105,9 +105,6 @@
 #include "s_debug.h"
 #include "userload.h"
 
-#ifdef HAVE_CRYPT_H
-#include <crypt.h>
-#endif
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -115,10 +112,10 @@
 
 static char saltChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
 
-
 static char *make_salt(void)
 {
   static char salt[3];
+  srandom(CurrentTime); /* may not be the BEST salt, but its close */
   salt[0] = saltChars[random() % 64];
   salt[1] = saltChars[random() % 64];
   salt[2] = '\0';
@@ -129,6 +126,7 @@ static char *make_md5_salt(void)
 {
   static char salt[13];
   int i;
+  srandom(CurrentTime); /* may not be the BEST salt, but its close */
   salt[0] = '$';
   salt[1] = '1';
   salt[2] = '$';
@@ -150,6 +148,9 @@ int mo_mkpasswd(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
 {
   int is_md5 = 0;
 
+  if (parc < 2)
+    return need_more_params(sptr, "MKPASSWD");
+
   if (parc == 3) {
     if (!ircd_strcmp(parv[2], "MD5")) {
       is_md5 = 1;
@@ -161,11 +162,9 @@ int mo_mkpasswd(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
     }
   }
 
-  if (parc == 1)
-    send_reply(sptr, ERR_NEEDMOREPARAMS, "MKPASSWD");
-  else
-    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C: Encryption for [%s]:  %s", &me, parv[1],
-                  crypt(parv[1], is_md5 ? make_md5_salt() : make_salt()));
+  sendcmdto_one(&me, CMD_NOTICE, sptr, "%C: Encryption for [%s]: %s",
+		&me, parv[1], crypt(parv[1], is_md5 ?
+				    make_md5_salt() : make_salt()));
 
   return 0;
 }

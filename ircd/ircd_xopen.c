@@ -33,4 +33,3 @@ const char* ircd_crypt(const char* key, const char* salt)
   assert(0 != salt);
   return crypt(key, salt);
 }
-

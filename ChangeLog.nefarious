@@ -1,6 +1,25 @@
+2003-11-24  Reed Loden  <reed@reedloden.com>
+
+	* include/ircd_features.h: Add FEAT_REMOTE_MOTD.
+
+	* include/motd.h: Increase normal remote motd from 3 to 5 lines.
+
+	* ircd/ircd_features.c: Add FEAT_REMOTE_MOTD (default off).
+
+	* ircd/ircd_xopen.c: Remove excess line at EOF.
+
+	* ircd/m_ircops.c: Remove unneeded include.
+
+	* ircd/m_mkpasswd.c: Randomize the seed a bit more and get rid
+	of the include of crypt.h since it is not even needed.
+
+	* ircd/m_oper.c: Did more work and fixed more bugs.
+
+	* ircd/motd.c: Add REMOTE_MOTD.
+
 2003-11-25  Matthias Crauwels <ultimate_@wol.be>
 	
-	* Fixed some bugs in remote oper
+	* ircd/m_oper.c: Fixed some bugs in remote oper
 
 2003-11-23  Reed Loden  <reed@reedloden.com>
 

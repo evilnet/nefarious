@@ -395,6 +395,7 @@ static struct FeatureDesc {
   F_S(HIDDEN_OPERHOST, FEAT_CASE, "Staff.AfterNET.Org", 0),
   F_B(TOPIC_BURST, 0, 1, 0),
   F_B(REMOTE_OPER, 0, 1, 0),
+  F_B(REMOTE_MOTD, 0, 0, 0),
   F_I(BOT_CLASS, 0, 0, 0),
   F_B(LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_LOCAL_CHANNELS, 0, 1, 0),
