@@ -1,31 +1,61 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-02-11  Reed Loden  <reed@reedloden.com>
+
+	* config.guess, config.sub: Synched to timestamp 2005-02-10.
+
+	* ircd/engine_kqueue.c, ircd/fileio.c, ircd/ircd_log.c,
+	ircd/send.c: Backport of FreeBSD 5.3 fixes from u2.10.12.
+
+	* ircd/m_svsnoop.c: Removed unnecessary #include for
+	ircd_features.h.
+
+	* ircd/s_user.c: Synched with QuakeNet +kX patch (+X now allows
+	oper to change nick while banned in a channel).
+
 2005-02-10  Reed Loden  <reed@reedloden.com>
 
-	* ircd/gline.c
+	* include/ircd_features.h: Removed FEAT_MOTD_LAST_CHANGED due to
+	problems.
 
-	* ircd/m_endburst.c
+	* ircd/gline.c: Backport of u2.10.12 fix for problem when
+	glining +TEST instead of +*@TEST. Part of fix is originally from
+	QuakeNet Asuka.
 
-	* ircd/m_fakehost.c
+	* ircd/ircd_features.c: Removed FEAT_MOTD_LAST_CHANGED due to
+	problems.
 
-	* ircd/m_invite.c
+	* ircd/m_endburst.c: If the channel has already been "nuked", we
+	can't remove a mode from it. This was found when using
+	ElectricFence and has yet to be reported to Undernet.
 
-	* ircd/m_kick.c
+	* ircd/m_fakehost.c: Cleaned up code and removed unnecessary
+	brackets.
 
-	* ircd/m_mode.c
+	* ircd/m_invite.c: +R (AccountOnly) now stops unauthed users
+	from inviting people that have umode +R set. Patch from
+	QuakeNet.
 
-	* ircd/m_svsjoin.c
+	* ircd/m_kick.c: Fixed a warning due to missing parentheses.
 
-	* ircd/m_userip.c
+	* ircd/m_mode.c: Fixed a warning due to uninitialized variable.
 
-	* ircd/motd.c
+	* ircd/m_svsjoin.c: Cleaned up code (optimized a bit) and
+	removed the check for check_target_limit() as it is for local
+	clients only and does not apply to us.
 
-	* ircd/s_conf.c
+	* ircd/m_userip.c: Synched with QuakeNet HIS_USERIP patch.
 
-	* ircd/s_user.c
+	* ircd/motd.c: Removed offending code that caused problems when
+	running ElectricFence. This removes FEAT_MOTD_LAST_CHANGED.
 
-	* ircd/whocmds.c
+	* ircd/s_conf.c: Synched with QuakeNet sethost patch (allows IP
+	addresses to be wildcarded).
+
+	* ircd/s_user.c: Removed code concerning FEAT_MOTD_LAST_CHANGED.
+
+	* ircd/whocmds.c: Synched with QuakeNet HIS_USERIP patch.
 
 2005-01-31  Reed Loden  <reed@reedloden.com>
 

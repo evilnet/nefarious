@@ -1,3 +1,17 @@
+2005-01-21  Michael Poole <mdpoole@troilus.org>
+
+	* ircd/engine_kqueue.c: Move <sys/types.h> earlier to fix build on
+	FreeBSD 5.x (which needs it for <sys/event.h>).
+
+	* ircd/fileio.c (fbopen): Replace BSDism S_IREAD, S_IWRITE with
+	portable equivalents.
+
+	* ircd/ircd_log.c (log_open): Likewise.
+
+2003-12-18  Timothy Grant Vogelsang <net@astrolink.org>
+
+	* ircd/ircd_log.c, ircd/send.c: va_list is not a scalar type
+
 2004-10-16  Michael Poole <mdpoole@troilus.org>
 
 	* ircd/numeric.h: Remove the unused RPL_STATMEM and

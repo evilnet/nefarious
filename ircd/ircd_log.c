@@ -191,7 +191,7 @@ log_open(struct LogFile *lf)
   if (lf && lf->fd < 0) {
     alarm(3); /* if NFS hangs, we hang only for 3 seconds */
     lf->fd = open(lf->file, O_WRONLY | O_CREAT | O_APPEND,
-		  S_IREAD | S_IWRITE);
+		  S_IRUSR | S_IWUSR);
     alarm(0);
   }
 }
@@ -396,7 +396,7 @@ log_vwrite(enum LogSys subsys, enum LogLevel severity, unsigned int flags,
 
   /* Build the basic log string */
   vd.vd_format = fmt;
-  vd.vd_args = vl;
+  va_copy(vd.vd_args, vl);
 
   /* save the length for writev */
   /* Log format: "SYSTEM [SEVERITY]: log message" */

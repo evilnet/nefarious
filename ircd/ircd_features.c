@@ -433,7 +433,6 @@ static struct FeatureDesc {
   F_B(RULES, 0, 0, 0),
   F_B(OPERMOTD, 0, 0, 0),
   F_S(GEO_LOCATION, FEAT_NULL, 0, 0),
-  F_B(MOTD_LAST_CHANGED, 0, 0, 0),
   F_S(DEFAULT_UMODE, 0, "+", 0),
   F_B(HOST_IN_TOPIC, 0, 1, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),

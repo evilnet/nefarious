@@ -967,7 +967,8 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     if (MyUser(sptr)) {
       const char* channel_name;
       struct Membership *member;
-      if ((channel_name = find_no_nickchange_channel(sptr))) {
+      if ((channel_name = find_no_nickchange_channel(sptr)) &&
+	  !IsXtraOp(sptr)) {
         return send_reply(cptr, ERR_BANNICKCHANGE, channel_name);
       }
       /*
