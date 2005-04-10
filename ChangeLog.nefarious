@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-04-10  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/patchlevel.h: 0.4.0 Release time.. yes seriously.
+
 2005-04-04  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: regenerated.
