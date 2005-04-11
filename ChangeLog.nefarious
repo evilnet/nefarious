@@ -5,6 +5,17 @@
 
 	* include/patchlevel.h: 0.4.0 Release time.. yes seriously.
 
+2005-04-10  Reed Loden  <reed@reedloden.com>
+
+	* configure: regenerated.
+
+	* configure.in: Added --with-optimization from .12, plus some
+	adjustments to AS_HELP_STRING.
+
+	* ircd/m_exempt.c: Changed Removed to removed.
+
+	* ircd/version.c.SH: Added missing closing bracket.
+
 2005-04-04  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: regenerated.
