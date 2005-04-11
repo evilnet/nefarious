@@ -94,7 +94,7 @@ const char *infotext[] = {
     "reed         Reed Loden               <reed@reedloden.com>",
     "Math         Mathieu Rene             <math@rootservices.net>",
     "SiRVulcaN    Neil Spierling           <sirvulcan@gmail.com>",
-    "Rubin        Alex Schumann            <rubin@afternet.org",
+    "Rubin        Alex Schumann            <rubin@afternet.org>",
     "-",
     "Other contributors to Nefarious:",
     "ULtimaTe_    Matthias Crauwels        <ultimate_@wol.be>",

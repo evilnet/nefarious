@@ -53,9 +53,17 @@ AC_PROG_CC
 
 dnl ANSIfy the C compiler whenever possible.
 AM_PROG_CC_STDC
-dnl Use -O3 instead of -O2.
+dnl Allow specification of optimization level.
+AC_ARG_WITH([optimization],
+    AS_HELP_STRING([--with-optimization=[-O2]], [Explicitly set the compiler optimization flags (default: -O3)]),
+    [unet_cv_optimization=$withval],
+    [unet_cv_optimization="-O3"])
+AC_CACHE_CHECK([optimization level], [unet_cv_optimization], [unet_cv_optimization="-O3"])
+if test "x$unet_cv_optimization" = "xno" ; then
+    unet_cv_optimization=""
+fi
 if test x"$CFLAGS" != x; then
-    CFLAGS=`echo "$CFLAGS" | sed -e 's/-O2/-O3/'`
+    CFLAGS=`echo "$CFLAGS" | sed -e s/-O2/$unet_cv_optimization/`
 fi
 dnl Remove -pipe during configure
 if test x"$CFLAGS" != x; then
@@ -368,8 +376,8 @@ dnl fi
 
 if test x"$unet_cv_enable_ssl" = xyes; then
   AC_MSG_CHECKING([for OpenSSL includes])
-  AC_ARG_WITH(openssl-includes,
-  [  --with-openssl-includes Specify location of OpenSSL header files (default /usr/include)],
+  AC_ARG_WITH([openssl-includes],
+  AS_HELP_STRING([--with-openssl-includes=dir], [Specify location of OpenSSL header files (default: /usr/include)]),
   [base_ssl_inc=$withval],
   [base_ssl_inc=/usr/include])
   [unet_cv_with_openssl_inc_prefix=$base_ssl_inc]
@@ -378,8 +386,8 @@ if test x"$unet_cv_enable_ssl" = xyes; then
   [Path name used as a base for the ssl include files.])
 
   AC_MSG_CHECKING([for OpenSSL libraries])
-  AC_ARG_WITH(openssl-libs,
-  [  --with-openssl-libs     Specify location of OpenSSL libs (default /usr/lib)],
+  AC_ARG_WITH([openssl-libs],
+  AS_HELP_STRING([--with-openssl-libs=dir], [Specify location of OpenSSL libs (default: /usr/lib)]),
   [unet_cv_with_openssl_prefix=$withval],
   [unet_cv_with_openssl_prefix=/usr/lib])
   AC_MSG_RESULT([$unet_cv_with_openssl_prefix])
@@ -387,8 +395,8 @@ if test x"$unet_cv_enable_ssl" = xyes; then
   [Path name used as a base for the ssl lib files.])
 
   AC_MSG_CHECKING([for Kerberos includes])
-  AC_ARG_WITH(kerberos-includes,
-  [  --with-kerb-includes    Specify location of Kerberos includes (default /usr/kerberos/include)],
+  AC_ARG_WITH([kerberos-includes],
+  AS_HELP_STRING([--with-kerb-includes=dir], [Specify location of Kerberos includes (default: /usr/kerberos/include)]),
   [unet_cv_with_kerberos_prefix=$withval],
   [unet_cv_with_kerberos_prefix=/usr/kerberos/include])
   AC_MSG_RESULT([$unet_cv_with_kerberos_prefix])

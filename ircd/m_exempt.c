@@ -109,7 +109,7 @@ int del_exempt(struct Client* sptr, char* host)
 
   for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next) {
     if (!match(dnsblexempts->host, host)) {
-      sendto_opmask_butone(0, SNO_GLINE, "%C Removing DNSBL Exemption for %s", sptr, host);
+      sendto_opmask_butone(0, SNO_GLINE, "%C removing DNSBL Exemption for %s", sptr, host);
 
       log_write(LS_DNSBL, L_INFO, 0, "%C Removing DNSBL Exemption for %s", sptr, host);
 
