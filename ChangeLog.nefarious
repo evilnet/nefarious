@@ -5,14 +5,22 @@
 
 	* include/patchlevel.h: 0.4.0 Release time.. yes seriously.
 
+2005-04-11  Reed Loden  <reed@reedloden.com>
+
+	* ircd/m_invite.c: Fixed crash bug due to a missing parameter 
+	for the ERR_ACCOUNTONLY reply.
+
 2005-04-10  Reed Loden  <reed@reedloden.com>
 
-	* configure: regenerated.
+	* configure: Ran autoconf (regenerated).
 
-	* configure.in: Added --with-optimization from .12, plus some
-	adjustments to AS_HELP_STRING.
+	* configure.in: Added --with-optimization from .12 and added
+	some added AS_HELP_STRING() invokes to clean up ./configure 
+	--help.
 
-	* ircd/m_exempt.c: Changed Removed to removed.
+	* README: Updated documentation.
+
+	* ircd/m_exempt.c: Changed "Removed" to "removed".
 
 	* ircd/version.c.SH: Added missing closing bracket.
 

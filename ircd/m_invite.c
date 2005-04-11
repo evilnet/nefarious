@@ -175,7 +175,7 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   /* If we get here, it was a VALID and meaningful INVITE */
 
   if (IsAccountOnly(acptr) && !IsAccount(sptr) && !IsOper(sptr)) {
-    send_reply(sptr, ERR_ACCOUNTONLY, cli_name(acptr));
+    send_reply(sptr, ERR_ACCOUNTONLY, cli_name(acptr), "INVITE");
     return 0;
   }
 
