@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+
+2005-04-19  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Undernet sync.
+
 2005-04-10  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/patchlevel.h: 0.4.0 Release time.. yes seriously.

@@ -1,3 +1,8 @@
+2005-04-18  Michael Poole <mdpoole@troilus.org>
+
+	* ircd/support.c (check_if_ipmask): Do not interpret masks that
+	start with . or / as IP-based host masks.
+
 2005-02-20  Perry Lorier <isomer@undernet.org>
 
 	* ircd/engine_epoll.c: Change a size_t to socklen_t to match
