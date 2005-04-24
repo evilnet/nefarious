@@ -1365,8 +1365,8 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
                                  that didn't fit (full==1) */
 
   if (feature_bool(FEAT_TOPIC_BURST) && *chptr->topic)
-    sendcmdto_one(&me, CMD_TOPIC, cptr, "%H %Tu %Tu :%s", chptr,
-                 chptr->creationtime, chptr->topic_time, chptr->topic);
+    sendcmdto_one(&me, CMD_TOPIC, cptr, "%H %s %Tu %Tu :%s", chptr,
+                 chptr->topic_nick, chptr->creationtime, chptr->topic_time, chptr->topic);
 }
 
 /*

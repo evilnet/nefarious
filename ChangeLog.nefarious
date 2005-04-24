@@ -2,6 +2,15 @@
  Nefarious IRCu ChangeLog
 
 
+2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Send who set the topic when bursting topics.
+
+	* ircd/m_topic.c: When a topic comes in with the person who
+	set the topic (ms_topic), make sure we make the topic set
+	by that person when parsing it. No more not knowing who actually
+	set the topic when a server splits and rejoins.
+
 2005-04-19  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Undernet sync.

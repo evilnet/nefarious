@@ -97,9 +97,10 @@
 #include <stdlib.h>
 
 static void do_settopic(struct Client *sptr, struct Client *cptr, 
-		        struct Channel *chptr, char *topic, time_t ts)
+		        struct Channel *chptr, char *topic, time_t ts, char *setter)
 {
    int newtopic;
+   char *nickb, *nick = NULL;
    struct Client *from;
 
    if (feature_bool(FEAT_HIS_BANWHO) && IsServer(sptr)) {
@@ -116,27 +117,48 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    newtopic=ircd_strncmp(chptr->topic,topic,TOPICLEN)!=0;
    /* setting a topic */
    ircd_strncpy(chptr->topic, topic, TOPICLEN);
-   ircd_strncpy(chptr->topic_nick, cli_name(from), NICKLEN);
-   if (feature_bool(FEAT_HOST_IN_TOPIC) && !IsServer(sptr)) {
-     strcat(chptr->topic_nick, "!");
-     strcat(chptr->topic_nick, cli_username(from));
-     strcat(chptr->topic_nick, "@");
-     strcat(chptr->topic_nick, cli_user(from)->host);
+   if (setter) {
+     if (feature_bool(FEAT_HOST_IN_TOPIC)) {
+       ircd_strncpy(chptr->topic_nick, setter, NICKLEN+USERLEN+HOSTLEN+3);
+       for (nick = strtok_r(setter, "!", &nickb);
+            nick;
+            nick = strtok_r(NULL, "!", &nickb))
+       {
+       }
+     } else
+       ircd_strncpy(chptr->topic_nick, setter, NICKLEN);
+   } else {
+     ircd_strncpy(chptr->topic_nick, cli_name(from), NICKLEN);
+     if (feature_bool(FEAT_HOST_IN_TOPIC) && !IsServer(sptr)) {
+       strcat(chptr->topic_nick, "!");
+       strcat(chptr->topic_nick, cli_username(from));
+       strcat(chptr->topic_nick, "@");
+       strcat(chptr->topic_nick, cli_user(from)->host);
+     }
    }
    chptr->topic_time = ts ? ts : TStime();
    /* Fixed in 2.10.11: Don't propagate local topics */
    if (!IsLocalChannel(chptr->chname))
-     sendcmdto_serv_butone(sptr, CMD_TOPIC, cptr, "%H %Tu %Tu :%s", chptr,
-			   chptr->creationtime, chptr->topic_time, chptr->topic);
-   if (newtopic)
-      sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
-      				       "%H :%s", chptr, chptr->topic);
+     sendcmdto_serv_butone(sptr, CMD_TOPIC, cptr, "%H %s %Tu %Tu :%s", chptr,
+			   chptr->topic_nick, chptr->creationtime, chptr->topic_time,
+                           chptr->topic);
+   if (newtopic) {
+      if (IsServer(sptr))
+        sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
+       				         "%H :%s (%s)", chptr, chptr->topic,
+                                         setter ? (nick ? nick : setter) : cli_name(from));
+
+      else
+        sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
+       				         "%H :%s", chptr, chptr->topic);
+    
       /* if this is the same topic as before we send it to the person that
        * set it (so they knew it went through ok), but don't bother sending
        * it to everyone else on the channel to save bandwidth
        */
-    else if (MyUser(sptr))
-      sendcmdto_one(sptr, CMD_TOPIC, sptr, "%H :%s", chptr, chptr->topic);   	
+    } else if (MyUser(sptr))
+      sendcmdto_one(sptr, CMD_TOPIC, sptr, "%H :%s (%s)", chptr, chptr->topic,
+                    setter ? (nick ? nick : setter) : cli_name(from));
 }
 
 /*
@@ -210,12 +232,12 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	if (hascolour == -1) hascolour = HasColour(topic);
 	if (hascolour) {
 	  if (!topicnocolour) topicnocolour = (char*)StripColour(topic);
-	  do_settopic(sptr,cptr,chptr,topicnocolour,0);
+	  do_settopic(sptr,cptr,chptr,topicnocolour,0,0);
 	  continue;
 	}
       }
       /* (kind of) fallthrough */
-      do_settopic(sptr,cptr,chptr,topic,0);
+      do_settopic(sptr,cptr,chptr,topic,0,0);
     }
   }
   return 0;
@@ -226,6 +248,7 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
  *
  * parv[0]        = sender prefix
  * parv[1]        = channel
+ * parv[parc - 4] = topic setter (optional)
  * parv[parc - 3] = channel timestamp (optional)
  * parv[parc - 2] = topic timestamp (optional)
  * parv[parc - 1] = topic
@@ -265,7 +288,7 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (parc > 3 && (ts = atoi(parv[parc - 2])) && chptr->topic_time > ts)
       continue;
 
-    do_settopic(sptr,cptr,chptr,topic,ts);
+    do_settopic(sptr,cptr,chptr,topic,ts,parv[parc-4]);
   }
   return 0;
 }
