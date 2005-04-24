@@ -4,6 +4,8 @@
 
 2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
 
+	* include/patchlevel.h: Bump to 0.5.0-dev.
+
 	* ircd/channel.c: Send who set the topic when bursting topics.
 
 	* ircd/m_topic.c: When a topic comes in with the person who
