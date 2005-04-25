@@ -2,6 +2,11 @@
  Nefarious IRCu ChangeLog
 
 
+2005-04-26  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_nick.c: Removed code that shouldnt of been added in the
+	last commit.
+
 2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Shun F:Lines.

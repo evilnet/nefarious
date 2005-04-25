@@ -149,7 +149,6 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char*          arg;
   char*          s;
   const char*    client_name;
-//  const char*    client_host;
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -159,8 +158,6 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    */
   client_name = (*(cli_name(sptr))) ? cli_name(sptr) : "*";
 
-//  client_host = (*(cli_user(sptr)->host)) ? cli_user(sptr)->host : "*";
-  
   if (ircd_strcmp(client_name, "*") != 0)
     if ((parv[0] != '\0') && shun_lookup(sptr, 0))
       return 0;
