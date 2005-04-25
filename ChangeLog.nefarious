@@ -4,6 +4,54 @@
 
 2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
 
+	* doc/example.conf: Shun F:Lines.
+
+	* doc/readme.shun: readme.gline modified.
+
+	* include/client.h: Shun privs.
+
+	* include/handlers.h: Declerations for m/s_shun etc.
+
+	* include/ircd_features.h: Declerations for added features.
+
+	* include/ircd_struct.h: Added variable to hold the shun reason.
+
+	* include/msg.h: Added SHUN.
+
+	* include/numeric.h: Added numerics for shun.
+
+	* include/shun.c: Declerations.
+
+	* ircd/client.c: Make use of the new privs for shun.
+
+	* ircd/ircd_features.c: Added new features for shun.
+
+	* ircd/m_nick.c: Do a shun check here aslong as the user has
+	a host.
+
+	* ircd/m_shun.c: Copy of m_gline.c modified.
+
+	* ircd/Makefile.in: Added m_shun.c && shun.c.
+
+	* ircd/parse.c: For most commands check to see if the user is
+	shunned or not. While we are at it to an expiry check too.
+
+	* ircd/s_debug.c: Make some debugging stats avail for shuns.
+
+	* ircd/s_err.c: Added numerics.
+
+	* ircd/s_serv.c: Burst shuns on links.
+
+	* ircd/s_stats.c: Added stats S.
+
+	* ircd/s_user.c: Check shuns on connect && send a notice if so.
+
+	* ircd/shun.c: Main functions for SHUN, based off gline.c with
+	nickgline code and minus the channel gline code.
+
+
+2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
+
 	* include/patchlevel.h: Bump to 0.5.0-dev.
 
 	* ircd/channel.c: Send who set the topic when bursting topics.

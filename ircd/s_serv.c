@@ -53,6 +53,7 @@
 #include "s_misc.h"
 #include "s_user.h"
 #include "send.h"
+#include "shun.h"
 #include "ircd_struct.h"
 #include "support.h"
 #include "sys.h"
@@ -193,6 +194,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
    * our burst.
    */
   gline_burst(cptr);
+  shun_burst(cptr);
   jupe_burst(cptr);
 
   /*

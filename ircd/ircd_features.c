@@ -491,6 +491,15 @@ static struct FeatureDesc {
   F_B(CHMODE_Z, 0, 1, 0),
   F_B(LUSERS_AUTHED, 0, 0, 0),
   F_B(OPER_WHOIS_PARANOIA, 0, 0, 0),
+  F_I(SHUNMAXUSERCOUNT, 0, 20, 0),
+  F_B(OPER_SHUN, 0, 1, 0),
+  F_B(OPER_LSHUN, 0, 1, 0),
+  F_B(OPER_WIDE_SHUN, 0, 1, 0),
+  F_B(LOCOP_LSHUN, 0, 1, 0),
+  F_B(LOCOP_WIDE_SHUN, 0, 0, 0),
+  F_B(HIS_SHUN, 0, 1, 0),
+  F_B(HIS_USERSHUN, 0, 1, 0),
+  F_B(HIS_STATS_S, 0, 1, 0),
 
 #undef F_S
 #undef F_B

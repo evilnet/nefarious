@@ -45,6 +45,7 @@
 #include "s_numeric.h"
 #include "s_user.h"
 #include "send.h"
+#include "shun.h"
 #include "ircd_struct.h"
 #include "sys.h"
 #include "whocmds.h"
@@ -547,6 +548,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_gline, ms_gline, mo_gline, m_ignore }
   },
   {
+    MSG_SHUN,
+    TOK_SHUN,
+    0, MAXPARA,         0, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_shun, ms_shun, mo_shun, m_ignore }
+  },
+  {
     MSG_JUPE,
     TOK_JUPE,
     0, MAXPARA, MFLG_SLOW, 0,
@@ -917,6 +925,25 @@ parse_client(struct Client *cptr, char *buffer, char *bufend)
 
   if ((s = strchr(ch, ' ')))
     *s++ = '\0';
+
+  expire_shuns();
+  if ((strcasecmp(ch, "NICK"))    &&  /* rejection handled in m_nick.c */
+      (strcasecmp(ch, "SERVER"))  &&  /* expiring shuns with this or matching
+                                       * just causes major issues, we dont need
+                                       * to check shuns with SERVER.
+                                       */
+      (strcasecmp(ch, "USER"))    &&  /* avoid issues, doesnt matter if we
+                                         prase while shunned */
+      (strcasecmp(ch, "PASS"))    &&  /* LOC */
+      (strcasecmp(ch, "ADMIN"))   &&  /* get admin info for help*/
+      (strcasecmp(ch, "PART"))    &&  /* obvious */
+      (strcasecmp(ch, "QUIT"))    &&  /* obvious */
+      (strcasecmp(ch, "PONG"))      /* survive */
+    ) {
+    if (shun_lookup(cptr, 0)) {
+      return 0;  
+    }
+  }
 
   /*
    * If there is a service, we simply force msg_tree_parse() to

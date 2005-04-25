@@ -50,6 +50,7 @@
 #include "s_serv.h"
 #include "s_user.h"
 #include "send.h"
+#include "shun.h"
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
@@ -511,7 +512,10 @@ struct StatDesc statsinfo[] = {
     send_usage, 0,
     "System resource usage (Debug only)." },
 #endif
-  { 's', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_s,
+  { 'S', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_S,
+    shun_stats, 0,
+    "Global Shuns." },
+  { 's', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_s,
     stats_sline, 0,
     "Spoofed hosts information." },
   { 'T', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_T,

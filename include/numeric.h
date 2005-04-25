@@ -487,7 +487,12 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_DNSBLEXEMPTLIST  540
 #define RPL_ENDOFEXEMPTLIST  541
 
-#define ERR_LASTERROR        542
+#define RPL_STATSSHUN        542
+#define ERR_NOSUCHSHUN       543
+#define RPL_SLIST            544
+#define RPL_ENDOFSLIST       545
+
+#define ERR_LASTERROR        546
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

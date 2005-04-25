@@ -57,6 +57,7 @@
 #include "s_misc.h"
 #include "s_serv.h" /* max_client_count */
 #include "send.h"
+#include "shun.h"
 #include "ircd_struct.h"
 #include "support.h"
 #include "supported.h"
@@ -355,6 +356,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
                   const char *nick, char *username)
 {
   struct ConfItem* aconf;
+  struct Shun*     ashun = NULL;
   char*            parv[4];
   char*            tmpstr;
   char*            tmpstr2;
@@ -708,6 +710,14 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyConnect(sptr)) {
     cli_handler(sptr) = CLIENT_HANDLER;
     release_dns_reply(sptr);
+
+    if ((ashun = shun_lookup(sptr, 0))) {
+      sendto_opmask_butone(0, SNO_GLINE, "Shun active for %s%s",
+                           IsUnknown(sptr) ? "Unregistered Client ":"",
+                           get_client_name(sptr, SHOW_IP));
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are shunned: %s", sptr,
+           ashun->sh_reason);
+    }
 
   /*
    * even though a client isnt auto +x'ing we still do a virtual 

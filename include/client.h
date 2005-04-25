@@ -85,6 +85,8 @@ enum Priv {
   PRIV_DIE,		/* oper can DIE */
   PRIV_GLINE,		/* oper can GLINE */
   PRIV_LOCAL_GLINE,	/* oper can local GLINE */
+  PRIV_SHUN,		/* oper can SHUN */
+  PRIV_LOCAL_SHUN,	/* oper can local SHUN */
   PRIV_JUPE,		/* oper can JUPE */
   PRIV_LOCAL_JUPE,	/* oper can local JUPE */
   PRIV_OPMODE,		/* oper can OP/CLEARMODE */
@@ -100,6 +102,7 @@ enum Priv {
   PRIV_SEE_OPERS,	/* display hidden opers */
 
   PRIV_WIDE_GLINE,	/* oper can set wider G-lines */
+  PRIV_WIDE_SHUN,	/* oper can set wider Shuns */
 
   PRIV_FORCE_OPMODE,	/* oper can override a Q-line */
   PRIV_FORCE_LOCAL_OPMODE, /* oper can override a local channel Q-line */

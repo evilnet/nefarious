@@ -166,6 +166,7 @@ IRCD_SRC = \
 	m_set.c \
 	m_sethost.c \
 	m_settime.c \
+	m_shun.c \
 	m_silence.c \
 	m_squit.c \
 	m_stats.c \
@@ -212,6 +213,7 @@ IRCD_SRC = \
 	s_stats.c \
 	s_user.c \
 	send.c \
+	shun.c \
 	@SSL_C@ \
 	support.c \
 	uping.c \

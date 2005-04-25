@@ -1,0 +1,82 @@
+SHUN documentation, last updated on 25 April 2005
+
+For an ordinary user, the syntax is:
+
+  SHUN [<mask>]
+
+If <mask> is given, and if a Shun for that server exists, all the
+information about that Shun is displayed.  If <mask> is not given,
+an error is returned.
+
+For an operator, the syntax is:
+
+  SHUN [[!][+|-][$R<type>]<mask> [[<target>] <expiration> :<reason>]]
+
+If <mask> is not given, or if it is not prefixed by "+" or "-", the
+operation is exactly the same as if it were issued by an ordinary
+user, except that a list of all Shuns may be returned.  If the "+"
+or "-" prefixes are used, the arguments <target>, <expiration>, and
+<reason> must be given, even if the Shun already exists.  If
+<target> is "*" and the currently existing Shun is a local Shun,
+the local Shun will be erased and recreated with the parameters
+given, as described below.  Otherwise, if the Sgyb currently exists,
+a prefix of "+" will cause an inactive Shun to be activated, whereas
+a prefix of "-" will cause an active Shun to be deactivated.  If an
+attempt is made to modify a Shun set by a U-lined service such as
+Uworld, the change will be forced to be local.  If the mask would not
+be permitted due to it being too wide or affecting too many users
+(governed by the SHUNMAXUSERCOUNT feature), the "!" prefix may be
+used to force the Shun to be set anyway. The <type> argument can
+be used to Shun user Realnames by using $R. For example
+
+  SHUN +$R*sub7* local.server 123456 :infected with sub7
+
+This would Shun all users that have "sub7" in their realnames.
+
+If the Shun does not already exist, it is created. The <target>
+parameter is used to select whether the Shun is only to apply to a
+single server (which need not be the local server) or to the whole
+network; if <target> is not given, it is assumed to be the local
+server.  This could be useful if a single particular link is having
+problems, for instance.  The <expiration> parameter is a number of
+seconds, not to exceed 7 days, for the Shun to exist.  The <reason>
+argument is mandatory and should describe why this particular Shun
+was placed.  The <mask> parameter must be a nick!user@host mask. The
+nick part is optional, a nick!user@host mask will work. The host component
+must contain at least 2 non-wildcarded subdomains or, if it is an IP
+address, at least 16 bits.  Normally, the host component may not contain
+*any* wildcards, but that can be overridden with the "!" prefix, as
+indicated above, if the operator has the WIDE_SHUN privilege.
+
+For a server, the syntax is:
+
+  <prefix> SU <target> (+|-)[$<type>]<mask> <expiration> <lastmod> :<reason>
+
+The <target> may be a server numeric or the character "*", for a
+globally scoped Shun.  The <mask> argument is a server name, and
+must be prefixed by one of "+" (to indicate an active Shun) or "-"
+(to indicate an inactive Shun).  The parameter <expiration> is a
+total number of seconds the Shun is to live for, and <lastmod> is
+used for versioning.  Since SHUNs are propagated during netbursts,
+there must be some way of resolving conflicting states, which is the
+reason for this argument, and is also the reason Shuns cannot be
+deleted, only deactivated.  The <reason> parameter indicates the
+reason the Shun was placed. The <type> arguement is the same as
+a normal Shun done by a opers (See second paragraph from top). Nicks
+can also be Shund via the mask just like norml Shuns done by opers
+
+If a SHUN is received with a <target> of "*", any Shuns with local
+scope are deleted, in preference for the globally scoped version.  If
+the Shun already exists, the values of <lastmod> are compared; if
+the received <lastmod> is less than the stored <lastmod>, the existing
+Shun is resent to the server from which the SHUN message was
+received; otherwise, the Shun is activated or deactivated, depending
+on the <mask> prefix.  If the Shun does not currently exist, it is
+created with the parameters given.
+
+For a U-lined server, this syntax should be used:
+
+  <prefix> SU <target> +<mask> <expiration> :<reason>
+  <prefix> SU <target> -<mask>
+
+The <lastmod> parameter will be assumed to be 0.

@@ -85,6 +85,7 @@ struct User {
   char               virtip[SOCKIPLEN + 30];
   char               virthost[HOSTLEN + 1];
   char               dnsblhost[HOSTLEN + 20];
+  char               shunreason[BUFSIZE + 1];
   char*              swhois;         /* pointer to swhois message */
 };
 
