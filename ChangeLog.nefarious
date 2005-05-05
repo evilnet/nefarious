@@ -2,6 +2,12 @@
  Nefarious IRCu ChangeLog
 
 
+2005-05-05  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_invite.c: Some fixes to the invite syntax, needs some
+	further testing over multiple servers. If it works out fine then
+	i will consider applying it to the 0.4.0 cvs branch.
+
 2005-04-26  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_nick.c: Removed code that shouldnt of been added in the
