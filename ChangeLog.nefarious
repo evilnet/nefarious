@@ -2,6 +2,17 @@
  Nefarious IRCu ChangeLog
 
 
+2005-05-08  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added DNSBL d flag for rejecting clients.
+
+	* include/client.h: Added ClearDNSBLAllowed(), Is/SetDNSBLDenied().
+
+	* ircd/s_conf.c: If a client is matched on a line containing a
+	d flag then dont allow the client through even if matched on
+	another line. We then set the denied flag so that they cant be
+	allowed on any further line.
+
 2005-05-05  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_invite.c: Some fixes to the invite syntax, needs some

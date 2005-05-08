@@ -92,7 +92,8 @@ static int dnsbl_flags[] = {
   DFLAG_BITMASK,  'b',
   DFLAG_REPLY,    'r',
   DFLAG_ALLOW,    'a',
-  DFLAG_MARK,     'm'
+  DFLAG_MARK,     'm',
+  DFLAG_DENY,     'd'
 };
 
 
@@ -1020,6 +1021,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   char oct[4]; /* last bit of replyip, and a null */
   char cstr_buf[HOSTLEN +1];
   char *cstr = cstr_buf;
+  int da = 0;
   int c = 0;
   int j = 0;
   unsigned int x_flag = 0;
@@ -1030,10 +1032,6 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     Debug((DEBUG_DEBUG, "find_blline missing parameter(s) aborting check."));
     return 0;
   }
-
-  /* Return if they are already marked by a dnsbl, the 1st one returned is the only one. */
-  if (IsDNSBL(sptr))
-    return 1;
 
   /* Pull the last octet out of the reply ip into oct */
   for(j=strlen(replyip);j>0;j--) {
@@ -1089,8 +1087,13 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
             if (x_flag & DFLAG_MARK)
               SetDNSBLMarked(sptr);
 
-            if (x_flag & DFLAG_ALLOW)
+            if ((x_flag & DFLAG_ALLOW) && (!IsDNSBLDenied(sptr)))
               SetDNSBLAllowed(sptr);
+
+            if (x_flag & DFLAG_DENY) {
+              ClearDNSBLAllowed(sptr);
+              SetDNSBLDenied(sptr);
+            }
 
             if (EmptyString(cli_dnsbl(sptr)))
               ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
@@ -1100,27 +1103,41 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
           }
         } else if (x_flag & DFLAG_REPLY) {
 	    for(csep = cstr; *(csep+1); csep++); /* set csep to the end */
+              for (;csep >= cstr; csep--) {
+                if (*csep == ',' || csep==cstr) {
 
-            for (;csep >= cstr; csep--)
-                if(*csep == ',' || csep==cstr) {
-                  if (!ircd_strcmp(csep+1, oct)) {
+                  if (*csep == ',') {
+                    if (!ircd_strcmp(csep+1, oct))
+                      da = 1;
+                  } else if (csep==cstr)
+                    da = 1;
+
+                  if (da == 1) {
                     log_write(LS_DNSBL, L_INFO, 0, "DNSBL Matched %p %s (R)", sptr, blline->name);
                     SetDNSBL(sptr);
 
                     if (x_flag & DFLAG_MARK)
                       SetDNSBLMarked(sptr);
 
-                    if (x_flag & DFLAG_ALLOW)
+                    if ((x_flag & DFLAG_ALLOW) && (!IsDNSBLDenied(sptr)))
                       SetDNSBLAllowed(sptr);
+
+                    if (x_flag & DFLAG_DENY) {
+                      ClearDNSBLAllowed(sptr);
+                      SetDNSBLDenied(sptr);
+                    }
 
                     if (EmptyString(cli_dnsbl(sptr)))
                       ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
                     if (EmptyString(cli_dnsblformat(sptr)))
                       ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
+
+                    da = 0;
                     return 1;
                   }
-		  *csep = 0;
+  		  *csep = 0;
                 }
+            }
         }
     }
   }

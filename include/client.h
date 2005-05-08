@@ -169,6 +169,7 @@ enum Flag {
     FLAG_DNSBL,                     /* Client in DNSBL */
     FLAG_DNSBLMARKED,               /* Client in DNSBL Marked */
     FLAG_DNSBLALLOWED,              /* Client in DNSBL Allowed in */
+    FLAG_DNSBLDENIED,               /* Only set if a client is found on a d X:line */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /* First local mode flag */
@@ -484,6 +485,7 @@ struct Client {
 #define IsDNSBL(x)		HasFlag(x, FLAG_DNSBL)
 #define IsDNSBLMarked(x)	HasFlag(x, FLAG_DNSBLMARKED)
 #define IsDNSBLAllowed(x)	HasFlag(x, FLAG_DNSBLALLOWED)
+#define IsDNSBLDenied(x)	HasFlag(x, FLAG_DNSBLDENIED)
 #define IsAdmin(x)		(HasFlag(x, FLAG_ADMIN) && feature_bool(FEAT_OPERFLAGS))
 #define IsWhois(x)		HasFlag(x, FLAG_WHOIS)
 
@@ -520,6 +522,7 @@ struct Client {
 #define SetDNSBL(x)		SetFlag(x, FLAG_DNSBL)
 #define SetDNSBLMarked(x)	SetFlag(x, FLAG_DNSBLMARKED)
 #define SetDNSBLAllowed(x)	SetFlag(x, FLAG_DNSBLALLOWED)
+#define SetDNSBLDenied(x)	SetFlag(x, FLAG_DNSBLDENIED)
 #define SetAdmin(x)		SetFlag(x, FLAG_ADMIN)
 #define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
 
@@ -550,6 +553,7 @@ struct Client {
 #define ClearAdmin(x)		ClrFlag(x, FLAG_ADMIN)
 #define ClearWhois(x)		ClrFlag(x, FLAG_WHOIS)
 #define ClearDNSBLMarked(x)	ClrFlag(x, FLAG_DNSBLMARKED)
+#define ClearDNSBLAllowed(x)	ClrFlag(x, FLAG_DNSBLALLOWED)
 
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \
 			      && (HasPriv(acptr, PRIV_DISPLAY) \
@@ -573,6 +577,7 @@ struct Client {
 #define DFLAG_REPLY	0x002	/* Reply X:Line */
 #define DFLAG_ALLOW	0x004	/* Client is allowed to connect regardless of results */
 #define DFLAG_MARK	0x008	/* Client hostname is marked */
+#define DFLAG_DENY	0x010	/* Dont allow even if allowed */
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/* socket needs to be freed */
