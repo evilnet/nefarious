@@ -186,3 +186,83 @@ extern char *format_dnsbl_msg(char *dnsblip, char *dnsblhost, char *dnsbluser,
 
   return message;
 }
+
+
+extern char *format_message(char *nick, char *ident, char *host, char *ip,
+                            char *channel, char *format)
+{
+   unsigned short pos = 0;   /* position in format */
+   unsigned short len = 0;   /* position in message */
+   unsigned short size = 0;  /* temporary size buffer */
+
+   unsigned int i;
+
+   struct message_format_assoc table[] = {
+     {'n',   (void *) NULL,         FORMATTYPE_STRING },
+     {'i',   (void *) NULL,         FORMATTYPE_STRING },
+     {'h',   (void *) NULL,         FORMATTYPE_STRING },
+     {'i',   (void *) NULL,         FORMATTYPE_STRING },
+     {'c',   (void *) NULL,         FORMATTYPE_STRING },
+   };
+
+   table[0].data = nick;
+   table[1].data = ident;
+   table[2].data = host;
+   table[3].data = ip;
+   table[4].data = channel;
+
+   /*
+    * Copy format to message character by character, inserting any matching
+    * data after %.
+    */
+   while(format[pos] != '\0' && len < (BUFSIZE - 1)) {
+      switch(format[pos]) {
+
+         case '%':
+            /* % is the last char in the string, move on */
+            if(format[pos + 1] == '\0')
+               continue;
+
+            /* %% escapes % and becomes % */
+            if(format[pos + 1] == '%') {
+               message[len++] = '%';
+               pos++; /* skip past the escaped % */
+               break;
+            }
+            /* Safe to check against table now */
+            for(i = 0; i < (sizeof(table) / sizeof(struct message_format_assoc)); i++) {
+               if(table[i].key == format[pos + 1]) {
+                  switch(table[i].type) {
+                     case FORMATTYPE_STRING:
+
+                        size = strlen( (char *) table[i].data);
+
+                        /* Check if the new string can fit! */
+                        if( (size + len) > BUFSIZE )
+                           break;
+                        else {
+                           strcat(message, (char *) table[i].data);
+                           len += size;
+                        }
+
+                     default:
+                        break;
+                  }
+               }
+            }
+            /* Skip key character */
+            pos++;
+            break;
+
+         default:
+            message[len++] = format[pos];
+            message[len] = '\0';
+            break;
+      }
+      /* continue to next character in format */
+      pos++;
+   }
+
+  return message;
+}
+

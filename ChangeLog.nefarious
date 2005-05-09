@@ -4,6 +4,22 @@
 
 2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
 
+	* doc/example.conf: Added feature ERR_OPERONLYCHAN.
+
+	* include/ircd_features.h: Added feature ERR_OPERONLYCHAN.
+
+	* include/ircd_reply.h: Added struct for message formatting.
+
+	* ircd/ircd_features.c: Added feature ERR_OPERONLYCHAN.
+
+	* ircd/ircd_reply.c: Added functions for formatting messages.
+
+	* ircd/m_join.c: Apply formatting for ERR_OPERONLYCHAN.
+
+	* ircd/s_err.c: Turned ERR_OPERONLYCHAN reply to %s.
+
+2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
+
 	* doc/example.conf: Added rank field to X:Lines.
 
 	* include/client.h: cli_dnsbl holds the highest rank dnsbl,

@@ -30,6 +30,16 @@ struct dnsbl_format_assoc
    int type;
 };
 
+struct message_format_assoc
+{
+   char key;
+   void *data;
+   int type;
+};
+
+extern char *format_message(char *nick, char *ident, char *host, char *ip,
+                            char *channel, char *format);
+
 extern char *format_dnsbl_msg(char *dnsblip, char *dnsblhost, char *dnsbluser,
                               char *dnsblnick, char *format);
 

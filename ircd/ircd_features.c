@@ -500,6 +500,7 @@ static struct FeatureDesc {
   F_B(HIS_SHUN, 0, 1, 0),
   F_B(HIS_USERSHUN, 0, 1, 0),
   F_B(HIS_STATS_S, 0, 1, 0),
+  F_S(ERR_OPERONLYCHAN, 0, "Cannot join channel (+O)", 0),
 
 #undef F_S
 #undef F_B

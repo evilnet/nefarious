@@ -90,6 +90,7 @@
 #include "ircd_chattr.h"
 #include "ircd_features.h"
 #include "ircd_reply.h"
+#include "ircd_snprintf.h"
 #include "ircd_string.h"
 #include "msg.h"
 #include "numeric.h"
@@ -175,6 +176,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char *chanlist;
   char *name;
   char *keys;
+  char format_reply[BUFSIZE + 1];
 
   if (parc < 2 || *parv[1] == '\0')
     return need_more_params(sptr, "JOIN");
@@ -283,7 +285,14 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    sendto_opmask_butone(0, SNO_HACK4, "OPER JOIN: %C JOIN %H "
 				 "(overriding +%c)", sptr, chptr, i);
 	} else {
-	  send_reply(sptr, i, chptr->chname);
+          if (i == ERR_OPERONLYCHAN) {
+            ircd_snprintf(0, format_reply, sizeof(format_reply), "%s", format_message(cli_name(sptr),
+                          cli_username(sptr), (char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+                          cli_user(sptr)->host, chptr->chname,(char*)feature_str(FEAT_ERR_OPERONLYCHAN)));
+
+            send_reply(sptr, i, chptr->chname, format_reply);
+          } else
+           send_reply(sptr, i, chptr->chname);
 	  continue;
 	}
 
