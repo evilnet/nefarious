@@ -312,7 +312,7 @@ stats_dnsbl(struct Client* to, struct StatDesc* sd, int stat, char* param)
   struct blline *blline;
 
   for (blline = GlobalBLList; blline; blline = blline->next)
-    send_reply(to, RPL_STATSXLINE, blline->server, blline->name, blline->flags, blline->replies, blline->reply);
+    send_reply(to, RPL_STATSXLINE, blline->server, blline->name, blline->flags, blline->replies, blline->rank, blline->reply);
 }
 
 static void

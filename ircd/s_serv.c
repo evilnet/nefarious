@@ -35,6 +35,7 @@
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "ircd_snprintf.h"
+#include "ircd_struct.h"
 #include "ircd_xopen.h"
 #include "jupe.h"
 #include "list.h"
@@ -261,11 +262,18 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 		      "%C :%s", acptr, cli_user(acptr)->swhois);
       if (IsDNSBLMarked(acptr)) /* Burst even if dnsbl is disabled */
       {
-          char* dnsblhost = cli_user(acptr)->dnsblhost;
-          if(!dnsblhost[0])
-              dnsblhost = "notmarked";
-        sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s %s ma %s :%s", cli_name(acptr),
-                      MARK_DNSBL, cli_dnsbl(acptr), dnsblhost, cli_dnsblformat(acptr));
+        struct SLink*  lp;
+        char* dnsblhost = cli_user(acptr)->dnsblhost;
+        if(!dnsblhost[0])
+            dnsblhost = "notmarked";
+
+        sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s ma %s", cli_name(acptr), MARK_DNSBL,
+                      dnsblhost);
+
+        for (lp = cli_sdnsbls(acptr); lp; lp = lp->next)
+           sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s %s", cli_name(acptr),
+                         MARK_DNSBL_DATA, lp->value.cp);
+
       }
 
     }

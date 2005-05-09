@@ -247,6 +247,10 @@ static void exit_one_client(struct Client* bcptr, const char* comment)
     while ((lp = cli_user(bcptr)->silence))
       del_silence(bcptr, lp->value.cp);
 
+    /* Clean up sdnsblsfield */
+    while ((lp = cli_sdnsbls(bcptr)))
+      del_dnsbl(bcptr, lp->value.cp);
+
     /* Clean up snotice lists */
     if (MyUser(bcptr))
       set_snomask(bcptr, ~0, SNO_DEL);

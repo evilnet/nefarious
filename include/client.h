@@ -272,8 +272,11 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /* Unique name of the client, nick or host */
   char cli_username[USERLEN + 1]; /* username here now for auth stuff */
   char cli_info[REALLEN + 1];   /* Free form additional client information */
-  char cli_dnsbl[BUFSIZE + 1];       /* dnsbl identifier */
+  char cli_dnsbl[BUFSIZE + 1];       /* dnsbl hostname identifier */
+  char cli_dnsbls[BUFSIZE + 1];      /* all dnsbls matched identifier */
+  struct SLink*   cli_sdnsbls;       /* chain of dnsbl pointer blocks */
   char cli_dnsblformat[BUFSIZE + 1]; /* dnsbl rejection message */
+  int  cli_dnsbllastrank;            /* last rank we got */
 };
 
 #define CLIENT_MAGIC 0x4ca08286
@@ -305,8 +308,11 @@ struct Client {
 #define cli_info(cli)		((cli)->cli_info)
 #define cli_oflags(cli)		((cli)->cli_oflags)
 #define cli_dnsbl(cli)		((cli)->cli_dnsbl)
+#define cli_dnsbls(cli)		((cli)->cli_dnsbls)
+#define cli_sdnsbls(cli)	((cli)->cli_sdnsbls)
 #define cli_dnsblformat(cli)	((cli)->cli_dnsblformat)
 #define cli_dnsblcount(cli)	((cli)->cli_dnsblcount)
+#define cli_dnsbllastrank(cli)  ((cli)->cli_dnsbllastrank)
 
 #define cli_count(cli)		((cli)->cli_connect->con_count)
 #define cli_fd(cli)		((cli)->cli_connect->con_fd)

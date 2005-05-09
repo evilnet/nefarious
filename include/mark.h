@@ -23,7 +23,8 @@
  * $Id$
  */
 
-#define MARK_DNSBL "DNSBL"
+#define MARK_DNSBL	"DNSBL"
+#define MARK_DNSBL_DATA	"DNSBL_DATA"
 
 
 #endif /* INCLUDED_mark_h */

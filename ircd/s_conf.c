@@ -976,7 +976,8 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   struct blline *blline;
 
   if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-     EmptyString(fields[3]) || EmptyString(fields[4]) || EmptyString(fields[5]))
+     EmptyString(fields[3]) || EmptyString(fields[4]) ||
+     EmptyString(fields[5]) || EmptyString(fields[6]))
     return;
 
   ++GlobalBLCount;
@@ -988,6 +989,7 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   DupString(blline->flags, fields[3]);
   DupString(blline->replies, fields[4]);
   DupString(blline->reply, fields[5]);
+  DupString(blline->rank, fields[6]);
   blline->next = GlobalBLList;
   GlobalBLList = blline;
 }
@@ -1002,10 +1004,62 @@ void clear_dnsbl_list(void)
     MyFree(blline->flags);
     MyFree(blline->replies);
     MyFree(blline->reply);
+    MyFree(blline->rank);
     MyFree(blline);
   }
   GlobalBLList = 0;
 }
+
+extern int find_dnsbl(struct Client* sptr, const char* dnsbl)
+{
+  struct SLink *lp;
+
+  for (lp = cli_sdnsbls(sptr); lp; lp = lp->next) {
+    if (!ircd_strcmp(lp->value.cp, dnsbl))
+      return 1;
+  }
+
+  return 0;
+}
+
+extern int add_dnsbl(struct Client* sptr, const char* dnsbl)
+{
+  struct SLink *lp;
+
+  if (!find_dnsbl(sptr, dnsbl)) {
+    lp = make_link();
+    memset(lp, 0, sizeof(struct SLink));
+    lp->next = cli_sdnsbls(sptr);
+    lp->value.cp = (char*) MyMalloc(strlen(dnsbl) + 1);
+    assert(0 != lp->value.cp);
+    strcpy(lp->value.cp, dnsbl);
+    cli_sdnsbls(sptr) = lp;
+  }
+  return 0;
+}
+
+extern int del_dnsbl(struct Client *sptr, char *dnsbl)
+{
+  struct SLink **lp;
+  struct SLink *tmp;
+  int ret = -1;
+
+  for (lp = &(cli_sdnsbls(sptr)); *lp;) {
+    if (!ircd_strcmp(dnsbl, (*lp)->value.cp))
+    {
+      tmp = *lp;
+      *lp = tmp->next;
+      MyFree(tmp->value.cp);
+      free_link(tmp);
+      ret = 0;
+    }
+    else
+      lp = &(*lp)->next;
+  }
+  return ret;
+}
+
+
 /* Find an X:line matching the rbl reply and mark the client appropreately
  *
  * @sptr
@@ -1022,6 +1076,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
   char cstr_buf[HOSTLEN +1];
   char *cstr = cstr_buf;
   int da = 0;
+  int ret = 0;
   int c = 0;
   int j = 0;
   unsigned int x_flag = 0;
@@ -1095,11 +1150,14 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
               SetDNSBLDenied(sptr);
             }
 
-            if (EmptyString(cli_dnsbl(sptr)))
+            if (atoi(blline->rank) > cli_dnsbllastrank(sptr)) {
               ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
-            if (EmptyString(cli_dnsblformat(sptr)))
               ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
-            return 1;
+            }
+
+            cli_dnsbllastrank(sptr) = atoi(blline->rank);
+            add_dnsbl(sptr, blline->name);
+            ret = 1;
           }
         } else if (x_flag & DFLAG_REPLY) {
 	    for(csep = cstr; *(csep+1); csep++); /* set csep to the end */
@@ -1127,13 +1185,16 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
                       SetDNSBLDenied(sptr);
                     }
 
-                    if (EmptyString(cli_dnsbl(sptr)))
+                    if (atoi(blline->rank) > cli_dnsbllastrank(sptr)) {
                       ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
-                    if (EmptyString(cli_dnsblformat(sptr)))
                       ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
+                    }
 
+                    cli_dnsbllastrank(sptr) = atoi(blline->rank);
+
+                    add_dnsbl(sptr, blline->name);
                     da = 0;
-                    return 1;
+                    ret = 1;
                   }
   		  *csep = 0;
                 }
@@ -1141,7 +1202,7 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
         }
     }
   }
-  return 0;
+  return ret;
 }
 
 void conf_add_local(const char* const* fields, int count)

@@ -40,6 +40,7 @@
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "ircd_struct.h"
 #include "list.h"
 #include "mark.h"
 #include "match.h"
@@ -597,6 +598,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   }
 
   if (MyConnect(sptr) && feature_bool(FEAT_DNSBL_CHECKS)) {
+    struct SLink*  dp;
     char *dhost = NULL;
     char chkhosti[NICKLEN+USERLEN+SOCKIPLEN+3];
     char chkhosth[NICKLEN+USERLEN+HOSTLEN+3];
@@ -606,14 +608,25 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ircd_snprintf(0, chkhosti, NICKLEN+USERLEN+SOCKIPLEN+3, "%s!%s@%s", cli_name(sptr), user->username, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))));
     ircd_snprintf(0, chkhosth, NICKLEN+USERLEN+HOSTLEN+3, "%s!%s@%s", cli_name(sptr), user->username, cli_sockhost(sptr));
 
-    if (IsDNSBL(sptr))
+    if (IsDNSBL(sptr)) {
       log_write(LS_DNSBL, L_INFO, 0, "Client %s - %p", cli_name(sptr), sptr);
+
+      for (dp = cli_sdnsbls(sptr); dp; dp = dp->next) {
+        if (EmptyString(cli_dnsbls(sptr)))
+          strcat(cli_dnsbls(sptr), dp->value.cp);
+        else {
+          strcat(cli_dnsbls(sptr), ", ");
+          strcat(cli_dnsbls(sptr), dp->value.cp);
+        }
+      }
+    }
 
     if (IsDNSBL(sptr) && ((dhost = find_dnsblexempt(chkhosti)) || (dhost = find_dnsblexempt(chkhosth)))) {
       log_write(LS_DNSBL, L_INFO, 0, "Client %s is exempted, marking and allowing.", cli_name(sptr));
       SetDNSBLAllowed(sptr);
       SetDNSBLMarked(sptr);
     }
+
 
     if (IsDNSBL(sptr) && !IsDNSBLAllowed(sptr)) {
       if (feature_bool(FEAT_DNSBL_WALLOPS_ONLY))
@@ -827,6 +840,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyUser(sptr))
   {
     struct Flags flags;
+    struct SLink*  lp;
 
     if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
       char flagbuf[BUFSIZE];
@@ -861,8 +875,12 @@ int register_user(struct Client *cptr, struct Client *sptr,
       dnsblhost = cli_user(sptr)->dnsblhost;
       if(!dnsblhost[0])
           dnsblhost = "notmarked";
-      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s %s %s %s :%s", cli_name(sptr), MARK_DNSBL, 
-                            cli_dnsbl(sptr), flagbuf, dnsblhost , cli_dnsblformat(sptr));
+      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s %s %s", cli_name(sptr), MARK_DNSBL,
+                            flagbuf, dnsblhost);
+
+      for (lp = cli_sdnsbls(sptr); lp; lp = lp->next)
+         sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s %s", cli_name(sptr),
+                               MARK_DNSBL_DATA, lp->value.cp);
 
       Debug((DEBUG_DEBUG, "MARKED DNSBL: %s (r %s - n %s) (d %s m %s a %s)", cli_dnsbl(sptr),
             cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",

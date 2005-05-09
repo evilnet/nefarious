@@ -117,16 +117,15 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     unsigned int x_flag = 0;
     struct Client* acptr;
 
-    if(parc < 7)
-        return protocol_violation(sptr, "MARK received too few parameters (%u)", parc);;
+    if(parc < 5)
+        return protocol_violation(sptr, "MARK DNSBL received too few parameters (%u)", parc);;
 
-    Debug((DEBUG_DEBUG, "Receiving MARK"));
+    Debug((DEBUG_DEBUG, "Receiving DNSBL MARK"));
     if ((acptr = FindUser(parv[1]))) {
-      log_write(LS_DNSBL, L_INFO, 0, "Received DNSBL Mark %s d: %s flags: %s host: %s reason: %s",
-                cli_name(acptr), parv[3], parv[4], parv[5], parv[6]);
-      Debug((DEBUG_DEBUG, "Marking: %s d: %s flags: %s host: %s reason: %s", cli_name(acptr), parv[3], parv[4], parv[5], parv[6]));
+      log_write(LS_DNSBL, L_INFO, 0, "Received DNSBL Mark %s flags: %s host: %s",
+                cli_name(acptr), parv[3], parv[4]);
 
-      x_flag = dflagstr(parv[4]);
+      x_flag = dflagstr(parv[3]);
 
       SetDNSBL(acptr);
 
@@ -136,15 +135,30 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
       if (x_flag & DFLAG_ALLOW)
         SetDNSBLAllowed(acptr);
 
-      ircd_strncpy(cli_dnsbl(acptr), parv[3], BUFSIZE);
+      ircd_strncpy(cli_user(acptr)->dnsblhost, parv[4], HOSTLEN);
 
-      /* not used yet so no real need to fuss around with parv/parv */
-      ircd_strncpy(cli_dnsblformat(acptr), parv[6], BUFSIZE);
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s", cli_name(acptr), MARK_DNSBL,
+                            parv[3], cli_user(acptr)->dnsblhost);
+    } else
+      Debug((DEBUG_DEBUG, "MARK cannot find user %s", parv[1]));
 
-      ircd_strncpy(cli_user(acptr)->dnsblhost, parv[5], HOSTLEN);
+    return 0;
 
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s %s :%s", cli_name(acptr), MARK_DNSBL,
-                            cli_dnsbl(acptr), parv[4], cli_user(acptr)->dnsblhost, cli_dnsblformat(acptr));
+  } else if (!strcmp(parv[2], MARK_DNSBL_DATA)) {
+    struct Client* acptr;
+
+    if(parc < 4)
+        return protocol_violation(sptr, "MARK DNSBL Data received too few parameters (%u)", parc);;
+
+    Debug((DEBUG_DEBUG, "Receiving MARK DNSBL Data"));
+    if ((acptr = FindUser(parv[1]))) {
+      log_write(LS_DNSBL, L_INFO, 0, "Received DNSBL Mark Data %s d: %s",
+                cli_name(acptr), parv[3]);
+
+      add_dnsbl(acptr, parv[3]);
+
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s", cli_name(acptr), MARK_DNSBL_DATA,
+                            parv[3]);
     } else
       Debug((DEBUG_DEBUG, "MARK cannot find user %s", parv[1]));
 

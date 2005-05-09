@@ -202,6 +202,7 @@ struct blline {
   char *flags;
   char *replies;
   char *reply;
+  char *rank;
 };
 
 
@@ -270,5 +271,8 @@ extern void clear_svclines(void);
 extern struct svcline *find_svc(const char *cmd);
 extern char *oflagstr(long);
 extern const char dflagstr(const char* dflags);
+extern int find_dnsbl(struct Client* sptr, const char* dnsbl);
+extern int add_dnsbl(struct Client* sptr, const char* dnsbl);
+extern int del_dnsbl(struct Client* sptr, char* dnsbl);
 
 #endif /* INCLUDED_s_conf_h */

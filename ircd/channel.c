@@ -654,11 +654,6 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   se = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->username,
                           (cli_user(cptr))->host);
 
-  if (IsDNSBLMarked(cptr))
-    sde = make_nick_user_host(nu_dnsblhoste, cli_name(cptr),
-                              cli_user(cptr)->realusername,
-                              cli_user(cptr)->dnsblhost);
-
   if (HasSetHost(cptr))
     she = make_nick_user_host(nu_realhoste, cli_name(cptr),
                              cli_user(cptr)->realusername,
@@ -730,9 +725,29 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
         }
       }
     }
+
+    if (IsDNSBLMarked(cptr)) {
+      struct SLink* lp;
+      char tmpdhoste[BUFSIZE + 1];
+      int dnsble = 0;
+
+      for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
+        ircd_snprintf(0, tmpdhoste, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
+        sde = make_nick_user_host(nu_dnsblhoste, cli_name(cptr),
+                                  cli_user(cptr)->realusername,
+                                  tmpdhoste);
+
+        if (sde && match(tmpe->value.except.exceptstr, sde) == 0) {
+          dnsble = 1;
+          break;
+        }
+      }
+
+      if (dnsble == 1)
+        break;
+    }
+
     if (match(tmpe->value.except.exceptstr, se) == 0)
-      break;
-    else if (sde && match(tmpe->value.except.exceptstr, sde) == 0)
       break;
     else if (she && match(tmpe->value.except.exceptstr, she) == 0)
       break;
@@ -794,11 +809,6 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
   s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->username,
 			  (cli_user(cptr))->host);
-
-  if (IsDNSBLMarked(cptr))
-    sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
-                             cli_user(cptr)->realusername,
-                             cli_user(cptr)->dnsblhost);
 
   if (HasSetHost(cptr))
     sh = make_nick_user_host(nu_realhost, cli_name(cptr),
@@ -871,11 +881,31 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
         }
       }
     }
+
+    if (IsDNSBLMarked(cptr)) {
+      struct SLink* lp;
+      char tmpdhostb[BUFSIZE + 1];
+      int dnsblb = 0;
+
+      for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
+        ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
+        sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                                  cli_user(cptr)->realusername,
+                                  tmpdhostb);
+
+        if (sd && match(tmp->value.ban.banstr, sd) == 0) {
+          dnsblb = 1;
+          break;
+        }
+      }
+
+      if (dnsblb == 1)
+        break;
+    }
+
     if (match(tmp->value.ban.banstr, s) == 0)
       break;
     else if (sh && match(tmp->value.ban.banstr, sh) == 0)
-      break;
-    else if (sd && match(tmp->value.ban.banstr, sd) == 0)
       break;
     else if (sf && match(tmp->value.ban.banstr, sf) == 0)
       break;

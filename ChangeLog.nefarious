@@ -2,6 +2,44 @@
  Nefarious IRCu ChangeLog
 
 
+2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added rank field to X:Lines.
+
+	* include/client.h: cli_dnsbl holds the highest rank dnsbl,
+	cli_dnsbls hold all the dnsbls matched in a char format, and
+	cli_sdnsbls is a structure containing all the matched dnsbls.
+	cli_dnsbls is generated off this for user in WHOIS.
+
+	* ircd/mark.h: Added MARK_DNSBL_DATA.
+
+	* ircd/s_conf.h: Added rank field into the blline struct.
+
+	* ircd/channel.c: Check all matched dnsbls from the cli_sdnsbls
+	struct for bans and exempts.
+
+	* ircd/m_mark.c: Added MARK_DNSBL_DATA so we can send and recieve
+	multiple dnsbls, one per send. MARK_DNSBL has been adjusted,
+	removing the cli_dnsbl field and the reason field.
+
+	* ircd/m_whois.c: If cli_dnsbls is empty then generate a new list
+	from cli_sdnsbls. It will only be empty on a remote server after
+	it has linked. Once its generated it will not be generated again.
+
+	* ircd/s_conf.c Added rank field and functions to add, find and
+	remove from the cli_sdnsbls struct.
+
+	* ircd/s_err.c: Added rank field to STATSXLINE.
+
+	* ircd/s_misc.c: Clean up the cli_sdnsbls struct on quit.
+
+	* ircd/s_serv.c: Burst MARK_DNSBL and MARK_DNSBL_DATA.
+
+	* ircd/s_stats.c: Added rank field to STATSXLINE.
+
+	* ircd/s_user.c: Generate a cli_dnsbls list and burst MARK_DNSBL
+	and MARK_DNSBL_DATA.
+
 2005-05-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added DNSBL d flag for rejecting clients.
