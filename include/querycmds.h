@@ -27,6 +27,7 @@ struct UserStatistics {
   unsigned int clients;         /* IsUser() */
   unsigned int localclients;
   unsigned int globalclients;
+  unsigned int conncount;
 
   /* Global user mode changes: */
   unsigned int inv_clients;     /* IsUser() && IsInvisible() */

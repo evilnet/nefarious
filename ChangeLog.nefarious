@@ -4,6 +4,15 @@
 
 2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
 
+	* include/querycmds.h: Added conncount.
+
+	* ircd/m_lusers.c: Display conncount with highest connection
+	notice.
+
+	* ircd/s_user.c: Increment conncount on each connect.
+
+2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
+
 	* doc/example.conf: Added feature ERR_OPERONLYCHAN.
 
 	* include/ircd_features.h: Added feature ERR_OPERONLYCHAN.

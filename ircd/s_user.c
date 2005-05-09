@@ -384,6 +384,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
     static time_t last_too_many1;
     static time_t last_too_many2;
 
+    ++UserStats.conncount;
+
     assert(cptr == sptr);
     switch (conf_check_client(sptr))
     {
