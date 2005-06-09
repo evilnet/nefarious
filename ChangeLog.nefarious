@@ -2,6 +2,11 @@
  Nefarious IRCu ChangeLog
 
 
+2005-06-10  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_user.c: Small bug fix with MARK's not being sent for
+	users who are exempting via class or loc methods (dnsbl scans).
+
 2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/querycmds.h: Added conncount.

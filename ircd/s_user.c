@@ -650,6 +650,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         }
 
         if ((class_exempt == 1) || (loc_exempt == 1)) {
+          SetDNSBLAllowed(sptr);
 	  loc_exempt = 0;
 	  class_exempt = 0;
         } else
