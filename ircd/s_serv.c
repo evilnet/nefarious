@@ -237,7 +237,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
   }
 
   for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next)
-    sendcmdto_one(&me, CMD_EXEMPT, cptr, "%C +%s nb", cptr, dnsblexempts->host);
+    sendcmdto_one(&me, CMD_EXEMPT, cptr, "%C +%s %Tu nb", cptr, dnsblexempts->host, dnsblexempts->lastseen);
 
   for (acptr = &me; acptr; acptr = cli_prev(acptr))
   {

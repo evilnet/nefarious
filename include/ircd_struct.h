@@ -100,12 +100,14 @@ struct dnsblexempts {
   struct dnsblexempts *next;
   struct dnsblexempts **prev;
 
-  char *host;
+  char                *host;
+  time_t              lastseen;
 };
 
 extern struct dnsblexempts*    DNSBLExemptList;
 
 extern char* find_dnsblexempt(const char* host);
-
+extern char* process_exempts(struct Client* sptr, char* host, time_t lseen);
+extern int add_exempt(struct Client* sptr, char* host, char* netburst, time_t lseen);
 
 #endif /* INCLUDED_ircd_struct_h */

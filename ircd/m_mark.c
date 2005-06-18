@@ -148,7 +148,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     struct Client* acptr;
 
     if(parc < 4)
-        return protocol_violation(sptr, "MARK DNSBL Data received too few parameters (%u)", parc);;
+        return protocol_violation(sptr, "MARK DNSBL Data received too few parameters (%u)", parc);
 
     Debug((DEBUG_DEBUG, "Receiving MARK DNSBL Data"));
     if ((acptr = FindUser(parv[1]))) {
@@ -161,6 +161,24 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
                             parv[3]);
     } else
       Debug((DEBUG_DEBUG, "MARK cannot find user %s", parv[1]));
+
+    return 0;
+  } else if (!strcmp(parv[2], MARK_EXEMPT_UPDATE)) {
+    struct Client* acptr;
+
+    if(parc < 4)
+      return protocol_violation(sptr, "MARK Exempt Update received too few parameters (%u)", parc);
+
+    Debug((DEBUG_DEBUG, "Receiving MARK Exempt Update"));
+
+    if ((acptr = FindNServer(parv[1]))) {
+      process_exempts(acptr, parv[3], atoi(parv[4]));
+
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s", cli_name(acptr), MARK_EXEMPT_UPDATE,
+                            parv[3], parv[4]);
+
+    } else
+      Debug((DEBUG_DEBUG, "MARK cannot find server %s", parv[1]));
 
     return 0;
   } else

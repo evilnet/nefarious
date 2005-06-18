@@ -2,6 +2,36 @@
  Nefarious IRCu ChangeLog
 
 
+2005-06-18  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added new feature EXEMPT_EXPIRE, default set
+	to 172800 seconds.
+
+	* include/ircd_features.h: Added FEAT_EXEMPT_EXPIRE.
+
+	* include/ircd_struct.h: Added lastseen to dnsbl exempt list
+	struct.
+
+	* include/mark.h: Added new MARK type for sending out updated
+	last seen exempt times.
+
+	* ircd/ircd_features.c: Added FEAT_EXEMPT_EXPIRE.
+
+	* ircd/m_exempt.c: Added functions for processing the exempt
+	list for updating and expiring where nessecary.
+
+	* ircd/m_mark.c: Do a process_exempts if we get an updated
+	last seen time, process_exempts will only do the updating
+	bits and not the expiring bit.
+
+	* ircd/s_err.c: Added %Tu to RPL_DNSBLEXEMPTLIST.
+
+	* ircd/s_user.c: Run process_exempts on connect against	a
+	clients real host and ip address.
+
+	* ircd/s_serv.c: Send out the lastseen time on burst so all
+	servers are in sync.
+
 2005-06-10  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Small bug fix with MARK's not being sent for

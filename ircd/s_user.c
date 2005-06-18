@@ -623,6 +623,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
       }
     }
 
+    process_exempts(sptr, chkhosti, 0);
+    process_exempts(sptr, chkhosth, 0);
+
     if (IsDNSBL(sptr) && ((dhost = find_dnsblexempt(chkhosti)) || (dhost = find_dnsblexempt(chkhosth)))) {
       log_write(LS_DNSBL, L_INFO, 0, "Client %s is exempted, marking and allowing.", cli_name(sptr));
       SetDNSBLAllowed(sptr);

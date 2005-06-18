@@ -37,7 +37,9 @@
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "ircd_struct.h"
 #include "list.h"
+#include "mark.h"
 #include "match.h"
 #include "msg.h"
 #include "numeric.h"
@@ -67,7 +69,44 @@ char* find_dnsblexempt(const char* host)
   return 0;
 }
 
-int add_exempt(struct Client* sptr, char* host, char* netburst)
+char* process_exempts(struct Client* sptr, char* host, time_t lseen)
+{
+  struct dnsblexempts *pdnsblexempts;
+  int m = 0;
+
+  for (pdnsblexempts = DNSBLExemptList; pdnsblexempts; pdnsblexempts = pdnsblexempts->next) {
+    Debug((DEBUG_DEBUG, "[PROCESS][SEARCH] %s (%s)", pdnsblexempts->host, host));
+    if (!match(pdnsblexempts->host, host)) {
+      Debug((DEBUG_DEBUG, "[PROCESS][UPDATE] Match"));
+      pdnsblexempts->lastseen = IsServer(sptr) ? lseen : CurrentTime;
+      if (!IsServer(sptr)) {
+        sendcmdto_serv_butone(sptr, CMD_MARK, sptr, "%C %s %s %Tu", &me, MARK_EXEMPT_UPDATE, pdnsblexempts->host,
+                              pdnsblexempts->lastseen);
+        m = 1;
+      }
+    }
+
+    if (!IsServer(sptr)) {
+      if ((m == 0) && (pdnsblexempts->lastseen+feature_int(FEAT_EXEMPT_EXPIRE) <= CurrentTime)) {
+        Debug((DEBUG_DEBUG, "[PROCESS][EXPIRE] Match %C %s", &me, host));
+        sendcmdto_serv_butone(&me, CMD_EXEMPT, &me, "%C -%s %Tu nm", &me, pdnsblexempts->host, pdnsblexempts->lastseen);
+        *pdnsblexempts->prev = pdnsblexempts->next;
+
+        if (pdnsblexempts->next)
+          pdnsblexempts->next->prev = pdnsblexempts->prev;
+
+        MyFree(pdnsblexempts->host);
+      }
+
+      m = 0;
+    }
+
+  }
+
+  return 0;
+}
+
+int add_exempt(struct Client* sptr, char* host, char* netburst, time_t lseen)
 {
   struct dnsblexempts *dnsblexempts;
   char *dhost;
@@ -86,6 +125,11 @@ int add_exempt(struct Client* sptr, char* host, char* netburst)
   dnsblexempts = (struct dnsblexempts *)MyMalloc(sizeof(struct dnsblexempts));
 
   DupString(dnsblexempts->host, host);
+
+  if (lseen == 0)
+    dnsblexempts->lastseen = CurrentTime;
+  else
+    dnsblexempts->lastseen = lseen;
 
   dnsblexempts->next = DNSBLExemptList;
   dnsblexempts->prev = &DNSBLExemptList;
@@ -139,7 +183,7 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (parc < 2 || EmptyString(parv[1]) || (strlen(parv[1]) <= 4)) {
     for (dnsblexempts = DNSBLExemptList; dnsblexempts; dnsblexempts = dnsblexempts->next)
-      send_reply(sptr, RPL_DNSBLEXEMPTLIST, dnsblexempts->host);
+      send_reply(sptr, RPL_DNSBLEXEMPTLIST, dnsblexempts->host, dnsblexempts->lastseen);
 
     send_reply(sptr, RPL_ENDOFEXEMPTLIST, cli_name(sptr));
     return 0;
@@ -156,7 +200,7 @@ int mo_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   cp = pretty_mask(cp);
 
-  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, "nm")))
+  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, "nm", 0)))
     sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %c%s", sptr, c, cp);
 
   return 0;
@@ -177,8 +221,10 @@ int ms_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else
     c = '+';
 
-  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, parv[3] ? parv[3] : "nm")))
-    sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s", sptr, parv[2]);
+  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, parv[4] ? parv[4] : "nm", parv[4] ?
+      atoi(parv[3]) : 0)))
+      sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s %d %s", sptr, parv[2], parv[4] ? atoi(parv[3]) : 0,
+                            parv[4] ? parv[4] : "nm");
 
   return 0;
 }
