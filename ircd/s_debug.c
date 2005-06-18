@@ -36,6 +36,7 @@
 #include "ircd.h"
 #include "jupe.h"
 #include "list.h"
+#include "listener.h"
 #include "motd.h"
 #include "msgq.h"
 #include "numeric.h"
@@ -44,6 +45,7 @@
 #include "s_bsd.h"
 #include "s_conf.h"
 #include "s_stats.h"
+#include "s_user.h"
 #include "send.h"
 #include "shun.h"
 #ifdef USE_SSL
@@ -246,13 +248,13 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       cn = 0,                   /* connections */
       ch = 0,                   /* channels */
       lcc = 0,                  /* local client conf links */
-      us = 0,                   /* user structs */
       chi = 0,                  /* channel invites */
       chb = 0,                  /* channel bans */
       che = 0,                  /* channel excepts */
       wwu = 0,                  /* whowas users */
       cl = 0,                   /* classes */
       co = 0,                   /* conf lines */
+      listeners = 0,            /* listeners */
       memberships = 0;          /* channel memberships */
 
   int usi = 0,                  /* users invited */
@@ -267,6 +269,8 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       chem = 0,                 /* memory used by channel excepts */
       cm = 0,                   /* memory used by clients */
       cnm = 0,                  /* memory used by connections */
+      us = 0,                   /* user structs */
+      usm = 0,                  /* memory used by user structs */
       awm = 0,                  /* memory used by aways */
       wwam = 0,                 /* whowas away memory used */
       wwm = 0,                  /* whowas array memory used */
@@ -278,6 +282,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       dbufs_used = 0,           /* memory used by dbufs */
       msg_allocated = 0,	/* memory used by struct Msg */
       msgbuf_allocated = 0,	/* memory used by struct MsgBuf */
+      listenersm = 0,           /* memory used by listetners */
       rm = 0,                   /* res memory used */
       totcl = 0, totch = 0, totww = 0, tot = 0;
 
@@ -296,7 +301,6 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
     }
     if (cli_user(acptr))
     {
-      us++;
       for (link = cli_user(acptr)->invited; link; link = link->next)
         usi++;
       for (member = cli_user(acptr)->channel; member; member = member->next_channel)
@@ -312,6 +316,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
   }
   cm = c * sizeof(struct Client);
   cnm = cn * sizeof(struct Connection);
+  user_count_memory(&us, &usm);
 
   for (chptr = GlobalChannelList; chptr; chptr = chptr->next)
   {
@@ -351,8 +356,8 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
 	     ":Clients %d(%zu) Connections %d(%zu)", c, cm, cn, cnm);
 #endif /* USE_SSL */
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
-	     ":Users %d(%zu) Accounts %d(%zu) Invites %d(%zu)",
-	     us, us * sizeof(struct User), acc, acc * (ACCOUNTLEN + 1),
+	     ":Users %zu(%zu) Accounts %d(%zu) Invites %d(%zu)",
+             us, usm, acc, acc * (ACCOUNTLEN + 1),
 	     usi, usi * sizeof(struct SLink));
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
 	     ":User channels %d(%zu) Aways %d(%zu)", memberships,
@@ -397,6 +402,10 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
 	     ":Hash: client %d(%zu), chan is the same", HASHSIZE,
 	     sizeof(void *) * HASHSIZE);
+
+  count_listener_memory(&listeners, &listenersm);
+  send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
+             ":Listeners allocated %d(%zu)", listeners, listenersm);
 
   /*
    * NOTE: this count will be accurate only for the exact instant that this

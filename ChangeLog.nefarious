@@ -2,6 +2,11 @@
  Nefarious IRCu ChangeLog
 
 
+2005-06-19  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_debug.c: Backported a couple of .12 things for debugging
+	and stats purposes.
+
 2005-06-18  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new feature EXEMPT_EXPIRE, default set
