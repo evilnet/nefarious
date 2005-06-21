@@ -113,7 +113,8 @@ static struct ListingArgs la_init = {
   0,                          /* flags */
   2147483647,                 /* max_topic_time */
   0,                          /* min_topic_time */
-  0                           /* chptr */
+  0,                          /* bucket */
+  {0}                         /* wildcard */
 };
 
 static struct ListingArgs la_default = {
@@ -124,7 +125,8 @@ static struct ListingArgs la_default = {
   0,                          /* flags */
   2147483647,                 /* max_topic_time */
   0,                          /* min_topic_time */
-  0                           /* chptr */
+  0,                          /* bucket */
+  {0}                         /* wildcard */
 };
 
 static int
@@ -158,12 +160,20 @@ show_usage(struct Client *sptr)
   send_reply(sptr, RPL_LISTUSAGE,
 	     " \002T>\002\037min_minutes\037 ; Channels with a topic last "
 	     "set more than \037min_minutes\037 ago.");
+  send_reply(sptr, RPL_LISTUSAGE,
+	     " \037pattern\037       ; Channels with names matching "
+             "\037pattern\037. ");
+  send_reply(sptr, RPL_LISTUSAGE,
+	     " !\037pattern\037      ; Channels with names not "
+             "matching \037pattern\037. ");
+  send_reply(sptr, RPL_LISTUSAGE, "Note: Patterns may contain * and ?. "
+             "You may only give one pattern match constraint.");
   if (IsAnOper(sptr))
     send_reply(sptr, RPL_LISTUSAGE,
 	       " \002S\002             ; Show secret channels.");
   send_reply(sptr, RPL_LISTUSAGE,
-	     "Example: LIST <3,>1,C<10,T>0  ; 2 users, younger than 10 "
-	     "min., topic set.");
+	     "Example: LIST <3,>1,C<10,T>0,#a*  ; 2 users, younger than 10 "
+	     "min., topic set., starts with #a");
 
   return LPARAM_ERROR; /* return error condition */
 }
@@ -175,6 +185,7 @@ param_parse(struct Client *sptr, const char *param, struct ListingArgs *args,
   int is_time = 0;
   char dir;
   unsigned int val;
+  char *tmp1, *tmp2;
 
   assert(0 != args);
 
@@ -249,7 +260,47 @@ param_parse(struct Client *sptr, const char *param, struct ListingArgs *args,
 	return show_usage(sptr);
       break;
 
-    default: /* channel name? */
+    default:
+      /* It might be a wildcard... */
+      if (strchr(param, '*') ||
+          strchr(param, '?'))
+      {
+        if (param[0] == '!')
+        {
+          param++;
+          args->flags |= LISTARG_NEGATEWILDCARD;
+        }
+
+        /* Only one wildcard allowed... */
+        if (args->wildcard[0] != 0)
+          return show_usage(sptr);
+
+        /* If its not going to match anything, don't bother. */
+        if (param[0] != '*' &&
+            param[0] != '?' &&
+            param[0] != '#' &&
+            param[0] != '&')
+          return show_usage(sptr);
+
+        tmp1 = strchr(param, ',');
+        tmp2 = strchr(param, ' ');
+        if (tmp2 && (!tmp1 || (tmp2 < tmp1)))
+          tmp1 = tmp2;
+        
+        if (tmp1)
+          *tmp1++ = 0;
+
+        ircd_strncpy(args->wildcard, param, CHANNELLEN-1);
+        args->wildcard[CHANNELLEN-1] = 0;
+
+        if (tmp1 == NULL)
+          return LPARAM_SUCCESS;
+
+        param = tmp1;
+        continue;
+      }
+
+      /* channel name? */
       if (!permit_chan || !IsChannelName(param))
 	return show_usage(sptr);
 
@@ -292,8 +343,8 @@ int m_list(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (cli_listing(sptr))            /* Already listing ? */
   {
-    cli_listing(sptr)->chptr->mode.mode &= ~MODE_LISTED;
-    MyFree(cli_listing(sptr));
+    if (cli_listing(sptr))
+      MyFree(cli_listing(sptr));
     cli_listing(sptr) = 0;
     send_reply(sptr, RPL_LISTEND);
     update_write(sptr);
@@ -332,14 +383,8 @@ int m_list(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       cli_listing(sptr) = (struct ListingArgs*) MyMalloc(sizeof(struct ListingArgs));
       assert(0 != cli_listing(sptr));
       memcpy(cli_listing(sptr), &args, sizeof(struct ListingArgs));
-      if ((cli_listing(sptr)->chptr = GlobalChannelList)) {
-        int m = GlobalChannelList->mode.mode & MODE_LISTED;
-        list_next_channels(sptr, 64);
-        GlobalChannelList->mode.mode |= m;
-        return 0;
-      }
-      MyFree(cli_listing(sptr));
-      cli_listing(sptr) = 0;
+     list_next_channels(sptr);
+     return 0;
     }
     send_reply(sptr, RPL_LISTEND);
     return 0;

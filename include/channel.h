@@ -109,10 +109,9 @@ struct Client;
 #define MODE_EXCEPT		0x400000 /* ban exceptions */
 #define MODE_ADMINONLY		0x800000 /* only admins may join */
 #define MODE_PERSIST            0x1000000 /* channel is persistant */
-#define MODE_LISTED		0x2000000
-#define MODE_SAVE		0x4000000 /* save this mode-with-arg 'til later */
-#define MODE_FREE		0x8000000 /* string needs to be passed to MyFree() */
-#define MODE_BURSTADDED		0x10000000 /* channel was created by a BURST */
+#define MODE_SAVE		0x2000000 /* save this mode-with-arg 'til later */
+#define MODE_FREE		0x4000000 /* string needs to be passed to MyFree() */
+#define MODE_BURSTADDED		0x8000000 /* channel was created by a BURST */
 
 /*
  * mode flags which take another parameter (With PARAmeterS)
@@ -128,7 +127,6 @@ struct Client;
 #define ShowChannel(v,c)        (PubChannel(c) || find_channel_member((v),(c)))
 #define PubChannel(x)           ((!x) || ((x)->mode.mode & \
                                     (MODE_PRIVATE | MODE_SECRET)) == 0)
-#define is_listed(x)            ((x)->mode.mode & MODE_LISTED)
 
 #define IsGlobalChannel(name)	(*(name) == '#')
 #define IsLocalChannel(name)	(*(name) == '&')
@@ -149,6 +147,7 @@ typedef enum ChannelGetType {
 
 #define LISTARG_TOPICLIMITS	0x0001
 #define LISTARG_SHOWSECRET	0x0002
+#define LISTARG_NEGATEWILDCARD  0x0004
 
 /*
  * Maximum acceptable lag time in seconds: A channel younger than
@@ -268,7 +267,8 @@ struct ListingArgs {
   unsigned int flags;
   time_t max_topic_time;
   time_t min_topic_time;
-  struct Channel *chptr;
+  unsigned int bucket;
+  char wildcard[CHANNELLEN];
 };
 
 struct ModeBuf {
@@ -378,8 +378,6 @@ extern int is_half_op(struct Client *cptr, struct Channel *chptr);
 extern void send_channel_modes(struct Client *cptr, struct Channel *chptr);
 extern char *pretty_mask(char *mask);
 extern void del_invite(struct Client *cptr, struct Channel *chptr);
-extern void list_next_channels(struct Client *cptr, int nr);
-extern void list_set_default(void); /* this belongs elsewhere! */
 
 extern void modebuf_init(struct ModeBuf *mbuf, struct Client *source,
 			 struct Client *connect, struct Channel *chan,

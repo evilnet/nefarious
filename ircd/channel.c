@@ -207,21 +207,6 @@ int destroy_unregistered_channel(struct Channel* chptr)
 
   assert(0 == chptr->members);
 
-  /* Channel became (or was) empty: Remove channel */
-  if (is_listed(chptr))
-  {
-    int i;
-    for (i = 0; i <= HighestFd; i++)
-    {
-      struct Client *acptr = 0;
-      if ((acptr = LocalClientArray[i]) && cli_listing(acptr) &&
-          (cli_listing(acptr))->chptr == chptr)
-      {
-        list_next_channels(acptr, 1);
-        break;                  /* Only one client can list a channel */
-      }
-    }
-  }
   /*
    * Now, find all invite links from channel structure
    */
@@ -289,21 +274,6 @@ int sub1_from_channel(struct Channel* chptr)
 
   assert(0 == chptr->members);
 
-  /* Channel became (or was) empty: Remove channel */
-  if (is_listed(chptr))
-  {
-    int i;
-    for (i = 0; i <= HighestFd; i++)
-    {
-      struct Client *acptr = 0;
-      if ((acptr = LocalClientArray[i]) && cli_listing(acptr) &&
-          (cli_listing(acptr))->chptr == chptr)
-      {
-        list_next_channels(acptr, 1);
-        break;                  /* Only one client can list a channel */
-      }
-    }
-  }
   /*
    * Now, find all invite links from channel structure
    */
@@ -1812,67 +1782,6 @@ void del_invite(struct Client *cptr, struct Channel *chptr)
       tmp = 0;
       break;
     }
-}
-
-/* List and skip all channels that are listen */
-void list_next_channels(struct Client *cptr, int nr)
-{
-  char modebuf[MODEBUFLEN];
-  char parabuf[MODEBUFLEN];
-  char modestuff[MODEBUFLEN + TOPICLEN + 5];
-  struct ListingArgs *args = cli_listing(cptr);
-  struct Channel *chptr = args->chptr;
-  chptr->mode.mode &= ~MODE_LISTED;
-  while (is_listed(chptr) || --nr >= 0)
-  {
-    for (; chptr; chptr = chptr->next)
-    {
-      if (!cli_user(cptr))
-        continue;
-      if (chptr->users > args->min_users && chptr->users < args->max_users &&
-          chptr->creationtime > args->min_time &&
-          chptr->creationtime < args->max_time &&
-          (!(args->flags & LISTARG_TOPICLIMITS) || (*chptr->topic &&
-          chptr->topic_time > args->min_topic_time &&
-          chptr->topic_time < args->max_topic_time)))
-      {
-        if ((args->flags & LISTARG_SHOWSECRET) || ShowChannel(cptr,chptr)) {
-	  modebuf[0] = parabuf[0] = modestuff[0] = 0;
-	  if (!(chptr->mode.mode & MODE_NOLISTMODES) || (IsOper(cptr))) {
-	    channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
-	    if (modebuf[1] != '\0') {
-	      strcat(modestuff, "[");
-	      strcat(modestuff, modebuf);
-	      if (parabuf[0]) {
-	        strcat(modestuff, " ");
-	        strcat(modestuff, parabuf);
-	      }
-	      strcat(modestuff, "] ");
-	    }
-	  }
-	  strcat(modestuff, chptr->topic);
-	  send_reply(cptr, RPL_LIST, chptr->chname, chptr->users,
-		     modestuff);
-	}
-        chptr = chptr->next;
-        break;
-      }
-    }
-    if (!chptr)
-    {
-      MyFree(cli_listing(cptr));
-      cli_listing(cptr) = NULL;
-      send_reply(cptr, RPL_LISTEND);
-      break;
-    }
-  }
-  if (chptr)
-  {
-    (cli_listing(cptr))->chptr = chptr;
-    chptr->mode.mode |= MODE_LISTED;
-  }
-
-  update_write(cptr);
 }
 
 /*

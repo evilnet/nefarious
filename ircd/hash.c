@@ -26,10 +26,14 @@
 #include "hash.h"
 #include "client.h"
 #include "channel.h"
+#include "ircd_alloc.h"
 #include "ircd_chattr.h"
+#include "ircd_reply.h"
 #include "ircd_string.h"
 #include "ircd.h"
+#include "match.h"
 #include "msg.h"
+#include "numeric.h"
 #include "send.h"
 #include "ircd_struct.h"
 #include "support.h"
@@ -579,3 +583,68 @@ void clearNickJupes(void)
   for (i = 0; i < JUPEHASHSIZE; i++)
     jupeTable[i][0] = '\000';
 }
+
+/** Send more channels to a client in mid-LIST.
+ * @param[in] cptr Client to send the list to.
+ */
+void list_next_channels(struct Client *cptr)
+{
+  char modebuf[MODEBUFLEN];
+  char parabuf[MODEBUFLEN];
+  char modestuff[MODEBUFLEN + TOPICLEN + 5];
+  struct ListingArgs *args;
+  struct Channel *chptr;
+
+  /* Walk consecutive buckets until we hit the end. */
+  for (args = cli_listing(cptr); args->bucket < HASHSIZE; args->bucket++)
+  {
+    /* Send all the matching channels in the bucket. */
+    for (chptr = channelTable[args->bucket]; chptr; chptr = chptr->hnext)
+    {
+      if (chptr->users > args->min_users
+          && chptr->users < args->max_users
+          && chptr->creationtime > args->min_time
+          && chptr->creationtime < args->max_time
+          && (!args->wildcard[0] || (args->flags & LISTARG_NEGATEWILDCARD) ||
+              (!match(args->wildcard, chptr->chname)))
+          && (!(args->flags & LISTARG_NEGATEWILDCARD) ||
+              match(args->wildcard, chptr->chname))
+          && (!(args->flags & LISTARG_TOPICLIMITS)
+              || (chptr->topic[0]
+                  && chptr->topic_time > args->min_topic_time
+                  && chptr->topic_time < args->max_topic_time))
+          && ((args->flags & LISTARG_SHOWSECRET)
+              || ShowChannel(cptr, chptr)))
+      {
+        modebuf[0] = parabuf[0] = modestuff[0] = 0;
+        if (!(chptr->mode.mode & MODE_NOLISTMODES) || (IsOper(cptr))) {
+          channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
+          if (modebuf[1] != '\0') {
+            strcat(modestuff, "[");
+            strcat(modestuff, modebuf);
+            if (parabuf[0]) {
+              strcat(modestuff, " ");
+              strcat(modestuff, parabuf);
+            }
+            strcat(modestuff, "] ");
+          }
+        }
+        strcat(modestuff, chptr->topic);
+        send_reply(cptr, RPL_LIST, chptr->chname, chptr->users, modestuff);
+      }
+    }
+    /* If, at the end of the bucket, client sendq is more than half
+     * full, stop. */
+    if (MsgQLength(&cli_sendQ(cptr)) > cli_max_sendq(cptr) / 2)
+      break;
+  }
+
+  /* If we did all buckets, clean the client and send RPL_LISTEND. */
+  if (args->bucket >= HASHSIZE)
+  {
+    MyFree(cli_listing(cptr));
+    cli_listing(cptr) = NULL;
+    send_reply(cptr, RPL_LISTEND);
+  }
+}
+

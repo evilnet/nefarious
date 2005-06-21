@@ -252,7 +252,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     modebuf_init(mbuf = &modebuf, &me, cptr, chptr,
 		 MODEBUF_DEST_CHANNEL | MODEBUF_DEST_NOKEY);
     modebuf_mode(mbuf, MODE_DEL | chptr->mode.mode); /* wipeout modes */
-    chptr->mode.mode &= MODE_LISTED | MODE_BURSTADDED;
+    chptr->mode.mode &= MODE_BURSTADDED;
 
     parse_flags |= (MODE_PARSE_SET | MODE_PARSE_WIPEOUT); /* wipeout keys */
 
