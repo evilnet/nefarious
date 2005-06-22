@@ -1,6 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-06-23  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Most taken from Undernet IRCu 2.10.12, of course modified
+	where nessecary.
+
+	* include/class.h: Doxyfy class.h.
+
+	* include/IPcheck.h: Doxyfy IPcheck.h.
+
+	* ircd/class.c: Doxyfy class.c.
+
+	* ircd/IPcheck.c: Doxyfy IPcheck.c.
+
 2005-06-21  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Topic tracking updates and wildcard searching in LIST. Both

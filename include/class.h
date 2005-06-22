@@ -16,9 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
+/** @file
+ * @brief Declarations and interfaces for handling connection classes.
+ * @version $Id$
+ */
+
 #ifndef INCLUDED_class_h
 #define INCLUDED_class_h
 #ifndef INCLUDED_sys_types_h
@@ -33,33 +36,47 @@ struct ConfItem;
 /*
  * Structures
  */
+/** Represents a connection class. */
 struct ConnectionClass {
-  struct ConnectionClass* next;
-  int                     cc_class;
-  unsigned int            max_sendq;
-  short                   ping_freq;
-  short                   conn_freq;
-  short                   max_links;
-  unsigned char           valid;
-  int                     ref_count;
+  struct ConnectionClass* next;           /**< Link to next connection class. */
+  int                     cc_class;       /**< Number of connection class. */
+  unsigned int            max_sendq;      /**< Maximum client SendQ in bytes. */
+  short                   ping_freq;      /**< Ping frequency for clients. */
+  short                   conn_freq;      /**< Auto-connect frequency. */
+  short                   max_links;      /**< Maximum connections allowed. */
+  unsigned char           valid;          /**< Valid flag (cleared after this
+                                             class is removed from the config).*/
+  int                     ref_count;      /**< Number of references to class. */
 };
 
 /*
  * Macro's
  */
 
+/** Get class name for \a x. */
 #define ConClass(x)     ((x)->cc_class)
+/** Get ping frequency for \a x. */
 #define PingFreq(x)     ((x)->ping_freq)
+/** Get connection frequency for \a x. */
 #define ConFreq(x)      ((x)->conn_freq)
+/** Get maximum links allowed for \a x. */
 #define MaxLinks(x)     ((x)->max_links)
+/** Get maximum SendQ size for \a x. */
 #define MaxSendq(x)     ((x)->max_sendq)
+/** Get number of references to \a x. */
 #define Links(x)        ((x)->ref_count)
 
+/** Get class name for ConfItem \a x. */
 #define ConfClass(x)    ((x)->conn_class->cc_class)
+/** Get ping frequency for ConfItem \a x. */
 #define ConfPingFreq(x) ((x)->conn_class->ping_freq)
+/** Get connection frequency for ConfItem \a x. */
 #define ConfConFreq(x)  ((x)->conn_class->conn_freq)
+/** Get maximum links allowed for ConfItem \a x. */
 #define ConfMaxLinks(x) ((x)->conn_class->max_links)
+/** Get maximum SendQ size for ConfItem \a x. */
 #define ConfSendq(x)    ((x)->conn_class->max_sendq)
+/** Get number of references to class in ConfItem \a x. */
 #define ConfLinks(x)    ((x)->conn_class->ref_count)
 
 /*
