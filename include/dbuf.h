@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
+/** @file
+ * @brief Interfaces and declarations for dealing with data buffers.
+ * @version $Id$
+ */
+
 #ifndef INCLUDED_dbuf_h
 #define INCLUDED_dbuf_h
 #ifndef INCLUDED_sys_types_h
@@ -33,21 +36,17 @@ extern int DBufUsedCount;       /* GLOBAL - count of dbufs in use */
 
 struct DBufBuffer;
 
+/** Queue of data chunks. */
 struct DBuf {
-  unsigned int length;          /* Current number of bytes stored */
-  struct DBufBuffer *head;      /* First data buffer, if length > 0 */
-  struct DBufBuffer *tail;      /* last data buffer, if length > 0 */
+  unsigned int length;          /**< Current number of bytes stored */
+  struct DBufBuffer *head;      /**< First data buffer, if length > 0 */
+  struct DBufBuffer *tail;      /**< Last data buffer, if length > 0 */
 };
 
-/*
- * DBufLength - Returns the current number of bytes stored into the buffer.
- */
+/** Return number of bytes in a DBuf. */
 #define DBufLength(dyn) ((dyn)->length)
 
-/*
- * DBufClear - Scratch the current content of the buffer.
- * Release all allocated buffers and make it empty.
- */
+/** Release the entire content of a DBuf. */
 #define DBufClear(dyn) dbuf_delete((dyn), DBufLength(dyn))
 
 /*

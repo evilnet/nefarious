@@ -1,4 +1,28 @@
 /*
+ * IRC - Internet Relay Chat, ircd/crule.c
+ * Copyright (C) Tony Vencill <vencill@bga.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+/**
+ * @file
+ * @brief Connection rule parser and checker
+ * @version $Id$
+ */
+
+/*
  * SmartRoute phase 1
  * connection rule patch
  * by Tony Vencill (Tonto on IRC) <vencill@bga.com>
@@ -30,7 +54,6 @@
  * the rule functions are made empty functions as in the stand-alone
  * test parser.
  *
- * $Id$
  */
 #include "config.h"
 
@@ -81,36 +104,56 @@
 #endif
 
 /* some constants and shared data types */
-#define CR_MAXARGLEN 80         /* why 80? why not? it's > hostname lengths */
-#define CR_MAXARGS 3            /* There's a better way to do this,
-                                   but not now. */
+#define CR_MAXARGLEN 80         /**< Maximum arg length (must be > HOSTLEN) */
+#define CR_MAXARGS 3            /**< Maximum number of args for a rule */
 
 /*
  * Some symbols for easy reading
  */
 
+/** Input scanner tokens. */
 enum crule_token {
-  CR_UNKNOWN, CR_END, CR_AND, CR_OR, CR_NOT, CR_OPENPAREN, CR_CLOSEPAREN,
-  CR_COMMA, CR_WORD
+  CR_UNKNOWN,    /**< Unknown token type. */
+  CR_END,        /**< End of input ('\\0' or ':'). */
+  CR_AND,        /**< Logical and operator (&&). */
+  CR_OR,         /**< Logical or operator (||). */
+  CR_NOT,        /**< Logical not operator (!). */
+  CR_OPENPAREN,  /**< Open parenthesis. */
+  CR_CLOSEPAREN, /**< Close parenthesis. */
+  CR_COMMA,      /**< Comma. */
+  CR_WORD        /**< Something that looks like a hostmask (alphanumerics, "*?.-"). */
 };
 
+/** Parser error codes. */
 enum crule_errcode {
-  CR_NOERR, CR_UNEXPCTTOK, CR_UNKNWTOK, CR_EXPCTAND, CR_EXPCTOR,
-  CR_EXPCTPRIM, CR_EXPCTOPEN, CR_EXPCTCLOSE, CR_UNKNWFUNC, CR_ARGMISMAT
+  CR_NOERR,      /**< No error. */
+  CR_UNEXPCTTOK, /**< Invalid token given context. */
+  CR_UNKNWTOK,   /**< Input did not form a valid token. */
+  CR_EXPCTAND,   /**< Did not see expected && operator. */
+  CR_EXPCTOR,    /**< Did not see expected || operator. */
+  CR_EXPCTPRIM,  /**< Expected a primitive (parentheses, ! or word). */
+  CR_EXPCTOPEN,  /**< Expected an open parenthesis after function name. */
+  CR_EXPCTCLOSE, /**< Expected a close parenthesis to match open parenthesis. */
+  CR_UNKNWFUNC,  /**< Attempt to use an unknown function. */
+  CR_ARGMISMAT   /**< Wrong number of arguments to function. */
 };
 
 /*
  * Expression tree structure, function pointer, and tree pointer local!
  */
+/** Evaluation function for a connection rule. */
 typedef int (*crule_funcptr) (int, void **);
 
+/** Node in a connection rule tree. */
 struct CRuleNode {
-  crule_funcptr funcptr;
-  int numargs;
-  void *arg[CR_MAXARGS];        /* For operators arg points to a tree element;
-                                   for functions arg points to a char string. */
+  crule_funcptr funcptr; /**< Evaluation function for this node. */
+  int numargs;           /**< Number of arguments. */
+  void *arg[CR_MAXARGS]; /**< Array of arguments.  For operators, each arg
+                            is a tree element; for functions, each arg is
+                            a string. */
 };
 
+/** Typedef to save typing effort. */
 typedef struct CRuleNode* CRuleNodePtr;
 
 /* local rule function prototypes */
@@ -142,7 +185,7 @@ void print_tree(CRuleNodePtr);
 #endif
 #endif
 
-/* error messages */
+/** Error messages, indexed by the corresponding crule_errcode. */
 char *crule_errstr[] = {
   "Unknown error",              /* NOERR? - for completeness */
   "Unexpected token",           /* UNEXPCTTOK */
@@ -156,13 +199,14 @@ char *crule_errstr[] = {
   "Argument mismatch"           /* ARGMISMAT */
 };
 
-/* function table - null terminated */
+/** Connection rule function table entry. */
 struct crule_funclistent {
-  char name[15];                /* MAXIMUM FUNCTION NAME LENGTH IS 14 CHARS!! */
-  int reqnumargs;
-  crule_funcptr funcptr;
+  char name[15];         /**< Function name. */
+  int reqnumargs;        /**< Required number of arguments. */
+  crule_funcptr funcptr; /**< Handler function. */
 };
 
+/** Defined connection rules. */
 struct crule_funclistent crule_funclist[] = {
   /* maximum function name length is 14 chars */
   {"connected", 1, crule_connected},
@@ -172,9 +216,14 @@ struct crule_funclistent crule_funclist[] = {
   {"", 0, NULL}                 /* this must be here to mark end of list */
 };
 
-#if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
+/** Check whether any connected server matches crulearg[0].
+ * @param[in] numargs Number of valid args in \a crulearg.
+ * @param[in] crulearg Argument array.
+ * @return Non-zero if the condition is true, zero if not.
+ */
 static int crule_connected(int numargs, void *crulearg[])
 {
+#if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
   struct Client *acptr;
 
   /* taken from m_links */
@@ -186,18 +235,18 @@ static int crule_connected(int numargs, void *crulearg[])
       continue;
     return (1);
   }
-  return (0);
-}
-#else
-static int crule_connected(int numargs, void **crulearg)
-{
-  return (0);
-}
 #endif
+  return (0);
+}
 
-#if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
+/** Check whether any directly connected server matches crulearg[0].
+ * @param[in] numargs Number of valid args in \a crulearg.
+ * @param[in] crulearg Argument array.
+ * @return Non-zero if the condition is true, zero if not.
+ */
 static int crule_directcon(int numargs, void *crulearg[])
 {
+#if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
   int i;
   struct Client *acptr;
 
@@ -210,18 +259,19 @@ static int crule_directcon(int numargs, void *crulearg[])
       continue;
     return (1);
   }
-  return (0);
-}
-#else
-static int crule_directcon(int numargs, void **crulearg)
-{
-  return (0);
-}
 #endif
+  return (0);
+}
 
-#if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
+/** Check whether a connected server matching crulearg[1] is
+ * connnected to me behind one matching crulearg[0].
+ * @param[in] numargs Number of valid args in \a crulearg.
+ * @param[in] crulearg Argument array.
+ * @return Non-zero if the condition is true, zero if not.
+ */
 static int crule_via(int numargs, void *crulearg[])
 {
+#if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
   struct Client *acptr;
 
   /* adapted from m_links */
@@ -236,15 +286,15 @@ static int crule_via(int numargs, void *crulearg[])
       continue;
     return (1);
   }
-  return (0);
-}
-#else
-static int crule_via(int numargs, void **crulearg)
-{
-  return (0);
-}
 #endif
+  return (0);
+}
 
+/** Check whether we have a local IRC operator.
+ * @param[in] numargs Number of valid args in \a crulearg.
+ * @param[in] crulearg Argument array.
+ * @return Non-zero if the condition is true, zero if not.
+ */
 static int crule_directop(int numargs, void **crulearg)
 {
 #if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
@@ -262,6 +312,12 @@ static int crule_directop(int numargs, void **crulearg)
   return (0);
 }
 
+/** Perform an and-or-or test on crulearg[0] and crulearg[1].
+ * If crulearg[2] is non-NULL, it means do OR; if it is NULL, do AND.
+ * @param[in] numargs Number of valid args in \a crulearg.
+ * @param[in] crulearg Argument array.
+ * @return Non-zero if the condition is true, zero if not.
+ */
 static int crule__andor(int numargs, void *crulearg[])
 {
   int result1;
@@ -281,6 +337,11 @@ static int crule__andor(int numargs, void *crulearg[])
         ((CRuleNodePtr) crulearg[1])->arg));
 }
 
+/** Logically invert the result of crulearg[0].
+ * @param[in] numargs Number of valid args in \a crulearg.
+ * @param[in] crulearg Argument array.
+ * @return Non-zero if the condition is true, zero if not.
+ */
 static int crule__not(int numargs, void *crulearg[])
 {
   return (!((CRuleNodePtr) crulearg[0])->funcptr
@@ -289,12 +350,21 @@ static int crule__not(int numargs, void *crulearg[])
 }
 
 #if !defined(CR_DEBUG) && !defined(CR_CHKCONF)
+/** Evaluate a connection rule.
+ * @param[in] rule Rule to evalute.
+ * @return Non-zero if the rule allows the connection, zero otherwise.
+ */
 int crule_eval(struct CRuleNode* rule)
 {
   return (rule->funcptr(rule->numargs, rule->arg));
 }
 #endif
 
+/** Scan an input token from \a ruleptr.
+ * @param[out] next_tokp Receives type of next token.
+ * @param[in,out] ruleptr Next readable character from input.
+ * @return Either CR_UNKNWTOK if the input was unrecognizable, else CR_NOERR.
+ */
 static int crule_gettoken(int* next_tokp, const char** ruleptr)
 {
   char pending = '\0';
@@ -352,6 +422,12 @@ static int crule_gettoken(int* next_tokp, const char** ruleptr)
   return CR_NOERR;
 }
 
+/** Scan a word from \a ruleptr.
+ * @param[out] word Output buffer.
+ * @param[out] wordlenp Length of word written to \a word (not including terminating NUL).
+ * @param[in] maxlen Maximum number of bytes writable to \a word.
+ * @param[in,out] ruleptr Next readable character from input.
+ */
 static void crule_getword(char* word, int* wordlenp, size_t maxlen, const char** ruleptr)
 {
   char *word_ptr;
@@ -366,26 +442,9 @@ static void crule_getword(char* word, int* wordlenp, size_t maxlen, const char**
   *wordlenp = word_ptr - word;
 }
 
-/*
- * Grammar
- *   rule:
- *     orexpr END          END is end of input or :
- *   orexpr:
- *     andexpr
- *     andexpr || orexpr
- *   andexpr:
- *     primary
- *     primary && andexpr
- *  primary:
- *    function
- *    ! primary
- *    ( orexpr )
- *  function:
- *    word ( )             word is alphanumeric string, first character
- *    word ( arglist )       must be a letter
- *  arglist:
- *    word
- *    word , arglist
+/** Parse an entire rule.
+ * @param[in] rule Text form of rule.
+ * @return CRuleNode for rule, or NULL if there was a parse error.
  */
 struct CRuleNode* crule_parse(const char *rule)
 {
@@ -416,6 +475,12 @@ struct CRuleNode* crule_parse(const char *rule)
   return 0;
 }
 
+/** Parse an or expression.
+ * @param[out] orrootp Receives parsed node.
+ * @param[in,out] next_tokp Next input token type.
+ * @param[in,out] ruleptr Next input character.
+ * @return A crule_errcode value.
+ */
 static int crule_parseorexpr(CRuleNodePtr * orrootp, int *next_tokp, const char** ruleptr)
 {
   int errcode = CR_NOERR;
@@ -471,6 +536,12 @@ static int crule_parseorexpr(CRuleNodePtr * orrootp, int *next_tokp, const char*
   return (errcode);
 }
 
+/** Parse an and expression.
+ * @param[out] androotp Receives parsed node.
+ * @param[in,out] next_tokp Next input token type.
+ * @param[in,out] ruleptr Next input character.
+ * @return A crule_errcode value.
+ */
 static int crule_parseandexpr(CRuleNodePtr * androotp, int *next_tokp, const char** ruleptr)
 {
   int errcode = CR_NOERR;
@@ -526,6 +597,12 @@ static int crule_parseandexpr(CRuleNodePtr * androotp, int *next_tokp, const cha
   return (errcode);
 }
 
+/** Parse a primary expression.
+ * @param[out] primrootp Receives parsed node.
+ * @param[in,out] next_tokp Next input token type.
+ * @param[in,out] ruleptr Next input character.
+ * @return A crule_errcode value.
+ */
 static int crule_parseprimary(CRuleNodePtr* primrootp, int *next_tokp, const char** ruleptr)
 {
   CRuleNodePtr *insertionp;
@@ -581,6 +658,12 @@ static int crule_parseprimary(CRuleNodePtr* primrootp, int *next_tokp, const cha
   return (errcode);
 }
 
+/** Parse a function call.
+ * @param[out] funcrootp Receives parsed node.
+ * @param[in,out] next_tokp Next input token type.
+ * @param[in,out] ruleptr Next input character.
+ * @return A crule_errcode value.
+ */
 static int crule_parsefunction(CRuleNodePtr* funcrootp, int* next_tokp, const char** ruleptr)
 {
   int errcode = CR_NOERR;
@@ -625,6 +708,12 @@ static int crule_parsefunction(CRuleNodePtr* funcrootp, int* next_tokp, const ch
     return (CR_EXPCTOPEN);
 }
 
+/** Parse the argument list to a CRuleNode.
+ * @param[in,out] argrootp Node whos argument list is being populated.
+ * @param[in,out] next_tokp Next input token type.
+ * @param[in,out] ruleptr Next input character.
+ * @return A crule_errcode value.
+ */
 static int crule_parsearglist(CRuleNodePtr argrootp, int *next_tokp, const char** ruleptr)
 {
   int errcode = CR_NOERR;
@@ -683,6 +772,9 @@ static int crule_parsearglist(CRuleNodePtr argrootp, int *next_tokp, const char*
  * DO NOT CALL THIS FUNTION WITH A POINTER TO A NULL POINTER
  * (ie: If *elem is NULL, you're doing it wrong - seg fault)
  */
+/** Free a connection rule and all its children.
+ * @param[in,out] elem Pointer to pointer to element to free.  MUST NOT BE NULL.
+ */
 void crule_free(struct CRuleNode** elem)
 {
   int arg, numargs;
@@ -713,6 +805,9 @@ void crule_free(struct CRuleNode** elem)
 }
 
 #ifdef CR_DEBUG
+/** Display a connection rule as text.
+ * @param[in] printelem Connection rule to display.
+ */
 static void print_tree(CRuleNodePtr printelem)
 {
   int funcnum, arg;
@@ -757,6 +852,9 @@ static void print_tree(CRuleNodePtr printelem)
 #endif
 
 #ifdef CR_DEBUG
+/** Read connection rules from stdin and display parsed forms as text.
+ * @return Zero.
+ */
 int main(void)
 {
   char indata[256];

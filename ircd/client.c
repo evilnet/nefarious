@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
+/** @file
+ * @brief Implementation of functions for handling local clients.
+ * @version $Id$
+ */
+
 #include "config.h"
 
 #include "client.h"
@@ -40,10 +43,11 @@
 
 #define BAD_PING                ((unsigned int)-2)
 
-/*
- * client_get_ping
- * returns shortest ping time in attached server or client conf
- * classes or PINGFREQUENCY
+/** Find the shortest non-zero ping time attached to a client.
+ * If all attached ping times are zero, return the value for
+ * FEAT_PINGFREQUENCY.
+ * @param[in] acptr Client to find ping time for.
+ * @return Ping time in seconds.
  */
 int client_get_ping(const struct Client* acptr)
 {
@@ -69,10 +73,8 @@ int client_get_ping(const struct Client* acptr)
   return ping;
 }
 
-/*
- * client_drop_sendq
- * removes the client's connection from the list of connections with
- * queued data
+/** Remove a connection from the list of connections with queued data.
+ * @param[in] con Connection with no queued data.
  */
 void client_drop_sendq(struct Connection* con)
 {
@@ -86,10 +88,9 @@ void client_drop_sendq(struct Connection* con)
   }
 }
 
-/*
- * client_add_sendq
- * adds the client's connection to the list of connections with
- * queued data
+/** Add a connection to the list of connections with queued data.
+ * @param[in] con Connection with queued data.
+ * @param[in,out] con_p Previous pointer to next connection.
  */
 void client_add_sendq(struct Connection* con, struct Connection** con_p)
 {
@@ -103,6 +104,7 @@ void client_add_sendq(struct Connection* con, struct Connection** con_p)
   }
 }
 
+/** Array mapping privilege values to names and vice versa. */
 static struct {
   enum Priv priv;
   enum Feature feat;
@@ -183,6 +185,7 @@ static struct {
   { PRIV_LAST_PRIV, FEAT_LAST_F, 0 }
 };
 
+/** Array mapping privilege values to names and vice versa. */
 static struct {
   char        *name;
   unsigned int priv;
@@ -201,9 +204,10 @@ static struct {
   { 0, 0 }
 };
 
-/* client_set_privs(struct Client* client)
- *
- * Sets the privileges for opers.
+
+/** Set privileges on \a client.
+ * @param[in] client Client whos privileges are being set.
+ * @return Zero.
  */
 void
 client_set_privs(struct Client* client)
@@ -289,11 +293,10 @@ client_set_privs(struct Client* client)
   }
 }
 
-
-
-/* client_report_privs(struct Client *to, struct Client *client)
- *
- * Sends a summary of the oper's privileges to the oper.
+/** Report privileges of \a client to \a to.
+ * @param[in] to Client requesting privilege list.
+ * @param[in] client Client whos privileges should be listed.
+ * @return Zero.
  */
 int
 client_report_privs(struct Client *to, struct Client *client)

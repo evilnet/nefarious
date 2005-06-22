@@ -3,6 +3,20 @@
 
 2005-06-23  Neil Spierling  <sirvulcan@gmail.com>
 
+	* include/client.h: Doxyfy'ed.
+
+	* include/crule.h: Doxyfy'ed.
+
+	* include/dbuf.h: Doxyfy'ed.
+
+	* ircd/client.c: Doxyfy'ed.
+
+	* ircd/crule.c: Doxyfy'ed.
+
+	* ircd/dbuf.c: Doxyfy'ed.
+
+2005-06-23  Neil Spierling  <sirvulcan@gmail.com>
+
 	* Most taken from Undernet IRCu 2.10.12, of course modified
 	where nessecary.
 
