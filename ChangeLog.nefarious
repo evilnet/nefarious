@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-07-07  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_svsjoin.c: Few changes, dont use this revision yet. Only
+	commiting so that i can update the testnet easily to test this out.
+
 2005-06-23  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/client.h: Doxyfy'ed.

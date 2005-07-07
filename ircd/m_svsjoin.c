@@ -127,12 +127,16 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (IsChannelService(acptr))
     return 0;
 
+  if ((chptr = FindChannel(parv[2]))) {
+    flags = CHFL_DEOPPED;
+    if (find_member_link(chptr, acptr))
+      return 0;
+  } else
+    flags = CHFL_CHANOP;
+
   chptr = get_channel(acptr, parv[2],
 		      (!FindChannel(parv[2])) ? CGT_CREATE :
 		      CGT_NO_CREATE);
-
-  if (find_member_link(chptr, acptr))
-    return 0;
 
   joinbuf_init(&join, acptr, acptr, JOINBUF_TYPE_JOIN, 0, 0);  
   joinbuf_init(&create, acptr, acptr, JOINBUF_TYPE_CREATE, 0, TStime());
@@ -144,14 +148,20 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if ((!IsChannelName(name)) || (HasCntrl(name)))
     return 0;
 
-  flags = (chptr->users == 0) ? CHFL_CHANOP : CHFL_DEOPPED;
-
   if (chptr)
     joinbuf_join(&join, chptr, flags);
-  else if (!(chptr = get_channel(acptr, name, CGT_CREATE)))
+  else {
+    if (!MyUser(acptr)) {
+      sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
+      return 0;
+    }
     return 0;
-  else
     joinbuf_join(&create, chptr, flags);
+    if (feature_bool(FEAT_AUTOCHANMODES) &&
+        feature_str(FEAT_AUTOCHANMODES_LIST) &&
+        strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+      SetAutoChanModes(chptr);
+  }
 
   if (chptr->topic[0]) {
     send_reply(acptr, RPL_TOPIC, chptr->chname, chptr->topic);
@@ -164,5 +174,6 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */  
   joinbuf_flush(&create);
 
+  sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
   return 0;
 }
