@@ -3,6 +3,12 @@
 
 2005-07-07  Neil Spierling  <sirvulcan@gmail.com>
 
+	* Changelog.nefarious: Updated CVS_VERSION bits.
+
+	* ircd/version.c.SH: Updated CVS_VERSION bits.
+
+2005-07-07  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_svsjoin.c: Few changes, dont use this revision yet. Only
 	commiting so that i can update the testnet easily to test this out.
 
@@ -3875,4 +3881,4 @@
 
 ***********************************************************************/
 
-#define CVS_VERSION "$Revision$"
+#define CVS_VERSION "$Id$"

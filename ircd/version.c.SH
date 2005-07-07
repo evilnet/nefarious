@@ -30,8 +30,8 @@ awk '{if (NF == 6) \
 else \
 	 { print $1 " " $2 " " $3 " " $7 " at " $4 " " $5 " " $6 }}'`
 
-cvs_version=`cat ../ChangeLog.nefarious | grep '#define CVS_VERSION "$Revision:' | \
-awk '{ print $4 }'`
+cvs_version=`cat ../ChangeLog.nefarious | grep '#define CVS_VERSION "$Id:' | \
+awk '{ print $5 " " $6 }'`
 
 /bin/cat >version.c <<!SUB!THIS!
 /*
