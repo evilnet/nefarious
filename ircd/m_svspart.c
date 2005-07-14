@@ -109,7 +109,10 @@
 int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client *acptr;
-  char* newparv[BUFSIZE];
+  struct Channel *chptr;
+  struct Membership *member;
+  struct JoinBuf parts;
+  unsigned int flags = 0;
 
   if (parc < 3) {
     protocol_violation(sptr, "Too few arguments for SVSPART");
@@ -122,8 +125,24 @@ int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (IsChannelService(acptr))
     return 0;
 
-  newparv[0] = cli_name(acptr);
-  newparv[1] = parv[2];
+  if (!(chptr = get_channel(acptr, parv[2], CGT_NO_CREATE)))
+    return 0;
 
-  return m_part(acptr, acptr, 2, newparv);
+  if (!(member = find_member_link(chptr, acptr)))
+    return 0;
+
+  /* init join/part buffer */
+  joinbuf_init(&parts, acptr, acptr, JOINBUF_TYPE_PART, 0, 0);
+
+  assert(!IsZombie(member)); /* Local users should never zombie */
+
+  if (!member_can_send_to_channel(member))
+      flags |= CHFL_BANNED;
+
+  joinbuf_join(&parts, chptr, flags);
+
+  sendcmdto_serv_butone(sptr, CMD_SVSPART, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx,
+	acptr->cli_yxx, parv[2]);
+
+  return joinbuf_flush(&parts);
 }

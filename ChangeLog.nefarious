@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-07-15  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_svspart.c: As with the svsjoin commit before, dont use this
+	revision yet. Only committing it so i can update my other servers
+	easy for testing. Just a few changes.
+
 2005-07-14  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Fixed exempt sending bug, if there are no bans,
