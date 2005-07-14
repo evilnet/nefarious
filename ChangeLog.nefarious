@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-07-14  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Fixed exempt sending bug, if there are no bans,
+	just exempts. Then an channel is bursted like this:
+	AS B #rah 1121309805 ANAAD:o :% ~ *!*@exempt.com
+	The ircd handles it fine on netbursts as far as i can tell. X2
+	also handles it fine, however X3 will need to be changed. As for
+	other services, im not sure who else supports nefarious non p10
+	exempts.
+
 2005-07-07  Neil Spierling  <sirvulcan@gmail.com>
 
 	* Changelog.nefarious: Updated CVS_VERSION bits.

@@ -1223,6 +1223,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
 	CHFL_VOICE  | CHFL_HALFOP,
 	CHFL_CHANOP | CHFL_HALFOP | CHFL_VOICE
       };
+  int                vfirst = 1;
   int                first = 1;
   int                full  = 1;
   int                flag_cnt = 0;
@@ -1336,8 +1337,9 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
           full = 1;
           break;
         }
-	msgq_append(&me, mb, " %s%s", first ? ":%" : "",
-		    lp2->value.ban.banstr);
+ 	msgq_append(&me, mb, "%s%s%s", vfirst ? " :" : " ", first ? "%" : "",
+	            lp2->value.ban.banstr);
+        vfirst = 0;
 	first = 0;
       }
 
@@ -1353,8 +1355,9 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
           full = 1;
           break;
         }
-  	msgq_append(&me, mb, " %s%s", first ? "~ " : "",
+  	msgq_append(&me, mb, "%s%s%s", vfirst ? " :% " : " ", first ? "~ " : "",
 	            lp3->value.except.exceptstr);
+        vfirst = 0;
 	first = 0;
       }
     }
