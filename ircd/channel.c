@@ -1303,7 +1303,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
         {
           new_mode = 0;
           if (IsVoicedOrOpped(member)) {
-	    char tbuf[4] = ":";
+	    char tbuf[5] = ":";
 	    int loc = 1;
 
             if (IsChanOp(member))
