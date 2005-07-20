@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-07-20  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/channel.c: Fix : in multi-line bursts. Update comment about
+	buffer below.
+
 2005-07-15  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Bump up a buffer.

@@ -1253,6 +1253,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
   {
     full = 0;                   /* Assume by default we get it
                                  all in one message */
+    vfirst = 1;
 
     /* (Continued) prefix: "<Y> B <channel> <TS>" */
     /* is there any better way we can do this? */
@@ -1284,7 +1285,7 @@ void send_channel_modes(struct Client *cptr, struct Channel *chptr)
             current_flags[flag_cnt])
           continue;             /* Skip members with different flags */
 	if (msgq_bufleft(mb) < NUMNICKLEN + 5)
-          /* The 4 is a possible ",:ov" */
+          /* The 5 is a possible ",:ohv" */
         {
           full = 1;           /* Make sure we continue after
                                  sending it so far */
