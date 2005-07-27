@@ -73,6 +73,7 @@ use port 994 for your SSL port, as it is standard. You should know that
 non-root users can't use ports under 1024 and the ircd wont run as root,
 so this becomes an issue. This can be fixed with the Bounce tool
 (tools/Bounce). You will need to have root access for this to work.
+Server to server SSL is not supported yet.
 
 cd tools/Bounce
 ./build

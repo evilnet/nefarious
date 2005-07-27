@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-07-28  Neil Spierling  <sirvulcan@gmail.com>
+
+	* README: Small change to test svn mails.
+
 2005-07-20  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/channel.c: Fix : in multi-line bursts. Update comment about
