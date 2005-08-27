@@ -118,7 +118,7 @@ int m_sethost(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return need_more_params(sptr, "SETHOST");
 
   if (0 == ircd_strcmp("undo", parv[1])) {
-    set_hostmask(sptr, NULL, NULL);
+    set_hostmask(sptr, sptr, NULL, NULL);
   } else {
     if (parc<3)
       return need_more_params(sptr, "SETHOST");
@@ -128,14 +128,14 @@ int m_sethost(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	send_reply(sptr, ERR_BADHOSTMASK, hostmask);
 	return 0;
       }
-      if (set_hostmask(sptr, hostmask, NULL))
+      if (set_hostmask(sptr, sptr, hostmask, NULL))
       	FlagClr(&setflags, FLAG_SETHOST);
     } else {
       if (!is_hostmask(parv[1])) {
 	send_reply(sptr, ERR_BADHOSTMASK, parv[1]);
 	return 0;
       }
-      if (set_hostmask(sptr, parv[1], parv[2]))
+      if (set_hostmask(sptr, sptr, parv[1], parv[2]))
         FlagClr(&setflags, FLAG_SETHOST);
     }
   }  

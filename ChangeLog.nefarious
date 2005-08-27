@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-08-27  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/s_user.h: Added extra param for determining if a sethost
+	is comming from a server or not. (set_hostmask)
+
+	* ircd/m_sethost.c: Updated set_hostmask calls.
+
+	* ircd/s_user.c: Update set_hostmask calls aswell as the function
+	itself.
+
 2005-07-28  Neil Spierling  <sirvulcan@gmail.com>
 
 	* README: Small change to test svn mails.

@@ -1600,7 +1600,7 @@ int unhide_hostmask(struct Client *cptr)
  * set_hostmask() - derived from hide_hostmask()
  *
  */
-int set_hostmask(struct Client *cptr, char *hostmask, char *password)
+int set_hostmask(struct Client *sptr, struct Client *cptr, char *hostmask, char *password)
 {
   int restore = 0;
   int freeform = 0;
@@ -1608,7 +1608,7 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
   char hiddenhost[USERLEN + HOSTLEN + 2];
   struct Membership *chan;
 
-  Debug((DEBUG_INFO, "set_hostmask() %C, %s, %s", cptr, hostmask, password));
+  Debug((DEBUG_INFO, "set_hostmask() %C %C, %s, %s", sptr, cptr, hostmask, password));
 
   /* sethost enabled? */
   if (MyConnect(cptr) && !feature_bool(FEAT_SETHOST)) {
@@ -1655,7 +1655,7 @@ int set_hostmask(struct Client *cptr, char *hostmask, char *password)
     /*
      * Oper sethost
      */
-    if (MyConnect(cptr)) {
+    if (MyConnect(cptr) && !IsServer(sptr)) {
       if (IsAnOper(cptr)) {
         if ((new_vhost = IsVhost(host, 1)) == NULL) {
           if (!feature_bool(FEAT_SETHOST_FREEFORM)) {
@@ -2158,7 +2158,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
   if (do_set_host) {
     /* We clear the flag in the old mask, so that the +h will be sent */
     /* Only do this if we're SETTING +h and it succeeded */
-    if (set_hostmask(acptr, hostmask, password) && hostmask)
+    if (set_hostmask(sptr, acptr, hostmask, password) && hostmask)
       FlagClr(&setflags, FLAG_SETHOST);
   }
   send_umode_out(cptr, acptr, &setflags, prop);
