@@ -142,23 +142,28 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
      sendcmdto_serv_butone(sptr, CMD_TOPIC, cptr, "%H %s %Tu %Tu :%s", chptr,
 			   chptr->topic_nick, chptr->creationtime, chptr->topic_time,
                            chptr->topic);
+
    if (newtopic) {
       if (IsServer(sptr))
         sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
        				         "%H :%s (%s)", chptr, chptr->topic,
                                          setter ? (nick ? nick : setter) : cli_name(from));
 
+      else if (IsChannelService(sptr))
+        sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
+      		                         "%H :%s%s%s%s", chptr, chptr->topic,
+                                         setter ? " (" : "",
+                                         setter ? (nick ? nick : setter) : cli_name(from),
+                                         setter ? ")" : "");
       else
         sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
        				         "%H :%s", chptr, chptr->topic);
-    
       /* if this is the same topic as before we send it to the person that
        * set it (so they knew it went through ok), but don't bother sending
        * it to everyone else on the channel to save bandwidth
        */
     } else if (MyUser(sptr))
-      sendcmdto_one(sptr, CMD_TOPIC, sptr, "%H :%s (%s)", chptr, chptr->topic,
-                    setter ? (nick ? nick : setter) : cli_name(from));
+      sendcmdto_one(sptr, CMD_TOPIC, sptr, "%H :%s", chptr, chptr->topic);
 }
 
 /*
@@ -257,6 +262,7 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Channel *chptr;
   char *topic = 0, *name, *p = 0;
+  int ppoint = 4;
   time_t ts = 0;
 
   if (parc < 3)
@@ -282,13 +288,16 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     }
 
     /* if existing channel is older, ignore -beware */
-    if (parc > 4 && (ts = atoi(parv[parc - 3])) && chptr->creationtime < ts)
+    if (parc > 5 && (ts = atoi(parv[parc - 3])) && chptr->creationtime < ts)
       continue;
 
-    if (parc > 3 && (ts = atoi(parv[parc - 2])) && chptr->topic_time > ts)
+    if (parc > 4 && (ts = atoi(parv[parc - 2])) && chptr->topic_time > ts)
       continue;
 
-    do_settopic(sptr,cptr,chptr,topic,ts,parv[parc-4]);
+    if ('#' == *parv[parc-4])
+      ppoint = 3;
+
+    do_settopic(sptr,cptr,chptr,topic,ts,parv[parc-ppoint]);
   }
   return 0;
 }

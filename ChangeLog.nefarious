@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-08-29  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_topic.c: Fixes with handling topic bursts containing the
+	setter.
+
 2005-08-27  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/s_user.h: Added extra param for determining if a sethost
