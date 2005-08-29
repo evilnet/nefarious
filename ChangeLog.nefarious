@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-08-30 Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_user.c: Trialing without an assert.
+
 2005-08-29  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_topic.c: Fixes with handling topic bursts containing the

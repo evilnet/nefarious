@@ -237,7 +237,7 @@ int hunt_server_cmd(struct Client *from, const char *cmd, const char *tok,
     return HUNTED_NOSUCH;
   }
 
-  assert(!IsServer(from));
+  /* assert(!IsServer(from)); XXX testing without this */
 
   parv[server] = (char *) acptr; /* HACK! HACK! HACK! ARGH! */
 
