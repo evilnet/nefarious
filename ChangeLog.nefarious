@@ -1,7 +1,15 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2005-08-30 Neil Spierling  <sirvulcan@gmail.com>
+2005-09-08  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_topic.c: Some changes to topic so that Nefarious wont
+	core when it gets a 0.4.0 style topic from a server. There will
+	probably be some oddness (nothing major) if you have 0.4.0 servers
+	and 0.5.0 servers but that will clear itself as the network
+	updates itself.
+
+2005-08-30  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_user.c: Trialing without an assert.
 

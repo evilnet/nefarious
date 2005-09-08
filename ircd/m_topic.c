@@ -153,7 +153,7 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
         sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
       		                         "%H :%s%s%s%s", chptr, chptr->topic,
                                          setter ? " (" : "",
-                                         setter ? (nick ? nick : setter) : cli_name(from),
+                                         setter ? setter : "",
                                          setter ? ")" : "");
       else
         sendcmdto_channel_butserv_butone(from, CMD_TOPIC, chptr, NULL, 0,
@@ -294,8 +294,15 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (parc > 4 && (ts = atoi(parv[parc - 2])) && chptr->topic_time > ts)
       continue;
 
-    if ('#' == *parv[parc-4])
-      ppoint = 3;
+    if (parv[parc-4]) {
+      if ('#' == *parv[parc-4])
+        ppoint = 3;
+      else if ('#' == *parv[parc-2]) { /* Fall backcode for Nefarious 0.4.0, remove after release */
+        do_settopic(sptr,cptr,chptr,topic,ts, 
+        IsServer(sptr) ? (feature_bool(FEAT_HIS_BANWHO) ? cli_name(&me) : cli_name(sptr)) : cli_name(sptr));
+        return 0;
+      }
+    }
 
     do_settopic(sptr,cptr,chptr,topic,ts,parv[parc-ppoint]);
   }
