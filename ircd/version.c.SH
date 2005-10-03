@@ -1,4 +1,8 @@
+#! /bin/sh
+
 echo "Extracting ircd/version.c ..."
+
+srcdir=$1
 
 if test -r version.c
 then
@@ -9,20 +13,6 @@ else
 fi
 
 generation=`expr $generation + 1`
-
-sum=sum
-if $sum s_serv.c 1> /dev/null 2>&1; then
-:
-else
-  sum=cksum
-fi
-sumsserv=`$sum s_serv.c 2> /dev/null`;
-sumsuser=`$sum s_user.c 2> /dev/null`;
-sumchan=`$sum channel.c 2> /dev/null`;
-sumsbsd=`$sum s_bsd.c 2> /dev/null`;
-sumhash=`$sum hash.c 2> /dev/null`;
-sumsmisc=`$sum s_misc.c 2> /dev/null`;
-sumircd=`$sum ircd.c 2> /dev/null`;
 
 creation=`date | \
 awk '{if (NF == 6) \
@@ -108,8 +98,25 @@ const char *infotext[] = {
     "A full listing of all coders can be found in doc/Authors in the",
     "source.",
     "-",
-    "[$sumsserv] [$sumchan] [$sumsbsd] [$sumsuser]",
-    "[$sumhash] [$sumsmisc] [$sumircd]",
+    "Sources:",
+!SUB!THIS!
+
+cvs_version=`cat ../ChangeLog.nefarious | grep '#define CVS_VERSION "$Id:' | \
+awk '{ print $5 " " $6 }'`
+
+
+for file in ${srcdir}/ircd/*.c ; do
+ echo "    \"[" `md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
+done;
+
+echo "    \"\"," >> version.c
+echo "    \"Headers:\"," >> version.c
+
+for file in ${srcdir}/include/*.h ; do
+ echo "    \"[" `md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
+done;
+
+/bin/cat >>version.c <<!SUB!THIS!
     0,
 };
 

@@ -4,6 +4,13 @@
 
 2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/Makefile.in: Send the source path when generating version
+	information.
+
+	* ircd/version.c.SH: .12 Style md5sum output in INFO.
+
+2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_whois.c: Fixed a bug with WHOIS. Should of realised this
 	before instead of just reverting.
 
