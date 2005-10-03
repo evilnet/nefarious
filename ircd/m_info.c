@@ -133,6 +133,7 @@ int m_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 int ms_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   const char **text = infotext;
+  const char **otext = othertext;
 
   if (IsServer(sptr))
     return 0;
@@ -143,15 +144,12 @@ int ms_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   while (text[2])
   {
-    if (!IsOper(sptr))
-      send_reply(sptr, RPL_INFO, *text);
+    send_reply(sptr, RPL_INFO, *text);
     text++;
   }
-  if (IsOper(sptr))
-  {
-    while (*text)
-      send_reply(sptr, RPL_INFO, *text++);
-    send_reply(sptr, RPL_INFO, "");
+  while (otext[2]) {
+    send_reply(sptr, RPL_INFO, *otext);
+    otext++;
   }
   send_reply(sptr, SND_EXPLICIT | RPL_INFO, ":Birth Date: %s, compile # %s",
       creation, generation);

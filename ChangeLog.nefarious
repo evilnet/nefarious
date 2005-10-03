@@ -4,6 +4,18 @@
 
 2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
 
+	* include/version.h: Declare othertext;
+
+	* ircd/m_info.c: Display md5sums only to remote info queries.
+
+	* ircd/version.c.SH: md5sums go into othertext now.
+
+	* Commit 1336 Change:
+
+	* ircd/m_join.c: Fixed a bug with FEAT_CREATE_CHAN_OPER_ONLY.
+
+2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/Makefile.in: Send the source path when generating version
 	information.
 
