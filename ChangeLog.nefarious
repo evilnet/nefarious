@@ -4,8 +4,8 @@
 
 2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
 
-	* ircd/m_whois.c: Reverted a change in the previous backports from
-	Undernet.
+	* ircd/m_whois.c: Fixed a bug with WHOIS. Should of realised this
+	before instead of just reverting.
 
 2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
 
