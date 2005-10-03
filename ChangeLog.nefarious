@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/Makefile.in: Ran make depend.
+
+	* Undernet Updates, see Changelog.
+
 2005-09-08  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_topic.c: Some changes to topic so that Nefarious wont

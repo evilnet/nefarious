@@ -1496,31 +1496,31 @@ int hide_hostmask(struct Client *cptr)
     sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr, 0,
       "%H", chan->channel);
     if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
-      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+      sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
         "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
     } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
       if(IsChanOp(chan) && IsHalfOp(chan)) {
-      	sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+      	sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
 	                  	         "%H +oh %C %C", chan->channel, cptr, cptr);
       }
       else if(IsChanOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                         "%H +ov %C %C", chan->channel, cptr, cptr);
       }
       else if(IsHalfOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +hv %C %C", chan->channel, cptr, cptr);
       }
       else if(IsChanOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +o %C", chan->channel, cptr);
       }
       else if(IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +h %C", chan->channel, cptr);
       }
       else if(HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +v %C", chan->channel, cptr);
       }
     }
@@ -1568,27 +1568,27 @@ int unhide_hostmask(struct Client *cptr)
         "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
     } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
       if(IsChanOp(chan) && IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +oh %C %C", chan->channel, cptr, cptr);
       }
       else if(IsChanOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                         "%H +ov %C %C", chan->channel, cptr, cptr);
       }
       else if(IsHalfOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +hv %C %C", chan->channel, cptr, cptr);
       }
       else if(IsChanOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +o %C", chan->channel, cptr);
       }
       else if(IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +h %C", chan->channel, cptr);
       }
       else if(HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +v %C", chan->channel, cptr);
       }
     }
@@ -1759,27 +1759,27 @@ int set_hostmask(struct Client *sptr, struct Client *cptr, char *hostmask, char 
         "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
     } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
       if(IsChanOp(chan) && IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +oh %C %C", chan->channel, cptr, cptr);
       }
       else if(IsChanOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                         "%H +ov %C %C", chan->channel, cptr, cptr);
       }
       else if(IsHalfOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +hv %C %C", chan->channel, cptr, cptr);
       }
       else if(IsChanOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +o %C", chan->channel, cptr);
       }
       else if(IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +h %C", chan->channel, cptr);
       }
       else if(HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+        sendcmdto_channel_butserv_butone(&his, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +v %C", chan->channel, cptr);
       }
     }

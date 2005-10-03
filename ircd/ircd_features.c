@@ -50,6 +50,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct Client his;
+
 /* List of log output types that can be set */
 static struct LogTypes {
   char *type;
@@ -62,6 +64,20 @@ static struct LogTypes {
   { "LEVEL", log_set_level, log_get_level },
   { 0, 0, 0 }
 };
+
+/** Handle an update to FEAT_HIS_SERVERNAME. */
+static void
+feature_notify_servername(void)
+{
+  ircd_strncpy(cli_name(&his), feature_str(FEAT_HIS_SERVERNAME), HOSTLEN);
+}
+
+/** Handle an update to FEAT_HIS_SERVERINFO. */
+static void
+feature_notify_serverinfo(void)
+{
+  ircd_strncpy(cli_info(&his), feature_str(FEAT_HIS_SERVERINFO), REALLEN);
+}
 
 /* Look up a struct LogType given the type string */
 static struct LogTypes *
@@ -382,8 +398,8 @@ static struct FeatureDesc {
   F_B(HIS_REWRITE, 0, 1, 0),
   F_I(HIS_REMOTE, 0, 1, 0),
   F_B(HIS_NETSPLIT, 0, 1, 0),
-  F_S(HIS_SERVERNAME, 0, "*.Nefarious", 0),
-  F_S(HIS_SERVERINFO, 0, "evilnet development", 0),
+  F_S(HIS_SERVERNAME, 0, "*.Nefarious", feature_notify_servername),
+  F_S(HIS_SERVERINFO, 0, "evilnet development", feature_notify_serverinfo),
   F_S(HIS_URLSERVERS, 0, "http://sourceforge.net/projects/evilnet/", 0),
 
   /* Misc. random stuff */
@@ -900,6 +916,11 @@ feature_init(void)
       break;
     }
   }
+
+  cli_magic(&his) = CLIENT_MAGIC;
+  cli_status(&his) = STAT_SERVER;
+  feature_notify_servername();
+  feature_notify_serverinfo();
 }
 
 /* report all F-lines */

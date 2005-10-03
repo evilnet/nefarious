@@ -1,3 +1,38 @@
+2005-07-14  Michael Poole <mdpoole@troilus.org>
+	    Jukka Ollila <jaollila@niksula.hut.fi>
+
+	* Note, this feature was spread out over several commits, all
+	merged into one as the others were just bug fixes and further &me
+	changes.
+
+	* include/ircd_features.h: Declare new "his" pseudo-server to hold
+	FEAT_HIS_SERVERNAME and FEAT_HIS_SERVERINFO in a convenient place.
+
+	* ircd/ircd_features.c: Initialize and update it.
+
+	* ircd/channel.c (modebuf_flush_int): Use it as the apparent
+	source for opmodes and server mode changes (also when the source
+	is me).	(joinbuf_join): Switch to &his instead of &me for
+	announcements to local users in a channel.
+
+	* ircd/m_burst.c (ms_burst): Use it as the apparent source for net
+	rider kicks. Plus more switching of &me
+
+	* ircd/m_invite.c (m_invite/ms_invite): Likewise.
+
+	* ircd/m_kick.c: Likewise.
+
+	* ircd/m_kill.c: Likewise.
+
+	* ircd/m_topic.c: Likewise.
+
+	* ircd/m_whois.c (do_whois): Use it to simplify code here.
+
+	* ircd/s_misc.c (exit_client): Use it as the apparent killer.
+
+	* ircd/s_user.c (hide_hostmask): Use HIS_SERVERNAME instead of the
+	real thing for the post-mode-x rejoin.
+
 2005-07-11  Michael Poole <mdpoole@troilus.org>
 
 	* doc/readme.features: Document FEAT_CHANNELLEN.

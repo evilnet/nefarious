@@ -104,7 +104,7 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    struct Client *from;
 
    if (feature_bool(FEAT_HIS_BANWHO) && IsServer(sptr)) {
-      from = &me;
+      from = &his;
    }
    else {
       from = sptr;
@@ -299,7 +299,7 @@ int ms_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         ppoint = 3;
       else if ('#' == *parv[parc-2]) { /* Fall backcode for Nefarious 0.4.0, remove after release */
         do_settopic(sptr,cptr,chptr,topic,ts, 
-        IsServer(sptr) ? (feature_bool(FEAT_HIS_BANWHO) ? cli_name(&me) : cli_name(sptr)) : cli_name(sptr));
+          IsServer(sptr) ? (feature_bool(FEAT_HIS_BANWHO) ? cli_name(&me) : cli_name(sptr)) : cli_name(sptr));
         return 0;
       }
     }

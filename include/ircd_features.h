@@ -24,6 +24,8 @@
 struct Client;
 struct StatDesc;
 
+extern struct Client his;
+
 enum Feature {
   /* Misc. features */
   FEAT_LOG,
