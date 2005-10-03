@@ -1617,7 +1617,8 @@ void clean_channelname(char *cn)
   int i;
 
   for (i = 0; cn[i]; i++) {
-    if (i >= CHANNELLEN || !IsChannelChar(cn[i])) {
+    if (i >= IRCD_MIN(CHANNELLEN, feature_int(FEAT_CHANNELLEN))
+        || !IsChannelChar(cn[i])) {
       cn[i] = '\0';
       return;
     }
@@ -1704,7 +1705,8 @@ struct Channel *get_channel(struct Client *cptr, char *chname, ChannelGetType fl
     return NULL;
 
   len = strlen(chname);
-  if (MyUser(cptr) && len > CHANNELLEN)
+
+  if (MyUser(cptr) && len > IRCD_MIN(CHANNELLEN, feature_int(FEAT_CHANNELLEN)))
   {
     len = CHANNELLEN;
     *(chname + CHANNELLEN) = '\0';

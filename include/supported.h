@@ -50,6 +50,7 @@
                 " AWAYLEN=%i" \
                 " KICKLEN=%i" \
                 " CHANNELLEN=%i" \
+                " MAXCHANNELLEN=%i" \
 		" CHANTYPES=%s" \
                 " PREFIX=%s" \
                 " STATUSMSG=%s" \
@@ -63,7 +64,8 @@
 			feature_int(FEAT_MAXEXCEPTS), \
 			feature_int(FEAT_NICKLEN), NICKLEN
 
-#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, CHANNELLEN, \
+#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, feature_int(FEAT_CHANNELLEN), \
+			CHANNELLEN, \
 			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
 			feature_bool(FEAT_HALFOPS) ? "(ohv)@%+" : "(ov)@+", \
 			feature_bool(FEAT_HALFOPS) ? "@%+" : "@+", \

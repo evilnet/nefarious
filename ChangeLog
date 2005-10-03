@@ -1,3 +1,20 @@
+2005-07-11  Michael Poole <mdpoole@troilus.org>
+
+	* doc/readme.features: Document FEAT_CHANNELLEN.
+
+	* doc/example.conf: Give an example of it.
+
+2005-07-11  Stephan Peijnik <speijnik@gmail.com>
+
+	* include/ircd_features.h: Declare new FEAT_CHANNELLEN.
+
+	* include/supported.h: Add it to the ISUPPORT display.
+
+	* ircd/channel.c (clean_channelname): Impose the lower limit
+	between FEAT_CHANNELLEN and CHANNELLEN.
+
+	* ircd/ircd_features.c: Define FEAT_CHANNELLEN.
+
 2005-04-18  Michael Poole <mdpoole@troilus.org>
 
 	* ircd/support.c (check_if_ipmask): Do not interpret masks that

@@ -318,7 +318,6 @@ int m_names(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    *  Special Case 2: User is on this channel, requesting full names list.
    *  (As performed with each /join) - ** High frequency usage **
    */
-
   clean_channelname(para);
   chptr = FindChannel(para); 
 
