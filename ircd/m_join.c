@@ -231,6 +231,11 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       break; /* no point processing the other channels */
     }
 
+    if (!chptr && feature_bool(FEAT_CREATE_CHAN_OPER_ONLY) && !IsAnOper(sptr)) {
+      send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+      continue;
+    }
+
     if (chptr) {
       if (check_target_limit(sptr, chptr, chptr->chname, 0))
 	continue; /* exceeded target limit */
@@ -304,9 +309,6 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     else if (check_target_limit(sptr, chptr, chptr->chname, 1)) {
       /* Note: check_target_limit will only ever return 0 here */
       sub1_from_channel(chptr); /* created it... */
-      continue;
-    } else if (feature_bool(FEAT_CREATE_CHAN_OPER_ONLY) && !IsAnOper(sptr)) {
-      send_reply(sptr, ERR_NOSUCHCHANNEL, name);
       continue;
     } else {
       joinbuf_join(&create, chptr, flags);
