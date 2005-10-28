@@ -122,7 +122,7 @@ char *oflagstr(long oflag)
  return oflagbuf;
 }
 
-const char dflagstr(const char* dflags)
+char dflagstr(const char* dflags)
 {
   unsigned int *flag_p;
   unsigned int x_flag = 0;

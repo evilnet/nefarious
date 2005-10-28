@@ -2,6 +2,12 @@
  Nefarious IRCu ChangeLog
 
 
+2005-10-28  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/s_conf.h: GCC 4.x compile fixes.
+
+	* ircd/s_conf.h: GCC 4.x compile fixes.
+
 2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/version.h: Declare othertext;
