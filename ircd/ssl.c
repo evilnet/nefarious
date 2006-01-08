@@ -206,8 +206,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
   int openssl_err = 0;
   char err_buff[120];
 
-  extern int errno;
-  int errno_sv;
+  errno = 0;
 
   assert(0 != socket);
   assert(0 != buf);
@@ -229,22 +228,21 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
     case SSL_ERROR_WANT_WRITE:
     case SSL_ERROR_WANT_READ:
     case SSL_ERROR_WANT_X509_LOOKUP:
-      Debug((DEBUG_DEBUG, "SSL_write returned WANT_ - retrying"));
       return retval;
     case SSL_ERROR_SYSCALL:
-      errno_sv = errno; /* Debug may use lib calls that tank errno */
-      Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SYSCALL res=%d errno=%d retval=%d", res, errno_sv, retval));
-      openssl_err = ERR_get_error();
-      Debug((DEBUG_DEBUG, "ERR_get_error() returned %d: %s", openssl_err, 
-                                 ERR_error_string(openssl_err, err_buff)));
-      
-      return (res < 0 && (errno_sv == EINTR || errno_sv == EBUSY || errno_sv == EAGAIN)) ? retval : IO_FAILURE;
+      //openssl_err = ERR_get_error(); ERR_error_string(openssl_err, err_buff)));
+      return (res < 0 && (errno == EWOULDBLOCK || 
+                          errno == EINTR || 
+                          errno == EBUSY || 
+                          errno == EAGAIN)) ? retval : IO_FAILURE;
+    case SSL_ERROR_SSL:
+      if(errno == EAGAIN) /* its what unreal ircd does..*/
+          return retval;
     case SSL_ERROR_ZERO_RETURN:
       SSL_shutdown(socket->ssl);
       return IO_FAILURE;
     default:
-      Debug((DEBUG_DEBUG, "SSL_write returned an unhandled error, we are assuming failure: %d", ssl_err));
-      return IO_FAILURE;
+      return retval; /* unknown error, assume block or success*/
     }
   }
   return retval;

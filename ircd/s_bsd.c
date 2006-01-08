@@ -400,7 +400,8 @@ unsigned int deliver_it(struct Client *cptr, struct MsgQ *buf)
     }
     /*
      * XXX - hrmm.. set blocked here? the socket didn't
-     * say it was blocked
+     * say it was blocked - yes, because maybe half went 
+     * and half was blocked, but thats not gonna gen an error -rubin
      */
     if (bytes_written < bytes_count)
       SetFlag(cptr, FLAG_BLOCKED);

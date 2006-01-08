@@ -2,6 +2,12 @@
  Nefarious IRCu ChangeLog
 
 
+2006-01-08  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/ssl.c: attempted to make the ssl write code default to retrying
+	instead of killing clients in unknown/unhandled circumstances. trying to
+	fix 'the ssl bug'.
+
 2005-10-28  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/s_conf.h: GCC 4.x compile fixes.
