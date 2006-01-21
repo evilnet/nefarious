@@ -202,7 +202,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	    unhide_hostmask(acptr);
 
 	  sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C U", acptr);
-	  return 0;
+	  break;
 
 	case 'M': /* account renaming */
 	  if (parc < 4)
@@ -222,7 +222,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 
 	  sendcmdto_serv_butone(sptr, CMD_ACCOUNT, cptr, "%C M %s",
 				acptr, parv[3]);
-	  return 0;
+	  break;
 
 	case 'R': /* account login */
 	  if (parc < 4)
@@ -267,6 +267,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 				"%C R %s %Tu" : "%C R %s",
 				acptr, cli_user(acptr)->account,
 				cli_user(acptr)->acc_create);
+	  break;
 
 	case 'C':  /* LOC request */
 	  if (parc < 6)
@@ -290,6 +291,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 	  } else /* auth checks are for services, not servers */
 	    return protocol_violation(cptr, "ACCOUNT check (%s %s %s)",
 				      parv[3], parv[4], parv[5]);
+	  break;
 
 	case 'A':
 	case 'D':
@@ -332,16 +334,21 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
 
 	  return register_user(acptr, acptr, cli_name(acptr),
 			       cli_user(acptr)->username);
+	  break;
 
 	default:
 	  return protocol_violation(cptr, "ACCOUNT sub-type '%s' not implemented", parv[2]);
+	  break;
      }
+     return 0;
   }
   else { /* OLD style FEAT_EXTENDED_ACCOUNTS==FALSE accounts */
     if (parc > 4)
-      return protocol_violation(cptr, "ACCOUNT recieved too many arguments.. Is the EXTENDED_ACCOUNTS F:line set right?");
+      return protocol_violation(cptr, "ACCOUNT received too many arguments. Is the EXTENDED_ACCOUNTS feature set correctly?");
+
     if (!(acptr = findNUser(parv[1])))
       return 0; /* Ignore ACCOUNT for a user that QUIT; probably crossed */
+
     if (IsAccount(acptr))
       return protocol_violation(cptr, "ACCOUNT for already registered user %s "
 				"(%s -> %s)", cli_name(acptr), cli_user(acptr)->account, parv[3]);
@@ -350,14 +357,17 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
     if (strlen(parv[2]) > ACCOUNTLEN)
       return protocol_violation(cptr, "Received account (%s) longer than %d for %s; ignoring.",
 				parv[2], ACCOUNTLEN, cli_name(acptr));
+
     if (parc > 3) {
       cli_user(acptr)->acc_create = atoi(parv[3]);
       Debug((DEBUG_DEBUG, "Received timestamped account: account \"%s\", "
 	     "timestamp %Tu", parv[2], cli_user(acptr)->acc_create));
     }
+
     Debug((DEBUG_DEBUG, "ACC TEST: hf: %s fh %s dh %s id %s dmf %s", HasFakeHost(acptr) ? "1" : "0",
 	   cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost, IsDNSBLMarked(acptr) ? "1" : "0",
 	   feature_bool(FEAT_DNSBL_MARK_FAKEHOST) ? "1" : "0"));
+
     if (HasFakeHost(acptr) && !ircd_strcmp(cli_user(acptr)->fakehost, cli_user(acptr)->dnsblhost) &&
         IsDNSBLMarked(acptr) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST))
       ClearFakeHost(acptr);

@@ -45,7 +45,7 @@
 #include <unistd.h>
 
 SSL_CTX *ctx;
-static int ssl_inuse = 0;
+static unsigned int ssl_inuse = 0;
 
 struct ssl_data {
   struct Socket socket;
@@ -64,7 +64,7 @@ static void abort_ssl(struct ssl_data *data)
  
 static void accept_ssl(struct ssl_data *data)
 {
-  const char* const error_ssl = "ERROR :SSL Connection Error\r\n";
+  const char* const error_ssl = "ERROR :SSL connection error\r\n";
 
   if (SSL_accept(data->socket.ssl) <= 0) {
     unsigned long err = ERR_get_error();
@@ -297,65 +297,65 @@ int ssl_count(void)
 
 static RSA *tmp_rsa_cb(SSL *s, int export, int keylen)
 {
-	Debug((DEBUG_DEBUG, "Generating %d bit temporary RSA key", keylen));
-	return RSA_generate_key(keylen, RSA_F4, NULL, NULL);
+  Debug((DEBUG_DEBUG, "Generating %d bit temporary RSA key", keylen));
+  return RSA_generate_key(keylen, RSA_F4, NULL, NULL);
 } 
 
 static void info_callback(const SSL *s, int where, int ret)
 {
-	if (where & SSL_CB_LOOP)
-	  Debug((DEBUG_DEBUG, "SSL state (%s): %s",
-		where & SSL_ST_CONNECT ? "connect" :
-		where & SSL_ST_ACCEPT ? "accept" :
-		"undefined", SSL_state_string_long(s)));
-	else if (where & SSL_CB_ALERT)
-	  Debug((DEBUG_DEBUG, "SSL alert (%s): %s: %s",
-		where & SSL_CB_READ ? "read" : "write",
-		SSL_alert_type_string_long(ret),
-		SSL_alert_desc_string_long(ret)));
-	else if (where == SSL_CB_HANDSHAKE_DONE)
-	  Debug((DEBUG_DEBUG, "SSL: handshake done"));
+  if (where & SSL_CB_LOOP)
+    Debug((DEBUG_DEBUG, "SSL state (%s): %s",
+	  where & SSL_ST_CONNECT ? "connect" :
+	  where & SSL_ST_ACCEPT ? "accept" :
+	  "undefined", SSL_state_string_long(s)));
+  else if (where & SSL_CB_ALERT)
+    Debug((DEBUG_DEBUG, "SSL alert (%s): %s: %s",
+	  where & SSL_CB_READ ? "read" : "write",
+	  SSL_alert_type_string_long(ret),
+	  SSL_alert_desc_string_long(ret)));
+  else if (where == SSL_CB_HANDSHAKE_DONE)
+    Debug((DEBUG_DEBUG, "SSL: handshake done"));
 }
        
 static void sslfail(char *txt)
 {
-	unsigned long err = ERR_get_error();
-	char string[120];
+  unsigned long err = ERR_get_error();
+  char string[120];
 
-	if (!err) {
-	  Debug((DEBUG_DEBUG, "%s: poof", txt));
-	} else {
-	  ERR_error_string(err, string);
-	  Debug((DEBUG_FATAL, "%s: %s", txt, string));
-	  exit(2);
-	}
+  if (!err) {
+    Debug((DEBUG_DEBUG, "%s: poof", txt));
+  } else {
+    ERR_error_string(err, string);
+    Debug((DEBUG_FATAL, "%s: %s", txt, string));
+    exit(2);
+  }
 }
 
 void ssl_init(void)
 {
-	char pemfile[1024];
+  char pemfile[1024];
 
-	SSLeay_add_ssl_algorithms();
-	SSL_load_error_strings();
+  SSLeay_add_ssl_algorithms();
+  SSL_load_error_strings();
 
-	Debug((DEBUG_NOTICE, "SSL: read %d bytes of randomness", RAND_load_file("/dev/urandom", 4096)));
+  Debug((DEBUG_NOTICE, "SSL: read %d bytes of randomness", RAND_load_file("/dev/urandom", 4096)));
 
-	ctx = SSL_CTX_new(SSLv23_server_method());
-	SSL_CTX_set_tmp_rsa_callback(ctx, tmp_rsa_cb);
-	SSL_CTX_need_tmp_RSA(ctx);
-	SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
-	SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_BOTH);
-	SSL_CTX_set_timeout(ctx, 300); /* XXX */
-	SSL_CTX_set_info_callback(ctx, info_callback);
+  ctx = SSL_CTX_new(SSLv23_server_method());
+  SSL_CTX_set_tmp_rsa_callback(ctx, tmp_rsa_cb);
+  SSL_CTX_need_tmp_RSA(ctx);
+  SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
+  SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_BOTH);
+  SSL_CTX_set_timeout(ctx, 300); /* XXX */
+  SSL_CTX_set_info_callback(ctx, info_callback);
 
-	ircd_snprintf(0, pemfile, sizeof(pemfile), "%s/ircd.pem", DPATH);
-	Debug((DEBUG_DEBUG, "SSL: using pem file: %s", pemfile));
-	if (!SSL_CTX_use_certificate_file(ctx, pemfile, SSL_FILETYPE_PEM))
-	  sslfail("SSL_CTX_use_certificate_file");
-	if (!SSL_CTX_use_RSAPrivateKey_file(ctx, pemfile, SSL_FILETYPE_PEM))
-	  sslfail("SSL_CTX_use_RSAPrivateKey_file");
-       
-	Debug((DEBUG_DEBUG, "SSL: init ok"));
+  ircd_snprintf(0, pemfile, sizeof(pemfile), "%s/ircd.pem", DPATH);
+  Debug((DEBUG_DEBUG, "SSL: using pem file: %s", pemfile));
+  if (!SSL_CTX_use_certificate_file(ctx, pemfile, SSL_FILETYPE_PEM))
+    sslfail("SSL_CTX_use_certificate_file");
+  if (!SSL_CTX_use_RSAPrivateKey_file(ctx, pemfile, SSL_FILETYPE_PEM))
+    sslfail("SSL_CTX_use_RSAPrivateKey_file");
+
+  Debug((DEBUG_DEBUG, "SSL: init ok"));
 }
 
 char *ssl_get_cipher(SSL *ssl)

@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-01-20  Reed Loden  <reed@reedloden.com>
+
+	* ircd/m_account.c: Add missing breaks, more sanity checks,
+	whitespacing changes, and cleaned-up protocol_violation()
+	reply.
+
+	* ircd/ssl.c: Whitespacing changes and use of |unsigned int|
+	instead of |int|.
 
 2006-01-08  Alex Schumann  <rubin@afternet.org>
 
