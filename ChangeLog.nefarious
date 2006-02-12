@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-02-12  Alex Schumann <rubin@afternet.org>
+
+	* ircd/s_stats.c: Applied a patch from muer to fix spacing problem in
+	stats v.
+
 2006-01-20  Reed Loden  <reed@reedloden.com>
 
 	* ircd/m_account.c: Add missing breaks, more sanity checks,
