@@ -117,8 +117,17 @@ AC_LIBRARY_NET
 
 dnl Look for res_mkquery.  Done after AC_LIBRARY_NET in case res_mkquery
 dnl is in one of those libraries somewhere.
-AC_SEARCH_LIBS(res_mkquery, resolv, ,
-[AC_MSG_ERROR([Unable to find library containing res_mkquery()])])
+
+dnl if no res_mkquery, try __res_mkquery as this is all there is on ia64 (ubuntu linux anyway)
+AC_SEARCH_LIBS(res_mkquery, resolv,
+  ,
+  [ AC_SEARCH_LIBS(__res_mkquery, resolv,
+       AC_DEFINE_UNQUOTED(RES_PREFIX, "TRUE", [__res_mkquery instead of res_mkquery]),
+       [AC_MSG_ERROR([Unable to find library containing res_mkquery() or __res_mkquery(). Please install resolv library. (comes with libc6)])]
+    )
+  ]
+)
+
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -424,7 +433,7 @@ if test x"$unet_cv_enable_ssl" = xyes; then
     LIBS="$LIBS -L$unet_cv_with_openssl_prefix $OPENSSL_LDFLAGS"
     CFLAGS="$CFLAGS -I$unet_cv_with_openssl_inc_prefix -I$unet_cv_with_kerberos_prefix"
   else
-    AC_MSG_ERROR([Unable to find OpenSSL, Use --with-openssl-includes and --with-openssl-libs if you have it installed in a different location])
+    AC_MSG_ERROR([Unable to find OpenSSL, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location])
   fi
 fi
 

@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-02-22  Alex Schumann <rubin@afternet.org>
+
+   * ircd/res.c: Added define for res_init and res_mkquery functions
+
+   * configure.in: Added check for __res_mkquery in addition to res_mkquery
+   as some 64bit linux distros seem to only have the hidden one.
+
+   * configure: new version from output of above
+
+   * config.h.in: setup define for res_mkquery __ prefix
+
 2006-02-12  Alex Schumann <rubin@afternet.org>
 
 	* ircd/s_stats.c: Applied a patch from muer to fix spacing problem in

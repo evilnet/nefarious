@@ -76,6 +76,16 @@
 #define RES_NOALIASES 0
 #endif
 
+/* Figure out how to use res_mkquery */
+#ifdef RES_PREFIX
+#define USE_RES_MKQUERY __res_mkquery
+#define USE_RES_INIT __res_init
+#else
+#define USE_RES_MKQUERY res_mkquery
+#define USE_RES_INIT res_init
+#endif
+
+
 /*
  * macros used to calulate offsets into fixed query buffer
  */
@@ -328,7 +338,7 @@ static void start_resolver(void)
   if (spare_fd > -1)
     close(spare_fd);
 
-  res_init();      /* res_init always returns 0 */
+  USE_RES_INIT();      /* res_init always returns 0 */
   /*
    * make sure we have a valid file descriptor below 256 so we can
    * do this again. Needed on Solaris
@@ -745,7 +755,7 @@ static void query_name(const char* name, int query_class,
 
   Debug((DEBUG_DNS, "Resolver: query_name: %s %d %d", name, query_class, type));
   memset(buf, 0, sizeof(buf));
-  if ((request_len = res_mkquery(QUERY, name, query_class, type, 
+  if ((request_len = USE_RES_MKQUERY(QUERY, name, query_class, type, 
                                  0, 0, 0, (unsigned char*) buf, sizeof(buf))) > 0) {
     HEADER* header = (HEADER*) buf;
 #ifndef LRAND48
