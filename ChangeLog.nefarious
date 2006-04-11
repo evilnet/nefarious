@@ -1,18 +1,27 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-04-11  Neil Spierling  <sirvulcan@gmail.com>
+
+	* configure: Something updated this at some point, autoconf most
+	likely.
+
+	* ircd/channel.c: If your +e exempted then you can get past +ilkr
+	now. If your able to get an exempt then you should be able to get
+	past these modes.
+
 2006-02-22  Alex Schumann <rubin@afternet.org>
 
-   * ircd/res.c: Added define for res_init and res_mkquery functions
+	* configure: new version from output of above
 
-   * configure.in: Added check for __res_mkquery in addition to res_mkquery
-   as some 64bit linux distros seem to only have the hidden one.
+	* configure.in: Added check for __res_mkquery in addition to res_mkquery
+	as some 64bit linux distros seem to only have the hidden one.
 
-   * configure: new version from output of above
+	* config.h.in: setup define for res_mkquery __ prefix
 
-   * config.h.in: setup define for res_mkquery __ prefix
+	* ircd/res.c: Added define for res_init and res_mkquery functions
 
-2006-02-12  Alex Schumann <rubin@afternet.org>
+2006-02-12  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_stats.c: Applied a patch from muer to fix spacing problem in
 	stats v.

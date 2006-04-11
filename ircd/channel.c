@@ -1567,22 +1567,23 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   /*
    * now using compall (above) to test against a whole key ring -Kev
    */
-  if (*chptr->mode.key && (EmptyString(key) || compall(chptr->mode.key, key)))
-    return overrideJoin + ERR_BADCHANNELKEY;
+  if (*chptr->mode.key && !is_excepted(sptr, chptr, NULL) && (EmptyString(key) ||
+      compall(chptr->mode.key, key)))
+        return overrideJoin + ERR_BADCHANNELKEY;
 
   if (*chptr->mode.key)
     keyv = 1;
 
-  if ((chptr->mode.mode & MODE_INVITEONLY) && ((keyv == 0) ||
+  if ((chptr->mode.mode & MODE_INVITEONLY) && !is_excepted(sptr, chptr, NULL) && ((keyv == 0) ||
      (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_INVITEONLYCHAN;
 
-  if (chptr->mode.limit && chptr->users >= chptr->mode.limit && ((keyv == 0) ||
-     (!feature_bool(FEAT_FLEXABLEKEYS))))
+  if (chptr->mode.limit && chptr->users >= chptr->mode.limit && !is_excepted(sptr, chptr, NULL)
+     && ((keyv == 0) || (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_CHANNELISFULL;
 
-  if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr) && ((keyv == 0) ||
-     (!feature_bool(FEAT_FLEXABLEKEYS))))
+  if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr) && !is_excepted(sptr, chptr, NULL)
+      && ((keyv == 0) || (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_NEEDREGGEDNICK;
 
   if ((chptr->mode.mode & MODE_OPERONLY) && !IsAnOper(sptr) && ((keyv == 0) ||
