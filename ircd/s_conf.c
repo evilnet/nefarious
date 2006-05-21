@@ -978,7 +978,10 @@ void conf_add_dnsbl_line(const char* const* fields, int count)
   if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
      EmptyString(fields[3]) || EmptyString(fields[4]) ||
      EmptyString(fields[5]) || EmptyString(fields[6]))
+  {
+    log_write(LS_CONFIG, L_CRIT, 0, "Your X: line must have 6 fields!");
     return;
+  }
 
   ++GlobalBLCount;
 
@@ -1057,6 +1060,37 @@ extern int del_dnsbl(struct Client *sptr, char *dnsbl)
       lp = &(*lp)->next;
   }
   return ret;
+}
+
+/* Check if ip (returned by the dnsbl) is a match for check (in X line)
+ *
+ * @check = 127.0.0.54 or 0.0.54 or 0.54 or 1
+ * @ip = 127.0.0.54
+ * example, check=2, ip=127.0.0.2; match
+ *          check=2, ip=124.9.124.2; no match
+ *          check=127.0.0.1, ip=127.0.0.1; match
+ * returns 1 for match, 0 for not a match.
+ */
+int dnsbl_result_match(char* check, const char* ip)
+{
+    char full_check[4][4] = {"127","0","0","0"};
+    char check_str[16];
+    int i, s, j;
+    int octet=3;
+    for(i=strlen(check);i>=0;i--) {
+        if(check[i] == '.' || i==0) {
+            j = 0;
+            if(i>0) s=i+1;
+            else s=0;
+            for(;check[s] != '\0' && check[s] != '.';s++) {
+                if(j > 3) return 0; // overrun protection
+                full_check[octet][j++] = check[s];
+            }
+            full_check[octet--][j] = '\0';
+        }
+    }
+    sprintf(check_str, "%s.%s.%s.%s", full_check[0], full_check[1], full_check[2], full_check[3]);
+    return strcmp(check_str, ip) == 0;
 }
 
 
@@ -1161,43 +1195,43 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
           }
         } else if (x_flag & DFLAG_REPLY) {
 	    for(csep = cstr; *(csep+1); csep++); /* set csep to the end */
-              for (;csep >= cstr; csep--) {
-                if (*csep == ',' || csep==cstr) {
+            for (;csep >= cstr; csep--) {
+              if (*csep == ',' || csep==cstr) {
+                char *checkval;
 
-                  if (*csep == ',') {
-                    if (!ircd_strcmp(csep+1, oct))
-                      da = 1;
-                  } else if (csep==cstr)
-                    da = 1;
+                if (*csep == ',')
+                  checkval = csep+1;
+                else
+                  checkval = cstr;
 
-                  if (da == 1) {
-                    log_write(LS_DNSBL, L_INFO, 0, "DNSBL Matched %p %s (R)", sptr, blline->name);
-                    SetDNSBL(sptr);
+                if (dnsbl_result_match(checkval, replyip)) {
+                  log_write(LS_DNSBL, L_INFO, 0, "DNSBL Matched %p %s (R)", sptr, blline->name);
+                  SetDNSBL(sptr);
 
-                    if (x_flag & DFLAG_MARK)
-                      SetDNSBLMarked(sptr);
+                  if (x_flag & DFLAG_MARK)
+                    SetDNSBLMarked(sptr);
 
-                    if ((x_flag & DFLAG_ALLOW) && (!IsDNSBLDenied(sptr)))
-                      SetDNSBLAllowed(sptr);
+                  if ((x_flag & DFLAG_ALLOW) && (!IsDNSBLDenied(sptr)))
+                    SetDNSBLAllowed(sptr);
 
-                    if (x_flag & DFLAG_DENY) {
-                      ClearDNSBLAllowed(sptr);
-                      SetDNSBLDenied(sptr);
-                    }
-
-                    if (atoi(blline->rank) > cli_dnsbllastrank(sptr)) {
-                      ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
-                      ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
-                    }
-
-                    cli_dnsbllastrank(sptr) = atoi(blline->rank);
-
-                    add_dnsbl(sptr, blline->name);
-                    da = 0;
-                    ret = 1;
+                  if (x_flag & DFLAG_DENY) {
+                    ClearDNSBLAllowed(sptr);
+                    SetDNSBLDenied(sptr);
                   }
-  		  *csep = 0;
+
+                  if (atoi(blline->rank) > cli_dnsbllastrank(sptr)) {
+                    ircd_strncpy(cli_dnsbl(sptr), blline->name, BUFSIZE);
+                    ircd_strncpy(cli_dnsblformat(sptr), blline->reply, BUFSIZE);
+                  }
+
+                  cli_dnsbllastrank(sptr) = atoi(blline->rank);
+
+                  add_dnsbl(sptr, blline->name);
+                  da = 0;
+                  ret = 1;
                 }
+              *csep = 0;
+              }
             }
         }
     }

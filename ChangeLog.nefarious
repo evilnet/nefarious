@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-05-21  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/s_conf.c: Improved dnsbl support for more than 8 bit return
+	values, such as zz.countries.nerd.dk. Added error when using 040 x
+	line syntax with 050 to log (no rank).
+
 2006-04-11  Neil Spierling  <sirvulcan@gmail.com>
 
 	* configure: Something updated this at some point, autoconf most
