@@ -70,6 +70,10 @@ struct Client;
 #define TOK_NICK                "N"
 #define CMD_NICK		MSG_NICK, TOK_NICK
 
+#define MSG_SVSINFO		"SVSINFO"	/* SVSI */
+#define TOK_SVSINFO		"SI"
+#define CMD_SVSINFO		MSG_SVSINFO, TOK_SVSINFO
+
 #define MSG_SVSNICK		"SVSNICK"	/* SVNI */
 #define TOK_SVSNICK		"SN"
 #define CMD_SVSNICK		MSG_SVSNICK, TOK_SVSNICK

@@ -170,6 +170,7 @@ IRCD_SRC = \
 	m_silence.c \
 	m_squit.c \
 	m_stats.c \
+	m_svsinfo.c \
 	m_svsjoin.c \
 	m_svsnick.c \
 	m_svsnoop.c \
