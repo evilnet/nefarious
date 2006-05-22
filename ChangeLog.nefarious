@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_silence.c: Allow servers to set servers, we can now do
+	centralized silence lists in X3.
+
+	* ircd/s_conf.c: Tweaked one of rubin's comments.
+
 2006-05-21  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_conf.c: Improved dnsbl support for more than 8 bit return

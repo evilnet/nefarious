@@ -1083,7 +1083,7 @@ int dnsbl_result_match(char* check, const char* ip)
             if(i>0) s=i+1;
             else s=0;
             for(;check[s] != '\0' && check[s] != '.';s++) {
-                if(j > 3) return 0; // overrun protection
+                if(j > 3) return 0; /* overrun protection */
                 full_check[octet][j++] = check[s];
             }
             full_check[octet--][j] = '\0';

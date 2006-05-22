@@ -163,9 +163,6 @@ int ms_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client* acptr;
 
-  if (IsServer(sptr)) {
-    return protocol_violation(sptr,"Server trying to silence a user");
-  }
   if (parc < 3 || EmptyString(parv[2])) {
     return need_more_params(sptr, "SILENCE");
   }
@@ -176,11 +173,12 @@ int ms_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     acptr = FindNServer(parv[1]);
 
   if (*parv[2] == '-') {
-    if (!del_silence(sptr, parv[2] + 1))
+    if (!del_silence(IsServer(sptr) ? acptr : sptr, parv[2] + 1))
       sendcmdto_serv_butone(sptr, CMD_SILENCE, cptr, "* %s", parv[2]);
   }
   else {
-    add_silence(sptr, parv[2]);
+    add_silence(IsServer(sptr) ? acptr : sptr, parv[2]);
+
     if (acptr && IsServer(cli_from(acptr))) {
       sendcmdto_one(sptr, CMD_SILENCE, acptr, "%C %s", acptr, parv[2]);
     }
