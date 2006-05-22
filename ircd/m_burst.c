@@ -379,20 +379,15 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
               if (except) { /* add the new except to the end of the list */
                 /* Build except buffer */
                 if (!exceptpos) {
-                  if (banstr && *banstr) {
-                    exceptstr[exceptpos++] = ' ';
-                    exceptstr[exceptpos++] = '~';
-                    exceptstr[exceptpos++] = ' ';
-                  } else {
+                  if (!banpos) {
                     exceptstr[exceptpos++] = ' ';
                     exceptstr[exceptpos++] = ':';
                     exceptstr[exceptpos++] = '%';
-                    exceptstr[exceptpos++] = ' ';
-                    exceptstr[exceptpos++] = '~';
-                    exceptstr[exceptpos++] = ' ';
                   }
-                } else
                   exceptstr[exceptpos++] = ' ';
+                  exceptstr[exceptpos++] = '~';
+                }
+                exceptstr[exceptpos++] = ' ';
                 for (ptr = except; *ptr; ptr++) /* add except to buffer */
                   exceptstr[exceptpos++] = *ptr;
 

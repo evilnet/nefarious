@@ -146,7 +146,7 @@ static struct Client *decode_auth_id(const char *id)
 3* Az AC AB    A     .15.1835576208 1037526164   -- LOC authorised
 4* Az AC AB    D     .15.1835576208 1037526164   -- LOC denied
 5* Az AC ABAAC U                                 -- Unregister
-6* Az AC ABAAC R     Rewbin                      -- Rename
+6* Az AC ABAAC M     Rewbin                      -- Rename
 
  * FEAT_EXTENDED_ACCOUNTS == FALSE :
 7* AK AC AoAAI Rubin 1037526164                  -- Old w/ timestamp 

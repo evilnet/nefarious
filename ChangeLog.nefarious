@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-05-22  Reed Loden  <reed@reedloden.com>
+
+	* ircd/m_burst.c: Clean-up the "fix" somewhat and use a
+	different method of checking.
+
 2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_burst.c: Possibly fixed a bug were testing on our testnet,
