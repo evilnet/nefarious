@@ -417,6 +417,7 @@ shun_add(struct Client *cptr, struct Client *sptr, char *userhost,
 				  cli_name(sptr));
         break;
     }
+     nick = 0;
      user = (*userhost =='$' ? userhost : userhost+2);
      host = 0;
   } else {
