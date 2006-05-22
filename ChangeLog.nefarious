@@ -4,7 +4,7 @@
 2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_burst.c: Possibly fixed a bug were testing on our testnet,
-	will know for sure when we update the testnet.
+	will know for sure when we update the testnet. + fix fix :) -rubin
 
 2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
 
