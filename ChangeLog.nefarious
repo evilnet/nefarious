@@ -3,6 +3,10 @@
 
 2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
 
+	* include/patchlevel.h: Bumped patchlevel.
+
+2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+
 	* include/handlers.h: Added decleration for ms_svsinfo.
 
 	* include/msg.h: Added SVSINFO (SI).
