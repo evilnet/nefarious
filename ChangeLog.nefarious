@@ -3,6 +3,11 @@
 
 2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_burst.c: Possibly fixed a bug were testing on our testnet,
+	will know for sure when we update the testnet.
+
+2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_silence.c: Allow servers to set servers, we can now do
 	centralized silence lists in X3.
 
