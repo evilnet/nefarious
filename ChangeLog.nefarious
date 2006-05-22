@@ -1,6 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/handlers.h: Added decleration for ms_svsinfo.
+
+	* include/msg.h: Added SVSINFO (SI).
+
+	* ircd/Makefile.in: Added m_svsinfo.c
+
+	* ircd/m_svsinfo.c: Services only command to change a users real
+	name / info line.
+
+	* ircd/parse.c: Added SVSINFO.
+
 2006-05-22  Reed Loden  <reed@reedloden.com>
 
 	* ircd/m_burst.c: Clean-up the "fix" somewhat and use a
