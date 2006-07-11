@@ -214,7 +214,7 @@ do_shun(struct Client *cptr, struct Client *sptr, struct Shun *shun)
         Debug((DEBUG_DEBUG,"Matched!"));
       } else { /* Host/IP shun */
 	      if (cli_user(acptr)->username && 
-			      match (shun->sh_user, (cli_user(acptr))->username) != 0)
+			      match (shun->sh_user, (cli_user(acptr))->realusername) != 0)
 		      continue;
 
 	      if (ShunIsIpMask(shun)) {
@@ -742,16 +742,16 @@ int
 shun_memory_count(size_t *sh_size)
 {
   struct Shun *shun;
-  unsigned int gl = 0;
+  unsigned int sh = 0;
 
   for (shun = GlobalShunList; shun; shun = shun->sh_next) {
-    gl++;
+    sh++;
     *sh_size += sizeof(struct Shun);
     *sh_size += shun->sh_user ? (strlen(shun->sh_user) + 1) : 0;
     *sh_size += shun->sh_host ? (strlen(shun->sh_host) + 1) : 0;
     *sh_size += shun->sh_reason ? (strlen(shun->sh_reason) + 1) : 0;
   }
-  return gl;
+  return sh;
 }
 
 int expire_shuns()

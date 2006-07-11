@@ -296,7 +296,7 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
         continue;
       } else { /* Host/IP gline */
 	      if (cli_user(acptr)->username && 
-			      match (gline->gl_user, (cli_user(acptr))->username) != 0)
+			      match (gline->gl_user, (cli_user(acptr))->realusername) != 0)
 		      continue;
 
 	      if (GlineIsIpMask(gline)) {
