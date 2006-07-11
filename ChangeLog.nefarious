@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-07-10  Alex Schumann  <rubin@afternet.org>
+
+	* include/patchlevel.h: we decided 1.0.1 is better than 1.1
+
 2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/gline.c: Tweaked username to realusername.
