@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-07-10  Alex Schumann  <rubin@afternet.org>
+
+	* include/patchlevel.h: bumping this trunk to 1.1
+
 2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/gline.c: Dont check GlineIsBadChan() here, its done else
