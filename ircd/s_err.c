@@ -522,11 +522,7 @@ static Numeric replyTable[] = {
 /* 246 */
   { RPL_STATSTLINE, "%c %s %s", "246" },
 /* 247 */
-#ifdef NICKGLINES
-  { RPL_STATSGLINE, "%c %s%s%s%s%s %Tu :%s", "247" },
-#else
   { RPL_STATSGLINE, "%c %s%s%s %Tu :%s", "247" },
-#endif
 /* 248 */
   { RPL_STATSULINE, "%c %s %s %s %d %d", "248" },
 /* 249 */
@@ -592,11 +588,7 @@ static Numeric replyTable[] = {
 /* 279 */
   { 0 },
 /* 280 */
-#ifdef NICKGLINES
-  { RPL_GLIST, "%s%s%s%s%s %Tu %s %c :%s", "280" },
-#else
   { RPL_GLIST, "%s%s%s %Tu %s %c :%s", "280" },
-#endif
 /* 281 */
   { RPL_ENDOFGLIST, ":End of G-line List", "281" },
 /* 282 */
@@ -1120,11 +1112,11 @@ static Numeric replyTable[] = {
 /* 541 */
   { RPL_ENDOFEXEMPTLIST, "%s :End of DNSBL Exempt List", "541" },
 /* 542 */
-  { RPL_STATSSHUN, "%c %s%s%s%s%s %Tu :%s", "542" },
+  { RPL_STATSGLINE, "%c %s%s%s %Tu :%s", "542" },
 /* 543 */
   { ERR_NOSUCHSHUN, "%s :No such shun", "543" },
 /* 544 */
-  { RPL_SLIST, "%s%s%s%s%s %Tu %s %c :%s", "544" },
+  { RPL_SLIST, "%s%s%s %Tu %s %c :%s", "544" },
 /* 545 */
   { RPL_ENDOFSLIST, ":End of Shun List", "545" },
 /* 546 */

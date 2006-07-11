@@ -858,7 +858,6 @@ Optional Features:
   --enable-pedantic       Enable pedantic warnings (add -pedantic to CFLAGS)
   --enable-warnings       Enable warnings (add -Wall to CFLAGS)
   --disable-inlines       Disable inlining for a few critical functions
-  --enable-nickglines     Enable nickglines
   --enable-ssl            Enable Secure Sockets Layer support
   --disable-devpoll       Disable the /dev/poll-based engine
   --disable-kqueue        Disable the kqueue-based engine
@@ -4694,7 +4693,8 @@ done
 
 
 
-for ac_header in arpa/inet.h crypt.h fcntl.h inttypes.h limits.h netdb.h netinet/in.h poll.h stddef.h stdlib.h string.h sys/devpoll.h sys/event.h  sys/epoll.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h
+
+for ac_header in arpa/inet.h crypt.h fcntl.h getopt.h inttypes.h limits.h netdb.h netinet/in.h poll.h stddef.h stdlib.h string.h sys/devpoll.h sys/event.h  sys/epoll.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -10713,32 +10713,6 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
-
-echo "$as_me:$LINENO: checking whether to enable nickname glines" >&5
-echo $ECHO_N "checking whether to enable nickname glines... $ECHO_C" >&6
-# Check whether --enable-nickglines or --disable-nickglines was given.
-if test "${enable_nickglines+set}" = set; then
-  enableval="$enable_nickglines"
-  unet_cv_enable_nickglines=$enable_nickglines
-else
-  if test "${unet_cv_enable_nickglines+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  unet_cv_enable_nickglines=no
-fi
-
-fi;
-echo "$as_me:$LINENO: result: $unet_cv_enable_nickglines" >&5
-echo "${ECHO_T}$unet_cv_enable_nickglines" >&6
-
-if test x"$unet_cv_enable_nickglines" = xyes; then
-
-cat >>confdefs.h <<\_ACEOF
-#define NICKGLINES
-_ACEOF
-
-fi
-
 
 echo "$as_me:$LINENO: checking whether to enable OpenSSL support" >&5
 echo $ECHO_N "checking whether to enable OpenSSL support... $ECHO_C" >&6

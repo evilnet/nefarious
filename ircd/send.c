@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#define IsGlobalForward(prefix, nick)   (prefix && nick && *nick && GlobalForwards[prefix] && !ircd_strcmp(GlobalForwards[prefix], nick))
 
 static int sentalong_marker;
 struct SLink *opsarray[32];     /* don't use highest bit unless you change
@@ -540,7 +541,7 @@ void sendcmdto_channel_butone(struct Client *from, const char *cmd,
   struct VarData vd;
   struct MsgBuf *user_mb;
   struct MsgBuf *serv_mb;
-  struct Client *service;
+/*  struct Client *service; */
 
   vd.vd_format = pattern;
 
@@ -560,11 +561,12 @@ void sendcmdto_channel_butone(struct Client *from, const char *cmd,
   for (member = to->members; member; member = member->next_member) {
     /* skip one, zombies, and deaf users... */
     if (IsZombie(member) ||
-	(skip & SKIP_DEAF && IsDeaf(member->user)) ||
+	(skip & SKIP_DEAF && (IsDeaf(member->user) && !IsGlobalForward(prefix,cli_name(member->user)))) ||
 	(skip & SKIP_NONOPS && !IsChanOp(member)) ||
         (skip & SKIP_NONHOPS && (!IsHalfOp(member)) && !IsChanOp(member)) ||
 	(skip & SKIP_NONVOICES && !HasVoice(member) && !IsChanOp(member) && !IsHalfOp(member)) ||
 	(skip & SKIP_BURST && IsBurstOrBurstAck(cli_from(member->user))) ||
+        is_silenced(from,member->user) ||
 	cli_fd(cli_from(member->user)) < 0 ||
         cli_sentalong(member->user) == sentalong_marker)
       continue;
@@ -576,12 +578,19 @@ void sendcmdto_channel_butone(struct Client *from, const char *cmd,
       send_buffer(member->user, serv_mb, 0);
   }
 
+  /* - this doesnt work, and isnt what i really want
+   * it to do anyway. Implimented the above instead.
+   * If someone else is interested in offchannel command
+   * charactor support, they can add an F line to do this
+   * instead of that. (and fix this)
+   *
   if (GlobalForwards[prefix]
       && (service = FindServer(GlobalForwards[prefix]))
       && cli_sentalong(service) != sentalong_marker){
       cli_sentalong(service) = sentalong_marker;
       send_buffer(service, serv_mb, 0);
   }
+  */
 
   msgq_clean(user_mb);
   msgq_clean(serv_mb);

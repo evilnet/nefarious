@@ -246,6 +246,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
       continue;
     if (IsUser(acptr))
     {
+      struct SLink *lp, **lpp;
       char xxx_buf[8];
       char *s = umode_str(acptr);
       sendcmdto_one(cli_user(acptr)->server, CMD_NICK, cptr,
@@ -276,6 +277,12 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 
       }
 
+      for (lpp = &(cli_user(acptr))->silence, lp = *lpp; lp;) {
+        sendcmdto_one(cli_user(acptr)->server, CMD_SILENCE, cptr, "%C +%s", acptr, lp->value.cp);
+
+        lpp = &lp->next;
+        lp = *lpp;
+      }
     }
   }
 

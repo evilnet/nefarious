@@ -111,14 +111,14 @@ awk '{ print $5 " " $6 }'`
 
 
 for file in ${srcdir}/ircd/*.c ; do
- echo "    \"[" `md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
+ echo "    \"[" `./md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
 done;
 
 echo "    \"\"," >> version.c
 echo "    \"Headers:\"," >> version.c
 
 for file in ${srcdir}/include/*.h ; do
- echo "    \"[" `md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
+ echo "    \"[" `./md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
 done;
 
 /bin/cat >>version.c <<!SUB!THIS!

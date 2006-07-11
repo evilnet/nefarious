@@ -143,8 +143,7 @@ int m_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   cp = pretty_mask(cp);
   if ((c == '-' && !del_silence(sptr, cp)) || (c != '-' && !add_silence(sptr, cp))) {
     sendcmdto_one(sptr, CMD_SILENCE, sptr, "%c%s", c, cp);
-    if (c == '-')
-      sendcmdto_serv_butone(sptr, CMD_SILENCE, 0, " * -%s", cp);
+    sendcmdto_serv_butone(sptr, CMD_SILENCE, cptr, "%C %s%s", cptr, (c == '-') ? "-" : "+", cp);
   }
   return 0;
 }
@@ -163,25 +162,22 @@ int ms_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client* acptr;
 
-  if (parc < 3 || EmptyString(parv[2])) {
+  if (parc < 3 || EmptyString(parv[2]))
     return need_more_params(sptr, "SILENCE");
-  }
 
-  if (*parv[1])        /* can be a server */
-    acptr = findNUser(parv[1]);
+  acptr = findNUser(parv[1]);
+
+  assert(0 != acptr);
+
+  if (*parv[2] == '-')
+    del_silence(acptr, parv[2] + 1);
   else
-    acptr = FindNServer(parv[1]);
+    add_silence(acptr, parv[2] + 1);
 
-  if (*parv[2] == '-') {
-    if (!del_silence(IsServer(sptr) ? acptr : sptr, parv[2] + 1))
-      sendcmdto_serv_butone(sptr, CMD_SILENCE, cptr, "* %s", parv[2]);
-  }
-  else {
-    add_silence(IsServer(sptr) ? acptr : sptr, parv[2]);
+  if (MyUser(acptr))
+    sendcmdto_one(acptr, CMD_SILENCE, acptr, "%s", parv[2]);
 
-    if (acptr && IsServer(cli_from(acptr))) {
-      sendcmdto_one(sptr, CMD_SILENCE, acptr, "%C %s", acptr, parv[2]);
-    }
-  }
+  sendcmdto_serv_butone(sptr, CMD_SILENCE, cptr, "%C %s", acptr, parv[2]);
+
   return 0;
 }

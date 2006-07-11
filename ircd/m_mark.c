@@ -157,7 +157,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
 
       add_dnsbl(acptr, parv[3]);
 
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s", cli_name(acptr), MARK_DNSBL_DATA,
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s", cli_name(acptr), MARK_DNSBL_DATA,
                             parv[3]);
     } else
       Debug((DEBUG_DEBUG, "MARK cannot find user %s", parv[1]));

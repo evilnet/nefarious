@@ -35,18 +35,11 @@
 struct Client;
 struct StatDesc;
 
-#ifdef NICKGLINES
-# define GLINE_MAX_EXPIRE 31536000	/* max expire: 1 year */
-#else
-# define GLINE_MAX_EXPIRE 604800	/* max expire: 7 days */
-#endif
+#define GLINE_MAX_EXPIRE 604800	/* max expire: 7 days */
 
 struct Gline {
   struct Gline *gl_next;
   struct Gline**gl_prev_p;
-#ifdef NICKGLINES
-  char	       *gl_nick;
-#endif
   char	       *gl_user;
   char	       *gl_host;
   char	       *gl_reason;
@@ -81,9 +74,6 @@ struct Gline {
 #define GlineIsBadChan(g)	((g)->gl_flags & GLINE_BADCHAN)
 #define GlineIsLocal(g)		((g)->gl_flags & GLINE_LOCAL)
 
-#ifdef NICKGLINES
-#define GlineNick(g)		((g)->gl_nick)
-#endif
 #define GlineUser(g)		((g)->gl_user)
 #define GlineHost(g)		((g)->gl_host)
 #define GlineReason(g)		((g)->gl_reason)
@@ -109,8 +99,5 @@ extern int gline_list(struct Client *sptr, char *userhost);
 extern void gline_stats(struct Client *sptr, struct StatDesc *sd, int stat,
 			char *param);
 extern int gline_memory_count(size_t *gl_size);
-#ifdef NICKGLINES
-extern struct Gline *IsNickGlined(struct Client *cptr, char *nick);
-#endif
 
 #endif /* INCLUDED_gline_h */

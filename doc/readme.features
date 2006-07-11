@@ -1313,6 +1313,13 @@ HIS_TRACE
 
 As per UnderNet CFV-165, this removes /TRACE from users.
 
+HIS_SHUN_REASON
+ * Type: boolean
+ * Default: TRUE
+
+This HIDES the shun reason from the target when a shun is set
+on them (when TRUE).
+
 HIS_STATS_l
  * Type: boolean
  * Default: TRUE

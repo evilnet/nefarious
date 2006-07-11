@@ -154,15 +154,6 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       && nick[1] == '\0')
     return 0;
 
-#ifdef NICKGLINES
-  /*
-   * Check if this is a LOCAL user trying to use a nick that has been
-   * "nick g-lined"; if so reject it...
-   */
-  if (IsNickGlined(acptr, nick) && !IsAnOper(acptr))
-    return 0;
-#endif
-
   /*
    * Set acptr2 to the client pointer of any user with nick's name.
    * If the user is the same as the person being svsnick'ed, let it

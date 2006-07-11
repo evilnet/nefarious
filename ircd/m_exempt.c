@@ -221,9 +221,9 @@ int ms_exempt(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else
     c = '+';
 
-  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, parv[4] ? parv[4] : "nm", parv[4] ?
+  if ((c == '-' && del_exempt(sptr, cp)) || (c != '-' && add_exempt(sptr, cp, parv[4] ? parv[4] : "nm", parv[3] ?
       atoi(parv[3]) : 0)))
-      sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s %d %s", sptr, parv[2], parv[4] ? atoi(parv[3]) : 0,
+      sendcmdto_serv_butone(sptr, CMD_EXEMPT, sptr, "%C %s %d %s", sptr, parv[2], parv[3] ? atoi(parv[3]) : 0,
                             parv[4] ? parv[4] : "nm");
 
   return 0;

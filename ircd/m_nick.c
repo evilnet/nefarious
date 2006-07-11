@@ -202,17 +202,6 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
   }
 
-#ifdef NICKGLINES
-  /*
-   * Check if this is a LOCAL user trying to use a nick that has been
-   * "nick g-lined"; if so reject it...
-   */
-  if (IsNickGlined(sptr, nick) && !IsAnOper(sptr)) {
-    send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
-    return 0;
-  }
-#endif
-
   if (!(acptr = FindClient(nick))) {
     /*
      * No collisions, all clear...

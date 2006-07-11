@@ -179,7 +179,7 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
   if (feature_bool(FEAT_EXTENDED_ACCOUNTS))
   {
     if (strlen(parv[2]) != 1)
-      return protocol_violation(cptr, "ACCOUNT detected invalid subcommand token '%s'. Old syntax maybe? See EXDENDED_ACCOUNTS F:line", parv[2]);
+      return protocol_violation(cptr, "ACCOUNT detected invalid subcommand token '%s'. Old syntax maybe? See EXTENDED_ACCOUNTS F:line", parv[2]);
 
     type = parv[2][0];
 

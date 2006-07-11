@@ -267,27 +267,16 @@ count_users(char *mask)
   struct Client *acptr;
   int count = 0;
   char ipbuf[USERLEN + 16 + 2];
-#ifdef NICKGLINES
-  char namebuf[NICKLEN + USERLEN + HOSTLEN + 3];
-#else
   char namebuf[USERLEN + HOSTLEN + 2];
-#endif
 
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr)) {
     if (!IsUser(acptr))
       continue;
 
-#ifdef NICKGLINES
-    ircd_snprintf(0, namebuf, sizeof(namebuf), "%s!%s@%s", cli_name(acptr),
-                  cli_user(acptr)->username, cli_user(acptr)->host);
-    ircd_snprintf(0, ipbuf, sizeof(ipbuf), "%s!%s@%s", cli_name(acptr),
-                   cli_user(acptr)->username, ircd_ntoa((const char *) &(cli_ip(acptr))));
-#else
     ircd_snprintf(0, namebuf, sizeof(namebuf), "%s@%s",
 		  cli_user(acptr)->username, cli_user(acptr)->host);
     ircd_snprintf(0, ipbuf, sizeof(ipbuf), "%s@%s", cli_user(acptr)->username,
 		  ircd_ntoa((const char *) &(cli_ip(acptr))));
-#endif
 
     if (!match(mask, namebuf) || !match(mask, ipbuf))
       count++;

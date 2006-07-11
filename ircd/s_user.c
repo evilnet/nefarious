@@ -734,8 +734,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
       sendto_opmask_butone(0, SNO_GLINE, "Shun active for %s%s",
                            IsUnknown(sptr) ? "Unregistered Client ":"",
                            get_client_name(sptr, SHOW_IP));
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are shunned: %s", sptr,
-           ashun->sh_reason);
+      if (!feature_bool(FEAT_HIS_SHUN_REASON))
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are shunned: %s", sptr,
+             ashun->sh_reason);
     }
 
   /*
@@ -2567,11 +2568,12 @@ int is_silenced(struct Client *sptr, struct Client *acptr)
         (HasSetHost(sptr) && !match(lp->value.cp, senderh)))) ||
         ((lp->flags & CHFL_SILENCE_IPMASK) && !match(lp->value.cp, senderip)))
     {
-      if (!MyConnect(sptr))
-      {
-        sendcmdto_one(acptr, CMD_SILENCE, cli_from(sptr), "%C %s", sptr,
-                      lp->value.cp);
-      }
+/*      if (!MyConnect(sptr))
+ *      {
+ *       sendcmdto_one(acptr, CMD_SILENCE, cli_from(sptr), "%C %s", sptr,
+ *                     lp->value.cp);
+ *     }
+ */
       return 1;
     }
   }

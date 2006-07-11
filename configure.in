@@ -131,7 +131,7 @@ AC_SEARCH_LIBS(res_mkquery, resolv,
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([arpa/inet.h crypt.h fcntl.h inttypes.h limits.h netdb.h netinet/in.h poll.h stddef.h stdlib.h string.h sys/devpoll.h sys/event.h  sys/epoll.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h crypt.h fcntl.h getopt.h inttypes.h limits.h netdb.h netinet/in.h poll.h stddef.h stdlib.h string.h sys/devpoll.h sys/event.h  sys/epoll.h sys/file.h sys/ioctl.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics
 AC_C_CONST
@@ -352,20 +352,6 @@ AC_MSG_RESULT([$unet_cv_enable_inlines])
 if test x"$unet_cv_enable_inlines" = xyes; then
     AC_DEFINE([FORCEINLINE], , [Force inlining for a few critical functions])
 fi
-
-dnl Now check for --enable-nickglines
-AC_MSG_CHECKING([whether to enable nickname glines])
-AC_ARG_ENABLE([nickglines],
-[  --enable-nickglines     Enable nickglines],
-[unet_cv_enable_nickglines=$enable_nickglines],
-[AC_CACHE_VAL(unet_cv_enable_nickglines,
-[unet_cv_enable_nickglines=no])])
-AC_MSG_RESULT([$unet_cv_enable_nickglines])
-
-if test x"$unet_cv_enable_nickglines" = xyes; then
-    AC_DEFINE([NICKGLINES], , [Nickname glines.])
-fi
-
 
 dnl **
 dnl **  SSL Library checks (OpenSSL)

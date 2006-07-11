@@ -35,12 +35,11 @@
 struct Client;
 struct StatDesc;
 
-#define SHUN_MAX_EXPIRE 31536000	/* max expire: 1 year */
+#define SHUN_MAX_EXPIRE 604800	/* max expire: 7 days */
 
 struct Shun {
   struct Shun *sh_next;
   struct Shun **sh_prev_p;
-  char	       *sh_nick;
   char	       *sh_user;
   char	       *sh_host;
   char	       *sh_reason;
@@ -73,7 +72,6 @@ struct Shun {
 #define ShunIsRealName(s)	((s)->sh_flags & SHUN_REALNAME)
 #define ShunIsLocal(s)		((s)->sh_flags & SHUN_LOCAL)
 
-#define ShunNick(s)		((s)->sh_nick)
 #define ShunUser(s)		((s)->sh_user)
 #define ShunHost(s)		((s)->sh_host)
 #define ShunReason(s)		((s)->sh_reason)
@@ -101,6 +99,5 @@ extern void shun_stats(struct Client *sptr, struct StatDesc *sd, int stat,
 extern int shun_memory_count(size_t *sh_size);
 extern int expire_shuns();
 extern int count_affected(char* mask);
-extern struct Shun *IsNickShunned(struct Client *cptr, char *nick);
 
 #endif /* INCLUDED_shun_h */

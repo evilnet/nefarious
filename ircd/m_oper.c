@@ -330,7 +330,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	   OSetGlobal(sptr);
 	   SetAdmin(sptr);
 	 }
-	 sendcmdto_one(&me, CMD_MODE, sptr, "%C %s", sptr,
+	 sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
 		       (IsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
 	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 

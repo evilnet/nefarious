@@ -132,10 +132,6 @@ const char* debug_serveropts(void)
   if (feature_bool(FEAT_IDLE_FROM_MSG))
     AddC('M');
 
-#ifdef NICKGLINES
-  AddC('N');
-#endif /* NICKGLINES */
-
   if (feature_bool(FEAT_NO_OPER_DEOP_LCHAN))
     AddC('o');
 

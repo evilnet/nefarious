@@ -1,6 +1,126 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/gline.c: Dont check GlineIsBadChan() here, its done else
+	where.
+
+2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/version.c.SH: Use md5sum that comes with nefarious. (again
+	opps).
+
+2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+
+	* configure: Ran autoconf.
+
+	* configure.in: Added check for getopt.h
+
+	* include/md5.h: A lot of systems dont seem to come with md5sum.
+	This messes up the output in INFO, so heres a small md5sum
+	program.
+
+	* ircd/Makefile.in: Compile md5sum.c into md5sum at the start
+	of complimation.
+
+	* ircd/md5sum.c: See md5.h entry.
+
+	* ircd/version.c.SH: Use md5sum that comes with nefarious.
+
+2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+
+	* config.h.in: Ran autoheader.
+
+	* configure: Ran autoconf.
+
+	* configure.in: Removed nick glines. They never worked properly
+	and it made the code damn hard to read.
+
+	* doc/example.conf: Added feature HIS_SHUN_REASON. On by default,
+	the shun reason will NOT be displayed to the target(s) when they
+	are shunned.
+
+	* doc/readme.features: Added HIS_SHUN_REASON.
+
+	* include/gline.h: See configure.in entry.
+
+	* include/ircd_features.h: See example.conf entry.
+
+	* include/shun.h: Removed nick bits.
+
+	* ircd/gline.c: See configure.in entry. Also grabbed a fresh copy
+	of gline.c and readded our extra bits just to be safe.
+
+	* ircd/ircd_features.c: See example.conf entry.
+
+	* ircd/m_nick.c: See configure.in entry.
+
+	* ircd/m_svsnick.c: See configure.in entry.
+
+	* ircd/Makefile.in: Ran make depend.
+
+	* ircd/s_debug.c: See configure.in entry.
+
+	* ircd/s_err.c: See configure.in entry.
+
+	* ircd/s_user.c: Make use of HIS_SHUN_REASON here.
+
+	* ircd/shun.c: Redone using the fresh gline.c, shuns dont include
+	nicknames now as that code is quite dodgy.
+
+	* ircd/whocmds.c: See configure.in entry.
+
+2006-07-10  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_mark.c: Woops one too many %s's.
+
+	* ircd/s_user.c: No need to send it out anymore as we fully burst
+	silences.
+
+2006-07-10  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_silence.c: Send out the usual silence notice if a server
+	or service adds a silence for you.
+
+2006-07-10  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_oper.c: Apply an old fix with remote opering that was
+	never applied to the trunk.
+
+	* ircd/send.c: Silences apply to channel messages and notices.
+	This needs a wee bit more testing *hint hint*.
+
+2006-06-05  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/s_serv.c: Burst silences on link.
+
+2006-06-05  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_silence.c: Send all ignores to all servers. This needs
+	testing on our own testnet, committing so that the others can
+	try it. Dont use this revision for a day or 2 atleast please.
+
+	* ircd/send.c: Fixed a warning.
+
+2006-06-03  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/m_exempt.c: experimental patch for exempt crash bug
+
+	* ircd/m_silence.c: doesn't core anymore, but needs improvement to
+	burst properly. Currently locally REMOVING a silence bursts, but not
+	setting one locally....
+
+2006-05-25  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/send.c: Made blines work to override umode +d
+	for privmsgs starting with that prefix, and removed the previous
+	(broken) offchannel cmdchar support.
+
+2006-05-24  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/m_topic.c: fixed using wrong ident field for topic set
+
 2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
 
 	* include/patchlevel.h: Bumped patchlevel.
