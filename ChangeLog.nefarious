@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-07-23  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/Makefile.in: stop overwriting existing motd and similar config
+	files on make install (!!) *scowel*
+
 2006-07-10  Alex Schumann  <rubin@afternet.org>
 
 	* include/patchlevel.h: we decided 1.0.1 is better than 1.1

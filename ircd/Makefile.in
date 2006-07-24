@@ -304,10 +304,11 @@ install-with-symlink: build mkbindir
 	@${RM} /tmp/ircd.tag
 	${INSTALL} -s -m 700 -o ${IRCDOWN} -g ${IRCDGRP} chkconf ${BINDIR}
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example.conf ${DPATH}
-	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.quotes ${DPATH}
-	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
-	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
-	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}	
+# You cant overwrite these, they might already exist!!!! 
+#	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.quotes ${DPATH}
+#	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
+#	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
+#	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}	
 	${top_srcdir}/tools/makepem/makepem ${DPATH} ${top_srcdir}
 	${RM} -f ${top_srcdir}/ircd/version.c
 # 	( cd ${DPATH}; \
