@@ -53,7 +53,7 @@ struct SLink *opsarray[32];     /* don't use highest bit unless you change
 				   atoi to strtoul in sendto_op_mask() */
 static struct Connection *send_queues = 0;
 /** Indicates which server should receive prefixed commands. */
-char *GlobalForwards[256];
+extern char *GlobalForwards[256];
 
 /*
  * dead_link

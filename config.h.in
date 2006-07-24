@@ -42,6 +42,9 @@
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
+/* Define to 1 if you have the <getopt.h> header file. */
+#undef HAVE_GETOPT_H
+
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE
 
