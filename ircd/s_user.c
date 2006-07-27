@@ -617,8 +617,10 @@ int register_user(struct Client *cptr, struct Client *sptr,
         if (EmptyString(cli_dnsbls(sptr)))
           strcat(cli_dnsbls(sptr), dp->value.cp);
         else {
-          strcat(cli_dnsbls(sptr), ", ");
-          strcat(cli_dnsbls(sptr), dp->value.cp);
+          if(strlen(cli_dnsbls(sptr)) + strlen(dp->value.cp) + 2 < BUFSIZE) {
+              strcat(cli_dnsbls(sptr), ", ");
+              strcat(cli_dnsbls(sptr), dp->value.cp);
+          }
         }
       }
     }

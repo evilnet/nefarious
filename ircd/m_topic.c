@@ -119,15 +119,17 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    ircd_strncpy(chptr->topic, topic, TOPICLEN);
    if (setter) {
      if (feature_bool(FEAT_HOST_IN_TOPIC)) {
-       ircd_strncpy(chptr->topic_nick, setter, NICKLEN+USERLEN+HOSTLEN+3);
+       ircd_strncpy(chptr->topic_nick, setter, NICKLEN+USERLEN+HOSTLEN+2);
        for (nick = strtok_r(setter, "!", &nickb);
             nick;
             nick = strtok_r(NULL, "!", &nickb))
        {
        }
      } else
+       memset(chptr->topic_nick, '\0', NICKLEN+USERLEN+HOSTLEN+3);
        ircd_strncpy(chptr->topic_nick, setter, NICKLEN);
    } else {
+     memset(chptr->topic_nick, '\0', NICKLEN+USERLEN+HOSTLEN+3);
      ircd_strncpy(chptr->topic_nick, cli_name(from), NICKLEN);
      if (feature_bool(FEAT_HOST_IN_TOPIC) && !IsServer(sptr)) {
        strcat(chptr->topic_nick, "!");

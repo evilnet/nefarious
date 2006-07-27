@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-07-27  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/s_user.c: Thwart unlikely buffer overrun if a user matched a
+	_LOT_ of rbls with long names.
+
+	* ircd/m_topic.c: Fix buffer overrun in /topic with host in topic set
+	and a 30 char nick. This leads to a crash, and memory corruption. It
+	is advised everyone either upgrade to this build or set F:NICKLEN:29
+	or lower immediately.
+
 2006-07-23  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/Makefile.in: stop overwriting existing motd and similar config
