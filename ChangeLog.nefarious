@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-08-22  Neil Spierling  <sirvulcan@gmail.com>
+
+	* include/ircd_struct.h: Bumped up the size of dnsblhost.
+
+	* ircd/client.c: Send privs to servers on all opers.
+
+	* ircd/s_serv.c: Burst privs on link.
+
+	* ircd/s_user.c: Tweaked a couple of snprintf's, these could be
+	causing the burst bug.
+
 2006-07-27  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_user.c: Thwart unlikely buffer overrun if a user matched a

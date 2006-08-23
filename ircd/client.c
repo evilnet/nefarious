@@ -43,6 +43,8 @@
 
 #define BAD_PING                ((unsigned int)-2)
 
+char privbufp[512] = "";
+
 /** Find the shortest non-zero ping time attached to a client.
  * If all attached ping times are zero, return the value for
  * FEAT_PINGFREQUENCY.
@@ -214,6 +216,7 @@ client_set_privs(struct Client* client)
 {
   struct Privs privs;
   struct Privs antiprivs;
+  char privbuf[512] = "";
   int i;
 
   memset(&privs, 0, sizeof(struct Privs));
@@ -275,22 +278,22 @@ client_set_privs(struct Client* client)
     privs.priv_mask[i] &= ~antiprivs.priv_mask[i];
 
   cli_privs(client) = privs;
-  if (IsRemoteOper(client)) {
-    char privbuf[512] = "";
-    int i;
-    /* Send privileges */
-    for (i = 0; privtab[i].name; i++)
-      if (HasPriv(client, privtab[i].priv)) {
+
+  /* Send privileges */
+  for (i = 0; privtab[i].name; i++)
+  if (HasPriv(client, privtab[i].priv)) {
 	strcat(privbuf, privtab[i].name);
 	strcat(privbuf, ",");
-      }
-    privbuf[strlen(privbuf)] = 0;
-    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
+  }
+  privbuf[strlen(privbuf)] = 0;
+  if (IsRemoteOper(client)) {
     ClearRemoteOper(client);
+    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
     /* Call client_set_privs() recursively so that privileges
        are set for a remote user rather than like any oper */
     client_set_privs(client);
-  }
+  } else
+    sendcmdto_serv_butone(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
 }
 
 /** Report privileges of \a client to \a to.
@@ -316,6 +319,22 @@ client_report_privs(struct Client *to, struct Client *client)
   msgq_clean(mb);
 
   return 0;
+}
+
+char *client_print_privs(struct Client *client)
+{
+  int i;
+
+  privbufp[0] = '\0';
+  for (i = 0; privtab[i].name; i++) {
+    if (HasPriv(client, privtab[i].priv)) {
+      strcat(privbufp, privtab[i].name);
+      strcat(privbufp, " ");
+    }
+  }
+  privbufp[strlen(privbufp)] = 0;
+
+  return privbufp;
 }
 
 int client_modify_priv_by_name(struct Client *who, char *priv, int what) {

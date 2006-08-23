@@ -79,12 +79,12 @@ struct User {
   char               host[HOSTLEN + 1];
   char               realusername[USERLEN + 1];
   char               realhost[HOSTLEN + 1];
-  char               fakehost[HOSTLEN + 1];
+  char               fakehost[HOSTLEN + 41];
   char               account[ACCOUNTLEN + 1];
   time_t	     acc_create;
   char               virtip[SOCKIPLEN + 30];
   char               virthost[HOSTLEN + 1];
-  char               dnsblhost[HOSTLEN + 20];
+  char               dnsblhost[HOSTLEN + 40];
   char               shunreason[BUFSIZE + 1];
   char*              swhois;         /* pointer to swhois message */
 };

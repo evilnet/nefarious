@@ -106,6 +106,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
   const char*    inpath;
   int            i;
   struct dnsblexempts *dnsblexempts;
+  char *privs;
 
   assert(0 != cptr);
   assert(0 != cli_local(cptr));
@@ -283,6 +284,11 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
         lpp = &lp->next;
         lp = *lpp;
       }
+
+
+      privs = client_print_privs(acptr);
+      if (privs)
+        sendcmdto_one(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C %s", acptr, privs);
     }
   }
 

@@ -857,14 +857,14 @@ int register_user(struct Client *cptr, struct Client *sptr,
       memset(flagbuf, 0, BUFSIZE);
 
       if (IsDNSBLMarked(sptr) && !IsAccount(sptr)) {
-        ircd_snprintf(0, cli_user(sptr)->dnsblhost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
+        ircd_snprintf(0, cli_user(sptr)->dnsblhost, sizeof(cli_user(sptr)->dnsblhost), "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
         strcat(flagbuf, "m");
 
         if (feature_bool(FEAT_FAKEHOST) && feature_bool(FEAT_DNSBL_MARK_FAKEHOST)) {
           log_write(LS_DNSBL, L_INFO, 0, "Marking client %s", cli_name(sptr));
           SetFakeHost(sptr);
           SetHiddenHost(sptr);
-          ircd_snprintf(0, cli_user(sptr)->fakehost, HOSTLEN, "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
+          ircd_snprintf(0, cli_user(sptr)->fakehost, sizeof(cli_user(sptr)->fakehost), "%s.%s", cli_dnsbl(sptr), cli_sockhost(sptr));
           hide_hostmask(sptr);
 
           sendcmdto_serv_butone(cli_user(sptr)->server, CMD_FAKEHOST, cptr, "%C %s", sptr,
