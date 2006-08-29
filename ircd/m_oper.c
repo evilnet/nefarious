@@ -253,7 +253,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (feature_bool(FEAT_OPERMOTD))
       m_opermotd(sptr, sptr, 1, parv);
 
-    log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#R)", name, sptr);
+    log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#C)", name, sptr);
   return 0;
 }
 
