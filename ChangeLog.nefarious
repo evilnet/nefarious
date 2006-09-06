@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/m_clearmode.c: Fix the old clearmode crash on bsd systems.
+
+	* ircd/md5sum.c: Older bsd systems dont seem to have getopt however
+	it seems unistd will sort this out.
+
 2006-08-29  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_oper.c: Fix from branches for oper logging crash.

@@ -6,10 +6,20 @@
  * $Id$
  */
 
-#include <getopt.h>
+#include "config.h"
 #include <stdlib.h>    /* Added RKNOP 960111 */
 #include <stdio.h>
 #include <string.h>
+
+/* older bsd systems dont seem to have getopt so we will use unistd */
+#ifdef HAVE_GETOPT_H
+#include <getopt.h>
+#else
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#endif
+
 #include "md5.h"
 
 #ifdef UNIX

@@ -142,7 +142,7 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
   };
   int *flag_p;
   unsigned int del_mode = 0;
-  char control_buf[20];
+  char control_buf[40];
   int control_buf_i = 0;
   struct ModeBuf mbuf;
   struct SLink *link, *next;
