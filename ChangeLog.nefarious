@@ -3,6 +3,13 @@
 
 2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/s_auth.c: Add specific notices as to if someone matches
+	or doesnt match on the dnsbl checks. Works properly now (tested).
+
+	* ircd/s_serv.c: Clean up how silences are bursted.
+
+2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/m_clearmode.c: Fix the old clearmode crash on bsd systems.
 
 	* ircd/md5sum.c: Older bsd systems dont seem to have getopt however

@@ -88,7 +88,8 @@ static struct {
     "ignoring hostname.\r\n"),
   MSG("NOTICE AUTH :*** Invalid hostname\r\n"),
   MSG("NOTICE AUTH :*** Checking your IP against DNS ban lists\r\n"),
-  MSG("NOTICE AUTH :*** DNS ban list checks complete, results pending\r\n")
+  MSG("NOTICE AUTH :*** DNS ban list check failed\r\n"),
+  MSG("NOTICE AUTH :*** DNS ban list check passed\r\n")
 #undef MSG
 };
 
@@ -103,7 +104,8 @@ typedef enum {
   REPORT_IP_MISMATCH,
   REPORT_INVAL_DNS,
   REPORT_DO_DNSBL,
-  REPORT_FIN_DNSBL
+  REPORT_F_DNSBL,
+  REPORT_P_DNSBL
 } ReportType;
 
 #ifdef USE_SSL
@@ -155,8 +157,12 @@ void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
   if (feature_bool(FEAT_DNSBL_CHECKS) && (cli_dnsblcount(auth->client) == 0)) {
     if (!IsDoingAuth(auth) && !IsDNSPending(auth)) {
       ClearDNSBLPending(auth);
-      if (IsUserPort(auth->client))
-        sendheader(auth->client, REPORT_FIN_DNSBL);
+      if (IsUserPort(auth->client)) {
+        if (IsDNSBL(auth->client))
+          sendheader(auth->client, REPORT_F_DNSBL);
+        else
+          sendheader(auth->client, REPORT_P_DNSBL);
+      }
 
       Debug((DEBUG_DEBUG, "Freeing auth after dnsbl %s@%s [%s]",
 	     cli_username(auth->client), cli_sockhost(auth->client),
@@ -167,8 +173,12 @@ void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
       unlink_auth_request(auth, &AuthIncompleteList);
       free_auth_request(auth);
     } else {
-      if (IsUserPort(auth->client))
-        sendheader(auth->client, REPORT_FIN_DNSBL);
+      if (IsUserPort(auth->client)) {
+        if (IsDNSBL(auth->client))
+          sendheader(auth->client, REPORT_F_DNSBL);
+        else
+          sendheader(auth->client, REPORT_P_DNSBL);
+      }
       ClearDNSBLPending(auth);
       log_write(LS_DNSBL, L_INFO, 0, "DNSBL Checks Complete %p", auth->client);
     }
@@ -224,8 +234,12 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   }
 
   if (cli_dnsblcount(auth->client) == 0) {
-    if (IsUserPort(auth->client))
-      sendheader(client, REPORT_FIN_DNSBL);
+    if (IsUserPort(auth->client)) {
+      if (IsDNSBL(auth->client))
+        sendheader(auth->client, REPORT_F_DNSBL);
+      else
+        sendheader(auth->client, REPORT_P_DNSBL);
+    }
     ClearDNSBLPending(auth);
     log_write(LS_DNSBL, L_INFO, 0, "DNSBL Checks Complete (none left to check) %s", auth->client);
   }
