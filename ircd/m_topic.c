@@ -125,9 +125,10 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
             nick = strtok_r(NULL, "!", &nickb))
        {
        }
-     } else
+     } else {
        memset(chptr->topic_nick, '\0', NICKLEN+USERLEN+HOSTLEN+3);
        ircd_strncpy(chptr->topic_nick, setter, NICKLEN);
+     }
    } else {
      memset(chptr->topic_nick, '\0', NICKLEN+USERLEN+HOSTLEN+3);
      ircd_strncpy(chptr->topic_nick, cli_name(from), NICKLEN);

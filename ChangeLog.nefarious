@@ -3,6 +3,10 @@
 
 2006-09-12  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_topic.c: Bug fix with host in topic, missed a { } set.
+
+2006-09-12  Neil Spierling  <sirvulcan@gmail.com>
+
 	* ircd/gline.c: Critical bug fix to BADCHANS (tested).
 
 2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
