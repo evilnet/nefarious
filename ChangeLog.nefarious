@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-09-12  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/gline.c: Critical bug fix to BADCHANS (tested).
+
 2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/s_auth.c: Add specific notices as to if someone matches

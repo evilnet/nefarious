@@ -428,11 +428,28 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
   assert(0 != userhost);
   assert(0 != reason);
 
-  if (*userhost == '$'
+  /* NO_OLD_GLINE allows *@#channel to work correctly */
+  if (*userhost == '#' || *userhost == '&'
 # ifndef NO_OLD_GLINE
-  || userhost[2] == '$'  
-#endif
-) {
+      || ((userhost[2] == '#' || userhost[2] == '&') && (userhost[1] == '@'))
+# endif /* OLD_GLINE */
+      ) {
+    if ((flags & GLINE_LOCAL) && !HasPriv(sptr, PRIV_LOCAL_BADCHAN))
+      return send_reply(sptr, ERR_NOPRIVILEGES);
+
+    flags |= GLINE_BADCHAN;
+# ifndef NO_OLD_GLINE
+    if ((userhost[2] == '#' || userhost[2] == '&') && (userhost[1] == '@'))
+      user = userhost + 2;
+    else
+# endif /* OLD_GLINE */
+      user = userhost;
+    host = 0;
+  } else if (*userhost == '$'
+# ifndef NO_OLD_GLINE
+  || userhost[2] == '$'
+# endif /* OLD_GLINE */
+  ) {
     switch (*userhost == '$' ? userhost[1] : userhost[3]) {
       case 'R': flags |= GLINE_REALNAME; break;
       default:
