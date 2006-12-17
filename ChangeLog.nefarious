@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2006-12-17  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Important update. I wont go into too much detail
+	but its to do with channel bans. See me if you want more info. I
+	advise you update.
+
 2006-09-12  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_topic.c: Bug fix with host in topic, missed a { } set.

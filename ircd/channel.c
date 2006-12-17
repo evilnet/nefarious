@@ -621,8 +621,8 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   /* If the user is authed and +x (and not +h), then sa is set to the real host */
   /* If the user is authed and -x (or +h), then sa is set to the "account" host */
 
-  se = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->username,
-                          (cli_user(cptr))->host);
+  se = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->realusername,
+                          (cli_user(cptr))->realhost);
 
   if (HasSetHost(cptr))
     she = make_nick_user_host(nu_realhoste, cli_name(cptr),
@@ -631,7 +631,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
 
   if (HasFakeHost(cptr))
     sfe = make_nick_user_host(nu_fakehoste, cli_name(cptr),
-                             cli_user(cptr)->username,
+                             cli_user(cptr)->realusername,
                              cli_user(cptr)->fakehost);
 
   if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
@@ -643,7 +643,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
        else {
           make_hidden_hostmask(tmphoste, cptr);
           sae = make_nick_user_host(nu_accthoste, cli_name(cptr),
-                                   cli_user(cptr)->username,
+                                   cli_user(cptr)->realusername,
                                    tmphoste);
        }
     }
@@ -655,7 +655,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
      else {
        ircd_snprintf(0, tmphoste, HOSTLEN, "%s", cli_user(cptr)->virthost);
        sae = make_nick_user_host(nu_accthoste, cli_name(cptr),
-                                cli_user(cptr)->username,
+                                cli_user(cptr)->realusername,
                                 tmphoste);
      }
   }
@@ -667,7 +667,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
       
       if (!ip_se) {
         ip_se = make_nick_user_ip(nu_ipe, cli_name(cptr),
-                                 (cli_user(cptr))->username, cli_ip(cptr));
+                                 (cli_user(cptr))->realusername, cli_ip(cptr));
         if ((ipe_start = strrchr(ip_se, '@')))
           cli_addr = inet_addr(ipe_start + 1);
       }
@@ -777,8 +777,8 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   /* If the user is authed and +x (and not +h), then sa is set to the real host */
   /* If the user is authed and -x (or +h), then sa is set to the "account" host */
 
-  s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->username,
-			  (cli_user(cptr))->host);
+  s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+			  (cli_user(cptr))->realhost);
 
   if (HasSetHost(cptr))
     sh = make_nick_user_host(nu_realhost, cli_name(cptr),
@@ -787,7 +787,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
   if (HasFakeHost(cptr))
     sf = make_nick_user_host(nu_fakehost, cli_name(cptr),
-			     cli_user(cptr)->username,
+			     cli_user(cptr)->realusername,
 			     cli_user(cptr)->fakehost);
 
   if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
@@ -799,7 +799,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
        else {
 	  make_hidden_hostmask(tmphost, cptr);
           sa = make_nick_user_host(nu_accthost, cli_name(cptr),
-                                   cli_user(cptr)->username,
+                                   cli_user(cptr)->realusername,
                                    tmphost);
        }
     }
@@ -811,7 +811,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
      else {
        ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
        sa = make_nick_user_host(nu_accthost, cli_name(cptr),
-                                cli_user(cptr)->username,
+                                cli_user(cptr)->realusername,
                                 tmphost);
      }
   }
@@ -823,7 +823,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
       
       if (!ip_s) {
         ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
-				 (cli_user(cptr))->username, cli_ip(cptr));
+				 (cli_user(cptr))->realusername, cli_ip(cptr));
         if ((ip_start = strrchr(ip_s, '@')))
           cli_addr = inet_addr(ip_start + 1);
       }
