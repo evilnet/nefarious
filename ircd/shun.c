@@ -607,7 +607,8 @@ shun_lookup(struct Client *cptr, unsigned int flags)
       return shun;
     }
     else {
-      if (match(shun->sh_user, (cli_user(cptr))->realusername) != 0)
+      if (match(shun->sh_user,
+          (cli_user(cptr)->realusername ? cli_user(cptr)->realusername : cli_user(cptr)->username)) != 0)
         continue;
     	 
       if (ShunIsIpMask(shun)) {
@@ -616,7 +617,8 @@ shun_lookup(struct Client *cptr, unsigned int flags)
           continue;
       }    
       else {
-        if (match(shun->sh_host, (cli_user(cptr))->realhost) != 0) 
+        if (match(shun->sh_host,
+            (cli_user(cptr)->realhost ? cli_user(cptr)->realhost : cli_user(cptr)->host)) != 0) 
           continue;
       }
     }

@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-01-07  Neil Spierling  <sirvulcan@gmail.com>
+
+	* Includes an undernet backport, See ChangeLog.
+
+	* ircd/parse.c: If we have a user and host then we can do a shun
+	check.
+
+	* ircd/shun.c: Seems theres cases where realusername (and possibly
+	realhost are not being set before the shun_lookup check.
+
 2006-12-17  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Important update. I wont go into too much detail

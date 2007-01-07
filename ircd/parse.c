@@ -947,8 +947,9 @@ parse_client(struct Client *cptr, char *buffer, char *bufend)
       (strcasecmp(ch, "QUIT"))    &&  /* obvious */
       (strcasecmp(ch, "PONG"))      /* survive */
     ) {
-    if (shun_lookup(cptr, 0)) {
-      return 0;  
+    if (cli_user(cptr)->username && cli_user(cptr)->host) {
+      if (shun_lookup(cptr, 0))
+        return 0;  
     }
   }
 
