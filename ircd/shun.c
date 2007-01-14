@@ -214,7 +214,7 @@ do_shun(struct Client *cptr, struct Client *sptr, struct Shun *shun)
         Debug((DEBUG_DEBUG,"Matched!"));
       } else { /* Host/IP shun */
 	      if (cli_user(acptr)->username && 
-			      match (shun->sh_user, (cli_user(acptr))->realusername) != 0)
+			      match (shun->sh_user, cli_user(acptr)->realusername ? cli_user(acptr)->realusername : cli_user(acptr)->username ) != 0)
 		      continue;
 
 	      if (ShunIsIpMask(shun)) {

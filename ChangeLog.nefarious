@@ -1,7 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2007-01-07  Neil Spierling  <sirvulcan@gmail.com>
+2007-01-14  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/shun.c: Just a further tweak for the fix on the 7th.
+
+2007-01-14  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/m_svspart.c: Possible fix for an issue we found on AfterNET.
 
