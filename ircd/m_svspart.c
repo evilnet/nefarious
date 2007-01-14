@@ -134,10 +134,11 @@ int ms_svspart(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   /* init join/part buffer */
   joinbuf_init(&parts, acptr, acptr, JOINBUF_TYPE_PART, 0, 0);
 
-  assert(!IsZombie(member)); /* Local users should never zombie */
+  if (IsZombie(member))
+    flags |= CHFL_ZOMBIE;
 
   if (!member_can_send_to_channel(member))
-      flags |= CHFL_BANNED;
+    flags |= CHFL_BANNED;
 
   joinbuf_join(&parts, chptr, flags);
 

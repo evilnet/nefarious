@@ -3,6 +3,10 @@
 
 2007-01-07  Neil Spierling  <sirvulcan@gmail.com>
 
+	* ircd/m_svspart.c: Possible fix for an issue we found on AfterNET.
+
+2007-01-07  Neil Spierling  <sirvulcan@gmail.com>
+
 	* Includes an undernet backport, See ChangeLog.
 
 	* ircd/parse.c: If we have a user and host then we can do a shun
