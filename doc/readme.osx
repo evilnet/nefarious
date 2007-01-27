@@ -1,0 +1,4 @@
+Open ircd/res.c and uncomment the define toward the top (there are comments)
+
+
+Someone who actually has a mac should add this to ./configure somehow...

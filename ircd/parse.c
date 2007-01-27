@@ -30,6 +30,7 @@
 #include "ircd_alloc.h"
 #include "ircd_chattr.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
@@ -945,7 +946,9 @@ parse_client(struct Client *cptr, char *buffer, char *bufend)
       (strcasecmp(ch, "ADMIN"))   &&  /* get admin info for help*/
       (strcasecmp(ch, "PART"))    &&  /* obvious */
       (strcasecmp(ch, "QUIT"))    &&  /* obvious */
-      (strcasecmp(ch, "PONG"))      /* survive */
+      (strcasecmp(ch, "PONG"))    &&  /* survive */
+      (IsRegistered(cptr))           /* Send through unregistered clients they
+                                         will just error anyway */
     ) {
     if (cli_user(cptr)->username && cli_user(cptr)->host) {
       if (shun_lookup(cptr, 0))
@@ -1151,6 +1154,7 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
      */
     if (0 == i)
     {
+      log_write(LS_SYSTEM, L_WARNING, 0, "Missing Prefix: (%s) %s", cli_name(cptr), buffer);
       protocol_violation(cptr,"Missing Prefix");
       from = cptr;
     }

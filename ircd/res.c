@@ -54,6 +54,14 @@
 #error this code needs to be able to address individual octets 
 #endif
 
+/* MAC OSX needs this or T_A is undefined *
+ * http://pastebin.ca/257389
+ * TODO: put this in ./configure somehow
+ *
+ * For now: osx/darwin users, uncomment the below:
+#define BIND_8_COMPAT   1
+*/
+
 /*
  * Some systems do not define INADDR_NONE (255.255.255.255)
  * INADDR_NONE is actually a valid address, but it should never
@@ -62,6 +70,7 @@
  * the same on all hosts so we shouldn't need to use htonl or ntohl to
  * compare or set the values.
  */ 
+
 #ifndef INADDR_NONE
 #define INADDR_NONE ((unsigned int) 0xffffffff)
 #endif
