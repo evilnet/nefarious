@@ -602,6 +602,7 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   char          nu_fakehoste[NUH_BUFSIZE];
   char          nu_ipe[NUI_BUFSIZE];
   char*         se;
+  char*         seb;
   char*         sae = NULL;
   char*         she = NULL;
   char*         sfe = NULL;
@@ -623,6 +624,9 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
 
   se = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->realusername,
                           (cli_user(cptr))->realhost);
+
+  seb = make_nick_user_host(nu_hoste, cli_name(cptr), (cli_user(cptr))->realusername,
+                          (cli_user(cptr))->host);
 
   if (HasSetHost(cptr))
     she = make_nick_user_host(nu_realhoste, cli_name(cptr),
@@ -719,6 +723,8 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
 
     if (match(tmpe->value.except.exceptstr, se) == 0)
       break;
+    else if (seb && match(tmpe->value.except.exceptstr, seb) == 0)
+      break;
     else if (she && match(tmpe->value.except.exceptstr, she) == 0)
       break;
     else if (sfe && match(tmpe->value.except.exceptstr, sfe) == 0)
@@ -758,6 +764,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char          nu_fakehost[NUH_BUFSIZE];
   char          nu_ip[NUI_BUFSIZE];
   char*         s;
+  char*         sb;
   char*         sa = NULL;
   char*         sh = NULL;
   char*         sf = NULL;
@@ -779,6 +786,9 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
   s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
 			  (cli_user(cptr))->realhost);
+
+  sb = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+			  (cli_user(cptr))->host);
 
   if (HasSetHost(cptr))
     sh = make_nick_user_host(nu_realhost, cli_name(cptr),
@@ -874,6 +884,8 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     }
 
     if (match(tmp->value.ban.banstr, s) == 0)
+      break;
+    else if (sb && match(tmp->value.ban.banstr, sb) == 0)
       break;
     else if (sh && match(tmp->value.ban.banstr, sh) == 0)
       break;

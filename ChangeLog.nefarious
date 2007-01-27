@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-01-27  Neil Spierling  <sirvulcan@gmail.com>
+
+	* ircd/channel.c: Couple of fixes.
+
 2007-01-14  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/shun.c: Just a further tweak for the fix on the 7th.
