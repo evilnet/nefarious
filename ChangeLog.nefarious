@@ -1,6 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-02-04  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added new AUTOJOIN lines.
+
+	* include/ircd_defs.h: Removed AUTOJOIN channel define.
+
+	* include/ircd_features.h: Tweaked current AUTOJOIN lines and added
+	oper and admin AUTOJOIN lines.
+
+	* ircd/m_oper.c: Added admin and oper AUTOJOIN sections.
+
+	* ircd/s_user.c: Tweaked AUTOJOIN section.
+
+	* ircd/ssl.c: Quashed some warnings.
+
 2007-01-27  Neil Spierling  <sirvulcan@gmail.com>
 
 	* ircd/channel.c: Couple of fixes.

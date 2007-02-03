@@ -81,6 +81,7 @@
  */
 #include "config.h"
 
+#include "channel.h"
 #include "client.h"
 #include "handlers.h"
 #include "hash.h"
@@ -161,6 +162,8 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   struct ConfItem* aconf;
   char*            name;
   char*            password;
+  char             chan[CHANNELLEN-1];
+  char*            join[2];
   struct Flags old_mode = cli_flags(sptr);
 
   assert(0 != cptr);
@@ -242,13 +245,44 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_umode_out(cptr, sptr, &old_mode, HasPriv(sptr, PRIV_PROPAGATE));
     send_reply(sptr, RPL_YOUREOPER);
 
-    if (IsAdmin(sptr))
+    if (IsAdmin(sptr)) {
       sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
                            parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
-    else
+
+      /* Autojoin admins to admin channel and oper channel (if enabled) */
+      if (feature_bool(FEAT_AUTOJOIN_ADMIN)) {
+        if (feature_bool(FEAT_AUTOJOIN_ADMIN_NOTICE))
+              sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_ADMIN_NOTICE_VALUE));
+
+        ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_ADMIN_CHANNEL), CHANNELLEN-1);
+        join[0] = cli_name(sptr);
+        join[1] = chan;
+        m_join(sptr, sptr, 2, join);
+      }
+      if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+        if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
+              sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
+
+        ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_OPER_CHANNEL), CHANNELLEN-1);
+        join[0] = cli_name(sptr);
+        join[1] = chan;
+        m_join(sptr, sptr, 2, join);
+      }
+    } else {
       sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c)",
                            parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
                            IsOper(sptr) ? 'O' : 'o'); 
+
+      if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+        if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
+              sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
+
+        ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_OPER_CHANNEL), CHANNELLEN-1);
+        join[0] = cli_name(sptr);
+        join[1] = chan;
+        m_join(sptr, sptr, 2, join);
+      }
+    }
 
     if (feature_bool(FEAT_OPERMOTD))
       m_opermotd(sptr, sptr, 1, parv);
@@ -262,6 +296,9 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
  */
 int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  char             chan[CHANNELLEN-1];
+  char*            join[2];
+
   struct ConfItem *aconf;
   assert(0 != cptr);
   assert(IsServer(cptr));
@@ -333,10 +370,47 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	 sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
 		       (IsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
-	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
-		"%s (%s@%s) is now an IRC %s", parv[0],
-		cli_user(sptr)->realusername, cli_user(sptr)->realhost,
-		(IsAdmin(sptr)) ? "Administrator (A)" : "Operator (O)");
+
+         if (IsAdmin(sptr)) {
+           sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+                                   "%s (%s@%s) is now an IRC Administrator",
+                                   parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+
+           /* Autojoin admins to admin channel and oper channel (if enabled) */
+           if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+             if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
+               sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
+
+             ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_OPER_CHANNEL), CHANNELLEN-1);
+             join[0] = cli_name(sptr);
+             join[1] = chan;
+             m_join(sptr, sptr, 2, join);
+           }
+           if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+             if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
+               sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
+
+             ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_OPER_CHANNEL), CHANNELLEN-1);
+             join[0] = cli_name(sptr);
+             join[1] = chan;
+             m_join(sptr, sptr, 2, join);
+           }
+         } else {
+            sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+                                    "%s (%s@%s) is now an IRC Operator (O)",
+                                    parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+
+           if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+             if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
+               sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
+
+             ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_OPER_CHANNEL), CHANNELLEN-1);
+             join[0] = cli_name(sptr);
+             join[1] = chan;
+             m_join(sptr, sptr, 2, join);
+           }
+         }
+
 	 if (feature_bool(FEAT_OPERMOTD))
 	   m_opermotd(sptr, sptr, 1, parv);
 	 return 0;

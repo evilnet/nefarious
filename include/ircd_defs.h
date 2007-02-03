@@ -112,12 +112,6 @@
 #define RESERVEDTARGETS	12
 
 /*
- * AUTOJOIN is the channel which a client will autojoin if 
- * FEAT_AUTOJOIN is enabled.
- */
-#define AUTOJOIN_CHANNEL	"#evilnet"
-
-/*
  * Host hiding style 2 encryption keys, These must be unique throughout
  * your network.
  */

@@ -359,6 +359,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   struct ConfItem* aconf;
   struct Shun*     ashun = NULL;
   char*            parv[4];
+  char*            join[2];
   char*            tmpstr;
   char*            tmpstr2;
   char             c = 0;    /* not alphanum */
@@ -372,6 +373,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   short            badid = 0;
   short            digitgroups = 0;
   struct User*     user = cli_user(sptr);
+  char             chan[CHANNELLEN-1];
   int              killreason;
   char             ip_base64[8];
 
@@ -924,13 +926,14 @@ int register_user(struct Client *cptr, struct Client *sptr,
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2", sptr, feature_str(FEAT_NETWORK));
     }
 
-    if (feature_bool(FEAT_AUTOJOIN)) {
-      if (feature_bool(FEAT_AUTOJOIN_NOTICE)) {
-            sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_NOTICE_VALUE));
-      }
-      parv[0] = cli_name(sptr);
-      parv[1] = AUTOJOIN_CHANNEL;
-      m_join(sptr, sptr, 2, parv);
+    if (feature_bool(FEAT_AUTOJOIN_USER)) {
+      if (feature_bool(FEAT_AUTOJOIN_USER_NOTICE))
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_USER_NOTICE_VALUE));
+
+      ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_USER_CHANNEL), CHANNELLEN-1);
+      join[0] = cli_name(sptr);
+      join[1] = chan;
+      m_join(sptr, sptr, 2, join);
     }
   }
 

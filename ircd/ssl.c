@@ -203,8 +203,10 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
   struct iovec iov[IOV_MAX];
   IOResult retval = IO_BLOCKED;
   int ssl_err = 0;
-  int openssl_err = 0;
-  char err_buff[120];
+/*
+ * int openssl_err = 0;
+ * char err_buff[120];
+ */
 
   errno = 0;
 
@@ -230,7 +232,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
     case SSL_ERROR_WANT_X509_LOOKUP:
       return retval;
     case SSL_ERROR_SYSCALL:
-      //openssl_err = ERR_get_error(); ERR_error_string(openssl_err, err_buff)));
+      /* openssl_err = ERR_get_error(); ERR_error_string(openssl_err, err_buff))); */
       return (res < 0 && (errno == EWOULDBLOCK || 
                           errno == EINTR || 
                           errno == EBUSY || 
