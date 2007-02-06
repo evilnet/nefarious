@@ -24,6 +24,10 @@
 
 	* ircd/m_invite.c: Likewise.
 
+	* ircd/m_kick.c: Likewise.
+
+	* ircd/m_kill.c: Likewise.
+
 	* ircd/m_topic.c: Likewise.
 
 	* ircd/m_whois.c: Likewise.
