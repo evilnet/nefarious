@@ -53,6 +53,7 @@
                 " MAXCHANNELLEN=%i" \
 		" CHANTYPES=%s" \
                 " PREFIX=%s" \
+                " ELIST=MNUCT" \
                 " STATUSMSG=%s" \
                 " CHANMODES=%s" \
                 " CASEMAPPING=%s" \

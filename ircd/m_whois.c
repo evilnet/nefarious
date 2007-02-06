@@ -139,8 +139,12 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
   
   const struct User* user = cli_user(acptr);
   const char* name = (!*(cli_name(acptr))) ? "?" : cli_name(acptr);  
-  a2cptr = feature_bool(FEAT_HIS_WHOIS_SERVERNAME) && !IsAnOper(sptr)
-      && sptr != acptr ? &his : user->server;
+  if (feature_bool(FEAT_HIS_HIDEWHO))
+    a2cptr = feature_bool(FEAT_HIS_WHOIS_SERVERNAME) && !IsAnOper(sptr)
+        && sptr != acptr ? &his : user->server;
+  else
+    a2cptr = user->server;
+
   assert(user);
   send_reply(sptr, RPL_WHOISUSER, name, user->username, user->host,
 		   cli_info(acptr));
@@ -204,8 +208,17 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
         send_reply(sptr, RPL_WHOISCHANNELS, name, buf);
   }
 
-  send_reply(sptr, RPL_WHOISSERVER, name, cli_name(a2cptr),
-	     cli_info(a2cptr));
+  if (feature_bool(FEAT_HIS_HIDEWHO)) {
+    send_reply(sptr, RPL_WHOISSERVER, name, cli_name(a2cptr),
+  	       cli_info(a2cptr));
+   } else {
+     if (feature_bool(FEAT_HIS_WHOIS_SERVERNAME) && !IsAnOper(sptr) && sptr != acptr)
+       send_reply(sptr, RPL_WHOISSERVER, name, feature_str(FEAT_HIS_SERVERNAME),
+                  feature_str(FEAT_HIS_SERVERINFO));
+     else
+       send_reply(sptr, RPL_WHOISSERVER, name, cli_name(a2cptr),
+                 cli_info(a2cptr));
+  }
 
   if (user)
   {

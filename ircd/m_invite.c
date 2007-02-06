@@ -198,7 +198,8 @@ int m_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!IsLocalChannel(chptr->chname) || MyConnect(acptr)) {
     if (feature_bool(FEAT_ANNOUNCE_INVITES)) {
       /* Announce to channel operators. */
-      sendcmdto_channel_butserv_butone(&his, get_error_numeric(RPL_ISSUEDINVITE)->str,
+      sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, 
+				       get_error_numeric(RPL_ISSUEDINVITE)->str,
                                        NULL, chptr, sptr, SKIP_NONOPS,
                                        "%H %C %C :%C has been invited by %C",
                                        chptr, acptr, sptr, acptr, sptr);
@@ -302,7 +303,8 @@ int ms_invite(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (feature_bool(FEAT_ANNOUNCE_INVITES)) {
     /* Announce to channel operators. */
-    sendcmdto_channel_butserv_butone(&his, get_error_numeric(RPL_ISSUEDINVITE)->str,
+    sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, 
+				     get_error_numeric(RPL_ISSUEDINVITE)->str,
                                      NULL, chptr, sptr, SKIP_NONOPS,
                                      "%H %C %C :%C has been invited by %C",
                                      chptr, acptr, sptr, acptr, sptr);

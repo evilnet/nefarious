@@ -1,6 +1,37 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-02-07  Neil Spierling  <sirvulcan@gmail.com>
+
+	* doc/example.conf: Added new F:line HIS_HIDEWHO, default TRUE.
+	When enabled various actions preformed by servers like modes,
+	invites, topic etc will display &his which is set via
+	HIS_SERVERNAME. This is the current behaviour i just forgot to
+	add an F:line to disable it.
+
+	* doc/readme.features: Document F:line.
+
+	* include/ircd_features.h: Added new F:line.
+
+	* ircd/supported.h: Now that we can do server side searches with
+	list we can have ELIST in the ISUPPORT line.
+
+	* ircd/ircd_features.c: Added new F:line.
+
+	* ircd/channel.c: If HIS_HIDWHO is on then use &me instead of &his.
+
+	* ircd/m_burst.c: Likewise.
+
+	* ircd/m_invite.c: Likewise.
+
+	* ircd/m_topic.c: Likewise.
+
+	* ircd/m_whois.c: Likewise.
+
+	* ircd/s_misc.c: Likewise.
+
+	* ircd/s_user.c: Likewise.
+
 2007-02-04  Neil Spierling  <sirvulcan@gmail.com>
 
 	* doc/example.conf: Added new AUTOJOIN lines.

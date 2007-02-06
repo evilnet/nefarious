@@ -104,7 +104,7 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
    struct Client *from;
 
    if (feature_bool(FEAT_HIS_BANWHO) && IsServer(sptr)) {
-      from = &his;
+      from = feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me;
    }
    else {
       from = sptr;

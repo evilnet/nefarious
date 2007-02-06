@@ -529,6 +529,7 @@ static struct FeatureDesc {
   F_B(HIS_SHUN_REASON, 0, 1, 0),
   F_S(ERR_OPERONLYCHAN, 0, "Cannot join channel (+O)", 0),
   F_I(EXEMPT_EXPIRE, 0, 172800, 0),
+  F_B(HIS_HIDEWHO, 0, 1, 0),
 
 #undef F_S
 #undef F_B

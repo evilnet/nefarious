@@ -96,6 +96,8 @@ static __inline__ NTL_HDR_strCasediff { NTL_SRC_strCasediff }
 #endif
 #endif /* FORCEINLINE */
 
+#define        strncpyzt(x, y, N) do{(void)strncpy(x,y,N);x[N-1]='\0';}while(0)
+
 /*
  * Proto types of other externally visible functions
  */

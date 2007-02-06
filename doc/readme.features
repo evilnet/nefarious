@@ -1543,6 +1543,13 @@ HIS_KILLWHO
 As per UnderNet CFV-165, this doesn't show which server or oper performed a
 kill.
 
+HIS_HIDEWHO
+ * Type: boolean
+ * Default: TRUE
+
+This doesn't show which server preformed various functions like mode, opmode
+kick, etc when server preforms..
+
 HIS_REWRITE
  * Type: boolean
  * Default: TRUE

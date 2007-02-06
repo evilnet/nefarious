@@ -435,7 +435,7 @@ int exit_client(struct Client *cptr,    /* Connection being handled by
 	  else
 	    sendrawto_one(victim, MSG_ERROR " :Closing Link: %s by %s (%s)",
 			  cli_name(victim),
-                          cli_name(IsServer(killer) ? &his : killer),
+                          cli_name(IsServer(killer) ? (feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me) : killer),
 			  comment);
 	}
       }
