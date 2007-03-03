@@ -203,10 +203,8 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
   struct iovec iov[IOV_MAX];
   IOResult retval = IO_BLOCKED;
   int ssl_err = 0;
-/*
- * int openssl_err = 0;
- * char err_buff[120];
- */
+  int openssl_err = 0;
+  char err_buff[120];
 
   errno = 0;
 
@@ -222,6 +220,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
   for (k = 0; k < count; k++) {
     res = SSL_write(socket->ssl, iov[k].iov_base, iov[k].iov_len);
     ssl_err = SSL_get_error(socket->ssl, res);
+    Debug((DEBUG_DEBUG, "SSL_write returned %d, error code %d.", res, ssl_err));
     switch (ssl_err) {
     case SSL_ERROR_NONE:
       *count_out += (unsigned) res;
@@ -229,27 +228,50 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
       break;
     case SSL_ERROR_WANT_WRITE:
     case SSL_ERROR_WANT_READ:
-    case SSL_ERROR_WANT_X509_LOOKUP:
+    case SSL_ERROR_WANT_X509_LOOKUP:                                                                      Debug((DEBUG_DEBUG, "SSL_write returned want WRITE, READ, or X509; returning retval %d", retval));  
       return retval;
-    case SSL_ERROR_SYSCALL:
-      /* openssl_err = ERR_get_error(); ERR_error_string(openssl_err, err_buff))); */
-      return (res < 0 && (errno == EWOULDBLOCK || 
-                          errno == EINTR || 
-                          errno == EBUSY || 
-                          errno == EAGAIN)) ? retval : IO_FAILURE;
     case SSL_ERROR_SSL:
-      if(errno == EAGAIN) /* its what unreal ircd does..*/
+      {   
+          int errorValue;                                                                                     Debug((DEBUG_ERROR, "SSL_write returned SSL_ERROR_SSL, errno %d, retval %d, res %d, ssl error code %d", errno, retval, res, ssl_err));
+          ERR_load_crypto_strings();
+          while((errorValue = ERR_get_error())) {                                                                 Debug((DEBUG_ERROR, "  Error Queue: %d -- %s", errorValue, ERR_error_string(errorValue, NULL)));
+          }
+          /* Dump core here, so we can figure out WTF */
+          //assert(0);
+          return IO_FAILURE;
+       }
+    case SSL_ERROR_SYSCALL:
+      //openssl_err = ERR_get_error(); ERR_error_string(openssl_err, err_buff)));
+      if(res < 0 && (errno == EWOULDBLOCK ||
+                     errno == EINTR ||
+                     errno == EBUSY ||
+                     errno == EAGAIN)) {
+             Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SYSCALL, errno %d - returning retval %d", errno, retval));
+             return retval;
+      }
+      else {
+             Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SYSCALL - errno %d - returning IO_FAILURE", errno));
+             return IO_FAILURE;
+      }
+      /*
+      if(errno == EAGAIN) * its what unreal ircd does..*
+      {
+          Debug((DEBUG_DEBUG, "SSL_write returned ERROR_SSL - errno %d returning retval %d", errno, retval));
           return retval;
+      }
+      */
     case SSL_ERROR_ZERO_RETURN:
       SSL_shutdown(socket->ssl);
       return IO_FAILURE;
     default:
+      Debug((DEBUG_DEBUG, "SSL_write return fell through - errno %d returning retval %d", errno, retval));
       return retval; /* unknown error, assume block or success*/
     }
   }
+  Debug((DEBUG_DEBUG, "SSL_write return fell through(2) - errno %d returning retval %d", errno, retval));
   return retval;
 }
-      
+     
 int ssl_send(struct Client *cptr, const char *buf, unsigned int len)
 {
   char fmt[16];
@@ -264,6 +286,7 @@ int ssl_send(struct Client *cptr, const char *buf, unsigned int len)
    * at this point SSL_write usually fails, so the data must be queued.
    * We're abusing the normal send queue for this.
    * Also strip \r\n from message, as sendrawto_one adds it later
+    this hack sucks. it conflicted with prority queues - caused random ssl disconnections for YEARS. In summery, this hack == bad. I may have solved that, but this still makes me nervous. 
    */
   ircd_snprintf(0, fmt, sizeof(fmt), "%%.%us", len - 2);
   sendrawto_one(cptr, fmt, buf);

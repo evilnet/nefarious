@@ -213,6 +213,11 @@ void send_buffer(struct Client* to, struct MsgBuf* buf, int prio)
 
   Debug((DEBUG_SEND, "Sending [%p] to %s", buf, cli_name(to)));
 
+#ifdef USE_SSL
+  if(cli_socket(to).ssl)
+      prio = 0;
+#endif
+
   msgq_add(&(cli_sendQ(to)), buf, prio);
   client_add_sendq(cli_connect(to), &send_queues);
   update_write(to);
