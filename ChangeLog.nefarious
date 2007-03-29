@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-03-29  Alex Schumann  <rubin@afternet.org>
+
+        *  ircd/s_err.c: fix case of 'z' in ssl only error message.
+
+	* include/ircd_features.h: new F line for strict username checking
+
+	* ircd/ircd_features.c: new F line for strict username checking
+
+	* ircd/s_user.c: added ability to turn off the checking that doesn't like various mixed case & numbers in
+	usernames. F:STRICTUSERNAME:FALSE (default is TRUE)
+
 2007-03-03  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/ssl.c: more debugging info for ssl

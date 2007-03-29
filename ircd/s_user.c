@@ -498,71 +498,73 @@ int register_user(struct Client *cptr, struct Client *sptr,
      * No other special characters are allowed.
      * Name must contain at least one letter.
      */
-    tmpstr2 = tmpstr = (username[0] == '~' ? &username[1] : username);
-    while (*tmpstr && !badid)
-    {
-      pos++;
-      c = *tmpstr;
-      tmpstr++;
-      if (IsLower(c))
-      {
-        lower++;
-      }
-      else if (IsUpper(c))
-      {
-        upper++;
-        if ((leadcaps || pos == 1) && !lower && !digits)
-          leadcaps++;
-      }
-      else if (IsDigit(c))
-      {
-        digits++;
-        if (pos == 1 || !IsDigit(d))
+    if(feature_bool(FEAT_STRICTUSERNAME)) {
+        tmpstr2 = tmpstr = (username[0] == '~' ? &username[1] : username);
+        while (*tmpstr && !badid)
         {
-          digitgroups++;
-          if (digitgroups > 2)
+          pos++;
+          c = *tmpstr;
+          tmpstr++;
+          if (IsLower(c))
+          {
+            lower++;
+          }
+          else if (IsUpper(c))
+          {
+            upper++;
+            if ((leadcaps || pos == 1) && !lower && !digits)
+              leadcaps++;
+          }
+          else if (IsDigit(c))
+          {
+            digits++;
+            if (pos == 1 || !IsDigit(d))
+            {
+              digitgroups++;
+              if (digitgroups > 2)
+                badid = 1;
+            }
+          }
+          else if (c == '-' || c == '_' || c == '.')
+          {
+            other++;
+            if (pos == 1)
+              badid = 1;
+            else if (d == '-' || d == '_' || d == '.' || other > 2)
+              badid = 1;
+          }
+          else
+            badid = 1;
+          d = c;
+        }
+        if (!badid)
+        {
+          if (lower && upper && (!leadcaps || leadcaps > 3 ||
+              (upper > 2 && upper > leadcaps)))
+            badid = 1;
+          else if (digitgroups == 2 && !(IsDigit(tmpstr2[0]) || IsDigit(c)))
+            badid = 1;
+          else if ((!lower && !upper) || !IsAlnum(c))
             badid = 1;
         }
-      }
-      else if (c == '-' || c == '_' || c == '.')
-      {
-        other++;
-        if (pos == 1)
-          badid = 1;
-        else if (d == '-' || d == '_' || d == '.' || other > 2)
-          badid = 1;
-      }
-      else
-        badid = 1;
-      d = c;
-    }
-    if (!badid)
-    {
-      if (lower && upper && (!leadcaps || leadcaps > 3 ||
-          (upper > 2 && upper > leadcaps)))
-        badid = 1;
-      else if (digitgroups == 2 && !(IsDigit(tmpstr2[0]) || IsDigit(c)))
-        badid = 1;
-      else if ((!lower && !upper) || !IsAlnum(c))
-        badid = 1;
-    }
-    if (badid && (!HasFlag(sptr, FLAG_GOTID) ||
-        strcmp(cli_username(sptr), username) != 0))
-    {
-      ServerStats->is_ref++;
+        if (badid && (!HasFlag(sptr, FLAG_GOTID) ||
+            strcmp(cli_username(sptr), username) != 0))
+        {
+          ServerStats->is_ref++;
 
-      send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
-                 ":Your username is invalid.");
-      send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
-                 ":Connect with your real username, in lowercase.");
-      send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
-                 ":If your mail address were foo@bar.com, your username "
-                 "would be foo.");
-      send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
-                 ":See %s for further information.",
-		 feature_str(FEAT_BADUSER_URL));
-      return exit_client(cptr, sptr, &me, "USER: Bad username");
-    }
+          send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
+                     ":Your username is invalid.");
+          send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
+                     ":Connect with your real username, in lowercase.");
+          send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
+                     ":If your mail address were foo@bar.com, your username "
+                     "would be foo.");
+          send_reply(cptr, SND_EXPLICIT | ERR_INVALIDUSERNAME,
+                     ":See %s for further information.",
+                     feature_str(FEAT_BADUSER_URL));
+          return exit_client(cptr, sptr, &me, "USER: Bad username");
+        }
+      }
   }
 
   if (!MyConnect(sptr)) {
