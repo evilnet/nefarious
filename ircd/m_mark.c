@@ -2,7 +2,7 @@
  * IRC - Internet Relay Chat, ircd/m_mark.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
- * Copyright (C) 2005 Neil Spierling <sirvulcan@gmail.com>
+ * Copyright (C) 2005 Neil Spierling <sirvulcan@sirvulcan.co.nz>
  *
  * See file AUTHORS in IRC package for additional names of
  * the programmers.

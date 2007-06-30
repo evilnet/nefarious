@@ -4,7 +4,7 @@
  * IRC - Internet Relay Chat, include/mark.h
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
- * Copyright (C) 2005 Neil Spierling <sirvulcan@gmail.com>
+ * Copyright (C) 2005 Neil Spierling <sirvulcan@sirvulcan.co.nz>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

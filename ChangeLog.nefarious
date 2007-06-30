@@ -1,16 +1,44 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-06-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Updated my email address throughout src.
+
+	* doc/example.conf: Added SET_ACTIVE_ON_CREATE, default TRUE.
+
+	* include/ircd_features.h: Added SET_ACTIVE_ON_CREATE.
+
+	* include/channel.h: Added last_message variable to channel struct.
+
+	* ircd/channel.c: Set the last_message time to the creation time
+	when a channel is created. This is controlled by the F:Line
+	SET_ACTIVE_ON_CREATE, if set to FALSE no channel will display in
+	LIST output until a message has been sent to it.
+
+	* ircd/hash.c: handle min_active and max_active.
+
+	* ircd/ircd_features.c: Added SET_ACTIVE_ON_CREATE, default TRUE.
+
+	* ircd/ircd_relay.c: If a person messages or notices a channel, update
+	the chptr->last_message to the current time.
+
+	* ircd/m_list.c: Allow LIST to show channels that have been active
+	within a specified time.
+
+	* ircd/ssl.c: Removed a // style command and a couple of unused
+	variables.
+
 2007-03-29  Alex Schumann  <rubin@afternet.org>
 
-        *  ircd/s_err.c: fix case of 'z' in ssl only error message.
+        * ircd/s_err.c: fix case of 'z' in ssl only error message.
 
 	* include/ircd_features.h: new F line for strict username checking
 
 	* ircd/ircd_features.c: new F line for strict username checking
 
-	* ircd/s_user.c: added ability to turn off the checking that doesn't like various mixed case & numbers in
-	usernames. F:STRICTUSERNAME:FALSE (default is TRUE)
+	* ircd/s_user.c: added ability to turn off the checking that doesn't like
+	 various mixed case & numbers in usernames. F:STRICTUSERNAME:FALSE (default is TRUE)
 
 2007-03-03  Alex Schumann  <rubin@afternet.org>
 
@@ -18,7 +46,7 @@
 
 	* ircd/send.c: fix for ssl 'write error: success' bug
 
-2007-02-07  Neil Spierling  <sirvulcan@gmail.com>
+2007-02-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new F:line HIS_HIDEWHO, default TRUE.
 	When enabled various actions preformed by servers like modes,
@@ -53,7 +81,7 @@
 
 	* ircd/s_user.c: Likewise.
 
-2007-02-04  Neil Spierling  <sirvulcan@gmail.com>
+2007-02-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new AUTOJOIN lines.
 
@@ -68,19 +96,19 @@
 
 	* ircd/ssl.c: Quashed some warnings.
 
-2007-01-27  Neil Spierling  <sirvulcan@gmail.com>
+2007-01-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Couple of fixes.
 
-2007-01-14  Neil Spierling  <sirvulcan@gmail.com>
+2007-01-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/shun.c: Just a further tweak for the fix on the 7th.
 
-2007-01-14  Neil Spierling  <sirvulcan@gmail.com>
+2007-01-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_svspart.c: Possible fix for an issue we found on AfterNET.
 
-2007-01-07  Neil Spierling  <sirvulcan@gmail.com>
+2007-01-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Includes an undernet backport, See ChangeLog.
 
@@ -90,39 +118,39 @@
 	* ircd/shun.c: Seems theres cases where realusername (and possibly
 	realhost are not being set before the shun_lookup check.
 
-2006-12-17  Neil Spierling  <sirvulcan@gmail.com>
+2006-12-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Important update. I wont go into too much detail
 	but its to do with channel bans. See me if you want more info. I
 	advise you update.
 
-2006-09-12  Neil Spierling  <sirvulcan@gmail.com>
+2006-09-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_topic.c: Bug fix with host in topic, missed a { } set.
 
-2006-09-12  Neil Spierling  <sirvulcan@gmail.com>
+2006-09-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/gline.c: Critical bug fix to BADCHANS (tested).
 
-2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
+2006-09-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Add specific notices as to if someone matches
 	or doesnt match on the dnsbl checks. Works properly now (tested).
 
 	* ircd/s_serv.c: Clean up how silences are bursted.
 
-2006-09-06  Neil Spierling  <sirvulcan@gmail.com>
+2006-09-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_clearmode.c: Fix the old clearmode crash on bsd systems.
 
 	* ircd/md5sum.c: Older bsd systems dont seem to have getopt however
 	it seems unistd will sort this out.
 
-2006-08-29  Neil Spierling  <sirvulcan@gmail.com>
+2006-08-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_oper.c: Fix from branches for oper logging crash.
 
-2006-08-22  Neil Spierling  <sirvulcan@gmail.com>
+2006-08-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/ircd_struct.h: Bumped up the size of dnsblhost.
 
@@ -152,7 +180,7 @@
 
 	* include/patchlevel.h: we decided 1.0.1 is better than 1.1
 
-2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/gline.c: Tweaked username to realusername.
 
@@ -162,17 +190,17 @@
 
 	* include/patchlevel.h: bumping this trunk to 1.1
 
-2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/gline.c: Dont check GlineIsBadChan() here, its done else
 	where.
 
-2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/version.c.SH: Use md5sum that comes with nefarious. (again
 	opps).
 
-2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Ran autoconf.
 
@@ -189,7 +217,7 @@
 
 	* ircd/version.c.SH: Use md5sum that comes with nefarious.
 
-2006-07-11  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* config.h.in: Ran autoheader.
 
@@ -232,19 +260,19 @@
 
 	* ircd/whocmds.c: See configure.in entry.
 
-2006-07-10  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_mark.c: Woops one too many %s's.
 
 	* ircd/s_user.c: No need to send it out anymore as we fully burst
 	silences.
 
-2006-07-10  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_silence.c: Send out the usual silence notice if a server
 	or service adds a silence for you.
 
-2006-07-10  Neil Spierling  <sirvulcan@gmail.com>
+2006-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_oper.c: Apply an old fix with remote opering that was
 	never applied to the trunk.
@@ -252,11 +280,11 @@
 	* ircd/send.c: Silences apply to channel messages and notices.
 	This needs a wee bit more testing *hint hint*.
 
-2006-06-05  Neil Spierling  <sirvulcan@gmail.com>
+2006-06-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_serv.c: Burst silences on link.
 
-2006-06-05  Neil Spierling  <sirvulcan@gmail.com>
+2006-06-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_silence.c: Send all ignores to all servers. This needs
 	testing on our own testnet, committing so that the others can
@@ -282,11 +310,11 @@
 
 	* ircd/m_topic.c: fixed using wrong ident field for topic set
 
-2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+2006-05-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/patchlevel.h: Bumped patchlevel.
 
-2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+2006-05-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/handlers.h: Added decleration for ms_svsinfo.
 
@@ -304,12 +332,12 @@
 	* ircd/m_burst.c: Clean-up the "fix" somewhat and use a
 	different method of checking.
 
-2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+2006-05-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_burst.c: Possibly fixed a bug were testing on our testnet,
 	will know for sure when we update the testnet. + fix fix :) -rubin
 
-2006-05-22  Neil Spierling  <sirvulcan@gmail.com>
+2006-05-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_silence.c: Allow servers to set servers, we can now do
 	centralized silence lists in X3.
@@ -322,7 +350,7 @@
 	values, such as zz.countries.nerd.dk. Added error when using 040 x
 	line syntax with 050 to log (no rank).
 
-2006-04-11  Neil Spierling  <sirvulcan@gmail.com>
+2006-04-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Something updated this at some point, autoconf most
 	likely.
@@ -362,13 +390,13 @@
 	instead of killing clients in unknown/unhandled circumstances. trying to
 	fix 'the ssl bug'.
 
-2005-10-28  Neil Spierling  <sirvulcan@gmail.com>
+2005-10-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/s_conf.h: GCC 4.x compile fixes.
 
 	* ircd/s_conf.h: GCC 4.x compile fixes.
 
-2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/version.h: Declare othertext;
 
@@ -380,25 +408,25 @@
 
 	* ircd/m_join.c: Fixed a bug with FEAT_CREATE_CHAN_OPER_ONLY.
 
-2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/Makefile.in: Send the source path when generating version
 	information.
 
 	* ircd/version.c.SH: .12 Style md5sum output in INFO.
 
-2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_whois.c: Fixed a bug with WHOIS. Should of realised this
 	before instead of just reverting.
 
-2005-10-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/Makefile.in: Ran make depend.
 
 	* Undernet Updates, see Changelog.
 
-2005-09-08  Neil Spierling  <sirvulcan@gmail.com>
+2005-09-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_topic.c: Some changes to topic so that Nefarious wont
 	core when it gets a 0.4.0 style topic from a server. There will
@@ -406,16 +434,16 @@
 	and 0.5.0 servers but that will clear itself as the network
 	updates itself.
 
-2005-08-30  Neil Spierling  <sirvulcan@gmail.com>
+2005-08-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Trialing without an assert.
 
-2005-08-29  Neil Spierling  <sirvulcan@gmail.com>
+2005-08-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_topic.c: Fixes with handling topic bursts containing the
 	setter.
 
-2005-08-27  Neil Spierling  <sirvulcan@gmail.com>
+2005-08-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/s_user.h: Added extra param for determining if a sethost
 	is comming from a server or not. (set_hostmask)
@@ -425,7 +453,7 @@
 	* ircd/s_user.c: Update set_hostmask calls aswell as the function
 	itself.
 
-2005-07-28  Neil Spierling  <sirvulcan@gmail.com>
+2005-07-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Small change to test svn mails.
 
@@ -434,17 +462,17 @@
 	* ircd/channel.c: Fix : in multi-line bursts. Update comment about
 	buffer below.
 
-2005-07-15  Neil Spierling  <sirvulcan@gmail.com>
+2005-07-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Bump up a buffer.
 
-2005-07-15  Neil Spierling  <sirvulcan@gmail.com>
+2005-07-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_svspart.c: As with the svsjoin commit before, dont use this
 	revision yet. Only committing it so i can update my other servers
 	easy for testing. Just a few changes.
 
-2005-07-14  Neil Spierling  <sirvulcan@gmail.com>
+2005-07-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Fixed exempt sending bug, if there are no bans,
 	just exempts. Then an channel is bursted like this:
@@ -454,18 +482,18 @@
 	other services, im not sure who else supports nefarious non p10
 	exempts.
 
-2005-07-07  Neil Spierling  <sirvulcan@gmail.com>
+2005-07-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Changelog.nefarious: Updated CVS_VERSION bits.
 
 	* ircd/version.c.SH: Updated CVS_VERSION bits.
 
-2005-07-07  Neil Spierling  <sirvulcan@gmail.com>
+2005-07-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_svsjoin.c: Few changes, dont use this revision yet. Only
 	commiting so that i can update the testnet easily to test this out.
 
-2005-06-23  Neil Spierling  <sirvulcan@gmail.com>
+2005-06-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/client.h: Doxyfy'ed.
 
@@ -479,7 +507,7 @@
 
 	* ircd/dbuf.c: Doxyfy'ed.
 
-2005-06-23  Neil Spierling  <sirvulcan@gmail.com>
+2005-06-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Most taken from Undernet IRCu 2.10.12, of course modified
 	where nessecary.
@@ -492,7 +520,7 @@
 
 	* ircd/IPcheck.c: Doxyfy IPcheck.c.
 
-2005-06-21  Neil Spierling  <sirvulcan@gmail.com>
+2005-06-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Topic tracking updates and wildcard searching in LIST. Both
 	from .12
@@ -531,12 +559,12 @@
 
 	* ircd/hash.c (list_next_channels): Check channel wildcard in list.
 
-2005-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2005-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_debug.c: Backported a couple of .12 things for debugging
 	and stats purposes.
 
-2005-06-18  Neil Spierling  <sirvulcan@gmail.com>
+2005-06-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new feature EXEMPT_EXPIRE, default set
 	to 172800 seconds.
@@ -566,12 +594,12 @@
 	* ircd/s_serv.c: Send out the lastseen time on burst so all
 	servers are in sync.
 
-2005-06-10  Neil Spierling  <sirvulcan@gmail.com>
+2005-06-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Small bug fix with MARK's not being sent for
 	users who are exempting via class or loc methods (dnsbl scans).
 
-2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
+2005-05-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/querycmds.h: Added conncount.
 
@@ -580,7 +608,7 @@
 
 	* ircd/s_user.c: Increment conncount on each connect.
 
-2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
+2005-05-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added feature ERR_OPERONLYCHAN.
 
@@ -596,7 +624,7 @@
 
 	* ircd/s_err.c: Turned ERR_OPERONLYCHAN reply to %s.
 
-2005-05-09  Neil Spierling  <sirvulcan@gmail.com>
+2005-05-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added rank field to X:Lines.
 
@@ -634,7 +662,7 @@
 	* ircd/s_user.c: Generate a cli_dnsbls list and burst MARK_DNSBL
 	and MARK_DNSBL_DATA.
 
-2005-05-08  Neil Spierling  <sirvulcan@gmail.com>
+2005-05-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added DNSBL d flag for rejecting clients.
 
@@ -645,18 +673,18 @@
 	another line. We then set the denied flag so that they cant be
 	allowed on any further line.
 
-2005-05-05  Neil Spierling  <sirvulcan@gmail.com>
+2005-05-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_invite.c: Some fixes to the invite syntax, needs some
 	further testing over multiple servers. If it works out fine then
 	i will consider applying it to the 0.4.0 cvs branch.
 
-2005-04-26  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_nick.c: Removed code that shouldnt of been added in the
 	last commit.
 
-2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Shun F:Lines.
 
@@ -704,7 +732,7 @@
 	nickgline code and minus the channel gline code.
 
 
-2005-04-25  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/patchlevel.h: Bump to 0.5.0-dev.
 
@@ -715,11 +743,11 @@
 	by that person when parsing it. No more not knowing who actually
 	set the topic when a server splits and rejoins.
 
-2005-04-19  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Undernet sync.
 
-2005-04-10  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/patchlevel.h: 0.4.0 Release time.. yes seriously.
 
@@ -742,7 +770,7 @@
 
 	* ircd/version.c.SH: Added missing closing bracket.
 
-2005-04-04  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: regenerated.
 
@@ -757,7 +785,7 @@
 
 	* ircd/version.c.SH: Added Rubin.
 
-2005-04-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/readme.log: Added DNSBL Section.
 
@@ -800,7 +828,7 @@
 	* ircd/s_conf.c: Performed some miscellaneous whitespacing and
 	grammatical changes.
 
-2005-04-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-04-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/client.h: Added ClearDNSBLMarked().
 
@@ -826,7 +854,7 @@
 	* ircd/m_account.c: check for null in decode_auth_id
 	(crash on pLaYa's net)
 
-2005-03-31  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Fixed a bug with style 2 and banning sethost
 	users. Also applied to exempts.
@@ -851,18 +879,18 @@
 
 	* ircd/ssl.c: added EBUSY and EAGAIN to errno's not to die on.
 
-2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Woops changed the wrong one.
 
 	* ircd/s_conf.c: Turn dhname strtok loop into a strtok_r loop.
 	Also turned dhname into a normal char.
 
-2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_svsnick.c: Bug fix: NICK was being sent twice to users.
 
-2005-03-30  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Turned a static char into a normal char.
 
@@ -887,7 +915,7 @@
 
 	* ircd/ssl.c: Save errno before Debug() calls.
 
-2005-03-28  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/querycmds.c: Fixed the reading of the tune file, LUSERS will
 	come out properly now.
@@ -903,7 +931,7 @@
 
 	* ircd/s_user.c: Renamed "b:line" to "B:line" in a comment.
 
-2005-03-26  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Dont destroy channels when -z is removed for
 	now. If your wondering why drop into #evilnet. Its a complicated
@@ -959,7 +987,7 @@
 	* ircd/s_serv.c: Dont send null host in mark, send "notmarked" to
 	keep param count right. ...now with works!
 
-2005-03-23  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Ok -z is hopefully fixed now.
 
@@ -977,14 +1005,14 @@
 
 	* ircd/s_user.c: properly initalise flagbuf.
 
-2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Fixed a small issue with -z'ing an empty channel. 
 	(Non crash bug). Wont know for sure till the rest of the test net is
 	updated, currently ive done testing with 2 servers seperatly and the
 	bug is fixed.
 
-2005-03-22  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Added a missing check for persist (doesnt fix a known
 	non critical bug)
@@ -997,17 +1025,17 @@
 
 	* ircd/s_conf.c: attempting to fix crash bug
 
-2005-03-14  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_exempt.c: Small fix.
 
-2005-03-14  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Added NICKLEN to the inital length of host and ip
 	check for dnsbl exempts. Changed HOSTLEN to SOCKIPLEN for the ip
 	mask.
 
-2005-03-14  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_exempt.c: Needed changes for our web exempt module. Send notices
 	if the exemption is already there when adding or isnt there when trying to
@@ -1036,12 +1064,12 @@
 	* ircd/s_user.c: Corrected a spelling typo and removed broken
 	UserStats.authed incrementer.
 
-2005-03-03  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_relay.c: If a stripped message (+S) is 0 in length
 	then dont send it. Found by pLaYa.
 
-2005-03-02  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_conf.c: Added some sanity checks.
 
@@ -1050,12 +1078,12 @@
 	* ircd/ssl.c: Added some Debug() info to try and track down
 	the Write error: 0 during netsplit bug for ssl users.
 
-2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Dont display RPL_HOSTHIDDEN if we are setting the
 	dnsblhost.
 
-2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_fakehost.c: Allow any server to set a fakehost.
 
@@ -1067,7 +1095,7 @@
 	Send +x's to the client and other servers so that they hide the clients
 	host with the dnsblhost. Send a nickname in MARK.
 
-2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_account.c: Temp debugging stuff.
 
@@ -1075,7 +1103,7 @@
 
 	* ircd/s_user.c: Adjusted CMD_MARK some wierdness going on here.
 
-2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_mark.c: Handle new parm plus send out MARK to any other servers.
 
@@ -1083,11 +1111,11 @@
 
 	* ircd/s_serv.c: Send the dnsblhost along to other servers.
 
-2005-03-01  Neil Spierling  <sirvulcan@gmail.com>
+2005-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * ircd/Makefile.in: Ran make depend.
 
-2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new feature DNSBL_MARK_FAKEHOST. Default
 	TRUE. When true a client who has been marked will get their dnsbl
@@ -1106,7 +1134,7 @@
 	* ircd/s_user.c: Set the dnsblhost to the fakehost and enable
 	it and hide the user if DNSBL_MARK_FAKEHOST is TRUE/
 
-2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * ircd/m_exempt.c: If we are recieving new exemptions during a
 	netburst then dont spit out notices over adding.. this could
@@ -1115,7 +1143,7 @@
 	* ircd/s_serv.c: send along nb on the end of a cmd_exempt when
 	bursting exemptions.
 
-2005-02-28  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/handlers.h: Added new handlers for exempt command.
 
@@ -1139,7 +1167,7 @@
 	* ircd/s_user.c: Mark a client if they are exempted and let
 	them in.
 
-2005-02-27  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenerated.
 
@@ -1160,7 +1188,7 @@
 
 	* doc/readme.www: Removed, not needed.
 
-2005-02-26  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * ircd/m_whois.c: Display dnsbl status even if its disabled on the
 	local server.
@@ -1191,25 +1219,25 @@
 	* ircd/s_auth.c: Add check for IsDNSPending(auth) in addition
 	to IsDoingAuth(auth) before freeing auth.
 
-2005-02-25  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Couple of debug statements so the if statements
 	are worthwhile.
 
-2005-02-25  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Don't decrement in the loop where we check for
 	multiple ips in the reply; do it before.
 	Implemented .12's header code.. much simpler.
 	Also added another reply for dnsbls.
 
-2005-02-24  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Check every dnsbl.
 
 	* ircd/s_conf.c: If the client has already been marked return 1.
 
-2005-02-24  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/client.h: Added a count to the client struct for counting
 	down dnsbls as we scan through them on connect.
@@ -1224,12 +1252,12 @@
 
 	* ircd/s_conf.c: Update bllinecount on start and rehash.
 
-2005-02-23  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_conf.c: Somehow find_blline was being called with missing
 	parameters, the results were quite nasty.
 
-2005-02-22  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_serv.c: We only want to send dnsbl info to the linking
 	server.
@@ -1270,7 +1298,7 @@
 
 	* ircd/s_err.c: Renumbered some of the RULES numerics.
 
-2005-02-21  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* config.h.in: Removed KEY defines.
 
@@ -1283,7 +1311,7 @@
 	* ircd/hosthiding.c: Removed some defines. Keeping the random
 	number function for now.
 
-2005-02-21  Neil Spierling  <sirvulcan@gmail.com>
+2005-02-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Updated X:Lines with new flags/name bits.
 
@@ -1436,7 +1464,7 @@
 	* ircd/s_user.c: Added FLAG_WHOIS (+W) and gave
 	FEAT_OPER_WHOIS_PARANOIA control over it.
 
-2005-01-31  Neil Spierling  <sirvulcan@gmail.com>
+2005-01-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Trash excepts when destroying channels (+z).
 
@@ -1460,7 +1488,7 @@
 	* ircd/s_user.c: Removed check for FEAT_LUSERS_AUTHED. Changed a
 	hardcoded 512 to BUFSIZE.
 
-2005-01-30  Neil Spierling  <sirvulcan@gmail.com>
+2005-01-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added b:lines (lowercase b) for prefix'ed
 	commands to be redirected to the specified server. Stats b
@@ -1585,7 +1613,7 @@
 
 	* ircd/s_err.c: Added RPL_WHOISSPECIAL (320).
 
-2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+2005-01-28  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_oper.c: Switched a couple of things.
 
@@ -1660,13 +1688,13 @@
 	Optimized code. Fixed a potential core bug (sptr -> acptr).
 	Renamed FEAT_DNSBL_TEST_N_WALLOP to FEAT_DNSBL_WALLOPS_ONLY.
 
-2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+2005-01-28  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* include/check.h: Quakenet updates, flags added.
 
 	* ircd/gline.c: Quakenet updates, few nick gline changes.
 
-2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+2005-01-28  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Changed RECORD to REPLY for X:Lines.
 
@@ -1678,7 +1706,7 @@
 	* ircd/s_conf.c: Make use of the new line, send a wallop if an
 	connecting client is listed on an dnsbl set in the X:Lines.
 
-2005-01-28  Neil Spierling <sirvulcan@gmail.com>
+2005-01-28  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Updated X:Lines entry.
 
@@ -1686,7 +1714,7 @@
 			 Added support for comma seperate replies for RECORD replies.
 			 General cleanup, removed debugging stuff.
 
-2005-01-26  Neil Spierling <sirvulcan@gmail.com>
+2005-01-26  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Updated X:Lines for type support.
                             Added in F:Lines for dnsbl loc rejection notices.
@@ -1707,12 +1735,12 @@
 
 	* ircd/s_user.c: Make use of the two new features.
 
-2005-01-24  Neil Spierling <sirvulcan@gmail.com>
+2005-01-24  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_ircops.c: Differ between irc admins and irc operators
 	in the output.
 
-2005-01-24  Neil Spierling <sirvulcan@gmail.com>
+2005-01-24  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
         * doc/example.conf: Added missing REMOTE_OPER.
 
@@ -1732,7 +1760,7 @@
 	* ircd/s_err.c: Allow extra information to be added to
 	ERR_CANNOTSENDTOCHAN.
 
-2005-01-24  Neil Spierling <sirvulcan@gmail.com>
+2005-01-24  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* ChangeLog.nefarious: Hey its jan not decemeber :).
 
@@ -1746,7 +1774,7 @@
 
 	* ircd/ircd_features.c: Same as example.cinf.
 
-2005-01-20  Neil Spierling <sirvulcan@gmail.com>
+2005-01-20  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Dropped DNSBL_LOC, merged with DNSBL_LOC_EXEMPT.
 
@@ -1758,7 +1786,7 @@
 	users still being prompoted for their authserv details after
 	they successfully auth with LOC.
 
-2005-01-20  Neil Spierling <sirvulcan@gmail.com>
+2005-01-20  Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new feature DNSBL_LOC. If enabled
 	along with LOGIN_ON_CONNECT, anyone matching on a DNSBL will be
@@ -1825,7 +1853,7 @@
 	* ircd/s_user.c: Optimized code, cleaned up whitespacing, and
 	added FEAT_AUTOINVISIBLE (from QuakeNet asuka).
 
-2004-12-15  Neil Spierling  <sirvulcan@gmail.com>
+2004-12-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * doc/example.conf: Updated X:Line entry.
 
@@ -1837,7 +1865,7 @@
 	Tried everything to get around it being truncated. Debugging
 	stuff added also.
 
-2004-12-10  Neil Spierling  <sirvulcan@gmail.com>
+2004-12-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added OPER_WHOIS_SECRET.
 
@@ -1888,20 +1916,20 @@
 
 	* ircd/s_serv.c: Removed unnecessary close(fd).
 
-2004-11-14  Neil Spierling  <sirvulcan@gmail.com>
+2004-11-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/client.h: Fix for 64bit systems, from QuakeNet.
 
 	* ircd/channel.c: Fixed a reply issue with ACCCHAN (+M).
 
-2004-11-01  Neil Spierling  <sirvulcan@gmail.com>
+2004-11-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README.Cygwin: Updated instructions.
 
 	* ircd/m_oper.c: Added some missing send_reply's for remote
 	opering.
 
-2004-10-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Code by Entrope.
 
@@ -1914,11 +1942,11 @@
 	* ircd/send.c: Delete sentalong array and replace with references
 	to con_sentalong().
 
-2004-10-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Tagged stable for AfterNET (Afternet-0_4_0-Stable).
 
-2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new feature DNSBL_LOC_EXEMPT.
 
@@ -1972,7 +2000,7 @@
 	ircd/m_trace.c, ircd/s_err.c: Couple of backports of .12 code
 	(and fixes).
 
-2004-10-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Added BOPM to list.
 
@@ -2018,7 +2046,7 @@
 	* patches/loc.srvx2.diff: The changes necessary to our srvx2 to
 	support this. Probably very similar for srvx.
 
-2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* patches/README: Updated with loc patch info etc.
 
@@ -2044,7 +2072,7 @@
 
 	* ircd/s_conf.c: Changed 'O' to "O" to fix warning.
 
-2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Note login on connect code by Alex Badea
 	<decampos@users.sourceforge.net>
@@ -2088,24 +2116,24 @@
 	* ircd/s_misc.c (tstats): report login-on-connect counter
 	from ServerStats.
 
-2004-10-18  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Applied a small fix posted on sourceforge for
 	CIDR bans and freebsd (also applied to exempts).
 
-2004-10-17  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * ircd/ircd_relay.c: Dont block bold and underline for +c, as +c
 	is only for blocking colours.
 
-2004-10-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * doc/readme.features: Major update, file should be up to date with
 	current features now. Im sure theres spelling or grammar mistakes in
 	there probably. Ill give it a decent read on Monday on my day off. Im
 	sure reed will get all pedantic before then tho :P
 
-2004-10-15  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added features AUTOCHANMODES and
 	AUTOCHANMODES_LIST, (Quakenet)
@@ -2131,7 +2159,7 @@
 
 	* ircd/s_conf.c: find_conf_cidr Function etc. (Quakenet).
 
-2004-10-03  Neil Spierling  <sirvulcan@gmail.com>
+2004-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ChangeLog.nefarious: Updated my email address.
 
@@ -2149,7 +2177,7 @@
 
 	* patches/README: Updated my email address.
 
-2004-09-29  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Reran autoconf again.
 
@@ -2159,7 +2187,7 @@
 
 	* config.h.in: Regenerated (header added back in after).
 
-2004-09-29  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Reran autoconf.
 
@@ -2167,7 +2195,7 @@
 	this everytime we run autoheader (unless i actually read the man
 	page properly as there may be a way of preserving it).
 
-2004-09-29  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* acinclude.m4: Cleaned up some AC_DEFINE's, dont need acconfig.h now.
 
@@ -2175,11 +2203,11 @@
 
 	* config.h.in: Regenerated (autoheader).
 
-2004-09-27  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/supported.h: Fixed a client parsing issue.
 
-2004-09-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Only use flexable keys if its enabled and the
 	key is set and valid on a join.
@@ -2226,7 +2254,7 @@
 
 	* Synched with u2.10.11.07(pre4) as per 2004-09-15.
 
-2004-09-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Include feature from WhatNET's IRCd (WhatIRCd)
 	(http://coder-com.whatnet.org).
@@ -2236,11 +2264,11 @@
 	* ircd/s_user.c: Modified read configuration file functions
 	to handle includes.
 
-2004-09-13  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Undernet sync.
 
-2004-09-13  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/channel.h: Added MODE_ADMINONLY.
 
@@ -2257,7 +2285,7 @@
 
 	* ircd/s_err.c: See supported.h entry.
 
-2004-09-13  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_whois.c: Small bug fix, display +s channels for opers
 	now in WHOIS's (prefixed with *).
@@ -2316,7 +2344,7 @@
 
 	* ircd/m_join.c: Small bug fix.
 
-2004-09-12  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/Makefile.in: Remove version.c on a make install, makes
 	life easier for keeping track of CVS version when coding.
@@ -2358,7 +2386,7 @@
 	* include/supported.h: Added STATUSMSG (isupport), and
 	CHANNELLEN.
 
-2004-09-11  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_auth.c: Small bug fix, was sending the wrong header.
 
@@ -2504,7 +2532,7 @@
 	* ircd/version.c.SH: Moved some stuff around and added a list of 
 	very helpful testers.
 
-2004-09-03  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added feature TPATH (default "ircd.tune").
 
@@ -2521,12 +2549,12 @@
 	* ircd/s_user.c: Update the tune file when user counts go up
 	above the highest known count.
 
-2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_wallhops.c: Couple of fixes with displaying "%".
 	% was being duplicated on each server the msg went to.
 
-2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_burst.c: Warning cleanup.
 
@@ -2540,13 +2568,13 @@
 
 	* ircd/ssl.c: Warning cleanup.
 
-2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: typo fix.
 
 	* ircd/ircd_features.c: typo fix.
 
-2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added FEAT_MAX_CHECK_OUTPUT.
 
@@ -2556,7 +2584,7 @@
 
 	* ircd/m_check.c: Actually use FEAT_MAX_CHECK_OUTPUT.
 
-2004-09-02  Neil Spierling  <sirvulcan@gmail.com>
+2004-09-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Sync with u2.10.11.07(pre1) as per 2004-08-31 (2 Commits).
 
@@ -2573,7 +2601,7 @@
 
 	* ircd/m_account.c: Re added verified accounts.
 	
-2004-08-31  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/s_user.h: do_nick_name can be called outside of
 	m_nick.c now.
@@ -2615,7 +2643,7 @@
 
 	* ircd/s_user.c: /SETHOST now ignores hosts that change nothing.
 
-2004-08-28  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new feature FLEXABLEKEYS. When TRUE, a
 	user joining a channel with the correct key can get past +rliOMm.
@@ -2656,7 +2684,7 @@
 
 	* ircd/m_oper.c: Flip-flop'd an 'if' check.
 
-2004-08-25  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new feature CHECK_EXTENDED.
 
@@ -2673,24 +2701,24 @@
 	Small F:Line tweak for EXCEPTS.
 	Small bug fix with displaying modes in CHECK output.
 
-2004-08-25  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ssl.c: Generate an error message when a client connects
 	to a SSL port on a normal connection (non-SSL).
 
-2004-08-24  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_bsd.c: SSL bug fix, was causing cores.
 
-2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_serv.c: Burst AWAY messages on links.
 
-2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Last 2 commits removed (one with no changelog).
 
-2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/map.h: Added an extra var to map_update for removing
 	a server.
@@ -2705,7 +2733,7 @@
 
 	* ircd/s_serv.c: Save as m_server.c entry.
 
-2004-08-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added F:Lines for HIS_MAP_SCRAMBLED,
 	HIS_LINKS_SCRAMBLED and HIS_SCRAMBLED_CACHE_TIME.
@@ -2732,19 +2760,19 @@
 
 	* ircd/s_serv.c: Update the map on links.
 
-2004-08-21  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_ircops.c: Tweak to IRCOPS HIS stuff.
 
 	* ircd/m_oper.c: Small tweak to yesterdays bug fix.
 
-2004-08-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_oper.c: Bug fix, allow an oper to "remote oper" on the
 	server he/she is on.
 	(user on irc.abc.com, /oper irc.abc.com user pass)
 
-2004-08-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added lines for HIS_IRCOPS and
 	HIS_IRCOPS_SERVERS.
@@ -2758,46 +2786,46 @@
 	normal user can use IRCOPS the opers server will not display.
 	HIS_SERVERNAME will be displayed instead.
 
-2004-08-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Bug fix for with default umodes, the mode(s)
 	were being sent out to other servers before the nick was even
 	sent out.
 
-2004-08-17  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/os_linux.c: Bug fix for fedora systems. This should fix
 	the `_SC_CLK_TCK' undeclared  error.
 
-2004-08-15  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Bug fix for setting +B, the server was letting
 	any user set +B. Reported by CaptKirk.
 
-2004-08-13  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Bug fix for DEFAULT_UMODE, dont know why I
 	added the clearhiddenhost part in the first place. When +x was
 	auto set and a user logged in, their hidden host wasn't being
 	set. This fixes that.
 
-2004-08-13  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* patches/halfops.srvx2.diff: Removed a couple of unneeded
 	debugging bits I added while creating the patch. Small code fix
 	also.
 
-2004-08-12  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* patches/banexempts.srvx2.diff: Changed strcat to strncat.
 
-2004-08-11  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: This should fix the issue with parting a +M
 	channel while your not logged in. Previously it would return a
 	cannot send to channel error with some data beside it.
 
-2004-08-11  Neil Spierling  <sirvulcan@gmail.com>
+2004-08-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* patches: Added new directory for services patches
 
@@ -2853,7 +2881,7 @@
 
 	* ircd/version.c.SH: Used a cleaner way to get cvs_version.
 
-2004-07-12  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/numeric.h: Removed CVS_VERSION.
 
@@ -2866,7 +2894,7 @@
 	CVS version out of ChangeLog.nefarious and throw it into a char
 	like creation, version, etc.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added feature BADUSER_URL, gives the user a url
 	to go to when they get an invalid username error upon connect.
@@ -2886,13 +2914,13 @@
 	* ircd/s_user.c: Do something with BADUSER_URL, send it out with
 	an invalid username error.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_features.c: Fixed up bug in HIS_NETSPLIT.
 
         * ircd/m_version.c: Added nessecary include for CVS_VERSION.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Bumped up the max excepts to 45.
 	Adjust various HIS lines to TRUE.
@@ -2900,7 +2928,7 @@
 	* ircd/ircd_features.c: Bumped up the max excepts to 45.
 	Adjust various HIS lines to TRUE.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/ircd_features.h: Added feature to disable target limiting.
 
@@ -2910,11 +2938,11 @@
 
 	* ircd/s_user.c: Added feature to disable target limiting.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_topic.c: Possibly fixed that crash with HOST_IN_TOPIC.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_wallchops.c: Fixed an issue where notices that you sent would be
 	echoed back to you.
@@ -2923,18 +2951,18 @@
 
 	* ircd/m_wallvoices.c: Same as above.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Default HOST_IN_TOPIC to false, had a seg fault on a network
 	where it had been working fine for a week.
 
 	* ircd/ircd_features.c: Same as above, will be working on a fix.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_account.c: Quick fix.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Odd fix for +z, adding brackets to the check if the user is
 		   	   connected via SSL or is a server.
@@ -2945,7 +2973,7 @@
 			   rewritten we will be able to check whats enabled on link and
 			   deny the link if things are not set right.
 
-2004-07-08  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Removed verified accounts code, will be re added later.
 
@@ -2970,13 +2998,13 @@
 
 	* ircd/s_user.c: Removed verified accounts code, will be re added later.
 
-2004-07-07  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_whois.c: Reverted verified accounts code back.
 
 	* ircd/s_err.c: Reverted verified accounts code back.
 
-2004-07-07  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/ircd.h: Include ircd_struct.h instead of struct.h.
 
@@ -3052,24 +3080,24 @@
 
 	* ircd/whowas.c: Include ircd_struct.h instead of struct.h.
 
-2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
         * ircd/channel.c: Removed some unnessecary checks
 
 	* ircd/m_burst.c: Removed some unnessecary checks
 
-2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/patchlevel.h: Bumped the patchlevel, so we can differ between
 	who has +he and who doesnt. Should be a bump after every major commit.
 
-2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Default halfops to false, suggestion by Rubin.
 
 	* ircd/ircd_features.c Default halfops to false, suggestion by Rubin.
 
-2004-07-05  Neil Spierling  <sirvulcan@gmail.com>
+2004-07-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Added Whatnet's ircd in as we got the halfops code
 	from their ircd ty ty.
@@ -3160,7 +3188,7 @@
 	* ircd/version.c.SH: Fix whitespacing and copyright text.
 
 2004-07-03  Reed Loden  <reed@reedloden.com>
-	    Neil Spierling  <sirvulcan@gmail.com>
+	    Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Actually fixed the problem with MODE_OPERONLY 
 	and MODE_SSLONLY not bursting correctly.
@@ -3213,7 +3241,7 @@
 	* ircd/version.c.SH: Correct indent/spacing and add current 
 	maintainers of IRCu.
 
-2004-06-23  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/ircd_features.h: Changed spambot check feature to
 	FALSE.
@@ -3224,27 +3252,27 @@
 
 	* ircd/ircd_features.c: Changed spambot check feature to FALSE.
 
-2004-06-21  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_rehash.c: Added new flag "s" so that an ircd.pem file
 	can be reloaded.
 
-2004-06-21  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_topic.c: Fixed potential crash; don't want to do the
 	user@host for a topic coming from a server (in topic bursts).
 
-2004-06-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* tools/makepem: Added basic support for users who already have 
 	an existing SSL certificate they wish to use.
 
-2004-06-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Don't let unregistered users send B:Line'd 
 	commands.
 
-2004-06-20  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/channel.h: Bumped up the size of topic_nick more so
 	it can hold a user's ident and a !.
@@ -3255,7 +3283,7 @@
 	[03:03] * Set by gandalf!BigDaddy@306cb8dc.15ce75d4.jet.net.nz
 	on Sun Jun 20 02:28:41
 
-2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new F:Line.
 
@@ -3266,7 +3294,7 @@
 	* ircd/ircd.c: Display the amount of time since the last ping
 	in the time in the Ping Timeout message.
 
-2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added new F:Line.
 
@@ -3277,7 +3305,7 @@
 	* ircd/m_topic: Made FEAT_HOST_IN_TOPIC useful, if it's enabled
 	the host will be added to topic_nick (See Below). RFE 975655.
 
-2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/channel.h: Bump up the size of topic_nick so it can
 	hold a host.
@@ -3288,7 +3316,7 @@
 	[09:45] * Set by gandalf@36df16fa.25b5c948.jet.net.nz
 	on Sat Jun 19 09:34:55
 
-2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added feature DEFAULT_UMODE.
 
@@ -3303,7 +3331,7 @@
 	* ircd/s_user.c: Took out the AUTOHIDE stuff and put in some
 	code to handle DEFAULT_UMODE.
 
-2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/channel.h: Added MODE_NOLISTMODES (+L).
 
@@ -3318,18 +3346,18 @@
 
 	* ircd/m_clearmode.c: Added fluff for MODE_NOLISTMODES.
 
-2004-06-19  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/res.c: Send out a notice for a resolver restart.
 
 	* ircd/s_user.c: Restart the resolver upon a rehash;
 	patch from Fredrik Söderblom (froo).
 
-2004-06-18  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_account.c: Fixed small issue.
 
-2004-06-18  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added features NOTVERIFIED (string msg) and
 	VERIFIED_ACCOUNTS (default: FALSE).
@@ -3361,12 +3389,12 @@
 	when VERIFIED_ACCOUNTS is TRUE. Note that VERIFIED_ACCOUNTS 
 	only works with hosthiding style 1.
 
-2004-06-17  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* tools/zBounce/*: Major sync of zBounce off the main zBounce
 	project CVS.
 
-2004-06-17  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Updated my email address + bumped date.
 
@@ -3393,15 +3421,15 @@
 	* ircd/m_part.c: If SPAMBOT_CHECKS is TRUE and the client isnt
 	an oper then check for spambot warnings.
 
-2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_user.c: Only send the cipher notice to SSL users only!
 
-2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenerated configure.
 
-2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure.in: Added a macro to for kerberos includes. Should
 	fix SSL errors. configure will be regenerated and committed in
@@ -3418,7 +3446,7 @@
 	* ircd/ssl.c: Added functions used for fetching ciphers for a 
 	client who is connected via SSL.
 
-2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/handlers.h: Add copyright function declerations.
 
@@ -3435,14 +3463,14 @@
 
 	* ircd/version.c.SH: Added GPL/Copyright text.
 
-2004-06-16  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/msg.h: Added CREDITS fluff.
 
 	* ircd/parse.c: Added CREDITS command, simply calls the m_info,
 	etc. functions.
 
-2004-06-15  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added in feature MOTD_LAST_CHANGED
 	(default FALSE).
@@ -3462,7 +3490,7 @@
 	notice contains the date of when the motd was last modified
 	(RFE 972238).
 
-2004-06-15  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/readme.features: Documented FEAT_GEO_LOCATION.
 
@@ -3540,7 +3568,7 @@
 
 	* ircd/random.c: Remove unneeded #include.
 
-2004-06-06  Neil Spierling  <sirvulcan@gmail.com>
+2004-06-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure.in: Added --disable/enable-nickglines;
 	used throughout the ircd in ifdef's.

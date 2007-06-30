@@ -248,6 +248,7 @@ struct Channel {
   struct Channel*    hnext;
   time_t             creationtime;
   time_t             topic_time;
+  time_t             last_message;
   unsigned int       users;
   struct Membership* members;
   struct SLink*      invites;
@@ -262,6 +263,8 @@ struct Channel {
 struct ListingArgs {
   time_t max_time;
   time_t min_time;
+  time_t max_active;
+  time_t min_active;
   unsigned int max_users;
   unsigned int min_users;
   unsigned int flags;

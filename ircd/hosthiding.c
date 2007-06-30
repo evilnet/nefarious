@@ -34,7 +34,7 @@
 #include <stdlib.h>
 
  /* This coded was ported from Ultimate IRCd (http://www.shadow-realm.org),
-  * modifications made by SiRVulcaN <sirvulcan@gmail.com> to work on 
+  * modifications made by SiRVulcaN <sirvulcan@sirvulcan.co.nz> to work on 
   * IRCu.
   */
 

@@ -1743,6 +1743,8 @@ struct Channel *get_channel(struct Client *cptr, char *chname, ChannelGetType fl
       SetAutoChanModes(chptr);
     GlobalChannelList = chptr;
     hAddChannel(chptr);
+    if (feature_bool(FEAT_SET_ACTIVE_ON_CREATE))
+      chptr->last_message = chptr->creationtime;
   }
   return chptr;
 }

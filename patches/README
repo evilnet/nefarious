@@ -29,8 +29,8 @@ loc.srvx2.diff		0.1	Afternet SRVX2	Adds in support so that SRVX2 will properly	N
 
 Author					Patches
 -----------------------------------------------------------------------------------------------------------------------
-SiRVulcaN <sirvulcan@gmail.com>		banexempts.srvx2.diff, halfops.srvx2.diff
-Rubin	  <rubinlinux@gmail.com>	loc.srvx2.diff
+SiRVulcaN <sirvulcan@sirvulcan.co.nz>	banexempts.srvx2.diff, halfops.srvx2.diff
+Rubin	  <rubin@afternet.org>		loc.srvx2.diff
 
 
 Service		Location					Notes
@@ -38,5 +38,5 @@ Service		Location					Notes
 Afternet SRVX2	http://sourceforge.net/projects/x2serv		Only avaliable on CVS (srvx2 module).
 
 
-- evilnet development - 11/08/2004 ------------------------------------------------------------------------------------
+- evilnet development - 30/07/2007 ------------------------------------------------------------------------------------
 

@@ -605,6 +605,8 @@ void list_next_channels(struct Client *cptr)
           && chptr->users < args->max_users
           && chptr->creationtime > args->min_time
           && chptr->creationtime < args->max_time
+          && chptr->last_message > args->min_active
+          && chptr->last_message < args->max_active
           && (!args->wildcard[0] || (args->flags & LISTARG_NEGATEWILDCARD) ||
               (!match(args->wildcard, chptr->chname)))
           && (!(args->flags & LISTARG_NEGATEWILDCARD) ||
