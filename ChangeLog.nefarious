@@ -3,6 +3,11 @@
 
 2007-06-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Updated source code and LICENSE to GPL v3. Wasnt as hard as i
+	thought it would be.
+
+2007-06-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* Updated my email address throughout src.
 
 	* doc/example.conf: Added SET_ACTIVE_ON_CREATE, default TRUE.
