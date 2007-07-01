@@ -86,6 +86,10 @@ struct Client;
 #define TOK_LIST                "LIST"
 #define CMD_LIST		MSG_LIST, TOK_LIST
 
+#define MSG_ALIST                "ALIST"          /* ALIST */
+#define TOK_ALIST                "ALIST"
+#define CMD_ALIST		MSG_ALIST, TOK_ALIST
+
 #define MSG_TOPIC               "TOPIC"         /* TOPI */
 #define TOK_TOPIC               "T"
 #define CMD_TOPIC		MSG_TOPIC, TOK_TOPIC

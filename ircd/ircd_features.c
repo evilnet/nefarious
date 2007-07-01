@@ -532,6 +532,7 @@ static struct FeatureDesc {
   F_B(HIS_HIDEWHO, 0, 1, 0),
   F_B(STRICTUSERNAME, 0, 1, 0),
   F_B(SET_ACTIVE_ON_CREATE, 0, 1, 0),
+  F_I(DEF_ALIST_LIMIT, 0, 30, 0),
 
 #undef F_S
 #undef F_B

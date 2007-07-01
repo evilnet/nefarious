@@ -360,6 +360,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_list, m_ignore, m_list, m_ignore }
   },
   {
+    MSG_ALIST,
+    TOK_ALIST,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_alist, m_ignore, m_alist, m_ignore }
+  },
+  {
     MSG_NAMES,
     TOK_NAMES,
     0, MAXPARA, MFLG_SLOW, 0,

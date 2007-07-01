@@ -1,6 +1,25 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-07-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added default ALIST max output (F:DEF_ALIST_LIMIT).
+	Default is 30.
+
+	* include/ircd_features.c: Added default ALIST max output.
+
+	* include/msg.h: Added ALIST.
+
+	* ircd/ircd_features.c: Added default ALIST max output.
+
+	* ircd/m_alist.c: ALIST command to show last active channels
+	within the specified time. Format is ALIST <time> [limit]. Time
+	is accepted as a timestamp or 2d1m2s format.
+
+	* ircd/Makefile.in: Added m_alist.c.
+
+	* ircd/parse.c: Added ALIST.
+
 2007-06-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/patchlevel.h: Bumped patchlevel.

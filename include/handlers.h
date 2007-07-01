@@ -85,6 +85,7 @@ struct Client;
 
 
 extern int m_admin(struct Client*, struct Client*, int, char*[]);
+extern int m_alist(struct Client*, struct Client*, int, char*[]);
 extern int m_away(struct Client*, struct Client*, int, char*[]);
 extern int m_copyright(struct Client*, struct Client*, int, char*[]);
 extern int m_cnotice(struct Client*, struct Client*, int, char*[]);
