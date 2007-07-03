@@ -3,6 +3,10 @@
 
 2007-07-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_alist.c: Quick tweak.
+
+2007-07-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added ALIST_SEND_FREQ, this defines how often
 	ALIST updates are sent out. This is default to 300 seconds (every
 	5 minutes). Also added ALIST_SEND_DIFF, only channels that are active

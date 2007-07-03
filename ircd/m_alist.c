@@ -190,6 +190,6 @@ int ms_alist(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   chptr->last_message = atoi(parv[2]);
 
-  sendcmdto_serv_butone(sptr, CMD_ALIST, cptr, "%s %Tu", parv[1], parv[2]);
+  sendcmdto_serv_butone(sptr, CMD_ALIST, cptr, "%s %s", parv[1], parv[2]);
   return 0;
 }
