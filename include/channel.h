@@ -249,6 +249,7 @@ struct Channel {
   time_t             creationtime;
   time_t             topic_time;
   time_t             last_message;
+  time_t             last_sent;
   unsigned int       users;
   struct Membership* members;
   struct SLink*      invites;

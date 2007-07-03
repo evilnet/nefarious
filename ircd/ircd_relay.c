@@ -106,7 +106,8 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
     }
   }
 
-  chptr->last_message = CurrentTime;
+  if (!IsService(sptr))
+    chptr->last_message = CurrentTime;
 
   sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);
@@ -165,7 +166,8 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
     }
   }
 
-  chptr->last_message = CurrentTime;
+  if (!IsService(sptr))
+    chptr->last_message = CurrentTime;
 
   sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
@@ -189,7 +191,8 @@ void server_relay_channel_message(struct Client* sptr, const char* name, const c
    * This first: Almost never a server/service
    */
   if (client_can_send_to_channel(sptr, chptr)) {
-    chptr->last_message = CurrentTime;
+    if (!IsService(sptr))
+      chptr->last_message = CurrentTime;
     sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			     SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);
   }
@@ -210,7 +213,8 @@ void server_relay_channel_notice(struct Client* sptr, const char* name, const ch
    * This first: Almost never a server/service
    */
   if (client_can_send_to_channel(sptr, chptr)) {
-    chptr->last_message = CurrentTime;
+    if (!IsService(sptr))
+      chptr->last_message = CurrentTime;
     sendcmdto_channel_butone(sptr, CMD_NOTICE, chptr, cli_from(sptr),
 			     SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
   }

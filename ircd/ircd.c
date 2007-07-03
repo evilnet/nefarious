@@ -23,6 +23,7 @@
 
 #include "ircd.h"
 #include "IPcheck.h"
+#include "channel.h"
 #include "class.h"
 #include "client.h"
 #include "crule.h"
@@ -111,6 +112,7 @@ static char   *spath             = SPATH;
 
 static struct Timer connect_timer; /* timer structure for try_connections() */
 static struct Timer ping_timer; /* timer structure for check_pings() */
+static struct Timer alist_timer;
 
 static struct Daemon thisServer  = { 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0 };
 
@@ -224,6 +226,26 @@ static int check_pid(void)
   return 0;
 }
   
+
+static void send_alist(struct Event* ev) {
+  time_t next, cur;
+  struct Channel *chptr;
+
+  cur = CurrentTime - feature_int(FEAT_ALIST_SEND_DIFF);
+  for (chptr = GlobalChannelList; chptr; chptr = chptr->next) {
+    if ((chptr->last_message > cur) && (chptr->last_sent != chptr->last_message)) {
+      chptr->last_sent = chptr->last_message;
+      sendcmdto_serv_butone(&me, CMD_ALIST, 0, "%s %Tu", chptr->chname, chptr->last_message);
+    }
+  }
+
+  next = CurrentTime + feature_int(FEAT_ALIST_SEND_FREQ);
+
+  Debug((DEBUG_NOTICE, "Next ALIST send : %s", myctime(next)));
+
+  timer_add(&alist_timer, send_alist, 0, TT_ABSOLUTE, next);
+}
+
 
 /*----------------------------------------------------------------------------
  * try_connections
@@ -688,6 +710,7 @@ int main(int argc, char **argv) {
   IPcheck_init();
   timer_add(timer_init(&connect_timer), try_connections, 0, TT_RELATIVE, 1);
   timer_add(timer_init(&ping_timer), check_pings, 0, TT_RELATIVE, 1);
+  timer_add(timer_init(&alist_timer), send_alist, 0, TT_RELATIVE, 1);
 
   CurrentTime = time(NULL);
 

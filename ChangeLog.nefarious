@@ -1,6 +1,32 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2007-07-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added ALIST_SEND_FREQ, this defines how often
+	ALIST updates are sent out. This is default to 300 seconds (every
+	5 minutes). Also added ALIST_SEND_DIFF, only channels that are active
+	within the last specified seconds will be sent out. This is default
+	to 600 seconds (10 minutes). Both F:Lines are in seconds.
+
+	* include/handlers.h: Added in ms_alist.
+
+	* include/ircd_features.h: Added 2 new F:lines (see above).
+
+	* ircd/channel.c: Only update last_message if the message comes
+	from a regular client (not a service).
+
+	* ircd/ircd.c: Added in ALIST timer.
+
+	* ircd/ircd_features.h: Added 2 new F:lines
+
+	* ircd/ircd_relay.c: Only update last_message if the message comes
+	from a regular client (not a service).
+
+	* ircd/m_alist.c: Added in ms_list to handle incomming ALIST updates.
+
+	* ircd/parse.c: Added in ms_alist.
+
 2007-07-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added default ALIST max output (F:DEF_ALIST_LIMIT).

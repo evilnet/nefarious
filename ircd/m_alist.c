@@ -109,8 +109,8 @@
  * m_alist - generic message handler
  *
  * parv[0] = sender prefix
- * parv[2] = timestamp
- * parv[1] = limit
+ * parv[1] = timestamp
+ * parv[2] = limit
  */
 int m_alist(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
@@ -170,5 +170,26 @@ int m_alist(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       break;
   }
   send_reply(sptr, RPL_LISTEND);
+  return 0;
+}
+
+
+/*      
+ * ms_alist - generic message handler
+ *
+ * parv[0] = sender prefix
+ * parv[1] = channel
+ * parv[2] = timestamp
+ */
+int ms_alist(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+{
+  struct Channel *chptr = 0;
+
+  if (!IsChannelName(parv[1]) || !(chptr = FindChannel(parv[1])))
+    return 0;
+
+  chptr->last_message = atoi(parv[2]);
+
+  sendcmdto_serv_butone(sptr, CMD_ALIST, cptr, "%s %Tu", parv[1], parv[2]);
   return 0;
 }
