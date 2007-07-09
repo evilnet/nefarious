@@ -226,13 +226,16 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
       break;
     case SSL_ERROR_WANT_WRITE:
     case SSL_ERROR_WANT_READ:
-    case SSL_ERROR_WANT_X509_LOOKUP:                                                                      Debug((DEBUG_DEBUG, "SSL_write returned want WRITE, READ, or X509; returning retval %d", retval));  
+    case SSL_ERROR_WANT_X509_LOOKUP:
+      Debug((DEBUG_DEBUG, "SSL_write returned want WRITE, READ, or X509; returning retval %d", retval));
       return retval;
     case SSL_ERROR_SSL:
       {   
-          int errorValue;                                                                                     Debug((DEBUG_ERROR, "SSL_write returned SSL_ERROR_SSL, errno %d, retval %d, res %d, ssl error code %d", errno, retval, res, ssl_err));
+          int errorValue;
+          Debug((DEBUG_ERROR, "SSL_write returned SSL_ERROR_SSL, errno %d, retval %d, res %d, ssl error code %d", errno, retval, res, ssl_err));
           ERR_load_crypto_strings();
-          while((errorValue = ERR_get_error())) {                                                                 Debug((DEBUG_ERROR, "  Error Queue: %d -- %s", errorValue, ERR_error_string(errorValue, NULL)));
+          while((errorValue = ERR_get_error())) {
+            Debug((DEBUG_ERROR, "  Error Queue: %d -- %s", errorValue, ERR_error_string(errorValue, NULL)));
           }
           return IO_FAILURE;
        }
