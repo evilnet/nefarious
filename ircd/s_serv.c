@@ -59,6 +59,7 @@
 #include "support.h"
 #include "sys.h"
 #include "userload.h"
+#include "zline.h"
 
 #include <assert.h>
 #include <fcntl.h>
@@ -196,6 +197,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
    * our burst.
    */
   gline_burst(cptr);
+  zline_burst(cptr);
   shun_burst(cptr);
   jupe_burst(cptr);
 

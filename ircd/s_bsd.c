@@ -55,6 +55,7 @@
 #include "sys.h"
 #include "uping.h"
 #include "version.h"
+#include "zline.h"
 
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
@@ -639,6 +640,8 @@ void add_connection(struct Listener* listener, int fd) {
   struct sockaddr_in addr;
   struct Client      *new_client;
   time_t             next_target = 0;
+  struct Zline*    azline = NULL;
+  char zreason[256];
 
   const char* const throttle_message =
          "ERROR :Your host is trying to (re)connect too fast -- throttled\r\n";
@@ -729,6 +732,20 @@ void add_connection(struct Listener* listener, int fd) {
   ++listener->ref_count;
 
   Count_newunknown(UserStats);
+
+  if ((azline = zline_lookup_oc(new_client, 0))) {
+    ircd_snprintf(0, zreason, sizeof(zreason), "%s", azline->zl_reason);
+
+#ifdef USE_SSL
+    ssl_murder(ssl, fd, zreason);
+#else
+    write(fd, zreason, sizeof(zreason));
+    close(fd);
+#endif /* USE_SSL */
+
+    return;
+  }
+
   /* if we've made it this far we can put the client on the auth query pile */
   start_auth(new_client);
 }

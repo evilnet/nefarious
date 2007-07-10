@@ -196,6 +196,7 @@ IRCD_SRC = \
 	m_who.c \
 	m_whois.c \
 	m_whowas.c \
+	m_zline.c \
 	map.c \
 	match.c \
 	motd.c \
@@ -224,7 +225,8 @@ IRCD_SRC = \
 	uping.c \
 	userload.c \
 	whocmds.c \
-	whowas.c
+	whowas.c \
+	zline.c
 
 CHKCONF_SRC = chkconf.c
 MD5_SRC = md5sum.c

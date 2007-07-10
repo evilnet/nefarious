@@ -54,6 +54,7 @@
 #include "ircd_struct.h"
 #include "sys.h"
 #include "whowas.h"
+#include "zline.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -257,6 +258,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       aw = 0,                   /* aways set */
       wwa = 0,                  /* whowas aways */
       gl = 0,                   /* glines */
+      zl = 0,                   /* zlines */
       sh = 0,                   /* shuns */
       ju = 0;                   /* jupes */
 
@@ -271,6 +273,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       wwam = 0,                 /* whowas away memory used */
       wwm = 0,                  /* whowas array memory used */
       glm = 0,                  /* memory used by glines */
+      zlm = 0,                  /* memory used by zlines */
       shm = 0,                  /* memory used by shuns */
       jum = 0,                  /* memory used by jupes */
       com = 0,                  /* memory used by conf lines */
@@ -388,10 +391,11 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
   motd_memory_count(cptr);
 
   gl = gline_memory_count(&glm);
+  zl = zline_memory_count(&zlm);
   sh = shun_memory_count(&shm);
   ju = jupe_memory_count(&jum);
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
-	     ":Glines %d(%zu) Shuns %d(%zu) Jupes %d(%zu)", gl, glm, sh, shm, ju, jum);
+	     ":Glines %d(%zu) Zlines %d(%zu) Shuns %d(%zu) Jupes %d(%zu)", gl, glm, zl, zlm, sh, shm, ju, jum);
 
   totww = wwu * sizeof(struct User) + wwam + wwm;
 

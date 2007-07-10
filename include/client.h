@@ -86,7 +86,9 @@ enum Priv {
   PRIV_RESTART,         /**< oper can RESTART */
   PRIV_DIE,             /**< oper can DIE */
   PRIV_GLINE,           /**< oper can GLINE */
-  PRIV_LOCAL_GLINE,     /**< oper can local GLINE */
+  PRIV_LOCAL_GLINE,     /**< oper can local ZLINE */
+  PRIV_ZLINE,           /**< oper can GLINE */
+  PRIV_LOCAL_ZLINE,     /**< oper can local ZLINE */
   PRIV_SHUN,            /**< oper can SHUN */
   PRIV_LOCAL_SHUN,      /**< oper can local SHUN */
   PRIV_JUPE,            /**< oper can JUPE */
@@ -102,7 +104,8 @@ enum Priv {
   PRIV_DISPLAY,         /**< "Is an oper" displayed */
   PRIV_SEE_OPERS,       /**< display hidden opers */
   PRIV_WIDE_GLINE,      /**< oper can set wider G-lines */
-  PRIV_WIDE_SHUN,       /**< oper can set wider G-lines */
+  PRIV_WIDE_ZLINE,      /**< oper can set wider Z-lines */
+  PRIV_WIDE_SHUN,       /**< oper can set wider Shuns */
   PRIV_LIST_CHAN,       /**< oper can list secret channels */
   PRIV_FORCE_OPMODE,    /**< can hack modes on quarantined channels */
   PRIV_FORCE_LOCAL_OPMODE, /**< can hack modes on quarantined local channels */
@@ -871,7 +874,7 @@ struct Client {
 #define SNO_TCPCOMMON   0x40    /**< common TCP or socket errors */
 #define SNO_TOOMANY     0x80    /**< too many connections */
 #define SNO_HACK4       0x100   /**< Uworld actions on channels */
-#define SNO_GLINE       0x200   /**< glines */
+#define SNO_GLINE       0x200   /**< glines/zlines/shuns */
 #define SNO_NETWORK     0x400   /**< net join/break, etc */
 #define SNO_IPMISMATCH  0x800   /**< IP mismatches */
 #define SNO_THROTTLE    0x1000  /**< host throttle add/remove notices */

@@ -57,6 +57,7 @@
 #include "ircd_struct.h"
 #include "userload.h"
 #include "querycmds.h"
+#include "zline.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -547,9 +548,12 @@ struct StatDesc statsinfo[] = {
   { 'y', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_y,
     report_classes, 0,
     "Connection classes." },
-  { 'z', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_z,
+  { 'z', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_z,
     count_memory, 0,
     "Memory/Structure allocation information." },
+  { 'Z', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_Z,
+    zline_stats, 0,
+    "Global IP bans (Z-lines)." },
   { '*', (STAT_FLAG_CASESENS | STAT_FLAG_VARPARAM), FEAT_LAST_F,
     stats_help, 0,
     "Send help for stats." },

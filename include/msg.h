@@ -338,6 +338,10 @@ struct Client;
 #define TOK_GLINE               "GL"
 #define CMD_GLINE		MSG_GLINE, TOK_GLINE
 
+#define MSG_ZLINE               "ZLINE"         /* ZLIN */
+#define TOK_ZLINE               "ZL"
+#define CMD_ZLINE		MSG_ZLINE, TOK_ZLINE
+
 #define MSG_SHUN               "SHUN"         /* SHUN */
 #define TOK_SHUN               "SU"
 #define CMD_SHUN		MSG_SHUN, TOK_SHUN
