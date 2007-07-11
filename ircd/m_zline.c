@@ -93,6 +93,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "s_conf.h"
+#include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
 #include "support.h"

@@ -51,7 +51,7 @@ struct Zline {
 
 #define ZLINE_ACTIVE	0x0001
 #define ZLINE_IPMASK	0x0002
-#define ZLINE_LOCAL	0x0002
+#define ZLINE_LOCAL	0x0004
 #define ZLINE_ANY	0x0008
 #define ZLINE_FORCE	0x0010
 #define ZLINE_EXACT	0x0020

@@ -3,6 +3,14 @@
 
 2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/zline.h: Bug fix.
+
+	* ircd/zline.c: Bug fix.
+
+	* ircd/m_zline.c: Add debugging include.
+
+2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/zline.h: Zap line support.
 
 	* ircd/m_zline.c: Zap line support.

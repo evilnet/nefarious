@@ -504,15 +504,14 @@ zline_find(char *userhost, unsigned int flags)
   for (zline = GlobalZlineList; zline; zline = szline) {
     szline = zline->zl_next;
 
-    Debug((DEBUG_DEBUG, "Test: %s - %s", zline->zl_host,userhost));
-
-    if (zline->zl_expire <= CurrentTime)
+    if (zline->zl_expire <= CurrentTime) {
       zline_free(zline);
-    else if ((flags & ZLINE_GLOBAL && zline->zl_flags & ZLINE_LOCAL) || (flags & ZLINE_LASTMOD && !zline->zl_lastmod))
+    } else if ((flags & ZLINE_GLOBAL && zline->zl_flags & ZLINE_LOCAL) || (flags & ZLINE_LASTMOD && !zline->zl_lastmod)) {
       continue;
     } else {
-      if ((zline->zl_host && userhost && (ircd_strcmp(zline->zl_host,userhost) == 0)) || (!zline->zl_host && !userhost))
+      if ((zline->zl_host && userhost && (ircd_strcmp(zline->zl_host,userhost) == 0)) || (!zline->zl_host && !userhost)) {
         break;
+      }
     } 
   }
 
