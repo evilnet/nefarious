@@ -496,8 +496,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_NOSUCHZLINE      547
 #define RPL_ZLIST            548
 #define RPL_ENDOFZLIST       549
+#define ERR_INVALIDMASK      550
 
-#define ERR_LASTERROR        550
+#define ERR_LASTERROR        551
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

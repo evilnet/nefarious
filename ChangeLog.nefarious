@@ -3,13 +3,21 @@
 
 2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/numeric.h: Added numeric for invalid Z:line mask.
+
+	* ircd/zline.c: Use the new numeric.
+
+	* ircd/s_err.c: Added new numeric.
+
+2007-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/zline.h: Bug fix.
 
 	* ircd/zline.c: Bug fix.
 
 	* ircd/m_zline.c: Add debugging include.
 
-2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+2007-07-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/zline.h: Zap line support.
 

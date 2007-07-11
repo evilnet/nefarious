@@ -1128,7 +1128,7 @@ static Numeric replyTable[] = {
 /* 549 */
   { RPL_ENDOFZLIST, ":End of Z:Line List", "549" },
 /* 550 */
-  { 0 },
+  { ERR_INVALIDMASK, ":Z:line masks must an IP address mask.", "550" },
 /* 551 */
   { 0 },
 /* 552 */

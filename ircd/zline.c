@@ -348,10 +348,8 @@ zline_add(struct Client *cptr, struct Client *sptr, char *userhost,
       return send_reply(sptr, ERR_TOOMANYUSERS, tmp);
   }
 
-  if (!check_if_ipmask(userhost)) {
-    tmp = 31337;
-    return send_reply(sptr, ERR_TOOMANYUSERS, tmp);
-  }
+  if (!check_if_ipmask(userhost))
+    return send_reply(sptr, ERR_INVALIDMASK);
 
   /*
    * You cannot set a negative (or zero) expire time, nor can you set an
