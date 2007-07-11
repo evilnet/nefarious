@@ -3,6 +3,14 @@
 
 2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/zline.h: Zap line support.
+
+	* ircd/m_zline.c: Zap line support.
+
+	* ircd/zline.c: Zap line support.
+
+2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/ssl.c: Fixed some wierdness, missing line breaks.
 
 2007-07-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

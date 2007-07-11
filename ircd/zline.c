@@ -508,16 +508,10 @@ zline_find(char *userhost, unsigned int flags)
 
     if (zline->zl_expire <= CurrentTime)
       zline_free(zline);
-    else if ((flags & ZLINE_GLOBAL && zline->zl_flags & ZLINE_LOCAL) ||
-	     (flags & ZLINE_LASTMOD && !zline->zl_lastmod))
+    else if ((flags & ZLINE_GLOBAL && zline->zl_flags & ZLINE_LOCAL) || (flags & ZLINE_LASTMOD && !zline->zl_lastmod))
       continue;
-    else if (flags & ZLINE_EXACT) {
-      if ((zline->zl_host && userhost && ircd_strcmp(zline->zl_host,userhost) == 0)
-	 ||(!zline->zl_host && !userhost))
-        break;
     } else {
-      if ((zline->zl_host && userhost && ircd_strcmp(zline->zl_host,userhost) == 0)
-         ||(!zline->zl_host && !userhost))
+      if ((zline->zl_host && userhost && (ircd_strcmp(zline->zl_host,userhost) == 0)) || (!zline->zl_host && !userhost))
         break;
     } 
   }
@@ -547,11 +541,8 @@ zline_lookup(struct Client *cptr, unsigned int flags)
       Debug((DEBUG_DEBUG,"IP zline: %08x %08x/%i",(cli_ip(cptr)).s_addr,zline->ipnum.s_addr,zline->bits));
       if (((cli_ip(cptr)).s_addr & NETMASK(zline->bits)) != zline->ipnum.s_addr)
         continue;
-    }    
-    else {
-      if (match(zline->zl_host, (cli_user(cptr))->realhost) != 0) 
-        continue;
-    }
+    } else
+      continue;
 
     if (ZlineIsActive(zline))
       return zline;
