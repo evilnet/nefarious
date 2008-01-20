@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-01-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_svsjoin.c: Fixed up the way SVSJOIN is handled across servers.
+	There should be no more duplicate NAMES's and TOPIC's.
+
 2007-07-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/numeric.h: Added numeric for invalid Z:line mask.
