@@ -88,6 +88,7 @@
 #include "ircd.h"
 #include "ircd_chattr.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
@@ -109,70 +110,75 @@
  * parv[2] = channel to force client to join
  */
 int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
-  struct Client *acptr;
+  struct Client *acptr = NULL;
   struct Channel *chptr;
   struct JoinBuf join;
   struct JoinBuf create;
   unsigned int flags = 0;
   char *name;
 
-  if (parc < 3) {
-    protocol_violation(sptr, "Too few arguments for SVSJOIN");
-    return need_more_params(sptr, "SVSJOIN");
-  }
+  /* this could be done with hunt_server_cmd but its a bucket of shit */
 
   if(!(acptr = findNUser(parv[1])))
     return 0;
 
-  if (IsChannelService(acptr))
-    return 0;
+  if (0 == ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(&me))) {
 
-  if ((chptr = FindChannel(parv[2]))) {
-    flags = CHFL_DEOPPED;
-    if (find_member_link(chptr, acptr))
-      return 0;
-  } else
-    flags = CHFL_CHANOP;
-
-  chptr = get_channel(acptr, parv[2],
-		      (!FindChannel(parv[2])) ? CGT_CREATE :
-		      CGT_NO_CREATE);
-
-  joinbuf_init(&join, acptr, acptr, JOINBUF_TYPE_JOIN, 0, 0);  
-  joinbuf_init(&create, acptr, acptr, JOINBUF_TYPE_CREATE, 0, TStime());
-
-  name = chptr->chname;
-  clean_channelname(name);
-
-  /* bad channel name */
-  if ((!IsChannelName(name)) || (HasCntrl(name)))
-    return 0;
-
-  if (chptr)
-    joinbuf_join(&join, chptr, flags);
-  else {
-    if (!MyUser(acptr)) {
-      sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
-      return 0;
+    if (parc < 3) {
+      protocol_violation(sptr, "Too few arguments for SVSJOIN");
+      return need_more_params(sptr, "SVSJOIN");
     }
-    return 0;
-    joinbuf_join(&create, chptr, flags);
-    if (feature_bool(FEAT_AUTOCHANMODES) &&
-        feature_str(FEAT_AUTOCHANMODES_LIST) &&
-        strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
-      SetAutoChanModes(chptr);
+
+    if (IsChannelService(acptr))
+      return 0;
+
+    if ((chptr = FindChannel(parv[2]))) {
+      flags = CHFL_DEOPPED;
+      if (find_member_link(chptr, acptr))
+        return 0;
+    } else
+      flags = CHFL_CHANOP;
+
+    chptr = get_channel(acptr, parv[2],
+		        (!FindChannel(parv[2])) ? CGT_CREATE :
+		        CGT_NO_CREATE);
+
+    joinbuf_init(&join, acptr, acptr, JOINBUF_TYPE_JOIN, 0, 0);  
+    joinbuf_init(&create, acptr, acptr, JOINBUF_TYPE_CREATE, 0, TStime());
+
+    name = chptr->chname;
+    clean_channelname(name);
+
+    /* bad channel name */
+    if ((!IsChannelName(name)) || (HasCntrl(name)))
+      return 0;
+
+    if (chptr)
+      joinbuf_join(&join, chptr, flags);
+    else {
+      if (!MyUser(acptr)) {
+        sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
+        return 0;
+      }
+      return 0;
+      joinbuf_join(&create, chptr, flags);
+      if (feature_bool(FEAT_AUTOCHANMODES) &&
+          feature_str(FEAT_AUTOCHANMODES_LIST) &&
+          strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+        SetAutoChanModes(chptr);
+    }
+
+    if (chptr->topic[0]) {
+      send_reply(acptr, RPL_TOPIC, chptr->chname, chptr->topic);
+      send_reply(acptr, RPL_TOPICWHOTIME, chptr->chname,
+  	         chptr->topic_nick, chptr->topic_time);
+    }
+
+    do_names(acptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
+
+    joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */  
+    joinbuf_flush(&create);
   }
-
-  if (chptr->topic[0]) {
-    send_reply(acptr, RPL_TOPIC, chptr->chname, chptr->topic);
-    send_reply(acptr, RPL_TOPICWHOTIME, chptr->chname,
-	       chptr->topic_nick, chptr->topic_time);
-  }
-
-  do_names(acptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
-
-  joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */  
-  joinbuf_flush(&create);
 
   sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
   return 0;
