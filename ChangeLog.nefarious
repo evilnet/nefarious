@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* README: Added a special thanks section.
+
+	* ircd/m_user.c: Fixed a nasty crash bug with USER. Thanks goes out
+	to Vadtec for this fix.
+
 2008-01-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_svsjoin.c: Fixed up the way SVSJOIN is handled across servers.

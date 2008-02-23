@@ -143,16 +143,16 @@ int m_user(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   user->server = &me;
   ircd_strncpy(cli_info(cptr), info, REALLEN);
 
+  ircd_strncpy(user->username, username, USERLEN);
+  ircd_strncpy(user->host, cli_sockhost(cptr), HOSTLEN);
+ 
   if ((cli_name(cptr))[0] && cli_cookie(cptr) == COOKIE_VERIFIED) {
     /*
      * NICK and PONG already received, now we have USER...
      */
     return register_user(cptr, sptr, cli_name(sptr), username);
   }
-  else {
-    ircd_strncpy(user->username, username, USERLEN);
-    ircd_strncpy(user->host, cli_sockhost(cptr), HOSTLEN);
-  }
+
   return 0;
 }
 

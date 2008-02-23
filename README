@@ -36,6 +36,13 @@ RESPONSIBILITY for ANYTHING it might do on your network. We strongly
 recommend that you do NOT run the development version on a production 
 network! You have been warned.
 
+- Special Thanks ----------------------------------------------------
+
+Vadtec - vadtec@vadtec.net - Thanks for fixing that nasty crash bug
+                             with USER.
+Jobe   - jobe@mdbnet.co.uk - Well without you Vadtec may not have figured
+	  		     out the above fix.
+
 - Nefarious coders --------------------------------------------------
 
 reed      - Reed Loden     - <reed@reedloden.com>
