@@ -707,6 +707,21 @@ void add_connection(struct Listener* listener, int fd) {
   (cli_ip(new_client)).s_addr = addr.sin_addr.s_addr;
   cli_port(new_client)        = ntohs(addr.sin_port);
 
+/* begin zline */
+  if ((azline = zline_lookup_oc(new_client, 0))) {
+    ircd_snprintf(0, zreason, sizeof(zreason), "%s", azline->zl_reason);
+
+#ifdef USE_SSL
+    ssl_murder(ssl, fd, zreason);
+#else
+    write(fd, zreason, sizeof(zreason));
+    close(fd);
+#endif /* USE_SSL */
+
+    return;
+  }
+/* end zline */
+
   if (next_target)
     cli_nexttarget(new_client) = next_target;
 
@@ -732,19 +747,6 @@ void add_connection(struct Listener* listener, int fd) {
   ++listener->ref_count;
 
   Count_newunknown(UserStats);
-
-  if ((azline = zline_lookup_oc(new_client, 0))) {
-    ircd_snprintf(0, zreason, sizeof(zreason), "%s", azline->zl_reason);
-
-#ifdef USE_SSL
-    ssl_murder(ssl, fd, zreason);
-#else
-    write(fd, zreason, sizeof(zreason));
-    close(fd);
-#endif /* USE_SSL */
-
-    return;
-  }
 
   /* if we've made it this far we can put the client on the auth query pile */
   start_auth(new_client);

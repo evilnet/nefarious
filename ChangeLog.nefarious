@@ -3,6 +3,10 @@
 
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/s_bsd.c: Fixed Z:line crash. Fix by Jobe.
+
+2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/hash.c: Added back in last active. Also added in a fix from
 	Jobe where channels were not all being listed.
 
