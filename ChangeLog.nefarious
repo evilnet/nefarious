@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/hash.c: Added back in last active. Also added in a fix from
+	Jobe where channels were not all being listed.
+
+	* ircd/m_list.c: Re added last active code.
+
 2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Small fix.

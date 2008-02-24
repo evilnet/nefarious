@@ -8,7 +8,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 1, or (at your option)
+ * the Free Software Foundation; either version 3, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -108,6 +108,8 @@
 static struct ListingArgs la_init = {
   2147483647,                 /* max_time */
   0,                          /* min_time */
+  2147483647,                 /* max_active */
+  0,                          /* min_active */
   4294967295U,                /* max_users */
   0,                          /* min_users */
   0,                          /* flags */
@@ -120,6 +122,8 @@ static struct ListingArgs la_init = {
 static struct ListingArgs la_default = {
   2147483647,                 /* max_time */
   0,                          /* min_time */
+  2147483647,                 /* max_active */
+  0,                          /* min_active */
   4294967295U,                /* max_users */
   0,                          /* min_users */
   0,                          /* flags */
@@ -148,6 +152,12 @@ show_usage(struct Client *sptr)
   send_reply(sptr, RPL_LISTUSAGE,
 	     " \002>\002\037min_users\037    ; Show all channels with more "
 	     "than \037min_users\037.");
+  send_reply(sptr, RPL_LISTUSAGE,
+	     " \002M<\002\037max_active\037    ; Show all active channels less "
+	     "than \037max_active\037 ago.");
+  send_reply(sptr, RPL_LISTUSAGE,
+	     " \002M>\002\037min_active\037    ; Show all active channels more "
+	     "than \037min_active\037 ago.");
   send_reply(sptr, RPL_LISTUSAGE,
 	     " \002C<\002\037max_minutes\037 ; Channels that exist less "
 	     "than \037max_minutes\037.");
@@ -209,6 +219,15 @@ param_parse(struct Client *sptr, const char *param, struct ListingArgs *args,
 	return show_usage(sptr);
       /*FALLTHROUGH*/
 
+
+    case 'M':
+    case 'm':
+      is_time = 3;
+      param++;
+      if (*param != '<' && *param != '>')
+	return show_usage(sptr);
+      /*FALLTHROUGH*/
+
     case '<':
     case '>':
       dir = *(param++);
@@ -244,6 +263,13 @@ param_parse(struct Client *sptr, const char *param, struct ListingArgs *args,
 	  args->min_time = val;
 	else
 	  args->max_time = val;
+	break;
+
+      case 3: /* channel active time */
+	if (dir == '<')
+	  args->min_active = val;
+	else
+	  args->max_active = val;
 	break;
       }
       break;
@@ -378,7 +404,8 @@ int m_list(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!show_channels)
   {
     if (args.max_users > args.min_users + 1 && args.max_time > args.min_time &&
-        args.max_topic_time > args.min_topic_time)      /* Sanity check */
+        args.max_topic_time > args.min_topic_time &&
+        args.max_active > args.min_active)      /* Sanity check */
     {
       cli_listing(sptr) = (struct ListingArgs*) MyMalloc(sizeof(struct ListingArgs));
       assert(0 != cli_listing(sptr));
@@ -401,4 +428,3 @@ int m_list(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   send_reply(sptr, RPL_LISTEND);
   return 0;
 }
-
