@@ -3,6 +3,10 @@
 
 2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/patchlevel.h: Bumped patch level.
+
+2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added new conf lines.
 
 	* include/cloak.h: Declerations for cloak.c.
