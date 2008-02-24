@@ -29,8 +29,8 @@
 #include "channel.h"
 #include "class.h"
 #include "client.h"
+#include "cloak.h"
 #include "hash.h"
-#include "hosthiding.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_chattr.h"
@@ -749,10 +749,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
    * even though a client isnt auto +x'ing we still do a virtual 
    * ip of the client so we dont have to do it each time the client +x's 
    */
-  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2)
-    make_virtip((char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-		(char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-		cli_user(sptr)->virtip);
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 2)
+      ircd_snprintf(0, cli_user(sptr)->virtip, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
 
     SetLocalNumNick(sptr);
 
@@ -1051,9 +1049,8 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     if (HasHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
       make_hidden_hostmask(cli_user(new_client)->host, new_client);
     else if (IsHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) {
-      make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(new_client))),
-		    cli_user(new_client)->host, cli_user(new_client)->host,
-		    cli_user(new_client)->virthost);
+      ircd_snprintf(0, cli_user(new_client)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(new_client)->host));
+      ircd_snprintf(0, cli_user(new_client)->host, HOSTLEN, "%s", hidehost_normalhost(cli_user(new_client)->host));
       SetFlag(new_client, FLAG_HIDDENHOST);
     }
     if (HasSetHost(new_client)) {
@@ -2159,7 +2156,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	hide_hostmask(acptr);
     }
     else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-      make_virthost((char*)ircd_ntoa((const char*) &(cli_ip(acptr))), cli_user(acptr)->host, cli_user(acptr)->host, cli_user(acptr)->virthost);
+      ircd_snprintf(0, cli_user(acptr)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(acptr)->host));
+      ircd_snprintf(0, cli_user(acptr)->host, HOSTLEN, "%s", hidehost_normalhost(cli_user(acptr)->host));
       SetFlag(acptr, FLAG_HIDDENHOST);
     }
   }

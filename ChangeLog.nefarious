@@ -3,6 +3,43 @@
 
 2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added new conf lines.
+
+	* include/cloak.h: Declerations for cloak.c.
+
+	* include/ircd_defs.h: Removed style bits (KEY1/2/3). Controled
+	via conf now.
+
+	* include/ircd_struct.h: Increased the length of virtual ip.
+
+	* include/ircd_features.h: Added new conf lines.
+
+	* include/md5.h: Header file for md5 functions.
+
+	* include/md5sum.h: Renamed from md5.h, this is for the md5 sum program
+	which generates the sums for the c files.
+
+	* ircd/cloak.c: Implement unreal ircd host hiding for style 2. More
+	secure than the last type.
+
+	* ircd/hash.c: Removed last active bits from LIST. ALIST can be used
+	for last active.
+
+	* ircd/hosthiding.c: Removed.
+
+	* ircd/ircd_features.c: Added HOST_HIDING_PREFIX, HOST_HIDING_KEY1,
+	HOST_HIDING_KEY2, HOST_HIDING_KEY3. All for style 2.
+
+	* ircd/m_list.c: See hash.c.
+
+	* ircd/Makefile.in: Added cloak.c and md5.c, removed hosthiding.c.
+
+	* ircd/md5.c: MD5 functions for host hiding.
+
+	* ircd/s_user.c: Implement new host hiding features.
+	
+2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* README: Added a special thanks section.
 
 	* ircd/m_user.c: Fixed a nasty crash bug with USER. Thanks goes out

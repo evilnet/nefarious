@@ -1,32 +1,28 @@
-#ifndef INCLUDED_md5_h
-#define INCLUDED_md5_h
+
 /*
- * IRC - Internet Relay Chat, include/md5.h
- * Copyright (C) 1993 Branko Lankester
- *               1993 Colin Plumb
+ * This is an OpenSSL-compatible implementation of the RSA Data Security,
+ * Inc. MD5 Message-Digest Algorithm.
  *
- * $Id$
+ * Written by Solar Designer <solar@openwall.com> in 2001, and placed in
+ * the public domain.  See md5.c for more information.
  */
 
-#ifdef __alpha
-typedef unsigned int uint32;
-#else
-typedef unsigned long uint32;
-#endif
+#if !defined(INCLUDED_md5_h)
+#define INCLUDED_md5_h
 
-struct MD5Context {
-	uint32 buf[4];
-	uint32 bits[2];
-	unsigned char in[64];
-};
+/* Any 32-bit or wider unsigned integer data type will do */
+typedef unsigned long MD5_u32plus;
 
-void MD5Init(struct MD5Context *context);
-void MD5Update(struct MD5Context *context, unsigned char const *buf,
-	       unsigned len);
-void MD5Final(unsigned char digest[16], struct MD5Context *context);
-void MD5Transform(uint32 buf[4], uint32 const in[16]);
+typedef struct {
+        MD5_u32plus lo, hi;
+        MD5_u32plus a, b, c, d;
+        unsigned char buffer[64];
+        MD5_u32plus block[16];
+} MD5_CTX;
 
-typedef struct MD5Context MD5_CTX;
+extern void MD5_Init(MD5_CTX *ctx);
+extern void MD5_Update(MD5_CTX *ctx, void *data, unsigned long size);
+extern void MD5_Final(unsigned char *result, MD5_CTX *ctx);
+extern void DoMD5(unsigned char *mdout, unsigned char *src, unsigned long n);
 
 #endif
-

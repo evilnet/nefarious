@@ -82,7 +82,7 @@ struct User {
   char               fakehost[HOSTLEN + 41];
   char               account[ACCOUNTLEN + 1];
   time_t	     acc_create;
-  char               virtip[SOCKIPLEN + 30];
+  char               virtip[HOSTLEN + 1];
   char               virthost[HOSTLEN + 1];
   char               dnsblhost[HOSTLEN + 40];
   char               shunreason[BUFSIZE + 1];

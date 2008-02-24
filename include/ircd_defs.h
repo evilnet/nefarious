@@ -111,12 +111,4 @@
 #define STARTTARGETS	10
 #define RESERVEDTARGETS	12
 
-/*
- * Host hiding style 2 encryption keys, These must be unique throughout
- * your network.
- */
-#define KEY  45432
-#define KEY2 76934
-#define KEY3 98336
-
-#endif /* INCLUDED_ircd_defs_h */
+#endif

@@ -85,13 +85,13 @@ IRCD_SRC = \
 	channel.c \
 	class.c \
 	client.c \
+	cloak.c \
 	crule.c \
 	dbuf.c \
 	fda.c \
 	fileio.c \
 	gline.c \
 	hash.c \
-	hosthiding.c \
 	ircd.c \
 	ircd_alloc.c \
 	ircd_events.c \
@@ -199,6 +199,7 @@ IRCD_SRC = \
 	m_zline.c \
 	map.c \
 	match.c \
+	md5.c \
 	motd.c \
 	msgq.c \
 	numnicks.c \
@@ -390,7 +391,7 @@ depend:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-md5sum.o: md5sum.c ../include/md5.h
+md5sum.o: md5sum.c ../config.h ../include/md5sum.h
 IPcheck.o: IPcheck.c ../config.h ../include/IPcheck.h ../include/client.h \
   ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
   ../include/ircd_events.h ../config.h ../include/ircd_handler.h \
@@ -430,6 +431,14 @@ client.o: client.c ../config.h ../include/client.h ../include/ircd_defs.h \
   ../include/s_conf.h ../include/s_debug.h ../include/send.h \
   ../include/ircd_struct.h ../include/ircd_string.h \
   ../include/ircd_chattr.h
+cloak.o: cloak.c ../include/client.h ../include/ircd_defs.h \
+  ../include/dbuf.h ../include/msgq.h ../include/ircd_events.h \
+  ../config.h ../include/ircd_handler.h ../include/ircd.h \
+  ../include/ircd_struct.h ../include/ircd_reply.h \
+  ../include/ircd_alloc.h ../include/ircd_chattr.h ../include/ircd_defs.h \
+  ../include/ircd_features.h ../include/ircd_string.h \
+  ../include/ircd_snprintf.h ../include/match.h ../include/md5.h \
+  ../include/s_bsd.h ../include/s_debug.h ../include/ircd_struct.h
 crule.o: crule.c ../config.h ../include/crule.h ../include/client.h \
   ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
   ../include/ircd_events.h ../config.h ../include/ircd_handler.h \
@@ -464,15 +473,12 @@ hash.o: hash.c ../config.h ../include/hash.h ../include/client.h \
   ../include/ircd_struct.h ../include/match.h ../include/msg.h \
   ../include/numeric.h ../include/send.h ../include/ircd_struct.h \
   ../include/support.h ../include/sys.h
-hosthiding.o: hosthiding.c ../config.h ../include/ircd.h \
-  ../include/ircd_struct.h ../include/ircd_defs.h ../include/ircd_reply.h \
-  ../include/ircd_defs.h ../include/ircd_snprintf.h
 ircd.o: ircd.c ../config.h ../include/ircd.h ../include/ircd_struct.h \
   ../include/ircd_defs.h ../include/ircd_reply.h ../include/IPcheck.h \
-  ../include/class.h ../include/client.h ../include/dbuf.h \
-  ../include/msgq.h ../include/ircd_events.h ../config.h \
-  ../include/ircd_handler.h ../include/crule.h ../include/hash.h \
-  ../include/ircd_alloc.h ../include/ircd_events.h \
+  ../include/channel.h ../include/class.h ../include/client.h \
+  ../include/dbuf.h ../include/msgq.h ../include/ircd_events.h \
+  ../config.h ../include/ircd_handler.h ../include/crule.h \
+  ../include/hash.h ../include/ircd_alloc.h ../include/ircd_events.h \
   ../include/ircd_features.h ../include/ircd_log.h \
   ../include/ircd_reply.h ../include/ircd_signal.h \
   ../include/ircd_string.h ../include/ircd_chattr.h ../include/jupe.h \
@@ -592,6 +598,16 @@ m_admin.o: m_admin.c ../config.h ../include/client.h \
   ../include/ircd_reply.h ../include/ircd_features.h \
   ../include/ircd_reply.h ../include/msg.h ../include/numeric.h \
   ../include/numnicks.h ../include/s_conf.h ../include/s_user.h
+m_alist.o: m_alist.c ../config.h ../include/channel.h \
+  ../include/ircd_defs.h ../include/client.h ../include/dbuf.h \
+  ../include/msgq.h ../include/ircd_events.h ../config.h \
+  ../include/ircd_handler.h ../include/hash.h ../include/ircd.h \
+  ../include/ircd_struct.h ../include/ircd_reply.h \
+  ../include/ircd_alloc.h ../include/ircd_chattr.h \
+  ../include/ircd_features.h ../include/ircd_log.h \
+  ../include/ircd_reply.h ../include/ircd_string.h ../include/msg.h \
+  ../include/numeric.h ../include/numnicks.h ../include/s_bsd.h \
+  ../include/s_debug.h ../include/send.h ../include/support.h
 m_asll.o: m_asll.c ../config.h ../include/client.h ../include/ircd_defs.h \
   ../include/dbuf.h ../include/msgq.h ../include/ircd_events.h \
   ../config.h ../include/ircd_handler.h ../include/hash.h \
@@ -937,12 +953,13 @@ m_notice.o: m_notice.c ../config.h ../include/client.h \
   ../include/ircd_reply.h ../include/ircd_string.h ../include/match.h \
   ../include/msg.h ../include/numeric.h ../include/send.h \
   ../include/handlers.h
-m_oper.o: m_oper.c ../config.h ../include/client.h ../include/ircd_defs.h \
-  ../include/dbuf.h ../include/msgq.h ../include/ircd_events.h \
-  ../config.h ../include/ircd_handler.h ../include/handlers.h \
-  ../include/hash.h ../include/ircd.h ../include/ircd_struct.h \
-  ../include/ircd_reply.h ../include/ircd_features.h \
-  ../include/ircd_log.h ../include/ircd_reply.h ../include/ircd_string.h \
+m_oper.o: m_oper.c ../config.h ../include/channel.h \
+  ../include/ircd_defs.h ../include/client.h ../include/dbuf.h \
+  ../include/msgq.h ../include/ircd_events.h ../config.h \
+  ../include/ircd_handler.h ../include/handlers.h ../include/hash.h \
+  ../include/ircd.h ../include/ircd_struct.h ../include/ircd_reply.h \
+  ../include/ircd_features.h ../include/ircd_log.h \
+  ../include/ircd_reply.h ../include/ircd_string.h \
   ../include/ircd_chattr.h ../include/ircd_xopen.h ../include/msg.h \
   ../include/numeric.h ../include/numnicks.h ../include/querycmds.h \
   ../include/ircd_features.h ../include/s_conf.h ../include/s_debug.h \
@@ -1158,9 +1175,9 @@ m_svsjoin.o: m_svsjoin.c ../config.h ../include/channel.h \
   ../include/ircd_handler.h ../include/handlers.h ../include/hash.h \
   ../include/ircd.h ../include/ircd_struct.h ../include/ircd_reply.h \
   ../include/ircd_chattr.h ../include/ircd_features.h \
-  ../include/ircd_reply.h ../include/ircd_string.h ../include/msg.h \
-  ../include/numeric.h ../include/numnicks.h ../include/s_debug.h \
-  ../include/s_user.h ../include/send.h
+  ../include/ircd_log.h ../include/ircd_reply.h ../include/ircd_string.h \
+  ../include/msg.h ../include/numeric.h ../include/numnicks.h \
+  ../include/s_debug.h ../include/s_user.h ../include/send.h
 m_svsnick.o: m_svsnick.c ../config.h ../include/client.h \
   ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
   ../include/ircd_events.h ../config.h ../include/ircd_handler.h \
@@ -1324,6 +1341,16 @@ m_whowas.o: m_whowas.c ../config.h ../include/client.h \
   ../include/ircd_chattr.h ../include/msg.h ../include/numeric.h \
   ../include/numnicks.h ../include/s_user.h ../include/s_misc.h \
   ../include/send.h ../include/whowas.h
+m_zline.o: m_zline.c ../config.h ../include/client.h \
+  ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
+  ../include/ircd_events.h ../config.h ../include/ircd_handler.h \
+  ../include/zline.h ../include/hash.h ../include/ircd.h \
+  ../include/ircd_struct.h ../include/ircd_reply.h \
+  ../include/ircd_features.h ../include/ircd_reply.h \
+  ../include/ircd_string.h ../include/ircd_chattr.h ../include/match.h \
+  ../include/msg.h ../include/numeric.h ../include/numnicks.h \
+  ../include/s_conf.h ../include/s_debug.h ../include/s_misc.h \
+  ../include/send.h ../include/support.h
 map.o: map.c ../config.h ../include/map.h ../include/ircd_defs.h \
   ../include/client.h ../include/dbuf.h ../include/msgq.h \
   ../include/ircd_events.h ../config.h ../include/ircd_handler.h \
@@ -1439,7 +1466,7 @@ s_bsd.o: s_bsd.c ../config.h ../include/s_bsd.h ../include/client.h \
   ../include/s_conf.h ../include/s_debug.h ../include/s_misc.h \
   ../include/s_user.h ../include/send.h ../include/ircd_struct.h \
   ../include/support.h ../include/sys.h ../include/uping.h \
-  ../include/version.h
+  ../include/version.h ../include/zline.h
 s_conf.o: s_conf.c ../config.h ../include/s_conf.h ../include/IPcheck.h \
   ../include/class.h ../include/client.h ../include/ircd_defs.h \
   ../include/dbuf.h ../include/msgq.h ../include/ircd_events.h \
@@ -1466,7 +1493,8 @@ s_debug.o: s_debug.c ../config.h ../include/s_debug.h \
   ../include/numeric.h ../include/numnicks.h ../include/res.h \
   ../include/s_bsd.h ../include/s_conf.h ../include/s_stats.h \
   ../include/s_user.h ../include/send.h ../include/shun.h \
-  ../include/ircd_struct.h ../include/sys.h ../include/whowas.h
+  ../include/ircd_struct.h ../include/sys.h ../include/whowas.h \
+  ../include/zline.h
 s_err.o: s_err.c ../config.h ../include/numeric.h ../include/s_debug.h \
   ../include/ircd_defs.h
 s_misc.o: s_misc.c ../config.h ../include/s_misc.h ../include/IPcheck.h \
@@ -1507,7 +1535,7 @@ s_serv.o: s_serv.c ../config.h ../include/s_serv.h ../include/IPcheck.h \
   ../include/s_bsd.h ../include/s_conf.h ../include/s_debug.h \
   ../include/s_misc.h ../include/s_user.h ../include/send.h \
   ../include/shun.h ../include/support.h ../include/sys.h \
-  ../include/userload.h
+  ../include/userload.h ../include/zline.h
 s_stats.o: s_stats.c ../config.h ../include/s_stats.h \
   ../include/ircd_features.h ../include/class.h ../include/client.h \
   ../include/ircd_defs.h ../include/dbuf.h ../include/msgq.h \
@@ -1522,12 +1550,12 @@ s_stats.o: s_stats.c ../config.h ../include/s_stats.h \
   ../include/s_bsd.h ../include/s_conf.h ../include/s_debug.h \
   ../include/s_misc.h ../include/s_serv.h ../include/s_user.h \
   ../include/send.h ../include/shun.h ../include/ircd_struct.h \
-  ../include/userload.h ../include/querycmds.h
+  ../include/userload.h ../include/querycmds.h ../include/zline.h
 s_user.o: s_user.c ../config.h ../include/s_user.h ../include/IPcheck.h \
   ../include/channel.h ../include/ircd_defs.h ../include/class.h \
   ../include/client.h ../include/dbuf.h ../include/msgq.h \
   ../include/ircd_events.h ../config.h ../include/ircd_handler.h \
-  ../include/hash.h ../include/hosthiding.h ../include/ircd.h \
+  ../include/cloak.h ../include/hash.h ../include/ircd.h \
   ../include/ircd_struct.h ../include/ircd_reply.h \
   ../include/ircd_alloc.h ../include/ircd_chattr.h \
   ../include/ircd_features.h ../include/ircd_log.h \
@@ -1612,6 +1640,19 @@ whowas.o: whowas.c ../config.h ../include/whowas.h ../include/client.h \
   ../include/numeric.h ../include/s_debug.h ../include/s_misc.h \
   ../include/s_user.h ../include/send.h ../include/ircd_struct.h \
   ../include/support.h ../include/sys.h ../include/msg.h
+zline.o: zline.c ../config.h ../include/zline.h ../config.h \
+  ../include/channel.h ../include/ircd_defs.h ../include/client.h \
+  ../include/dbuf.h ../include/msgq.h ../include/ircd_events.h \
+  ../include/ircd_handler.h ../include/hash.h ../include/ircd.h \
+  ../include/ircd_struct.h ../include/ircd_reply.h \
+  ../include/ircd_alloc.h ../include/ircd_features.h \
+  ../include/ircd_log.h ../include/ircd_reply.h \
+  ../include/ircd_snprintf.h ../include/ircd_string.h \
+  ../include/ircd_chattr.h ../include/match.h ../include/numeric.h \
+  ../include/s_bsd.h ../include/s_debug.h ../include/s_misc.h \
+  ../include/s_stats.h ../include/send.h ../include/ircd_struct.h \
+  ../include/support.h ../include/msg.h ../include/numnicks.h \
+  ../include/sys.h ../include/whocmds.h
 os_bsd.o: os_bsd.c ../config.h ../include/ircd_osdep.h ../include/msgq.h \
   ../include/ircd_defs.h
 os_linux.o: os_linux.c ../config.h ../include/ircd_osdep.h \

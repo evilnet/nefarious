@@ -1,7 +1,7 @@
-#ifndef INCLUDED_hosthiding_h
-#define INCLUDED_hosthiding_h
+#ifndef INCLUDED_cloak_h
+#define INCLUDED_cloak_h
 /*
- * IRC - Internet Relay Chat, include/hosthiding.h
+ * IRC - Internet Relay Chat, include/cloak.h
  * Copyright (C) 2004 Reed Loden <reed@reedloden.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,17 +18,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id$
+ * $Id: cloak.h 654 2004-06-04 21:50:12Z r33d $
  */
 
-/*
- * Proto types
- */
+extern char *hidehost_normalhost(char *host);
+extern char *hidehost_ipv4(char *host);
 
-extern int str2arr (char **, char *, char *);
-extern unsigned long crc32 (const unsigned char *, unsigned int);
-extern void make_virthost (char *curr, char *host, char *new, char *virt);
-extern void make_virtip (char *curr, char *host, char *new);
-extern int cloakrand();
-
-#endif /* INCLUDED_hosthiding_h */
+#endif /* INCLUDED_cloak_h */

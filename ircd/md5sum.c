@@ -20,7 +20,7 @@
 #endif
 #endif
 
-#include "md5.h"
+#include "md5sum.h"
 
 #ifdef UNIX
 #define	FOPRTXT	"r"
