@@ -3,6 +3,12 @@
 
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/join.c: Propagate autochan modes.
+
+	* ircd/m_svsjoin.c: Propagate autochan modes.
+
+2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: See below.
 
 	* include/ircd_features.h: Added a F:line which controls the nick

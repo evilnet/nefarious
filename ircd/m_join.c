@@ -166,12 +166,12 @@ join0(struct JoinBuf *join, struct Client *cptr, struct Client *sptr,
  */
 int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
-  struct Channel *chptr;
+  struct Channel *chptr = NULL;
   struct JoinBuf join;
   struct JoinBuf create;
   struct Gline *gline;
   unsigned int flags = 0;
-  int i, flex = 0;
+  int i, flex = 0, automodes = 0;
   char *p = 0;
   char *chanlist;
   char *name;
@@ -314,8 +314,10 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       joinbuf_join(&create, chptr, flags);
       if (feature_bool(FEAT_AUTOCHANMODES) &&
 	  feature_str(FEAT_AUTOCHANMODES_LIST) &&
-	  strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+	  strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) {
 	SetAutoChanModes(chptr);
+        automodes = 1;
+      }
     }
 
     del_invite(sptr, chptr);
@@ -341,6 +343,10 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */
   joinbuf_flush(&create);
+
+  if (automodes && chptr)
+    sendcmdto_serv_butone(&me, CMD_MODE, sptr,
+                          "%H +%s", chptr, feature_str(FEAT_AUTOCHANMODES_LIST));
 
   return 0;
 }

@@ -111,11 +111,12 @@
  */
 int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
   struct Client *acptr = NULL;
-  struct Channel *chptr;
+  struct Channel *chptr = NULL;
   struct JoinBuf join;
   struct JoinBuf create;
   unsigned int flags = 0;
   char *name;
+  int automodes = 0;
 
   /* this could be done with hunt_server_cmd but its a bucket of shit */
 
@@ -164,8 +165,10 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       joinbuf_join(&create, chptr, flags);
       if (feature_bool(FEAT_AUTOCHANMODES) &&
           feature_str(FEAT_AUTOCHANMODES_LIST) &&
-          strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+          strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) {
         SetAutoChanModes(chptr);
+        automodes = 1;
+      }
     }
 
     if (chptr->topic[0]) {
@@ -178,6 +181,10 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
     joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */  
     joinbuf_flush(&create);
+
+    if (automodes && chptr)
+      sendcmdto_serv_butone(&me, CMD_MODE, sptr,
+                            "%H +%s", chptr, feature_str(FEAT_AUTOCHANMODES_LIST));
   }
 
   sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
