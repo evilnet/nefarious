@@ -3,6 +3,14 @@
 
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/client.h: Added 2 new channel modes for sending cloaked
+	hosts n ips with style 2 (+Cc).
+
+	* ircd/s_user.c: Send out cloaked hosts n ips so other servers
+	dont have to do extra work.
+
+2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/s_bsd.c: Fixed Z:line crash. Fix by Jobe.
 
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

@@ -163,6 +163,8 @@ enum Flag {
     FLAG_DEBUG,                     /**< send global debug/anti-hack info */
     FLAG_ACCOUNT,                   /**< account name has been set */
     FLAG_HIDDENHOST,                /**< user's host is hidden */
+    FLAG_CLOAKHOST,                 /**< style 2 cloaked host */
+    FLAG_CLOAKIP,                   /**< style 2 cloaked ip */
 
     FLAG_SETHOST,                   /**< oper's host is changed */
     FLAG_FAKEHOST,                  /**< user has been assigned a fake host */
@@ -653,6 +655,10 @@ struct Client {
 #define IsHiddenHost(x)		HasFlag(x, FLAG_HIDDENHOST)
 /** Return non-zero if the client has their host hidden (account/fakehost set). */
 #define HasHiddenHost(x)	(IsHiddenHost(x) && (IsAccount(x) || HasFakeHost(x)))
+/** Return non-zero if the client hasa cloaked host set (style 2) */
+#define HasCloakHost(x)         HasFlag(x, FLAG_CLOAKHOST)
+/** Return non-zero if the client hasa cloaked ip set (style 2) */
+#define HasCloakIP(x)           HasFlag(x, FLAG_CLOAKIP)
 /** Return non-zero if the client has a sethost active. */
 #define IsSetHost(x)		HasFlag(x, FLAG_SETHOST)
 /** Return non-zero if the client has a sethost active. */
@@ -726,6 +732,10 @@ struct Client {
 #define SetAccount(x)           SetFlag(x, FLAG_ACCOUNT)
 /** Mark a client as having mode +x (hidden host). */
 #define SetHiddenHost(x)	SetFlag(x, FLAG_HIDDENHOST)
+/** Mark a client as having mode +C (cloaked host). */
+#define SetCloakHost(x)         SetFlag(x, FLAG_CLOAKHOST)
+/** Mark a client as having mode +c (cloaked ip). */
+#define SetCloakIP(x)           SetFlag(x, FLAG_CLOAKIP)
 /** Mark a client as having a sethost (S:Lines). */
 #define SetSetHost(x)		SetFlag(x, FLAG_SETHOST)
 /** Mark a client as having a fakehost. */

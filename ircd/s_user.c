@@ -749,8 +749,23 @@ int register_user(struct Client *cptr, struct Client *sptr,
    * even though a client isnt auto +x'ing we still do a virtual 
    * ip of the client so we dont have to do it each time the client +x's 
    */
-    if (feature_int(FEAT_HOST_HIDING_STYLE) == 2)
-      ircd_snprintf(0, cli_user(sptr)->virtip, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+
+      if (!strcmp((char*)ircd_ntoa((const char*) &(cli_ip(sptr))), cli_user(sptr)->host)) {
+        ircd_snprintf(0, cli_user(sptr)->virthost, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
+        ircd_snprintf(0, cli_user(sptr)->virtip, HOSTLEN, "%s", hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
+      } else {
+        ircd_snprintf(0, cli_user(sptr)->virtip, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
+        ircd_snprintf(0, cli_user(sptr)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(sptr)->host));
+      }
+
+      SetFlag(sptr, FLAG_CLOAKHOST);
+      SetFlag(sptr, FLAG_CLOAKIP);
+
+      SetCloakIP(sptr);
+      SetCloakHost(sptr);
+
+    }
 
     SetLocalNumNick(sptr);
 
@@ -758,7 +773,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 	sptr,
 	RPL_WELCOME,
 	feature_str(FEAT_NETWORK),
-	feature_str(FEAT_PROVIDER) ? " via " : "",
+ 	feature_str(FEAT_PROVIDER) ? " via " : "",
 	feature_str(FEAT_PROVIDER) ? feature_str(FEAT_PROVIDER) : "",
 	nick);
 
@@ -945,6 +960,8 @@ static const struct UserMode {
   unsigned int flag;
   char         c;
 } userModeList[] = {
+  { FLAG_CLOAKHOST,   'C' },
+  { FLAG_CLOAKIP,     'c' },
   { FLAG_OPER,        'o' },
   { FLAG_LOCOP,       'O' },
   { FLAG_INVISIBLE,   'i' },
@@ -981,6 +998,8 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     const char* account = 0;
     const char* sethost = 0;
     const char* fakehost = 0;
+    const char* cloakhost = 0;
+    const char* cloakip = 0;
     char* host = 0;
     const char* p;
 
@@ -1004,6 +1023,10 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
 	      sethost = parv[argi++];
             if (userModeList[i].flag == FLAG_FAKEHOST)
               fakehost = parv[argi++];
+            if (userModeList[i].flag == FLAG_CLOAKHOST)
+              cloakhost = parv[argi++];
+            if (userModeList[i].flag == FLAG_CLOAKIP)
+              cloakip = parv[argi++];
             break;
           }
         }
@@ -1049,9 +1072,13 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
     if (HasHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
       make_hidden_hostmask(cli_user(new_client)->host, new_client);
     else if (IsHiddenHost(new_client) && (feature_int(FEAT_HOST_HIDING_STYLE) == 2)) {
-      ircd_snprintf(0, cli_user(new_client)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(new_client)->host));
-      ircd_snprintf(0, cli_user(new_client)->host, HOSTLEN, "%s", hidehost_normalhost(cli_user(new_client)->host));
+      SetFlag(new_client, FLAG_CLOAKHOST);
+      SetFlag(new_client, FLAG_CLOAKIP);
       SetFlag(new_client, FLAG_HIDDENHOST);
+
+      ircd_strncpy(cli_user(new_client)->virthost, cloakhost, HOSTLEN);
+      ircd_strncpy(cli_user(new_client)->host, cloakhost, HOSTLEN);
+      ircd_strncpy(cli_user(new_client)->virtip, cloakip, HOSTLEN);
     }
     if (HasSetHost(new_client)) {
       if ((host = strrchr(sethost, '@')) != NULL) {
@@ -1861,7 +1888,10 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       if (HasFlag(acptr, userModeList[i].flag) &&
 	  ((userModeList[i].flag != FLAG_ACCOUNT) &&
 	   (userModeList[i].flag != FLAG_SETHOST) &&
+           (userModeList[i].flag != FLAG_CLOAKHOST) &&
+           (userModeList[i].flag != FLAG_CLOAKIP) &&
 	   (userModeList[i].flag != FLAG_FAKEHOST)))
+
         *m++ = userModeList[i].c;
     }
     *m = '\0';
@@ -2007,6 +2037,20 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	  }
 	}
 	break;
+      case 'C':
+        if (what == MODE_ADD) {
+          if (*(p + 1)) {
+            SetCloakHost(acptr);
+            ircd_strncpy(cli_user(acptr)->virthost, *++p, HOSTLEN);
+          }
+        }
+      case 'c':
+        if (what == MODE_ADD) {
+          if (*(p + 1)) {
+            SetCloakIP(acptr);
+            ircd_strncpy(cli_user(acptr)->virtip, *++p, HOSTLEN);
+          }
+        }
       case 'h':
         if (what == MODE_ADD) {
           if (*(p + 1) && is_hostmask(*(p + 1))) {
@@ -2156,8 +2200,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	hide_hostmask(acptr);
     }
     else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-      ircd_snprintf(0, cli_user(acptr)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(acptr)->host));
-      ircd_snprintf(0, cli_user(acptr)->host, HOSTLEN, "%s", hidehost_normalhost(cli_user(acptr)->host));
+      ircd_snprintf(0, cli_user(acptr)->host, HOSTLEN, "%s", cli_user(acptr)->virthost);
       SetFlag(acptr, FLAG_HIDDENHOST);
     }
   }
@@ -2235,6 +2278,26 @@ char *umode_str(struct Client *cptr)
     *m++ = ' ';
     while ((*m++ = *t++))
       ; /* Empty loop */
+
+     m--; /* back up over previous nul-termination */
+   }
+
+  if (HasCloakHost(cptr)) {
+    char* t = cli_user(cptr)->virthost;
+
+    *m++ = ' ';
+    while ((*m++ = *t++))
+      ; /* Empty loop */
+
+     m--; /* back up over previous nul-termination */
+   }
+
+  if (HasCloakIP(cptr)) {
+    char* t = cli_user(cptr)->virtip;
+
+    *m++ = ' ';
+    while ((*m++ = *t++))
+      ; /* Empty loop */
    }
 
   *m = '\0';
@@ -2279,6 +2342,27 @@ void send_umode(struct Client *cptr, struct Client *sptr, struct Flags *old, int
           continue;
         break;
     }
+
+    if (flag == FLAG_CLOAKHOST) {
+      /* Don't send to users */
+      if (cptr && MyUser(cptr))
+        continue;
+
+      /* If we're setting +C, add the parameter later */
+      if (!FlagHas(old, flag))
+        needhost++;
+    }
+
+    if (flag == FLAG_CLOAKIP) {
+      /* Don't send to users */
+      if (cptr && MyUser(cptr))
+        continue;
+
+      /* If we're setting +c, add the parameter later */
+      if (!FlagHas(old, flag))
+        needhost++;
+    }
+
     /* Special case for SETHOST.. */
     if (flag == FLAG_SETHOST) {
       /* Don't send to users */
@@ -2287,7 +2371,7 @@ void send_umode(struct Client *cptr, struct Client *sptr, struct Flags *old, int
       
       /* If we're setting +h, add the parameter later */
       if (!FlagHas(old, flag))	
-      	needhost++;    
+      	needhost++;
     } else if (flag == FLAG_ACCOUNT || flag == FLAG_FAKEHOST)
       continue;
     if (FlagHas(old, flag))
