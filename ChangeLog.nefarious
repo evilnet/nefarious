@@ -3,6 +3,22 @@
 
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: See below.
+
+	* include/ircd_features.h: Added a F:line which controls the nick
+	change delay instead of being hard coded
+
+	* include/supported.h: Added Ccz usermodes.
+
+	* ircd/ircd_features.c: See ircd_features.h.
+
+	* ircd/list.c: Added Jobes nick delay patch.
+
+	* ircd/s_user.c: Added Jobes remote SSL status support and nick
+	delay patch
+
+2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/client.h: Added 2 new channel modes for sending cloaked
 	hosts n ips with style 2 (+Cc).
 

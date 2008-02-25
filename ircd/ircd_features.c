@@ -549,6 +549,7 @@ static struct FeatureDesc {
   F_B(HIS_USERZLINE, 0, 1, 0),
   F_B(HIS_STATS_Z, 0, 1, 0),
   F_B(HIS_ZLINE_REASON, 0, 1, 0),
+  F_I(NICK_DELAY, 0, 30, 0),
 
 #undef F_S
 #undef F_B

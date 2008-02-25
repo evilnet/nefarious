@@ -26,6 +26,7 @@
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_events.h"
+#include "ircd_features.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "listener.h"
@@ -209,7 +210,7 @@ struct Client* make_client(struct Client *from, int status)
     con_magic(con) = CONNECTION_MAGIC;
     con_fd(con) = -1; /* initialize struct Connection */
     con_freeflag(con) = 0;
-    con_nextnick(con) = CurrentTime - NICK_DELAY;
+    con_nextnick(con) = CurrentTime - feature_int(FEAT_NICK_DELAY);
     con_nexttarget(con) = CurrentTime - (TARGET_DELAY * (STARTTARGETS - 1));
     con_handler(con) = UNREGISTERED_HANDLER;
     con_client(con) = cptr;

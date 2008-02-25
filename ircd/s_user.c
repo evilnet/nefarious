@@ -925,6 +925,12 @@ int register_user(struct Client *cptr, struct Client *sptr,
     parv[3] = NULL; /* needed in case of +s */
     set_user_mode(sptr, sptr, 3, parv);
 
+#ifdef USE_SSL
+    /* Let client know he/she has user mode +z */
+    if (IsSSL(sptr))
+      sendcmdto_one(sptr, CMD_MODE, sptr, "%s %s", cli_name(sptr), "+z");
+#endif
+
     /* hack the 'old flags' so we don't send +r */
     if (HasFlag(sptr, FLAG_ACCOUNT))
       FlagSet(&flags, FLAG_ACCOUNT);
@@ -980,7 +986,8 @@ static const struct UserMode {
   { FLAG_NOCHAN,      'n' },
   { FLAG_NOIDLE,      'I' },
   { FLAG_ADMIN,       'a' },
-  { FLAG_WHOIS,       'W' }
+  { FLAG_WHOIS,       'W' },
+  { FLAG_SSL,         'z' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -1124,7 +1131,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       }
       else {
         /* Limit total to 1 change per NICK_DELAY seconds: */
-        cli_nextnick(cptr) += NICK_DELAY;
+        cli_nextnick(cptr) += feature_int(FEAT_NICK_DELAY);
         /* However allow _maximal_ 1 extra consecutive nick change: */
         if (cli_nextnick(cptr) < CurrentTime)
           cli_nextnick(cptr) = CurrentTime;
@@ -2093,6 +2100,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	else
 	  ClearWhois(acptr);
 	break;
+      case 'z':
+        if ( IsServer(cptr) ) {
+          if (what == MODE_ADD) {
+            SetSSL(acptr);
+          }
+          else {
+            ClearSSL(acptr);
+          }
+        }
+        break;
       default:
 	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, *m);
         break;
