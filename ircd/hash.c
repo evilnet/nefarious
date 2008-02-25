@@ -38,6 +38,7 @@
 #include "ircd_struct.h"
 #include "support.h"
 #include "sys.h"
+#include "watch.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -178,6 +179,7 @@ static HASHMEMS hash_weight_table[CHAR_MAX - CHAR_MIN + 1];
    so that I can use one hash function and one transformation map */
 static struct Client *clientTable[HASHSIZE];
 static struct Channel *channelTable[HASHSIZE];
+static struct Watch *watchTable[HASHSIZE];
 
 /* This is what the hash function will consider "equal" chars, this function 
    MUST be transitive, if HASHEQ(y,x)&&HASHEQ(y,z) then HASHEQ(y,z), and MUST
@@ -312,6 +314,21 @@ int hAddChannel(struct Channel *chptr)
   return 0;
 }
 
+/** Prepend a watch's nick  to the appropriate hash bucket.
+ * @param[in] chptr Watch to add to hash table.
+ * @return Zero.
+ */
+int hAddWatch(struct Watch *wptr)
+{
+  register HASHREGS hashv = strhash(wt_nick(wptr));
+
+  wt_next(wptr) = watchTable[hashv];
+  watchTable[hashv] = wptr;
+
+  return 0;
+
+}
+
 /*
  * hRemClient
  * Removes a Client's name from the hash linked list
@@ -393,6 +410,33 @@ int hRemChannel(struct Channel *chptr)
   return -1;
 }
 
+/** Remove a watch from its hash bucket.
+ * @param[in] chptr Watch to remove from hash table.
+ * @return Zero if the watch is found and removed, -1 if not found.
+ */
+int hRemWatch(struct Watch *wptr)
+{
+  HASHREGS hashv = strhash(wt_nick(wptr));
+  struct Watch *tmp = watchTable[hashv];
+
+  if (tmp == wptr) {
+    watchTable[hashv] = wt_next(wptr);
+    wt_next(wptr) = wptr;
+    return 0;
+  }
+
+  while (tmp) {
+    if (wt_next(tmp) == wptr) {
+      wt_next(tmp) = wt_next(wt_next(tmp));
+      wt_next(wptr) = wptr;
+      return 0;
+    }
+    tmp = wt_next(tmp);
+  }
+  return -1;
+}
+
+
 /*
  * hSeekClient
  * New semantics: finds a client whose name is 'name' and whose
@@ -446,6 +490,33 @@ struct Channel* hSeekChannel(const char *name)
     }
   }
   return chptr;
+
+}
+
+/** Find a watch by nick.
+ * If a watch's nick is found, it is moved to the top of its hash bucket.
+ * @param[in] name Watch nick to search for.
+ * @return Matching watch, or NULL if none.
+ */
+struct Watch *hSeekWatch(const char *nick)
+{
+  HASHREGS hashv = strhash(nick);
+  struct Watch *wptr = watchTable[hashv];
+
+  if (wptr) {
+    if (0 != ircd_strcmp(nick, wt_nick(wptr))) {
+      struct Watch* prev;
+      while (prev = wptr, wptr = wt_next(wptr)) {
+        if (0 == ircd_strcmp(nick, wt_nick(wptr))) {
+          wt_next(prev) = wt_next(wptr);
+          wt_next(wptr) = watchTable[hashv];
+          watchTable[hashv] = wptr;
+          break;
+        }
+      }
+    }
+  }
+  return wptr;
 
 }
 

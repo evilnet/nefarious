@@ -443,6 +443,10 @@ struct Client;
 #define TOK_MARK		"MK"
 #define CMD_MARK		MSG_MARK, TOK_MARK
 
+#define MSG_WATCH               "WATCH"         /* WATC */
+#define TOK_WATCH               "WATCH"
+
+
 /*
  * Constants
  */

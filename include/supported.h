@@ -38,6 +38,7 @@
                 " USERIP"\
                 " CPRIVMSG"\
                 " CNOTICE"\
+                " WATCH=%i"\
                 " SILENCE=%i" \
                 " MODES=%i" \
                 " MAXCHANNELS=%i" \
@@ -59,7 +60,8 @@
                 " CASEMAPPING=%s" \
                 " NETWORK=%s"
 
-#define FEATURESVALUES1 feature_int(FEAT_MAXSILES), MAXMODEPARAMS, \
+#define FEATURESVALUES1 feature_int(FEAT_MAXWATCHS), \
+			feature_int(FEAT_MAXSILES), MAXMODEPARAMS, \
 			feature_int(FEAT_MAXCHANNELSPERUSER), \
 			feature_int(FEAT_MAXBANS), \
 			feature_int(FEAT_MAXEXCEPTS), \

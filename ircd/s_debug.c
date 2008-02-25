@@ -53,6 +53,7 @@
 #endif /* USE_SSL */
 #include "ircd_struct.h"
 #include "sys.h"
+#include "watch.h"
 #include "whowas.h"
 #include "zline.h"
 
@@ -272,6 +273,8 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
       awm = 0,                  /* memory used by aways */
       wwam = 0,                 /* whowas away memory used */
       wwm = 0,                  /* whowas array memory used */
+      wt = 0,                   /* watch entrys */
+      wtm = 0,                  /* memory used by watchs */
       glm = 0,                  /* memory used by glines */
       zlm = 0,                  /* memory used by zlines */
       shm = 0,                  /* memory used by shuns */
@@ -387,6 +390,10 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
 	     wwu * sizeof(struct User), wwa, wwam);
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":Whowas array %d(%zu)",
 	     feature_int(FEAT_NICKNAMEHISTORYLENGTH), wwm);
+
+  watch_count_memory(&wt, &wtm);
+  send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
+             ":Watchs %d(%zu)", wt, wtm);
 
   motd_memory_count(cptr);
 

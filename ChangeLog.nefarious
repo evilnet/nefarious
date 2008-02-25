@@ -3,6 +3,47 @@
 
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/handlers.h: Added handlers for watch.
+
+	* include/hash.h: Hash related code for holding watch's.
+
+	* include/ircd_features.h: Added F:MAXWATCHS
+
+	* include/list.h: Struct for watch's.
+
+	* include/msg.h: WATCH command entries.
+
+	* include/numeric.h: Added numerics for watch's.
+
+	* include/struct.h: Watch counts.
+
+	* include/supported.h: Added WATCH.
+
+	* include/watch.h: Watch decelerations.
+
+	* ircd/hash.c: Hold watch's in hash tables.
+
+	* ircd/ircd_features.c: Added F:MAXWATCHS.
+
+	* ircd/Makefile.am: Added m_watch.c and watch.c.
+
+	* ircd/m_watch.c: Functions for /WATCH.
+
+	* ircd/parse.c: Added WATCH command.
+
+	* ircd/s_debug.c: Watch usage debug information.
+
+	* ircd/s_err.c Added numerics for watch's.
+
+	* ircd/s_misc.c: When we clean up after a user quits notify
+	watch lists.
+
+	* ircd/s_user.c: Monitor user connects and quits.
+
+	* ircd/watch.c: More watch funcions.
+
+2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/join.c: Propagate autochan modes.
 
 	* ircd/m_svsjoin.c: Propagate autochan modes.

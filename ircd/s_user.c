@@ -65,6 +65,7 @@
 #include "sys.h"
 #include "userload.h"
 #include "version.h"
+#include "watch.h"
 #include "whowas.h"
 
 #include "handlers.h" /* m_motd and m_lusers */
@@ -940,6 +941,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
     if (cli_snomask(sptr) != SNO_DEFAULT && HasFlag(sptr, FLAG_SERVNOTICE))
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
 
+    /* Notify new local user */
+    check_status_watch(sptr, RPL_LOGON);
+
     if (feature_bool(FEAT_POLICY_NOTICE)) {
       if (feature_bool(FEAT_RULES))
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Notice -- Please be advised that use of this service constitutes consent to all network policies and server conditions of use, which are at \2%s\2, stated within the servers \2/MOTD\2 and \2/RULES\2", sptr, feature_str(FEAT_NETWORK));
@@ -1095,6 +1099,9 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       }
     }
 
+    /* Notify new remote user */
+    check_status_watch(sptr, RPL_LOGOFF);
+
     return register_user(cptr, new_client, cli_name(new_client), cli_username(new_client));
   }
   else if ((cli_name(sptr))[0]) {
@@ -1158,6 +1165,9 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
      * on that channel. Propagate notice to other servers.
      */
     if (IsUser(sptr)) {
+      /* Notify exit user */
+      check_status_watch(sptr, RPL_LOGOFF);
+
       sendcmdto_common_channels_butone(sptr, CMD_NICK, NULL, ":%s", nick);
       add_history(sptr, 1);
       sendcmdto_serv_butone(sptr, CMD_NICK, cptr, "%s %Tu", nick,
@@ -1215,6 +1225,10 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
         return CPTR_KILLED;
     }
   }
+
+  /* Notify change nick local/remote user */
+  check_status_watch(sptr, RPL_LOGON);
+
   return 0;
 }
 

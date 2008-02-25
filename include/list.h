@@ -14,6 +14,7 @@ struct Client;
 struct Connection;
 struct Channel;
 struct ConfItem;
+struct Watch;
 
 /* 
  * Structures
@@ -25,6 +26,7 @@ struct SLink {
     struct Client *cptr;
     struct Channel *chptr;
     struct ConfItem *aconf;
+    struct Watch *wptr;     /**< List element as a watch. */
     char *cp;
     struct {
       char *banstr;

@@ -280,6 +280,7 @@ static struct FeatureDesc {
   F_I(AVBANLEN, 0, 40, 0),
   F_I(MAXBANS, 0, 45, 0),
   F_I(MAXSILES, 0, 15, 0),
+  F_I(MAXWATCHS, 0, 128, 0),
   F_I(HANGONGOODLINK, 0, 300, 0),
   F_I(HANGONRETRYDELAY, 0, 10, 0),
   F_I(CONNECTTIMEOUT, 0, 60, 0),

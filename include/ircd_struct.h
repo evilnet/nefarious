@@ -70,10 +70,12 @@ struct User {
   struct Membership* channel;        /* chain of channel pointer blocks */
   struct SLink*      invited;        /* chain of invite pointer blocks */
   struct SLink*      silence;        /* chain of silence pointer blocks */
+  struct SLink*      watch;          /**< chain of watch pointer blocks */
   char*              away;           /* pointer to away message */
   time_t             last;
   unsigned int       refcnt;          /* Number of times this block is referenced */
   unsigned int       joined;          /* number of channels joined */
+  unsigned int       watches;        /**< Number of entrances in the watch list */
   unsigned int       invites;         /* Number of channels we've been invited to */
   char               username[USERLEN + 1];
   char               host[HOSTLEN + 1];
