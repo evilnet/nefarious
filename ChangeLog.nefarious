@@ -140,6 +140,12 @@
 	* ircd/m_user.c: Fixed a nasty crash bug with USER. Thanks goes out
 	to Vadtec for this fix.
 
+2008-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+        * ircd/hash.c: fix for /list default not showing inactive channels
+	bug. (thanks Jobe) (adding after the fact as changelog was left out
+	-Rubin)
+
 2008-01-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_svsjoin.c: Fixed up the way SVSJOIN is handled across servers.
