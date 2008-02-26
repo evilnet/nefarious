@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-02-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_user.c: Patch by Jobe for 1.1 and 1.2 linking compatability
+	with style 2 hidden hosts.
+
 2008-02-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/handlers.h: Added handlers for watch.
