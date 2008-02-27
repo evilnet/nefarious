@@ -1099,6 +1099,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       SetFlag(new_client, FLAG_CLOAKHOST);
       SetFlag(new_client, FLAG_CLOAKIP);
       if ( IsHiddenHost(new_client) ) {
+        ircd_strncpy(cli_user(new_client)->host, cli_user(new_client)->virthost, HOSTLEN);
         SetFlag(new_client, FLAG_HIDDENHOST);
       }
     }

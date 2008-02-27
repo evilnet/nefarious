@@ -951,4 +951,6 @@ extern int client_report_privs(struct Client* to, struct Client* client);
 extern char *client_print_privs(struct Client* client);
 extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
 
+extern void DoMD5(unsigned char *mdout, unsigned char *src, unsigned long n);
+
 #endif /* INCLUDED_client_h */

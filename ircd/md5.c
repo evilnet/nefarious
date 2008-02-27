@@ -17,8 +17,9 @@
 
 #include "config.h"
 
-#include <string.h>
+#if !defined(USE_SSL)
 
+#include <string.h>
 #include "md5.h"
 
 /*
@@ -271,6 +272,8 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 	memset(ctx, 0, sizeof(ctx));
 }
 
+#else
+#include <openssl/md5.h>
 
 /** Generates an MD5 checksum.
  * @param mdout[out] Buffer to store result in, the result will be 16 bytes in binary
@@ -287,3 +290,4 @@ MD5_CTX hash;
 	MD5_Final(mdout, &hash);
 }
 
+#endif
