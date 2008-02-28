@@ -273,7 +273,20 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 }
 
 #else
+#define OPENSSL_NO_KRB5
+#include <openssl/rsa.h>       /* SSL stuff */
+#include <openssl/crypto.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
 #include <openssl/md5.h>
+#include <openssl/ripemd.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include "md5.h"
 #endif
 
 /** Generates an MD5 checksum.
