@@ -447,6 +447,10 @@ struct Client;
 #define TOK_WATCH               "WATCH"
 
 
+#define MSG_WEBIRC              "WEBIRC"         /* WEBIRC */
+#define TOK_WEBIRC              "WEBIRC"
+#define CMD_WEBIRC              MSG_WEBIRC, TOK_WEBIRC
+
 /*
  * Constants
  */

@@ -1664,6 +1664,10 @@ read_actual_config(const char *cfile)
     case 'i':                /* to connect me */
       aconf->status = CONF_CLIENT;
       break;
+    case 'W':                /* WEBIRC Auth lines */
+    case 'w':
+      aconf->status = CONF_WEBIRC;
+      break;
     case 'K':                /* Kill user line on irc.conf           */
       conf_add_deny(field_vector, field_count, 0);
       aconf->status = CONF_ILLEGAL;
@@ -1787,6 +1791,31 @@ read_actual_config(const char *cfile)
         delist_conf(bconf);
         bconf->status &= ~CONF_ILLEGAL;
         if (aconf->status == CONF_CLIENT) {
+          /*
+           * copy the password field in case it changed
+           */
+          MyFree(bconf->passwd);
+          bconf->passwd = aconf->passwd;
+          aconf->passwd = 0;
+
+          ConfLinks(bconf) -= bconf->clients;
+          bconf->conn_class = aconf->conn_class;
+          if (bconf->conn_class)
+            ConfLinks(bconf) += bconf->clients;
+        }
+        free_conf(aconf);
+        aconf = bconf;
+      }
+    }
+
+    /* WEBIRC config */
+    if (aconf->status & CONF_WEBIRC) {
+      struct ConfItem *bconf;
+
+      if ((bconf = find_conf_entry(aconf, aconf->status))) {
+        delist_conf(bconf);
+        bconf->status &= ~CONF_ILLEGAL;
+        if (aconf->status == CONF_WEBIRC) {
           /*
            * copy the password field in case it changed
            */

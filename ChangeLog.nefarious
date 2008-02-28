@@ -1,6 +1,37 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-02-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Patch below by Jobe
+
+	* doc/example.conf: Documented W:lines
+
+	* include/client.h: Added FLAG_WEBIRC for marking cgi:irc clients.
+
+	* include/handlers.h: Added handlers for webirc.
+
+	* include/ircd_features.h: Added 4 F:lines (see example.conf changes).
+
+	* include/msg.h: Added webirc command.
+
+	* include/s_conf.h: Added W:lines.
+
+	* ircd/Makefile.in: Added m_webirc.c.
+
+	* ircd/ircd_features.c: Added 4 F:lines (see example.conf changes).
+
+	* ircd/m_webirc.c: Added webirc commands.
+
+	* ircd/parse.c: Added webirc command.
+
+	* ircd/s_conf.c: Added W:lines.
+
+	* ircd/s_stats.c: Added stats for W:lines.
+
+	* ircd/s_user.c:  If FEAT_WEBIRC_USERIDENT is enabled then we need to
+	set the clients ident.
+
 2008-02-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/client.h: Moved DoMD5 to here.

@@ -779,6 +779,16 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_ignore, m_watch, m_ignore, m_watch, m_ignore }
   },
+  /* Defines the new WEBIRC command used for faking real host/ip on
+   * connection from a client authorised to do so
+   */
+  {
+    MSG_WEBIRC,
+    TOK_WEBIRC,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_webirc, m_registered, m_ignore, m_registered, m_ignore }
+  },
   /* This command is an alias for QUIT during the unregistered part of
    * of the server.  This is because someone jumping via a broken web
    * proxy will send a 'POST' as their first command - which we will

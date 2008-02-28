@@ -183,6 +183,8 @@ enum Flag {
     FLAG_DNSBLALLOWED,              /**< Client in DNSBL Allowed in */
     FLAG_DNSBLDENIED,               /**< Only set if a client is found on a d X:line */
 
+    FLAG_WEBIRC,                    /**< User registered with WEBIRC command */
+
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /**< First local mode flag */
     FLAG_GLOBAL_UMODES = FLAG_OPER  /**< First global mode flag */
@@ -693,6 +695,8 @@ struct Client {
 #define IsWhois(x)		HasFlag(x, FLAG_WHOIS)
 /** Return non-zero if the client has operator or server privileges. */
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
+/** Return non-zero if the client is a WEBIRC user. */
+#define IsWebIRC(x)             HasFlag(x, FLAG_WEBIRC)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -766,6 +770,8 @@ struct Client {
 #define SetAdmin(x)		SetFlag(x, FLAG_ADMIN)
 /** Mark a client as being oper mode +W set (/whois alerts). */
 #define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
+/** Mark a client as being a WEBIRC user. */
+#define SetWebIRC(x)            SetFlag(x, FLAG_WEBIRC)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -823,6 +829,8 @@ struct Client {
 #define ClearDNSBLMarked(x)	ClrFlag(x, FLAG_DNSBLMARKED)
 /** Client matching on dnsbl is no longer allowed in. Allow flag removed from client */
 #define ClearDNSBLAllowed(x)	ClrFlag(x, FLAG_DNSBLALLOWED)
+/** Client is no longer a WEBIRC user. */
+#define ClearWebIRC(x)          ClrFlag(x, FLAG_WEBIRC)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \

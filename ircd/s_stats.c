@@ -78,6 +78,7 @@
 static unsigned int report_array[17][3] = {
   {CONF_SERVER, RPL_STATSCLINE, 'C'},
   {CONF_CLIENT, RPL_STATSILINE, 'I'},
+  {CONF_WEBIRC, RPL_STATSILINE, 'W'},
   {CONF_LEAF, RPL_STATSLLINE, 'L'},
   {CONF_OPERATOR, RPL_STATSOLINE, 'O'},
   {CONF_HUB, RPL_STATSHLINE, 'H'},
@@ -179,6 +180,34 @@ stats_access(struct Client* to, struct StatDesc* sd, int stat, char* param)
 		   aconf->port, get_conf_class(aconf));
 	if (--count == 0)
 	  break;
+      }
+    }
+  }
+}
+
+/* WEBIRC stats handler */
+static void
+stats_webirc(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct ConfItem *aconf;
+  int wilds = 0;
+  int count = 1000;
+
+  if (!param) {
+    stats_configured_links(to, sd, stat, param);
+    return;
+  }
+
+  wilds = string_has_wildcards(param);
+
+  for (aconf = GlobalConfList; aconf; aconf = aconf->next) {
+    if (CONF_WEBIRC == aconf->status) {
+      if ((!wilds && (!match(aconf->host, param) || !match(aconf->name, param))) ||
+          (wilds && (!mmatch(param, aconf->host) || !mmatch(param, aconf->name)))) {
+        send_reply(to, RPL_STATSILINE, 'W', aconf->host, aconf->name,
+                   aconf->port, get_conf_class(aconf));
+        if (--count == 0)
+          break;
       }
     }
   }
@@ -534,7 +563,10 @@ struct StatDesc statsinfo[] = {
   { 'v', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_v,
     stats_servers_verbose, 0,
     "Verbose server information." },
-  { 'w', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_w,
+  { 'W', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_W,
+    stats_webirc, CONF_WEBIRC,
+    "WEBIRC authorization lines." },
+  { 'w', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_w,
     calc_load, 0,
     "Userload statistics." },
 #ifdef DEBUGMODE

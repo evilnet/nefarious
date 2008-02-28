@@ -454,10 +454,17 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     aconf = cli_confs(sptr)->value.aconf;
 
-    clean_user_id(user->username,
-        HasFlag(sptr, FLAG_GOTID) ? cli_username(sptr) : username,
-        HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
-        && !(HasSetHost(sptr))); /* No tilde for S-lined users. */
+    if ( feature_bool(FEAT_WEBIRC_USERIDENT) && IsWebIRC(sptr) ) {
+      clean_user_id(user->username, username,
+          HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
+          && !(HasSetHost(sptr))); /* No tilde for S-lined users. */
+    }
+    else {
+      clean_user_id(user->username,
+          HasFlag(sptr, FLAG_GOTID) ? cli_username(sptr) : username,
+          HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
+          && !(HasSetHost(sptr))); /* No tilde for S-lined users. */
+    }
 
     /* Have to set up "realusername" before doing the gline check below */
     ircd_strncpy(user->realusername, user->username, USERLEN);
