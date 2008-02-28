@@ -274,6 +274,7 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 
 #else
 #include <openssl/md5.h>
+#endif
 
 /** Generates an MD5 checksum.
  * @param mdout[out] Buffer to store result in, the result will be 16 bytes in binary
@@ -290,4 +291,3 @@ MD5_CTX hash;
 	MD5_Final(mdout, &hash);
 }
 
-#endif

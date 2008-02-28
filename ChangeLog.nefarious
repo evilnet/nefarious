@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-02-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/md5.c: Fixed a small compile issue without ssl enabled.
+
 2008-02-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Patch below by Jobe
