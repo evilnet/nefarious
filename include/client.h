@@ -116,9 +116,9 @@ enum Priv {
 
 /** Number of bits */
 #define _PRIV_NBITS		(8 * sizeof(unsigned long))
-/** Element number for priv \a priv. */
+/** Element number for priv */
 #define _PRIV_IDX(priv)		((priv) / _PRIV_NBITS)
-/** Element bit for priv \a priv. */
+/** Element bit for priv */
 #define _PRIV_BIT(priv)		(1UL << ((priv) % _PRIV_NBITS))
 
 /** Operator privileges. */
@@ -286,6 +286,7 @@ struct Client {
   char cli_name[HOSTLEN + 1];   /**< Unique name of the client, nick or host */
   char cli_username[USERLEN + 1];    /**< username here now for auth stuff */
   char cli_info[REALLEN + 1];        /**< Free form additional client information */
+  char cli_version[VERSIONLEN + 1];  /**< Free form client version information - added by Vadtec 02/26/2008 */
   char cli_dnsbl[BUFSIZE + 1];       /**< dnsbl hostname identifier */
   char cli_dnsbls[BUFSIZE + 1];      /**< all dnsbls matched identifier */
   struct SLink*   cli_sdnsbls;       /**< chain of dnsbl pointer blocks */
@@ -308,7 +309,7 @@ struct Client {
 #define cli_hnext(cli)		((cli)->cli_hnext)
 /** Get connection associated with client. */
 #define cli_connect(cli)	((cli)->cli_connect)
-/** Get local client that links us to \a cli. */
+/** Get local client that links us to a cli. */
 #define cli_from(cli)		((cli)->cli_connect->con_client)
 /** Get User structure for client, if client is a user. */
 #define cli_user(cli)		((cli)->cli_user)
@@ -344,6 +345,8 @@ struct Client {
 #define cli_name(cli)		((cli)->cli_name)
 /** Get client username (ident). */
 #define cli_username(cli)	((cli)->cli_username)
+/** Get client version (CTCP version). */
+#define cli_version(cli)	((cli)->cli_version)
 /** Get client realname (information field). */
 #define cli_info(cli)		((cli)->cli_info)
 /** Get client oper flags. */

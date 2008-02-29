@@ -337,6 +337,12 @@ enum Feature {
   FEAT_WEBIRC_FAKEIDENT,
   FEAT_WEBIRC_USERIDENT,
 
+  FEAT_CTCP_VERSIONING, /* added by Vadtec 02/25/2008 */
+  FEAT_CTCP_VERSIONING_KILL, /* added by Vadtec 02/27/2008 */
+  FEAT_CTCP_VERSIONING_CHAN, /* added by Vadtec 02/27/2008 */
+  FEAT_CTCP_VERSIONING_CHANNAME, /* added by Vadtec 02/27/2008 */
+  FEAT_CTCP_VERSIONING_USEMSG, /* added by Vadtec 02/28/2008 */
+
   FEAT_LAST_F
 };
 

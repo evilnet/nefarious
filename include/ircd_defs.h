@@ -79,6 +79,12 @@
  */
 #define REALLEN		50
 /*
+ * VERSIONLEN is the maximum length for user supplied information about a clients
+ * version. This information is set at client/server after a reply to CTCP VERSION.
+ * added by Vadtec 02/26/2008
+ */
+#define VERSIONLEN	75 
+/*
  * PASSWDLEN is the maximum length for a password used for connecting servers
  * and clients.
  */

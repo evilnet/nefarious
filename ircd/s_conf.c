@@ -2089,6 +2089,7 @@ int find_kill(struct Client *cptr)
   const char*      host;
   const char*      name;
   const char*      realname;
+  const char*      version; /* added by Vadtec 02/26/2008 */
   struct DenyConf* deny;
   struct Gline*    agline = NULL;
 
@@ -2100,10 +2101,12 @@ int find_kill(struct Client *cptr)
   host = cli_sockhost(cptr);
   name = cli_user(cptr)->username;
   realname = cli_info(cptr);
+  version = cli_version(cptr); /* added by Vadtec 02/26/2008 */
 
   assert(strlen(host) <= HOSTLEN);
   assert((name ? strlen(name) : 0) <= HOSTLEN);
   assert((realname ? strlen(realname) : 0) <= REALLEN);
+  assert((version ? strlen(version) : 0) <= VERSIONLEN); /* added by Vadtec 02/26/2008 */
 
   /* 2000-07-14: Rewrote this loop for massive speed increases.
    *             -- Isomer
@@ -2115,7 +2118,11 @@ int find_kill(struct Client *cptr)
     if (EmptyString(deny->hostmask))
       break;
 
-    if (deny->flags & DENY_FLAGS_REALNAME) { /* K: by real name */
+    if (deny->flags & DENY_FLAGS_VERSION && feature_bool(FEAT_CTCP_VERSIONING) && feature_bool(FEAT_CTCP_VERSIONING_KILL)) { /* K: by version - added by Vadtec 02/25/2006 */
+      if (0 == match(deny->hostmask + 2, version))
+	break;
+    }
+    else if (deny->flags & DENY_FLAGS_REALNAME) { /* K: by real name */
       if (0 == match(deny->hostmask + 2, realname))
 	break;
     } else if (deny->flags & DENY_FLAGS_IP) { /* k: by IP */

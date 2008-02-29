@@ -3,6 +3,29 @@
 
 2008-02-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Patch below by Vadtec
+
+	* doc/example.conf: Documented K:line version support, also documented
+	the new F:lines.
+
+	* include/client.h: Store version replies
+
+	* include/ircd_defs.h: Added VERSIONLEN.
+
+	* include/ircd_features.h: Added new F:lines.
+
+	* include/s_conf.h: Support for versions in K:lines.
+
+	* ircd/ircd_features.c: Added new F:lines.
+
+	* ircd/m_notice.c: If we get a CTCP reply then check it.
+
+	* ircd/s_conf.c: Add $V support to K:lines.
+
+	* ircd/s_user.c:  Check clients ctcp's on connect if enabled.
+
+2008-02-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/md5.c: Fixed an issue with openssl 0.9.8.
 
 2008-02-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

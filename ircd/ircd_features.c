@@ -558,6 +558,12 @@ static struct FeatureDesc {
   F_S(WEBIRC_FAKEIDENT, 0, "webirc", 0),
   F_B(WEBIRC_USERIDENT, 0, 0, 0),
 
+  F_B(CTCP_VERSIONING, 0, 0, 0), /* added by Vadtec 02/25/2008 */
+  F_B(CTCP_VERSIONING_KILL, 0, 0, 0), /* added by Vadtec 02/27/2008 */
+  F_B(CTCP_VERSIONING_CHAN, 0, 0, 0), /* added by Vadtec 02/27/2008 */
+  F_S(CTCP_VERSIONING_CHANNAME, 0, "#opers", 0), /* added by Vadtec 02/27/2008 */
+  F_B(CTCP_VERSIONING_USEMSG, 0, 0, 0), /* added by Vadtec 02/28/2008 */
+
 #undef F_S
 #undef F_B
 #undef F_I

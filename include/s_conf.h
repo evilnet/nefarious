@@ -95,6 +95,7 @@ struct DenyConf {
 #define DENY_FLAGS_FILE     0x0001 /* Comment is a filename */
 #define DENY_FLAGS_IP       0x0002 /* K-line by IP address */
 #define DENY_FLAGS_REALNAME 0x0004 /* K-line by real name */
+#define DENY_FLAGS_VERSION  0x0008 /* K-line by CTCP version - added by Vadtec 02/26/2008 */
 
 /*
  * A line: A:<line 1>:<line 2>:<line 3>

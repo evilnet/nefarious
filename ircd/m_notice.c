@@ -90,9 +90,18 @@
 #include "msg.h"
 #include "numeric.h"
 #include "send.h"
+#include "ircd_features.h" /* FEAT_CTCP_VERSIONING - added by Vadtec 02/25/2008 */
+#include "ircd.h" /* &me - added by Vadtec 02/26/2008 */
+#include "s_misc.h" /* CPTR_KILLED - added by Vadtec 02/26/2008 */
+#include "s_bsd.h" /* HighestFd, LocalClientArray[] - added by Vadtec 02/26/2008 */
+#include "hash.h" /* FindChannel() - added by Vadtec 02/26/2008 */
 
 #include <assert.h>
 #include <string.h>
+#include <stdio.h> /* snprintf - added by Vadtec 02/25/2008 */
+#ifdef _GNU_SOURCE
+#include <strings.h> /* strncasecmp() - added by Vadtec 02/25/2008 */
+#endif
 
 #if !defined(XXX_BOGUS_TEMP_HACK)
 #include "handlers.h"
@@ -106,8 +115,15 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char*           name;
   char*           server;
   int             i;
+  int             j;
+  int             fd = 0;
   int             count;
   char*           vector[MAXTARGETS];
+  char*		  temp; /* added by Vadtec 02/25/2008 */
+  char*		  parv_temp; /* added by Vadtec 02/26/2008 */
+  int             found_g = 0; /* added by Vadtec 02/26/2008 */
+  struct Client* acptr; /* added by Vadtec 02/26/2008 */
+  struct Channel* chptr; /* added by Vadtec 02/27/2008 */
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -126,6 +142,65 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   }
 
   count = unique_name_vector(parv[1], ',', vector, MAXTARGETS);
+
+  /* Check here to make sure that the client is ours so we dont respond to NOTICES from other server's users. - Vadtec */
+  if (feature_bool(FEAT_CTCP_VERSIONING) && MyConnect(sptr)) {
+    /*
+     Added by Vadtec 02/25/2008.
+     This is so that we can do version checking (and banning) of connecting clients.
+     Rules: Only one really. CTCP VERSION is not part of the RFC and therefore clients are not required to respond to
+     a request for their version.
+     NOTE: If we are lucky enough to have _GNU_SOURCE, we will use it over the standard strstr because its case insensetive.
+           This should help against clients that like to send lower case CTCPs from slipping through as easily with only one
+           function call.
+     TODO: Write a function (clean_control_codes) to strip out all control codes to remove formatting from the string.
+    */
+    for (fd = HighestFd; fd >= 0; --fd) {
+      /*
+       * get the users!
+      */
+      if ((acptr = LocalClientArray[fd])) {
+        if (!cli_user(acptr))
+          continue;
+
+        #ifdef _GNU_SOURCE
+        if ((temp = strcasestr(parv[2], "VERSION"))) {
+        #else
+        if ((temp = strstr(parv[2], "VERSION")) || (temp = strstr(parv[2], "version"))) {
+        #endif
+          temp = strchr(parv[2], ' ');
+          parv_temp = parv[2];
+          j = 0;
+          while (j <= (temp - parv[2])) { parv_temp++; j++; }
+          /* TODO: Remove the trailing \001 from the string here... */
+          ircd_strncpy(cli_version(sptr), parv_temp, VERSIONLEN);
+          if (feature_bool(FEAT_CTCP_VERSIONING_CHAN)) {
+            sprintf(temp, "%s has version \002%s\002", cli_name(sptr), cli_version(sptr));
+            /* Announce to channel. */
+            if ((chptr = FindChannel(feature_str(FEAT_CTCP_VERSIONING_CHANNAME)))) {
+              if (feature_bool(FEAT_CTCP_VERSIONING_USEMSG))
+                sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp);
+              else
+                sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp);
+            }
+          }
+
+          if (feature_bool(FEAT_CTCP_VERSIONING_KILL)) {
+            if ((found_g = find_kill(acptr))) {
+              sendto_opmask_butone(0, found_g == -2 ? SNO_GLINE : SNO_OPERKILL,
+                                   found_g == -2 ? "G-line active for %s%s" :
+                                   "K-line active for %s%s",
+                                   IsUnknown(sptr) ? "Unregistered Client ":"",
+                                   get_client_name(sptr, SHOW_IP));
+              return exit_client_msg(cptr, acptr, &me, "Banned Client: %s", cli_version(acptr));
+            }
+          }
+          else
+            return 0;
+        }
+      }
+    }
+  }
 
   for (i = 0; i < count; ++i) {
     name = vector[i];
