@@ -113,6 +113,7 @@ void do_names(struct Client* sptr, struct Channel* chptr, int filter)
   int idx;
   int flag;
   int needs_space; 
+  int done_prefix;
   int len; 
   char buf[BUFSIZE];
   struct Client *c2ptr;
@@ -160,25 +161,42 @@ void do_names(struct Client* sptr, struct Channel* chptr, int filter)
       idx++;
     }
     needs_space=1;
+    done_prefix=0;
     if (IsZombie(member))
     {
-      strcat(buf, "!");
-      idx++;
+      if ( IsNamesX(sptr) || !done_prefix )
+      {
+        strcat(buf, "!");
+        done_prefix=1;
+        idx++;
+      }
     }
-    else if (IsChanOp(member))
+    if (IsChanOp(member))
     {
-      strcat(buf, "@");
-      idx++;
+      if ( IsNamesX(sptr) || !done_prefix )
+      {
+        strcat(buf, "@");
+        done_prefix=1;
+        idx++;
+      }
     }
-    else if (IsHalfOp(member))
+    if (IsHalfOp(member))
     {
-      strcat(buf, "%");
-      idx++;
+      if ( IsNamesX(sptr) || !done_prefix )
+      {
+        strcat(buf, "%");
+        done_prefix=1;
+        idx++;
+      }
     }
-    else if (HasVoice(member))
+    if (HasVoice(member))
     {
-      strcat(buf, "+");
-      idx++;
+      if ( IsNamesX(sptr) || !done_prefix )
+      {
+        strcat(buf, "+");
+        done_prefix=1;
+        idx++;
+      }
     }
     strcat(buf, cli_name(c2ptr));
     idx += strlen(cli_name(c2ptr));

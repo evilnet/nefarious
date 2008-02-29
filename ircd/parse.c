@@ -789,6 +789,16 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_webirc, m_registered, m_ignore, m_registered, m_ignore }
   },
+  /* Defines PROTOCTL command used by clients to announce features
+   * listed by numeric 005 which they support
+   */
+  {
+    MSG_PROTOCTL,
+    TOK_PROTOCTL,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_protoctl, m_ignore, m_protoctl, m_ignore }
+  },
   /* This command is an alias for QUIT during the unregistered part of
    * of the server.  This is because someone jumping via a broken web
    * proxy will send a 'POST' as their first command - which we will

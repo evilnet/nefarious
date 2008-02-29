@@ -185,6 +185,8 @@ enum Flag {
 
     FLAG_WEBIRC,                    /**< User registered with WEBIRC command */
 
+    FLAG_NAMESX,                    /**< Client supports extended NAMES replies */
+
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /**< First local mode flag */
     FLAG_GLOBAL_UMODES = FLAG_OPER  /**< First global mode flag */
@@ -700,6 +702,8 @@ struct Client {
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 /** Return non-zero if the client is a WEBIRC user. */
 #define IsWebIRC(x)             HasFlag(x, FLAG_WEBIRC)
+/** Return non-zero if the client supports extended NAMES */
+#define IsNamesX(x)             HasFlag(x, FLAG_NAMESX)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -775,6 +779,8 @@ struct Client {
 #define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
 /** Mark a client as being a WEBIRC user. */
 #define SetWebIRC(x)            SetFlag(x, FLAG_WEBIRC)
+/** Mark a client as supporting extended NAMES. */
+#define SetNamesX(x)            SetFlag(x, FLAG_NAMESX)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -834,6 +840,8 @@ struct Client {
 #define ClearDNSBLAllowed(x)	ClrFlag(x, FLAG_DNSBLALLOWED)
 /** Client is no longer a WEBIRC user. */
 #define ClearWebIRC(x)          ClrFlag(x, FLAG_WEBIRC)
+/** Client no longer supports extended names. */
+#define ClearNamesX(x)          ClrFlag(x, FLAG_NAMESX)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \

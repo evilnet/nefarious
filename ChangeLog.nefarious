@@ -1,6 +1,27 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Patch Below By Jobe.
+
+	* include/client.h: NAMESX flag.
+
+	* include/handlers.h: Handlers for PROTOCTL.
+
+	* include/supported.h: Added support for NAMESX.
+
+	* ircd/Makefile.in: Added m_protoctl.c
+
+	* ircd/m_names.c: If a client is NAMESX capable then send all modes
+	in NAMES output.
+
+	* ircd/m_protoctl.c: If a client supports this then on connect if it
+	sees NAMEX in the server headers then it will send back PROTOCTL
+	NAMEX to say it supports it. mIRC and Xchat support this.
+
+	* ircd/parse.c: Added PROTOCTL.
+
 2008-02-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Removed most of the references to AfterNET and added

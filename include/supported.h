@@ -33,6 +33,7 @@
  */
 #define FEATURES1 \
                 "WHOX"\
+                " NAMESX" \
                 " WALLCHOPS"\
 		" WALLVOICES"\
                 " USERIP"\
