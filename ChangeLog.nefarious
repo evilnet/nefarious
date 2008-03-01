@@ -3,6 +3,14 @@
 
 2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Changed the default message so it fits in
+	with the connection notices.
+
+	* ircd/ircd_features.c: Changed the default message so it fits 
+	in with the connection notices.
+
+2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/s_user.c: Moved the CTCP version back to as early as possible.
 	It now sends just before the Welcome to the... numerics.
 

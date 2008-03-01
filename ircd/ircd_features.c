@@ -563,7 +563,7 @@ static struct FeatureDesc {
   F_B(CTCP_VERSIONING_CHAN, 0, 0, 0), /* added by Vadtec 02/27/2008 */
   F_S(CTCP_VERSIONING_CHANNAME, 0, "#opers", 0), /* added by Vadtec 02/27/2008 */
   F_B(CTCP_VERSIONING_USEMSG, 0, 0, 0), /* added by Vadtec 02/28/2008 */
-  F_S(CTCP_VERSIONING_NOTICE, 0, "You are being version scanned. This requires no action on your part.", 0),
+  F_S(CTCP_VERSIONING_NOTICE, 0, "*** Checking your client version", 0),
 
 #undef F_S
 #undef F_B
