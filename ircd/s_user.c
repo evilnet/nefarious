@@ -971,8 +971,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
     /* We do this here because CTCP VERSION isn't part of the RFC, so there is no reason to delay the user from 
        being able to join the network. */
     if (feature_bool(FEAT_CTCP_VERSIONING)) {
-        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are being version scanned. This requires no action on your part.", sptr);
-        sendcmdto_one(&me, CMD_PRIVATE, sptr, "%C :\001VERSION\001", sptr);
+      if (feature_str(FEAT_CTCP_VERSIONING_NOTICE))
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_CTCP_VERSIONING_NOTICE));
+      sendcmdto_one(&me, CMD_PRIVATE, sptr, "%C :\001VERSION\001", sptr);
     }
   }
 

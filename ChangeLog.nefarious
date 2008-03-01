@@ -3,6 +3,18 @@
 
 2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added new F:line CTCP_VERSIONING_NOTICE.
+
+	* include/ircd_features.c: Added FEAT_CTCP_VERSIONING_NOTICE.
+
+	* ircd/ircd_features.c: Added F:line CTCP_VERSIONING_NOTICE.
+
+	* ircd/s_user.c: If CTCP_VERSIONING_NOTICE is set then send out	a
+	the message just before they are checked. If its set to "" then
+	no notice will be sent.
+
+2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_mark.c: Fixed a wee bug.
 
 	* ircd/s_serv.c: Send versions on link.

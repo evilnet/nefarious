@@ -342,6 +342,7 @@ enum Feature {
   FEAT_CTCP_VERSIONING_CHAN, /* added by Vadtec 02/27/2008 */
   FEAT_CTCP_VERSIONING_CHANNAME, /* added by Vadtec 02/27/2008 */
   FEAT_CTCP_VERSIONING_USEMSG, /* added by Vadtec 02/28/2008 */
+  FEAT_CTCP_VERSIONING_NOTICE,
 
   FEAT_LAST_F
 };
