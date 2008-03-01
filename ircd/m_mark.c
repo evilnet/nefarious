@@ -181,6 +181,15 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
       Debug((DEBUG_DEBUG, "MARK cannot find server %s", parv[1]));
 
     return 0;
+  } else if (!strcmp(parv[2], MARK_CVERSION)) {
+    struct Client* acptr;
+
+    if(parc < 3)
+      return protocol_violation(sptr, "MARK client version received too few parameters (%u)", parc);
+
+    if ((acptr = FindNServer(parv[1])))
+      ircd_strncpy(cli_version(acptr), parv[3], VERSIONLEN);
+
   } else
     return protocol_violation(sptr, "Unknown MARK received [%s]", parv[2]);
 

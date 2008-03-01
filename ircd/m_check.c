@@ -376,6 +376,11 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    ircd_snprintf(0, outbuf, sizeof(outbuf), "   Connected to:: %s", cli_name(acptr->cli_user->server));
    send_reply(sptr, RPL_DATASTR, outbuf);
 
+   if (cli_version(acptr)) {
+     ircd_snprintf(0, outbuf, sizeof(outbuf), "   CTCP Version:: %s", cli_version(acptr));
+     send_reply(sptr, RPL_DATASTR, outbuf);
+   }
+
    /* +s (SERV_NOTICE) is not relayed to us from remote servers,
     * so we cannot tell if a remote client has that mode set.
     * And hacking it onto the end of the output of umode_str is EVIL BAD AND WRONG

@@ -3,6 +3,18 @@
 
 2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/mark.h: Added MARK_CVERSION for sending out client
+	versions.
+
+	* ircd/m_check.c: If cli_version is filled then show it in /CHECK.
+
+	* ircd/m_mark.c: Handle incoming MARK_CVERSION's.
+
+	* ircd/m_notice.c: Send out MARK_CVERSION's using MARK to other
+	servers.
+
+2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* Patch Below By Jobe.
 
 	* include/client.h: NAMESX flag.
