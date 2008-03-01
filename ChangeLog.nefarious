@@ -3,6 +3,12 @@
 
 2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_mark.c: Fixed a wee bug.
+
+	* ircd/s_serv.c: Send versions on link.
+
+2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/mark.h: Added MARK_CVERSION for sending out client
 	versions.
 

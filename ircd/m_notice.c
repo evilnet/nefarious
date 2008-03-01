@@ -175,7 +175,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           while (j <= (temp - parv[2])) { parv_temp++; j++; }
           /* TODO: Remove the trailing \001 from the string here... */
           ircd_strncpy(cli_version(sptr), parv_temp, VERSIONLEN);
-          sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s", cli_name(sptr), MARK_CVERSION, cli_version(sptr));
+          sendcmdto_serv_butone(&me, CMD_MARK, cptr, "%s %s :%s", cli_name(sptr), MARK_CVERSION, cli_version(sptr));
           if (feature_bool(FEAT_CTCP_VERSIONING_CHAN)) {
             sprintf(temp, "%s has version \002%s\002", cli_name(sptr), cli_version(sptr));
             /* Announce to channel. */
