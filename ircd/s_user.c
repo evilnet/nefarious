@@ -777,6 +777,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     SetLocalNumNick(sptr);
 
+    /* added by Vadtec 02/25/2008 */
+    /* We do this here because CTCP VERSION isn't part of the RFC, so there is no reason to delay the user from 
+       being able to join the network. */
+    if (feature_bool(FEAT_CTCP_VERSIONING)) {
+      if (feature_str(FEAT_CTCP_VERSIONING_NOTICE))
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_CTCP_VERSIONING_NOTICE));
+      sendcmdto_one(&me, CMD_PRIVATE, sptr, "%C :\001VERSION\001", sptr);
+    }
+
     send_reply(
 	sptr,
 	RPL_WELCOME,
@@ -966,14 +975,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
       join[0] = cli_name(sptr);
       join[1] = chan;
       m_join(sptr, sptr, 2, join);
-    }
-    /* added by Vadtec 02/25/2008 */
-    /* We do this here because CTCP VERSION isn't part of the RFC, so there is no reason to delay the user from 
-       being able to join the network. */
-    if (feature_bool(FEAT_CTCP_VERSIONING)) {
-      if (feature_str(FEAT_CTCP_VERSIONING_NOTICE))
-        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_CTCP_VERSIONING_NOTICE));
-      sendcmdto_one(&me, CMD_PRIVATE, sptr, "%C :\001VERSION\001", sptr);
     }
   }
 

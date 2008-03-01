@@ -3,6 +3,11 @@
 
 2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/s_user.c: Moved the CTCP version back to as early as possible.
+	It now sends just before the Welcome to the... numerics.
+
+2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added new F:line CTCP_VERSIONING_NOTICE.
 
 	* include/ircd_features.c: Added FEAT_CTCP_VERSIONING_NOTICE.
