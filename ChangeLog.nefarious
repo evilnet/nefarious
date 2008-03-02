@@ -1,6 +1,18 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added F:line ORIGINAL_BLINES (default false).
+
+	* doc/ircd_features.c: See above.
+
+	* ircd/ircd_features.c: See above.
+
+	* ircd/send.c: If ORIGINAL_BLINES is set to TRUE, then b:lines will
+	function as the were originally intended. Prefixed commands
+	will be sent to services even if they are off channel.
+
 2008-03-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Changed the default message so it fits in

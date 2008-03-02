@@ -546,7 +546,7 @@ void sendcmdto_channel_butone(struct Client *from, const char *cmd,
   struct VarData vd;
   struct MsgBuf *user_mb;
   struct MsgBuf *serv_mb;
-/*  struct Client *service; */
+  struct Client *service = NULL;
 
   vd.vd_format = pattern;
 
@@ -566,7 +566,8 @@ void sendcmdto_channel_butone(struct Client *from, const char *cmd,
   for (member = to->members; member; member = member->next_member) {
     /* skip one, zombies, and deaf users... */
     if (IsZombie(member) ||
-	(skip & SKIP_DEAF && (IsDeaf(member->user) && !IsGlobalForward(prefix,cli_name(member->user)))) ||
+	feature_bool(FEAT_ORIGINAL_BLINES) ? (skip & SKIP_DEAF && IsDeaf(member->user)) :
+          (skip & SKIP_DEAF && (IsDeaf(member->user) && !IsGlobalForward(prefix,cli_name(member->user)))) ||
 	(skip & SKIP_NONOPS && !IsChanOp(member)) ||
         (skip & SKIP_NONHOPS && (!IsHalfOp(member)) && !IsChanOp(member)) ||
 	(skip & SKIP_NONVOICES && !HasVoice(member) && !IsChanOp(member) && !IsHalfOp(member)) ||
@@ -589,13 +590,15 @@ void sendcmdto_channel_butone(struct Client *from, const char *cmd,
    * charactor support, they can add an F line to do this
    * instead of that. (and fix this)
    *
-  if (GlobalForwards[prefix]
+  */
+  if (feature_bool(FEAT_ORIGINAL_BLINES)) {
+    if (GlobalForwards[prefix]
       && (service = FindServer(GlobalForwards[prefix]))
       && cli_sentalong(service) != sentalong_marker){
       cli_sentalong(service) = sentalong_marker;
       send_buffer(service, serv_mb, 0);
+    }
   }
-  */
 
   msgq_clean(user_mb);
   msgq_clean(serv_mb);
