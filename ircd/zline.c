@@ -225,7 +225,7 @@ do_zline(struct Client *cptr, struct Client *sptr, struct Zline *zline)
       	   zline->zl_reason);
 
       /* let the ops know about it */
-      sendto_opmask_butone(0, SNO_GLINE, "Z-line active for %s",
+      sendto_allops(&me, SNO_GLINE, "Z-line active for %s",
       		     get_client_name(acptr, TRUE));
 
       /* and get rid of him */

@@ -410,7 +410,7 @@ int exit_client(struct Client *cptr,    /* Connection being handled by
       sendto_allops(&me, SNO_CONNEXIT,
 			   "Client exiting: %s (%s@%s) [%s] [%s] <%s%s>",
 			   cli_name(victim), cli_user(victim)->username,
-			   cli_user(victim)->host, comment,
+			   cli_user(victim)->realhost, comment,
 			   ircd_ntoa((const char*) &(cli_ip(victim))),
 			   NumNick(victim) /* Two %'s */
 			   );
