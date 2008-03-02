@@ -240,6 +240,7 @@ extern int ms_settime(struct Client*, struct Client*, int, char*[]);
 extern int ms_set(struct Client*, struct Client*, int, char*[]);
 extern int ms_shun(struct Client*, struct Client*, int, char*[]);
 extern int ms_silence(struct Client*, struct Client*, int, char*[]);
+extern int ms_sno(struct Client*, struct Client*, int, char*[]);
 extern int ms_squit(struct Client*, struct Client*, int, char*[]);
 extern int ms_stats(struct Client*, struct Client*, int, char*[]);
 extern int ms_svsinfo(struct Client*, struct Client*, int, char*[]);

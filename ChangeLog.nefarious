@@ -3,6 +3,24 @@
 
 2008-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/handlers.h: Added ms_sno.
+
+	* include/send.h: Added decleration for new sending to all opers
+	commands.
+
+	* include/msg.h: Added SNO.
+
+	* ircd/m_sno.c: From ircoderz2, allows servers to send global
+	oper notices.
+
+	* include/Makefile.in: Added m_sno.c.
+
+	* ircd/parse.c: Added SNO.
+
+	* ircd/send.c: Added functions to send notices to all opers.
+
+2008-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added F:line ORIGINAL_BLINES (default false).
 
 	* doc/ircd_features.c: See above.

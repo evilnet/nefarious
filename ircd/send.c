@@ -798,3 +798,75 @@ void vsendto_opmask_butone(struct Client *one, unsigned int mask,
 
   msgq_clean(mb);
 }
+
+/** Send a SNO to all opers
+ * @param[in] from Source of the command
+ * @param[in] mask One of the SNO_* constants.
+ * @param[in] pattern Format string for server notice.
+ */
+void sendto_allops(struct Client *from, unsigned int mask, const char *pattern, ...)
+{
+  va_list vl;
+
+  va_start(vl, pattern);
+  vsendto_allops_butserv(0, from, mask, pattern, vl);
+  va_end(vl);
+}
+
+/** Send a SNO to all opers
+ * @param[in] one Client direction to skip (or NULL).
+ * @param[in] from Source of the command
+ * @param[in] mask One of the SNO_* constants.
+ * @param[in] pattern Format string for server notice.
+ */
+void sendto_allops_butserv(struct Client *one, struct Client *from, unsigned int mask,
+                                const char *pattern, ...)
+{
+  va_list vl;
+
+  va_start(vl, pattern);
+  vsendto_allops_butserv(one, from, mask, pattern, vl);
+  va_end(vl);
+}
+
+void vsendto_allops_butserv(struct Client *one, struct Client *from, unsigned int mask,
+                           const char *pattern, va_list vl)
+{
+  struct VarData vd;
+  struct MsgBuf *mb;
+  struct DLink *lp;
+  struct SLink *opslist;
+  int i = 0, m = mask;
+
+  while ((m >>= 1))
+    i++;
+
+  vd.vd_format = pattern;
+  va_copy(vd.vd_args, vl);
+
+  /* send to local users */
+  if(( opslist = opsarray[i]))
+  {
+    mb = msgq_make(0, ":%s " MSG_NOTICE " * :*** Notice -- %v", cli_name(from),
+                 &vd);
+    for (; opslist; opslist = opslist->next)
+      send_buffer(opslist->value.cptr, mb, 0);
+
+    msgq_clean(mb);
+  }
+
+  if((lp = cli_serv(&me)->down)) {
+
+    mb = msgq_make(&me, "%C " TOK_SNO " %d :%v", from, mask, &vd);
+
+    for (lp = cli_serv(&me)->down; lp; lp = lp->next)
+    {
+       if (one && lp->value.cptr == cli_from(one))
+         continue;
+      send_buffer(lp->value.cptr, mb, 1);
+    }
+
+    msgq_clean(mb);
+  }
+}
+

@@ -455,6 +455,10 @@ struct Client;
 #define TOK_PROTOCTL            "PROTOCTL"
 #define CMD_PROTOCTL            MSG_PROTOCTL, CMD_PROTOCTL
 
+#define MSG_SNO                 "SNO"           /* SNO */
+#define TOK_SNO                 "SNO"
+#define CMD_SNO                 MSG_SNO, TOK_SNO
+
 /*
  * Constants
  */

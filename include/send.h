@@ -114,4 +114,10 @@ extern void sendto_opmask_butone_ratelimited(struct Client *one,
 extern void vsendto_opmask_butone(struct Client *one, unsigned int mask,
 				  const char *pattern, va_list vl);
 
+extern void sendto_allops(struct Client *from, unsigned int mask, const char *pattern, ...);
+extern void sendto_allops_butserv(struct Client *one, struct Client *from,
+                                unsigned int mask, const char *pattern, ...);
+extern void vsendto_allops_butserv(struct Client *one, struct Client *from, unsigned int mask,
+                           const char *pattern, va_list vl);
+
 #endif /* INCLUDED_send_h */
