@@ -196,13 +196,13 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
     switch (can_oper(sptr, name, password, &aconf)) {
     case ERR_NOOPERHOST:
-     sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
+     sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
 			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
      send_reply(sptr, ERR_NOOPERHOST);
      return 0;
      break;
     case ERR_PASSWDMISMATCH:
-     sendto_opmask_butone(0, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
+     sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
 			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
      send_reply(sptr, ERR_PASSWDMISMATCH);
      return 0;
@@ -246,8 +246,8 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_reply(sptr, RPL_YOUREOPER);
 
     if (IsAdmin(sptr)) {
-      sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
-                           parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+      sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
+                    parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
 
       /* Autojoin admins to admin channel and oper channel (if enabled) */
       if (feature_bool(FEAT_AUTOJOIN_ADMIN)) {
@@ -269,9 +269,9 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         m_join(sptr, sptr, 2, join);
       }
     } else {
-      sendto_opmask_butone(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c)",
-                           parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
-                           IsOper(sptr) ? 'O' : 'o'); 
+      sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c)",
+                         parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
+                         IsOper(sptr) ? 'O' : 'o'); 
 
       if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
         if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
@@ -330,7 +330,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /* Check login */
     switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
 	case ERR_NOOPERHOST:
-	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL, 
+	 sendto_allops(&me, SNO_OLDREALOP, 
 		"Failed OPER attempt by %s (%s@%s) (No O:line)", 
 		parv[0], cli_user(sptr)->realusername,
 		cli_user(sptr)->realhost);
@@ -338,7 +338,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	 return 0;
 	 break;
 	case ERR_PASSWDMISMATCH:
-	 sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+         sendto_allops(&me, SNO_OLDREALOP,
 		"Failed OPER attempt by %s (%s@%s) (Password Incorrect)",
 		parv[0], cli_user(sptr)->realusername,
 		cli_user(sptr)->realhost);
@@ -348,7 +348,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	case 0: /* Authentication successful */
 	 if (aconf->status == CONF_LOCOP) {
 	   send_reply(sptr, ERR_NOOPERHOST);
-	   sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
+           sendto_allops(&me, SNO_OLDREALOP, 
 		  "Failed OPER attempt by %s (%s@%s) (Local Oper)",
 		  parv[0], cli_user(sptr)->realusername,
 		  cli_user(sptr)->realhost);
@@ -372,9 +372,9 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	 send_reply(sptr, RPL_YOUREOPER);
 
          if (IsAdmin(sptr)) {
-           sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
-                                   "%s (%s@%s) is now an IRC Administrator",
-                                   parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+           sendto_allops(&me, SNO_OLDSNO,
+                              "%s (%s@%s) is now an IRC Administrator",
+                              parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
 
            /* Autojoin admins to admin channel and oper channel (if enabled) */
            if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
@@ -396,9 +396,9 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
              m_join(sptr, sptr, 2, join);
            }
          } else {
-            sendwallto_group_butone(&me, WALL_DESYNCH, NULL,
-                                    "%s (%s@%s) is now an IRC Operator (O)",
-                                    parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+            sendto_allops(&me, SNO_OLDSNO, 
+                               "%s (%s@%s) is now an IRC Operator (O)",
+                               parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
 
            if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
              if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))

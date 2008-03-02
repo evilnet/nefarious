@@ -745,9 +745,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
     release_dns_reply(sptr);
 
     if ((ashun = shun_lookup(sptr, 0))) {
-      sendto_opmask_butone(0, SNO_GLINE, "Shun active for %s%s",
-                           IsUnknown(sptr) ? "Unregistered Client ":"",
-                           get_client_name(sptr, SHOW_IP));
+       sendto_allops(&me, SNO_GLINE, "Shun active for %s%s",
+                          IsUnknown(sptr) ? "Unregistered Client ":"",
+                          get_client_name(sptr, SHOW_IP));
       if (!feature_bool(FEAT_HIS_SHUN_REASON))
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are shunned: %s", sptr,
              ashun->sh_reason);
@@ -822,13 +822,13 @@ int register_user(struct Client *cptr, struct Client *sptr,
     if (cli_snomask(sptr) & SNO_NOISY)
       set_snomask(sptr, cli_snomask(sptr) & SNO_NOISY, SNO_ADD);
     if (feature_bool(FEAT_CONNEXIT_NOTICES))
-      sendto_opmask_butone(0, SNO_CONNEXIT,
-			   "Client connecting: %s (%s@%s) [%s] {%d} [%s] <%s%s>",
-			   cli_name(sptr), user->username, user->host,
-			   cli_sock_ip(sptr), get_client_class(sptr),
-			   cli_info(sptr),
-			   NumNick(cptr) /* Two %'s */
-			   );
+       sendto_allops(&me, SNO_CONNEXIT,
+			  "Client connecting: %s (%s@%s) [%s] {%d} [%s] <%s%s>",
+			  cli_name(sptr), user->username, user->host,
+			  cli_sock_ip(sptr), get_client_class(sptr),
+			  cli_info(sptr),
+			  NumNick(cptr) /* Two %'s */
+			  );
     IPcheck_connect_succeeded(sptr);
   }
   else
@@ -1210,13 +1210,13 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
      * cli_name(sptr) is overwritten with the new nick. -reed
      */
     if (MyUser(sptr) && feature_bool(FEAT_CONNEXIT_NOTICES))
-      sendto_opmask_butone(0, SNO_CONNEXIT,
-			   "Nick change: From %s to %s [%s@%s] <%s%s>",
-			   cli_name(sptr), nick,
-			   cli_user(sptr)->username,
-			   cli_user(sptr)->host,
-			   NumNick(sptr) /* Two %'s */
-			   );
+      sendto_allops(&me, SNO_CONNEXIT,
+			 "Nick change: From %s to %s [%s@%s] <%s%s>",
+			 cli_name(sptr), nick,
+			 cli_user(sptr)->username,
+			 cli_user(sptr)->host,
+			 NumNick(sptr) /* Two %'s */
+			 );
 
     if ((cli_name(sptr))[0])
       hRemClient(sptr);

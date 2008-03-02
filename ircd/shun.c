@@ -237,7 +237,7 @@ do_shun(struct Client *cptr, struct Client *sptr, struct Shun *shun)
    	     shun->sh_reason);
 
       /* let the ops know about it */
-      sendto_opmask_butone(0, SNO_GLINE, "Shun active for %s",
+      sendto_allops(&me, SNO_GLINE, "Shun active for %s",
       		     get_client_name(acptr, TRUE));
 
       /* and mark him */

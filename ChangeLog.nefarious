@@ -3,6 +3,23 @@
 
 2008-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/gline.c: Broadcast gline active notices to all opers
+	who recieve them.
+
+	* ircd/m_oper: Broadcast oper sucessful, failed, etc notices to
+	all opers who recieve them.
+
+	* ircd/s_misc.c: Broadcast client exit notices to all opers
+	who recieve them.
+
+	* ircd/s_user.c: Broadcast client exit notices and shun active
+	notices to all opers who recieve them.
+
+	* ircd/shun.c: Broadcast shun active notices to all opers
+	who recieve them.
+
+2008-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/send.c: Woops missed this.
 
 2008-03-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
