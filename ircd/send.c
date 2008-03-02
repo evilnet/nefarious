@@ -856,6 +856,7 @@ void vsendto_allops_butserv(struct Client *one, struct Client *from, unsigned in
   }
 
   if((lp = cli_serv(&me)->down)) {
+    va_copy(vd.vd_args, vl);
 
     mb = msgq_make(&me, "%C " TOK_SNO " %d :%v", from, mask, &vd);
 
