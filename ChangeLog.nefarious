@@ -3,6 +3,16 @@
 
 2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* configure: Regenerated.
+
+	* configure.in: Check for subversion on configure, if its not
+	installed give a warning. Also updated Nefarious's version.
+
+	* ircd/Makefile.in: If subversion is install then before we
+	compile do a svn update.
+
+2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/s_misc.c: Send the real host not a crypted host in oper	
 	quit notices.
 

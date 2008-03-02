@@ -23,7 +23,7 @@ dnl $Id$
 
 dnl Make sure we are in the correct directory (someone could have run
 dnl 'configure' with a wrong '--srcdir').
-AC_INIT(Nefarious IRCu, 0.4.0, evilnet-devel@lists.sourceforge.net)
+AC_INIT(Nefarious IRCu, 1.2.0, evilnet-devel@lists.sourceforge.net)
 AC_CONFIG_SRCDIR([ircd/ircd.c])
 
 dnl Set the default prefix
@@ -446,6 +446,35 @@ dnl     SSL_C=ssl.c
 dnl     AC_SUBST(SSL_C)
 dnl     LIBS="$LIBS $SSLLIBS"
 dnl fi
+
+AC_MSG_CHECKING([weather to enable subversion updating support])
+AC_ARG_ENABLE([subversion],
+[  --enable-subversion     Enable subversion will check /usr/bin and /usr/local/bin for subversion],
+[unet_cv_enable_svn=$enable_svn],
+[AC_CACHE_VAL(unet_cv_enable_svn, [unet_cv_enable_svn=no])])
+
+found_svn=no
+for dir in $enableval /usr/bin /usr/local/bin; do
+    svndir="$dir"
+    if test -f "$svndir/svn"; then
+       found_svn=yes
+       SVNDIR=$svndir
+       break;
+    fi
+done
+
+AC_MSG_RESULT([$found_svn])
+
+if test "x$found_svn" = "xno" ; then
+	echo ""
+	echo "Apparently you do not have subversion installed.  If you want the"
+	echo "latest updates to Nefarious IRCu then you should install this and"
+	echo "run configure again."
+	echo ""
+fi
+
+AC_SUBST(SVNDIR)
+
 
 dnl --disable-devpoll check...
 AC_MSG_CHECKING([whether to enable the /dev/poll event engine])
