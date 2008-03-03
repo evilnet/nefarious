@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-03  Alex Schumann  <rubin@afternet.org>
+
+	* ircd/m_oper.c: fixing compilation bug from previous rev
+
 2008-03-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/example.conf: Removed ORIGINAL_BLINES as Jobe found the
