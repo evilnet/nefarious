@@ -3,6 +3,29 @@
 
 2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/handlers.h: Added ms_svsident/svsmode.
+
+	* include/msg.h: Added SVSIDENT and SVSMODE.
+
+	* include/s_user.h: Added define for magic usermode changes.
+
+	* ircd/Makefile.in: Added m_svsident.c and m_svsmode.c. Also
+	disabled auto svn updates (not my call).
+
+	* ircd/m_svsident.c: Ability for servers to change user idents.
+
+	* ircd/m_svsmode.c: Ability for servers to change user modes.
+
+	* ircd/m_svsnoop.c: Removed use of  hunt server command as its
+	shit. Replaced with a different way of doing that hunt server
+	command does. Also fixed a couple of other bugs i found.
+
+	* ircd/parse.c: Added SVSIDENT and SVSMODE.
+
+	* ircd/s_user.c: Change usermodes if its a SVSMODE with magic.
+
+2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* configure: Regenerated.
 
 	* configure.in: Check for subversion on configure, if its not

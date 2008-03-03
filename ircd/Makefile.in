@@ -177,8 +177,10 @@ IRCD_SRC = \
 	m_sno.c \
 	m_squit.c \
 	m_stats.c \
+	m_svsident.c \
 	m_svsinfo.c \
 	m_svsjoin.c \
+	m_svsmode.c \
 	m_svsnick.c \
 	m_svsnoop.c \
 	m_svspart.c \
@@ -252,11 +254,10 @@ all:
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
 
-build: svnupdate md5sum ircd chkconf
+build: md5sum ircd chkconf
 
 svnupdate:
 	@for i in $(SVNDIR); do \
-		( $$i/svn update ${top_src_dir} ) \
 	done
 
 ircd: ${OBJS} ../include/patchlevel.h version.o

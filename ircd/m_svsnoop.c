@@ -25,11 +25,13 @@
 #include "config.h"
 
 #include "client.h"
+#include "hash.h"
 #include "handlers.h"
 #include "ircd.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "msg.h"
+#include "numnicks.h"
 #include "send.h"
 #include "s_conf.h"
 #include "s_user.h"
@@ -47,13 +49,23 @@
 int ms_svsnoop(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct ConfItem *aconf;
+  struct Client *server = 0;
   char           c;
   char*          cp;
 
   if (!IsServer(sptr) || parc < 3)
     return 0;
 
-  if (hunt_server_cmd(sptr, CMD_SVSNOOP, cptr, 0, "%C", 1, parc, parv) != HUNTED_ISME) {
+  /* this could be done with hunt_server_cmd but its a bucket of shit */
+  if (!string_has_wildcards(parv[1]))
+    server = FindServer(parv[1]);
+  else
+    server = find_match_server(parv[1]);
+
+  if (!server)
+    return 0;
+
+  if (server == &me) {
      cp = parv[2];
      c = *cp;
      if (c == '+') {
@@ -66,6 +78,6 @@ int ms_svsnoop(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       }
   }
 
-  sendcmdto_serv_butone(sptr, CMD_SVSNOOP, cptr, "%C %s %s", sptr, parv[2], parv[3]);
+  sendcmdto_serv_butone(sptr, CMD_SVSNOOP, cptr, "%s %s", parv[1], parv[2]);
   return 0;
 }
