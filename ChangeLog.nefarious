@@ -3,6 +3,13 @@
 
 2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/Makefile.in: Run svncheck before compiling.
+
+	* ircd/svncheck.sh: Check svn for the latest updates. If there
+	are any updates available then echo a message.
+	
+2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/handlers.h: Added ms_svsident/svsmode.
 
 	* include/msg.h: Added SVSIDENT and SVSMODE.

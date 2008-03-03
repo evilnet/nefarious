@@ -43,6 +43,7 @@ OSDEP_C = @OSDEP_C@
 ENGINE_C = @ENGINE_C@
 EXT = @EXEEXT@
 SVNDIR = @SVNDIR@
+BASH = /bin/bash
 @SET_MAKE@
 
 BINDIR = @bindir@
@@ -254,11 +255,10 @@ all:
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
 
-build: md5sum ircd chkconf
+build: svnupdate md5sum ircd chkconf
 
 svnupdate:
-	@for i in $(SVNDIR); do \
-	done
+	@${BASH} ${srcdir}/svncheck.sh ${SVNDIR}
 
 ircd: ${OBJS} ../include/patchlevel.h version.o
 	${PURIFY} ${CC} ${CFLAGS} ${LDFLAGS} ${OBJS} version.o ${RINGLOG_O} ${LDFLAGS} ${LIBS} \
