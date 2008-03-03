@@ -130,4 +130,3 @@ int ms_svsmode(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   return 0;
 
 }
-
