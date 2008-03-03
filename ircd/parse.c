@@ -29,6 +29,7 @@
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_chattr.h"
+#include "ircd_defs.h"
 #include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
@@ -1129,6 +1130,7 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
 {
   struct Client*  from = cptr;
   char*           ch = buffer;
+  char*           buffbackup;
   char*           s;
   int             len;
   int             i;
@@ -1137,6 +1139,8 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
   struct Message* mptr;
 
   Debug((DEBUG_DEBUG, "Server Parsing: %s", buffer));
+
+  ircd_strncpy(buffbackup, buffer, BUFSIZE);
 
   if (IsDead(cptr))
     return 0;
@@ -1216,7 +1220,7 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
      */
     if (0 == i)
     {
-      log_write(LS_SYSTEM, L_WARNING, 0, "Missing Prefix: (%s) %s", cli_name(cptr), buffer);
+      log_write(LS_SYSTEM, L_WARNING, 0, "Missing Prefix: (%s) [%s]", cli_name(cptr), buffbackup);
       protocol_violation(cptr,"Missing Prefix");
       from = cptr;
     }

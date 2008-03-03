@@ -3,6 +3,12 @@
 
 2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/parse.c: Take a copy of the buffer before its trashed and
+	then if theres a missing prefix output whats in the backup. This
+	is a better way of doing this rather than logging everything.
+
+2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/Makefile.in: Run svncheck before compiling.
 
 	* ircd/svncheck.sh: Check svn for the latest updates. If there
