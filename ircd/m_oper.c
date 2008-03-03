@@ -374,7 +374,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
          if (IsAdmin(sptr)) {
            sendto_allops(&me, SNO_OLDSNO,
                               "%s (%s@%s) is now an IRC Administrator",
-                              parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+                              parv[0], cli_user(sptr)->username, cli_sockhost(sptr)->realhost);
 
            /* Autojoin admins to admin channel and oper channel (if enabled) */
            if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
@@ -398,7 +398,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
          } else {
             sendto_allops(&me, SNO_OLDSNO, 
                                "%s (%s@%s) is now an IRC Operator (O)",
-                               parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+                               parv[0], cli_user(sptr)->username, cli_sockhost(sptr)->realhost);
 
            if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
              if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))

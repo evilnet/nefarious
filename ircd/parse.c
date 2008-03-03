@@ -1130,7 +1130,7 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
 {
   struct Client*  from = cptr;
   char*           ch = buffer;
-  char*           buffbackup;
+  char            buffbackup[BUFSIZE] = "";
   char*           s;
   int             len;
   int             i;

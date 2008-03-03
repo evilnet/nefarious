@@ -1,6 +1,24 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/example.conf: Removed ORIGINAL_BLINES as Jobe found the
+	fix for the duplicates.
+
+	* include/ircd_features.h: See above.
+
+	* ircd/ircd_features.h: See above.
+
+	* ircd/m_oper.c: Fixed a bug found by Jobe. Remote oper hosts
+	were not showing up properly.
+
+	* ircd/parse.c: Me and pointers... oh dear. Fixed a bug which
+	completly broke linking with my last commit.
+
+	* ircd/send.c: Removed ORIGINAL_BLINES as Jobe found the fix for
+	the duplicates.
+
 2008-03-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/parse.c: Take a copy of the buffer before its trashed and
