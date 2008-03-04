@@ -60,6 +60,7 @@ doc/p10.txt		- Documentation on the P10 protocol
 doc/readme.asll		- Documentation on AsLL
 doc/readme.chroot	- Information on using chroot with Nefarious IRCu
 doc/readme.gline	- Documentation on glines
+doc/readme.shun		- Documentation on shuns
 
 - *IMPORTANT NOTICE* --------------------------------------------------
 
