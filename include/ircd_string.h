@@ -100,6 +100,7 @@ static __inline__ NTL_HDR_strCasediff { NTL_SRC_strCasediff }
  * Proto types of other externally visible functions
  */
 extern int strnChattr(const char *s, const size_t n);
+extern char *normalizeBuffer(char *);
 
 #endif /* INCLUDED_ircd_string_h */
 

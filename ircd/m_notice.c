@@ -120,10 +120,10 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int             fd = 0;
   int             count;
   char*           vector[MAXTARGETS];
-  char*		  temp; /* added by Vadtec 02/25/2008 */
-  char*		  parv_temp; /* added by Vadtec 02/26/2008 */
+  char*           temp; /* added by Vadtec 02/25/2008 */
+  char*           parv_temp; /* added by Vadtec 02/26/2008 */
   int             found_g = 0; /* added by Vadtec 02/26/2008 */
-  struct Client* acptr; /* added by Vadtec 02/26/2008 */
+  struct Client*  acptr; /* added by Vadtec 02/26/2008 */
   struct Channel* chptr; /* added by Vadtec 02/27/2008 */
 
   assert(0 != cptr);
@@ -173,8 +173,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           parv_temp = parv[2];
           j = 0;
           while (j <= (temp - parv[2])) { parv_temp++; j++; }
-          /* TODO: Remove the trailing \001 from the string here... */
-          ircd_strncpy(cli_version(sptr), parv_temp, VERSIONLEN);
+          ircd_strncpy(cli_version(sptr), normalizeBuffer(parv_temp), VERSIONLEN);
           sendcmdto_serv_butone(&me, CMD_MARK, cptr, "%s %s :%s", cli_name(sptr), MARK_CVERSION, cli_version(sptr));
           if (feature_bool(FEAT_CTCP_VERSIONING_CHAN)) {
             sprintf(temp, "%s has version \002%s\002", cli_name(sptr), cli_version(sptr));

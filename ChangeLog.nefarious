@@ -3,6 +3,16 @@
 
 2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/ircd_string.h: normalizebuffer decleration.
+
+	* ircd/ircd_string.c: Added a function from denora which removes
+	control codes etc from buffers.
+
+	* ircd/m_notice.c: Make sure of the new function to strip out
+	the \001's from the version replies.
+
+2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_svsident.c: Fixed up sending of the change to other
 	servers.
 
