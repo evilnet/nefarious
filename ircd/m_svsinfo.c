@@ -60,6 +60,9 @@ int ms_svsinfo(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      be truncated */
   ircd_strncpy(acptr->cli_info, parv[2], REALLEN);
 
-  sendcmdto_serv_butone(cptr, CMD_SVSINFO, 0, "%s :%s", parv[1], acptr->cli_info);
+
+  sendcmdto_serv_butone(sptr, CMD_SVSIDENT, cptr, "%s%s :%s", acptr->cli_user->server->cli_yxx,
+        acptr->cli_yxx, acptr->cli_info);
+
   return 0;
 }

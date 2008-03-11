@@ -66,20 +66,18 @@ int ms_svsident(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
   struct Client *acptr;
   char *s;
   char *newident;
-  char *numnick;
   int legalident=1;
 
   if (parc < 3)
     return need_more_params(sptr, "SVSIDENT");
 
    /* Ignore SVSIDENT for a user that has quit */
-  if(!(acptr = FindClient(parv[1])))
+  if (!(acptr = findNUser(parv[1])))
     return 0;
 
   if (IsChannelService(acptr))
     return 0;
 
-  ircd_strncpy(numnick, parv[1], NICKLEN);
   ircd_strncpy(newident, parv[2], USERLEN);
 
   if (strlen(newident) > USERLEN)
@@ -100,6 +98,8 @@ int ms_svsident(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
   ircd_strncpy(cli_user(acptr)->username, newident, USERLEN);
   ircd_strncpy(cli_username(acptr), newident, USERLEN);
 
-  sendcmdto_serv_butone(sptr, CMD_SVSIDENT, cptr, "%s %s", numnick, newident);
+  sendcmdto_serv_butone(sptr, CMD_SVSIDENT, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx,
+        acptr->cli_yxx, newident);
+
   return 0;
 }

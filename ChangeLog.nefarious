@@ -3,6 +3,14 @@
 
 2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_svsident.c: Fixed up sending of the change to other
+	servers.
+
+	* ircd/m_svsinfo.c: Fixed up sending of the change to other
+	servers.
+
+2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/s_user.c: Move the auto usermode code to before the nick
 	is sent out. That way the modes will go with the NICK. If host
 	hiding style 2 is used then services will hide the host straight
