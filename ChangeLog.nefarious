@@ -3,6 +3,13 @@
 
 2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/s_user.c: Move the auto usermode code to before the nick
+	is sent out. That way the modes will go with the NICK. If host
+	hiding style 2 is used then services will hide the host straight
+	away.
+
+2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/s_user.c: What was i thinking? Bug fix from Jobe.
 
 2008-03-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

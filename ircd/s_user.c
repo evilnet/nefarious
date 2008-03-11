@@ -870,6 +870,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
     }
   }
 
+  /*
+   * Set user's initial modes
+   */
+  parv[0] = (char*)nick;
+  parv[1] = (char*)nick;
+  parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
+  parv[3] = NULL; /* needed in case of +s */
+  set_user_mode(sptr, sptr, 3, parv);
+
   tmpstr = umode_str(sptr);
   sendcmdto_serv_butone(user->server, CMD_NICK, cptr,
 			"%s %d %Tu %s %s %s%s%s%s %s%s :%s",
@@ -932,15 +941,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
                 cli_sockhost(sptr), IsDNSBLMarked(sptr) ? cli_user(sptr)->dnsblhost : "notmarked",
                 IsDNSBL(sptr) ? "1" : "0", IsDNSBLMarked(sptr) ? "1" : "0", IsDNSBLAllowed(sptr) ? "1" : "0");
     }
-
-    /*
-     * Set user's initial modes
-     */
-    parv[0] = (char*)nick;
-    parv[1] = (char*)nick;
-    parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
-    parv[3] = NULL; /* needed in case of +s */
-    set_user_mode(sptr, sptr, 3, parv);
 
 #ifdef USE_SSL
     /* Let client know he/she has user mode +z */
