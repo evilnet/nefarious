@@ -3,6 +3,15 @@
 
 2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/ircd_string.h: more declerations.
+
+	* ircd/ircd_string.c: Added one more function from denora which
+	cleans up buffers.
+
+	* ircd/m_notice.c: Make sure of the new function.
+
+2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/ircd_string.h: normalizebuffer decleration.
 
 	* ircd/ircd_string.c: Added a function from denora which removes

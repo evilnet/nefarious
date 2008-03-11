@@ -548,3 +548,32 @@ char *normalizeBuffer(char *buf)
 
     return (newbuf);
 }
+
+void doCleanBuffer(char *str)
+{
+    char *in, *out;
+    char ch;
+
+    if (!str) {
+        return;
+    }
+
+    in = str;
+    out = str;
+
+    while (issp(ch = *in++));
+    if (ch != '\0')
+        for (;;) {
+            *out++ = ch;
+            ch = *in++;
+            if (ch == '\0')
+                break;
+            if (!issp(ch))
+                continue;
+            while (issp(ch = *in++));
+            if (ch == '\0')
+                break;
+            *out++ = ' ';
+        }
+    *out = ch;                  /* == '\0' */
+}

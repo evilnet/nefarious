@@ -119,6 +119,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int             j;
   int             fd = 0;
   int             count;
+  char            *clean;
   char*           vector[MAXTARGETS];
   char*           temp; /* added by Vadtec 02/25/2008 */
   char*           parv_temp; /* added by Vadtec 02/26/2008 */
@@ -154,7 +155,6 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      NOTE: If we are lucky enough to have _GNU_SOURCE, we will use it over the standard strstr because its case insensetive.
            This should help against clients that like to send lower case CTCPs from slipping through as easily with only one
            function call.
-     TODO: Write a function (clean_control_codes) to strip out all control codes to remove formatting from the string.
     */
     for (fd = HighestFd; fd >= 0; --fd) {
       /*
@@ -173,8 +173,13 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           parv_temp = parv[2];
           j = 0;
           while (j <= (temp - parv[2])) { parv_temp++; j++; }
-          ircd_strncpy(cli_version(sptr), normalizeBuffer(parv_temp), VERSIONLEN);
+
+          clean = normalizeBuffer(parv_temp);
+          doCleanBuffer((char *) clean);
+
+          ircd_strncpy(cli_version(sptr), normalizeBuffer(clean), VERSIONLEN);
           sendcmdto_serv_butone(&me, CMD_MARK, cptr, "%s %s :%s", cli_name(sptr), MARK_CVERSION, cli_version(sptr));
+
           if (feature_bool(FEAT_CTCP_VERSIONING_CHAN)) {
             sprintf(temp, "%s has version \002%s\002", cli_name(sptr), cli_version(sptr));
             /* Announce to channel. */
