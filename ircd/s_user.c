@@ -986,8 +986,6 @@ static const struct UserMode {
   unsigned int flag;
   char         c;
 } userModeList[] = {
-  { FLAG_CLOAKHOST,   'C' },
-  { FLAG_CLOAKIP,     'c' },
   { FLAG_OPER,        'o' },
   { FLAG_LOCOP,       'O' },
   { FLAG_INVISIBLE,   'i' },
@@ -1000,6 +998,8 @@ static const struct UserMode {
   { FLAG_HIDDENHOST,  'x' },
   { FLAG_SETHOST,     'h' },
   { FLAG_FAKEHOST,    'f' },
+  { FLAG_CLOAKHOST,   'C' },
+  { FLAG_CLOAKIP,     'c' },
   { FLAG_ACCOUNTONLY, 'R' },
   { FLAG_BOT,         'B' },
   { FLAG_XTRAOP,      'X' },

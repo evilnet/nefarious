@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_user.c: What was i thinking? Bug fix from Jobe.
+
 2008-03-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Small tweak mostly to make sure snapshots are working
