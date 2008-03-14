@@ -124,6 +124,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char*           temp; /* added by Vadtec 02/25/2008 */
   char*           parv_temp; /* added by Vadtec 02/26/2008 */
   int             found_g = 0; /* added by Vadtec 02/26/2008 */
+  int             sent = 0; /* added by Vadtec 03/13/2008 */
   struct Client*  acptr; /* added by Vadtec 02/26/2008 */
   struct Channel* chptr; /* added by Vadtec 02/27/2008 */
 
@@ -145,8 +146,10 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   count = unique_name_vector(parv[1], ',', vector, MAXTARGETS);
 
-  /* Check here to make sure that the client is ours so we dont respond to NOTICES from other server's users. - Vadtec */
-  if (feature_bool(FEAT_CTCP_VERSIONING) && MyConnect(sptr)) {
+  /* Check here to make sure that the client is ours so we dont respond to NOTICES from other server's users. - Vadtec 02/25/2008 */
+  /* Also, check to make sure that the notice is actually destined for the *server* and not another user. That way we don't process
+     some user saying "what version do you use" to another user via notice. - Vadtec 03/13/2008 */
+  if (feature_bool(FEAT_CTCP_VERSIONING) && MyConnect(sptr) && !strcmp(parv[1], cli_name(&me))) {
     /*
      Added by Vadtec 02/25/2008.
      This is so that we can do version checking (and banning) of connecting clients.
@@ -156,20 +159,23 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
            This should help against clients that like to send lower case CTCPs from slipping through as easily with only one
            function call.
     */
-    for (fd = HighestFd; fd >= 0; --fd) {
-      /*
-       * get the users!
-      */
+    for (fd = HighestFd; fd >= 0 && !sent; --fd) { /* Added the "sent" check here so that if we have already sent the notice
+                                                      we don't needlessly loop through *all* the users - Vadtec 03/13/2008 */
       if ((acptr = LocalClientArray[fd])) {
         if (!cli_user(acptr))
           continue;
 
         #ifdef _GNU_SOURCE
-        if ((temp = strcasestr(parv[2], "VERSION"))) {
+        if ((temp = strcasestr(parv[2], "\x01VERSION"))) { /* added \x01 to the string so that it will *only* respond to CTCP version
+                                                              replies. Seems redundant, but we dont want the users doing
+                                                              /notice <server> version (and getting away with it) - Vadtec 03/13/2008 */
+          temp = strchrnul(parv[2], ' '); /* Moved this here to take advantage of strchrnul - added by Vadtec 03/13/2008 */
         #else
-        if ((temp = strstr(parv[2], "VERSION")) || (temp = strstr(parv[2], "version"))) {
+        if ((temp = strstr(parv[2], "\x01VERSION")) || (temp = strstr(parv[2], "\x01version"))) { /* See above comment about \x01 - Vadtec */
+          temp = strchr(parv[2], ' '); /* Moved this here to take advantage of strchrnul - added by Vadtec 03/13/2008 */
+          if (temp == 0)
+            temp = parv[2] + strlen(parv[2]); /* This does the same thing as strchrnul - Vadtec */
         #endif
-          temp = strchr(parv[2], ' ');
           parv_temp = parv[2];
           j = 0;
           while (j <= (temp - parv[2])) { parv_temp++; j++; }
@@ -188,6 +194,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
                 sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp);
               else
                 sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp);
+              sent = 1;
             }
           }
 

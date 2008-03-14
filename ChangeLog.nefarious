@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_mark.c: Bug fix from Jobe.
+
+	* ircd/m_notice.c: Bug fix from Vadtec.
+
 2008-03-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/ircd_string.h: more declerations.
