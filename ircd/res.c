@@ -357,7 +357,7 @@ static void start_resolver(void)
     char sparemsg[80];
     ircd_snprintf(0, sparemsg, sizeof(sparemsg), "invalid spare_fd %d",
 		  spare_fd);
-    server_restart(sparemsg);
+    exit_schedule(1, 0, 0, sparemsg);
   }
 
   if (!_res.nscount) {

@@ -638,14 +638,14 @@ struct Message msgtab[] = {
     TOK_RESTART,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_unregistered, m_not_oper, m_ignore, mo_restart, m_ignore }
+    { m_unregistered, m_not_oper, ms_restart, mo_restart, m_ignore }
   },
   {
     MSG_DIE,
     TOK_DIE,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_unregistered, m_not_oper, m_ignore, mo_die, m_ignore }
+    { m_unregistered, m_not_oper, ms_die, mo_die, m_ignore }
   },
   {
     MSG_PROTO,

@@ -83,6 +83,7 @@
 
 #include "client.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
@@ -161,6 +162,10 @@ int ms_rehash(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int flag = 0;
 
   if ((parc > 2) && (hunt_server_cmd(sptr, CMD_REHASH, cptr, 1, "%C", 1, parc, parv) != HUNTED_ISME))
+    return 0;
+
+  /* OK, the message has been forwarded, but before we can act... */
+  if (!feature_bool(FEAT_NETWORK_REHASH))
     return 0;
 
   if (parc > 1) { /* special processing */

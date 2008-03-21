@@ -311,11 +311,11 @@ struct Client;
 #define CMD_CHECK		MSG_CHECK, TOK_CHECK
 
 #define MSG_REHASH              "REHASH"        /* REHA */
-#define TOK_REHASH              "REHASH"
+#define TOK_REHASH              "RH"
 #define CMD_REHASH		MSG_REHASH, TOK_REHASH
 
 #define MSG_RESTART             "RESTART"       /* REST */
-#define TOK_RESTART             "RESTART"
+#define TOK_RESTART             "RS"
 #define CMD_RESTART		MSG_RESTART, TOK_RESTART
 
 #define MSG_CLOSE               "CLOSE"         /* CLOS */
@@ -323,7 +323,7 @@ struct Client;
 #define CMD_CLOSE		MSG_CLOSE, TOK_CLOSE
 
 #define MSG_DIE                 "DIE"           /* DIE */
-#define TOK_DIE                 "DIE"
+#define TOK_DIE                 "DI"
 #define CMD_DIE			MSG_DIE, TOK_DIE
 
 #define MSG_HASH                "HASH"          /* HASH */

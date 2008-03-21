@@ -1,6 +1,29 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* This change log reflects the changes i made to the restart/die
+	with schedules code. The full change log is in ChangeLog.
+
+	* ircd/listener.h: Tweaked add_listener to handle is_exempt.
+
+	* ircd/listener.c: Tweaked add_listener to handle is_exempt. Also
+	fixed up the flag displaying code in /stats p.
+
+	* ircd/Makefile.in: Ran make depend.
+
+	* ircd/m_die.c: Intergrated the scheduled die code with the die
+	password code.
+
+	* ircd/m_rehash.c: As we already had ms_rehash i just inserted the
+	check for NETWORK_REHASH.
+
+	* ircd/m_restart.c: Intergrated the scheduled restart code with the
+	restart password code.
+
+	* ircd/s_conf.c: Fixed up the P:line flag processing code.
+
 2008-03-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_mark.c: Bug fix from Jobe.

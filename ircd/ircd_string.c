@@ -24,6 +24,8 @@
 #include "ircd_defs.h"
 #include "ircd_chattr.h"
 #include "ircd_log.h"
+#include "msg.h"
+#include "s_bsd.h"
 #include <assert.h>
 #include <string.h>
 #include <regex.h>

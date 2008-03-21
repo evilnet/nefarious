@@ -46,6 +46,7 @@ struct Listener {
   unsigned char    active;             /* current state of listener */
   unsigned char    hidden;             /* hidden in stats output for clients */
   unsigned char    server;             /* 1 if port is a server listener */
+  unsigned char    exempt;
 #ifdef USE_SSL
   unsigned char    ssl;                /* 1 if we're using SSL */
 #endif /* USE_SSL */
@@ -61,11 +62,11 @@ extern struct Listener* ListenerPollList; /* GLOBAL - listener list */
 #ifdef USE_SSL
 extern void        add_listener(int port, const char* vaddr_ip, 
                                 const char* mask, int is_server, 
-                                int is_hidden, int is_ssl);
+                                int is_hidden, int is_ssl, int is_exempt);
 #else
 extern void        add_listener(int port, const char* vaddr_ip,
                                 const char* mask, int is_server,
-                                int is_hidden);
+                                int is_hidden, int is_exempt);
 #endif /* USE_SSL */
 
 extern void        close_listener(struct Listener* listener);

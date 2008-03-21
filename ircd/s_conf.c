@@ -845,7 +845,9 @@ void conf_add_class(const char* const* fields, int count)
 
 void conf_add_listener(const char* const* fields, int count)
 {
+  int i = 1;
   int is_server = 0;
+  int is_exempt = 0;
   int is_hidden = 0;
 #ifdef USE_SSL
   int is_ssl = 0;
@@ -859,22 +861,39 @@ void conf_add_listener(const char* const* fields, int count)
 
   if (!EmptyString(fields[3])) {
     const char* x = fields[3];
+
     if ('S' == ToUpper(*x))
-      is_server = 1, ++x;
+      is_server = 1;
     if ('H' == ToUpper(*x))
-#ifdef USE_SSL
-      is_hidden = 1, ++x;
-    if ('E' == ToUpper(*x))
-      is_ssl = 1, ++x;
-#else
       is_hidden = 1;
+#ifdef USE_SSL
+    if ('E' == ToUpper(*x))
+      is_ssl = 1;
 #endif /* USE_SSL */
+    if ('X' == ToUpper(*x))
+      is_exempt = 1;
+
+    while (++x != NULL) {
+      if ('S' == ToUpper(*x))
+        is_server = 1;
+      if ('H' == ToUpper(*x))
+        is_hidden = 1;
+#ifdef USE_SSL
+      if ('E' == ToUpper(*x))
+        is_ssl = 1;
+#endif /* USE_SSL */
+      if ('X' == ToUpper(*x))
+        is_exempt = 1;
+      if (*x == '\0')
+        break;
+    }
   }
+
   /*           port             vhost      mask  */
 #ifdef USE_SSL
-  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_ssl);
+  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_ssl, is_exempt);
 #else
-  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden);
+  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_exempt);
 #endif /* USE_SSL */
 }
 

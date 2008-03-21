@@ -50,7 +50,7 @@ static void sigterm_callback(struct Event* ev)
   assert(SIGTERM == sig_signal(ev_signal(ev)));
   assert(SIGTERM == ev_data(ev));
 
-  server_die("received signal SIGTERM");
+  exit_schedule(0, 0, 0, "Received signal SIGTERM");
 }
 
 static void sighup_callback(struct Event* ev)
@@ -71,7 +71,7 @@ static void sigint_callback(struct Event* ev)
   assert(SIGINT == sig_signal(ev_signal(ev)));
   assert(SIGINT == ev_data(ev));
 
-  server_restart("caught signal: SIGINT");
+  exit_schedule(1, 0, 0, "Received signal SIGINT");
 }
 
 void setup_signals(void)

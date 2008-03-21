@@ -1629,3 +1629,22 @@ BADUSER_URL
 
 This defines a URL that users may visit to fix their username/ident when
 it is invalid.
+
+NETWORK_REHASH
+ * Type: boolean
+ * Default: FALSE
+
+Allow this server to act upon a network-issued /rehash.
+
+NETWORK_RESTART
+ * Type: boolean
+ * Default: FALSE
+
+Allow this server to act upon a network-issued /restart.
+
+NETWORK_DIE
+ * Type: boolean
+ * Default: FALSE
+
+Allow this server to act upon a network-issued /die.
+

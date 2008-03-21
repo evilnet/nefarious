@@ -344,6 +344,11 @@ enum Feature {
   FEAT_CTCP_VERSIONING_USEMSG, /* added by Vadtec 02/28/2008 */
   FEAT_CTCP_VERSIONING_NOTICE,
 
+  /* Really special features (tm) */
+  FEAT_NETWORK_REHASH,
+  FEAT_NETWORK_RESTART,
+  FEAT_NETWORK_DIE,
+
   FEAT_LAST_F
 };
 

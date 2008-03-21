@@ -91,6 +91,7 @@
 #include "numnicks.h"
 #include "opercmds.h"
 #include "s_bsd.h"
+#include "s_user.h"
 #include "send.h"
 
 /*
@@ -100,6 +101,8 @@ int mo_die(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client *acptr;
   int i;
+  time_t when = 0;
+  const char *reason = 0;
   char* password;
   char *diepass = (char *)feature_str(FEAT_DIEPASS);
 
@@ -112,18 +115,78 @@ int mo_die(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return send_reply(sptr, ERR_PASSWDMISMATCH);
   }
 
-  for (i = 0; i <= HighestFd; i++)
-  {
-    if (!(acptr = LocalClientArray[i]))
-      continue;
-    if (IsUser(acptr))
-      sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Server Terminating. %s",
-		    acptr, get_client_name(sptr, HIDE_IP));
-    else if (IsServer(acptr))
-      sendcmdto_one(&me, CMD_ERROR, acptr, ":Terminated by %s",
-		    get_client_name(sptr, HIDE_IP));
+  if (!EmptyString(diepass)) {
+    if (parc > 2 && !ircd_strcmp(parv[2], "cancel")) {
+      exit_cancel(sptr); /* cancel a pending exit */
+      return 0;
+    } else if (parc > 3) { /* have both time and reason */
+      when = atoi(parv[2]);
+      reason = parv[parc - 1];
+    } else if (parc > 2 && !(when = atoi(parv[2])))
+      reason = parv[parc - 1];
+  } else {
+    if (parc > 1 && !ircd_strcmp(parv[1], "cancel")) {
+      exit_cancel(sptr); /* cancel a pending exit */
+      return 0;
+    } else if (parc > 2) { /* have both time and reason */
+      when = atoi(parv[1]);
+      reason = parv[parc - 1];
+    } else if (parc > 1 && !(when = atoi(parv[1])))
+      reason = parv[parc - 1];
   }
-  server_die("received DIE");
+
+  /* now, let's schedule the exit */
+  exit_schedule(0, when, sptr, reason);
+
+  return 0;
+}
+
+
+/** Handle a DIE message from a server connection.
+ *
+ * \a parv has the following elements:
+ * \li \a parv[1] is the target server, or "*" for all.
+ * \li \a parv[2] is either "cancel" or a time interval in seconds
+ * \li \a parv[\a parc - 1] is the reason
+ *
+ * All fields must be present.  Additionally, the time interval should
+ * not be 0 for messages sent to "*", as that may not function
+ * reliably due to buffering in the server.
+ *
+ * See @ref m_functions for discussion of the arguments.
+ * @param[in] cptr Client that sent us the message.
+ * @param[in] sptr Original source of message.
+ * @param[in] parc Number of arguments.
+ * @param[in] parv Argument vector.
+ */
+int ms_die(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+{
+  const char *target, *when, *reason;
+
+  if (parc < 4)
+    return need_more_params(sptr, "DIE");
+
+  target = parv[1];
+  when = parv[2];
+  reason = parv[parc - 1];
+
+  /* is it a message we should pay attention to? */
+  if (target[0] != '*' || target[1] != '\0') {
+    if (hunt_server_cmd(sptr, CMD_DIE, cptr, 0, "%C %s :%s", 1, parc, parv)
+       != HUNTED_ISME)
+      return 0;
+  } else /* must forward the message */
+    sendcmdto_serv_butone(sptr, CMD_DIE, cptr, "* %s :%s", when, reason);
+
+  /* OK, the message has been forwarded, but before we can act... */
+  if (!feature_bool(FEAT_NETWORK_DIE))
+    return 0;
+
+  /* is it a cancellation? */
+  if (!ircd_strcmp(when, "cancel"))
+    exit_cancel(sptr); /* cancel a pending exit */
+  else /* schedule an exit */
+    exit_schedule(0, atoi(when), sptr, reason);
 
   return 0;
 }

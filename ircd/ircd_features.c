@@ -565,6 +565,11 @@ static struct FeatureDesc {
   F_B(CTCP_VERSIONING_USEMSG, 0, 0, 0), /* added by Vadtec 02/28/2008 */
   F_S(CTCP_VERSIONING_NOTICE, 0, "*** Checking your client version", 0),
 
+  /* Really special features (tm) */
+  F_B(NETWORK_REHASH, 0, 0, 0),
+  F_B(NETWORK_RESTART, 0, 0, 0),
+  F_B(NETWORK_DIE, 0, 0, 0),
+
 #undef F_S
 #undef F_B
 #undef F_I

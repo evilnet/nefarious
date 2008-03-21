@@ -125,6 +125,7 @@ void show_ports(struct Client* sptr, struct StatDesc* sd, int stat,
   int show_hidden = IsOper(sptr);
   int count = IsOper(sptr) || MyUser(sptr) ? 100 : 8;
   int port = 0;
+  int len = 0;
 
   assert(0 != sptr);
 
@@ -134,19 +135,20 @@ void show_ports(struct Client* sptr, struct StatDesc* sd, int stat,
   for (listener = ListenerPollList; listener; listener = listener->next) {
     if (port && port != listener->port)
       continue;
+    len = 0;
+
+    flags[len++] = listener->server ? 'S' : 'C';
+
 #ifdef USE_SSL
-    flags[0] = (listener->server) ? 'S' : ((listener->ssl) ? 'E' : 'C');
-#else
-    flags[0] = (listener->server) ? 'S' : 'C';
-#endif /* USE_SSL */
-    if (listener->hidden) {
-      if (!show_hidden)
-        continue;
-      flags[1] = 'H';
-      flags[2] = '\0';
-    }
-    else
-      flags[1] = '\0';
+    if (listener->ssl)
+      flags[len++] = 'E';
+#endif
+    if (listener->exempt)
+      flags[len++] = 'X';
+    if (listener->hidden && show_hidden)
+      flags[len++] = 'H';
+
+    flags[len] = '\0';
 
     send_reply(sptr, RPL_STATSPLINE, listener->port, listener->ref_count,
 	       flags, (listener->active) ? "active" : "disabled");
@@ -319,10 +321,10 @@ static int connection_allowed(const char* addr, const char* mask)
  */
 #ifdef USE_SSL
 void add_listener(int port, const char* vhost_ip, const char* mask,
-                  int is_server, int is_hidden, int is_ssl)
+                  int is_server, int is_hidden, int is_ssl, int is_exempt)
 #else
 void add_listener(int port, const char* vhost_ip, const char* mask,
-                  int is_server, int is_hidden)
+                  int is_server, int is_hidden, int is_exempt)
 #endif /* USE_SSL */
 {
   struct Listener* listener;
@@ -349,6 +351,7 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
      */
     listener->active = 1;
     set_listener_mask(listener, mask);
+    listener->exempt = is_exempt;
     listener->hidden = is_hidden;
     listener->server = is_server;
 #ifdef USE_SSL
@@ -360,6 +363,7 @@ void add_listener(int port, const char* vhost_ip, const char* mask,
   listener = make_listener(port, vaddr);
 
   set_listener_mask(listener, mask);
+  listener->exempt = is_exempt;
   listener->hidden = is_hidden;
   listener->server = is_server;
 #ifdef USE_SSL
@@ -528,6 +532,20 @@ static void accept_connection(struct Event* ev)
         close(fd);
 	continue;
       }
+
+      /*
+       * check to see if server is shutting down.
+       */
+      if (refuse && !listener->exempt)
+      {
+        ++ServerStats->is_ref;
+        /*                 111111111122222222223 3 3 */
+        /*        123456789012345678901234567890 1 2 */
+        send(fd, "ERROR :Server is shutting down\r\n", 32, 0);
+        close(fd);
+        continue;
+      }
+
       ++ServerStats->is_ac;
       /* nextping = CurrentTime; */
 

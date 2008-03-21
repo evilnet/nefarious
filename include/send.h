@@ -120,4 +120,7 @@ extern void sendto_allops_butserv(struct Client *one, struct Client *from,
 extern void vsendto_allops_butserv(struct Client *one, struct Client *from, unsigned int mask,
                            const char *pattern, va_list vl);
 
+/* Send server notice to all local users */
+extern void sendto_lusers(const char *pattern, ...);
+
 #endif /* INCLUDED_send_h */
