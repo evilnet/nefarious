@@ -48,7 +48,6 @@
 #include "whocmds.h"
 
 #include <assert.h>
-#include <regex.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -192,8 +191,6 @@ make_shun(char *user, char *host, char *reason, time_t expire, time_t lastmod,
 static int
 do_shun(struct Client *cptr, struct Client *sptr, struct Shun *shun)
 {
-  regex_t *needle;
-  char *haystack;
   struct Client *acptr;
   int fd, tval = 0;
 
@@ -209,22 +206,11 @@ do_shun(struct Client *cptr, struct Client *sptr, struct Shun *shun)
         continue;
 
 
-      if (ShunIsRealName(shun)) { /* Realname Shun *.
+      if (shun->sh_flags & SHUN_REALNAME) { /* Realname Shun */
 	Debug((DEBUG_DEBUG,"Realname Shun: %s %s",(cli_info(acptr)),
 					shun->sh_user+2));
         if (match(shun->sh_user+2, cli_info(acptr)) != 0)
             continue;
-        Debug((DEBUG_DEBUG,"Matched!"));
-      } else if (shun->sh_flags & SHUN_REGEXP) { /* Regexp Shun */
-        ircd_snprintf(0, haystack, sizeof(haystack), "%s!%s@%s :%s",
-                      cli_name(cptr), (cli_user(cptr))->username,
-                      (cli_user(cptr))->realhost, cli_info(cptr));
-  	 
-        Debug((DEBUG_DEBUG,"Regexp shun: %s %s",haystack, shun->sh_user+2));
-        if (regcomp(needle, shun->sh_user+2, REG_EXTENDED) != 0)
-          continue;
-        if (regexec(needle, haystack, 0, NULL,0) != 0)
-          continue;
         Debug((DEBUG_DEBUG,"Matched!"));
       } else { /* Host/IP shun */
 	      if (cli_user(acptr)->username && 
@@ -356,7 +342,7 @@ shun_add(struct Client *cptr, struct Client *sptr, char *userhost,
 {
   struct Shun *ashun;
   char uhmask[USERLEN + HOSTLEN + 2];
-  char *user, *host, *type;
+  char *user, *host;
   int tmp;
 
   assert(0 != userhost);
@@ -365,8 +351,10 @@ shun_add(struct Client *cptr, struct Client *sptr, char *userhost,
   if (*userhost == '$' || userhost[2] == '$') {
     switch (*userhost == '$' ? userhost[1] : userhost[3]) {
       case 'R': flags |= SHUN_REALNAME; break;
-      case 'X': flags |= SHUN_REGEXP; break;
       default:
+        /* uh, what to do here? */
+        /* The answer, my dear Watson, is we throw a protocol_violation()
+           -- hikari */
         return protocol_violation(sptr,"%s has sent an incorrect shun.",cli_name(sptr));
         break;
     }
@@ -406,31 +394,23 @@ shun_add(struct Client *cptr, struct Client *sptr, char *userhost,
 
   expire += CurrentTime; /* convert from lifetime to timestamp */
 
-  /* Determine type for decent logging and notice */
-  if (flags & SHUN_REALNAME)
-    type = "REALNAME SHUN";
-  else if (flags & SHUN_REGEXP)
-    type = "REGEXP SHUN";
-  else
-    type = "SHUN";
-
   /* Inform ops... */
   sendto_opmask_butone(0, ircd_strncmp(reason, "AUTO", 4) ? SNO_GLINE :
-		       SNO_AUTO, "%s adding %s %s for %s%s%s, expiring at "
+		       SNO_AUTO, "%s adding %s SHUN for %s%s%s, expiring at "
 		       "%Tu: %s",
 		       feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
-                       flags & SHUN_LOCAL ? "local" : "global", type, user,
-		       flags & (SHUN_REALNAME|SHUN_REGEXP) ? "" : "@",
-		       flags & (SHUN_REALNAME|SHUN_REGEXP) ? "" : host,
+		       flags & SHUN_LOCAL ? "local" : "global", user,
+		       flags & (SHUN_REALNAME) ? "" : "@",
+		       flags & (SHUN_REALNAME) ? "" : host,
 		       expire + TSoffset, reason);
 
   /* and log it */
   log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
 	    "%#C adding %s %s for %s%s%s, expiring at %Tu: %s", sptr,
-	    flags & SHUN_LOCAL ? "local" : "global", type, user,
-	    flags & (SHUN_REALNAME|SHUN_REGEXP) ? "" : "@",
-	    flags & (SHUN_REALNAME|SHUN_REGEXP) ? "" : host,
+	    flags & SHUN_LOCAL ? "local" : "global", user,
+	    flags & (SHUN_REALNAME) ? "" : "@",
+	    flags & (SHUN_REALNAME) ? "" : host,
 	    expire + TSoffset, reason);
 
   /* make the shun */
@@ -448,7 +428,6 @@ int
 shun_activate(struct Client *cptr, struct Client *sptr, struct Shun *shun,
 	       time_t lastmod, unsigned int flags)
 {
-  char *type;
   unsigned int saveflags = 0;
 
   assert(0 != shun);
@@ -471,26 +450,18 @@ shun_activate(struct Client *cptr, struct Client *sptr, struct Shun *shun,
   if ((saveflags & SHUN_ACTMASK) == SHUN_ACTIVE)
     return 0; /* was active to begin with */
 
-  /* Determine type for decent logging and notice */
-  if (flags & SHUN_REALNAME)
-    type = "REALNAME SHUN";
-  else if (flags & SHUN_REGEXP)
-    type = "REGEXP SHUN";
-  else
-    type = "SHUN";
-
   /* Inform ops and log it */
-  sendto_opmask_butone(0, SNO_GLINE, "%s activating global %s for %s%s%s, "
+  sendto_opmask_butone(0, SNO_GLINE, "%s activating global SHUN for %s%s%s, "
 		       "expiring at %Tu: %s",
 		       feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
-		       type, shun->sh_user, shun->sh_host ? "@" : "",
+		       shun->sh_user, shun->sh_host ? "@" : "",
 		       shun->sh_host ? shun->sh_host : "",
 		       shun->sh_expire + TSoffset, shun->sh_reason);
 
   log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
-	    "%#C activating global %s for %s%s%s, expiring at %Tu: %s", sptr,
-	    type, shun->sh_user,
+	    "%#C activating global SHUN for %s%s%s, expiring at %Tu: %s", sptr,
+	    shun->sh_user,
 	    shun->sh_host ? "@" : "",
 	    shun->sh_host ? shun->sh_host : "",
 	    shun->sh_expire + TSoffset, shun->sh_reason);
@@ -506,7 +477,7 @@ shun_deactivate(struct Client *cptr, struct Client *sptr, struct Shun *shun,
 		 time_t lastmod, unsigned int flags)
 {
   unsigned int saveflags = 0;
-  char *msg, *type;
+  char *msg;
 
   assert(0 != shun);
 
@@ -537,27 +508,19 @@ shun_deactivate(struct Client *cptr, struct Client *sptr, struct Shun *shun,
       return 0; /* was inactive to begin with */
   }
 
-  /* Determine type for decent logging and notice */
-  if (flags & SHUN_REALNAME)
-    type = "REALNAME SHUN";
-  else if (flags & SHUN_REGEXP)
-    type = "REGEXP SHUN";
-  else
-    type = "SHUN";
-
   /* Inform ops and log it */
   sendto_opmask_butone(0, SNO_GLINE, "%s %s %s for %s%s%s, expiring at %Tu: "
 		       "%s",
 		       feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
-		       msg, type,
+		       msg, "SHUN",
 		       shun->sh_user, shun->sh_host ? "@" : "",
 		       shun->sh_host ? shun->sh_host : "",
 		       shun->sh_expire + TSoffset, shun->sh_reason);
 
   log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
 	    "%#C %s %s for %s%s%s, expiring at %Tu: %s", sptr, msg,
-	    type, shun->sh_user,
+	    "SHUN", shun->sh_user,
 	    shun->sh_host ? "@" : "",
 	    shun->sh_host ? shun->sh_host : "",
 	    shun->sh_expire + TSoffset, shun->sh_reason);
@@ -617,8 +580,6 @@ shun_find(char *userhost, unsigned int flags)
 struct Shun *
 shun_lookup(struct Client *cptr, unsigned int flags)
 {
-  regex_t *needle;
-  char *haystack;
   struct Shun *shun;
   struct Shun *sshun;
 
@@ -640,23 +601,6 @@ shun_lookup(struct Client *cptr, unsigned int flags)
       if (match(shun->sh_user+2, cli_info(cptr)) != 0)
 	continue;
 
-      if (!ShunIsActive(shun))
-        continue;
-
-      return shun;
-    }
-    else if (ShunIsRegExp(shun)) {
-      /* Construct the haystack */
-      ircd_snprintf(0, haystack, sizeof(haystack), "%s!%s@%s :%s",
-                   cli_name(cptr), (cli_user(cptr))->username,
-                   (cli_user(cptr))->realhost, cli_info(cptr));
-
-      Debug((DEBUG_DEBUG,"regexp shun: '%s' '%s'",shun->sh_user,haystack));
-      if (regcomp(needle, shun->sh_user+2, REG_EXTENDED) != 0)
-        continue;
-      if (regexec(needle, haystack, 0, NULL,0) != 0)
-        continue;
-	 
       if (!ShunIsActive(shun))
         continue;
 

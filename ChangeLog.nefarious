@@ -3,6 +3,10 @@
 
 2008-03-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Reverted last commit for now.
+
+2008-03-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/gline.c: Declerations for regexp glines.
 
 	* include/shun.c: Declerations for regexp shuns.

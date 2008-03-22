@@ -61,9 +61,8 @@ struct Shun {
 #define SHUN_LASTMOD	0x0200	/* find only shuns with non-zero lastmod */
 #define SHUN_OPERFORCE	0x0400	/* oper forcing shun to be set */
 #define SHUN_REALNAME	0x0800	/* shun matches only the realname field */
-#define SHUN_REGEXP	0x1000  /* shun matches the regexp of n!u@h :gecos */
 
-#define SHUN_MASK	(SHUN_ACTIVE | SHUN_LOCAL | SHUN_REALNAME | SHUN_REGEXP)
+#define SHUN_MASK	(SHUN_ACTIVE | SHUN_LOCAL | SHUN_REALNAME )
 #define SHUN_ACTMASK	(SHUN_ACTIVE | SHUN_LDEACT)
 
 #define ShunIsActive(s)		(((s)->sh_flags & SHUN_ACTMASK) == \
@@ -72,7 +71,6 @@ struct Shun {
 #define ShunIsIpMask(s)		((s)->sh_flags & SHUN_IPMASK)
 #define ShunIsRealName(s)	((s)->sh_flags & SHUN_REALNAME)
 #define ShunIsLocal(s)		((s)->sh_flags & SHUN_LOCAL)
-#define ShunIsRegExp(s)		((s)->sh_flags & SHUN_REGEXP)
 
 #define ShunUser(s)		((s)->sh_user)
 #define ShunHost(s)		((s)->sh_host)
@@ -103,3 +101,4 @@ extern int expire_shuns();
 extern int count_affected(char* mask);
 
 #endif /* INCLUDED_shun_h */
+
