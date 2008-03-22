@@ -102,6 +102,37 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+
+/*
+ * Helper function to perform a JOIN 0 if needed; returns 0 if channel
+ * name is not 0, else removes user from all channels and returns 1.
+ */
+static int
+join0(struct JoinBuf *join, struct Client *cptr, struct Client *sptr,
+      char *chan)
+{
+  struct Membership *member;
+  struct JoinBuf part;
+
+  /* is it a JOIN 0? */
+  if (chan[0] != '0' || chan[1] != '\0')
+    return 0;
+
+  joinbuf_join(join, 0, 0); /* join special channel 0 */
+
+  /* leave all channels */
+  joinbuf_init(&part, sptr, cptr, JOINBUF_TYPE_PARTALL,
+               "Left all channels", 0);
+
+  while ((member = cli_user(sptr)->channel))
+    joinbuf_join(&part, member->channel,
+                 IsZombie(member) ? CHFL_ZOMBIE : 0);
+
+  joinbuf_flush(&part);
+
+  return 1;
+}
+
 /*
  * ms_svsjoin - server message handler
  *
@@ -140,12 +171,18 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     } else
       flags = CHFL_CHANOP;
 
+    joinbuf_init(&join, acptr, acptr, JOINBUF_TYPE_JOIN, 0, 0);  
+    joinbuf_init(&create, acptr, acptr, JOINBUF_TYPE_CREATE, 0, TStime());
+
+    if (join0(&join, acptr, acptr, parv[2])) { /* did client do a JOIN 0? */
+      joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */
+      joinbuf_flush(&create);
+      return 0;
+    }
+
     chptr = get_channel(acptr, parv[2],
 		        (!FindChannel(parv[2])) ? CGT_CREATE :
 		        CGT_NO_CREATE);
-
-    joinbuf_init(&join, acptr, acptr, JOINBUF_TYPE_JOIN, 0, 0);  
-    joinbuf_init(&create, acptr, acptr, JOINBUF_TYPE_CREATE, 0, TStime());
 
     name = chptr->chname;
     clean_channelname(name);

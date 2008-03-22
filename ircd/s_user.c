@@ -873,12 +873,13 @@ int register_user(struct Client *cptr, struct Client *sptr,
   /*
    * Set user's initial modes
    */
-  parv[0] = (char*)nick;
-  parv[1] = (char*)nick;
-  parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
-  parv[3] = NULL; /* needed in case of +s */
-  set_user_mode(sptr, sptr, 3, parv);
-
+  if (MyUser(sptr)) {
+    parv[0] = (char*)nick;
+    parv[1] = (char*)nick;
+    parv[2] = (char*)feature_str(FEAT_DEFAULT_UMODE);
+    parv[3] = NULL;
+    set_user_mode(sptr, sptr, 3, parv);
+  }
   tmpstr = umode_str(sptr);
   sendcmdto_serv_butone(user->server, CMD_NICK, cptr,
 			"%s %d %Tu %s %s %s%s%s%s %s%s :%s",
@@ -1104,6 +1105,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
         ircd_strncpy(cli_user(new_client)->virtip, cloakip, HOSTLEN);
       }
       else {
+
         if (!strcmp((char*)ircd_ntoa((const char*) &(cli_ip(new_client))), cli_user(new_client)->host)) {
           ircd_snprintf(0, cli_user(new_client)->virthost, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(new_client)))));
           ircd_snprintf(0, cli_user(new_client)->virtip, HOSTLEN, "%s", hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(new_client)))));
