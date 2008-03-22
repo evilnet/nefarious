@@ -48,6 +48,7 @@
 #include "whocmds.h"
 
 #include <assert.h>
+#include <regex.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -260,6 +261,8 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 {
   struct Client *acptr;
   int fd, retval = 0, tval;
+  regex_t *needle;
+  char *haystack;
 
   if (!GlineIsActive(gline)) /* no action taken on inactive glines */
     return 0;
@@ -273,11 +276,22 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
         continue;
 
 
-      if (gline->gl_flags & GLINE_REALNAME) { /* Realname Gline */
+     if (GlineIsRealName(gline)) { /* Realname Gline */ 
 	Debug((DEBUG_DEBUG,"Realname Gline: %s %s",(cli_info(acptr)),
 					gline->gl_user+2));
         if (match(gline->gl_user+2, cli_info(acptr)) != 0)
             continue;
+        Debug((DEBUG_DEBUG,"Matched!"));
+     } else if (gline->gl_flags & GLINE_REGEXP) { /* Regexp Gline */
+        ircd_snprintf(0, haystack, sizeof(haystack), "%s!%s@%s :%s",
+                     cli_name(cptr), (cli_user(cptr))->username,
+                     (cli_user(cptr))->realhost, cli_info(cptr));
+ 	 
+        Debug((DEBUG_DEBUG,"Regexp gline: %s %s",haystack, gline->gl_user+2));
+        if (regcomp(needle, gline->gl_user+2, REG_EXTENDED) != 0)
+          continue;
+        if (regexec(needle, haystack, 0, NULL,0) != 0)
+           continue;
         Debug((DEBUG_DEBUG,"Matched!"));
       } else if (gline->gl_flags & GLINE_BADCHAN) { /* Badchan Gline */
         struct Channel *chptr,*nchptr;
@@ -302,11 +316,9 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	      if (GlineIsIpMask(gline)) {
 		      Debug((DEBUG_DEBUG,"IP gline: %08x %08x/%i",(cli_ip(cptr)).s_addr,
                  gline->ipnum.s_addr,gline->bits));
-		      if (((cli_ip(acptr)).s_addr & NETMASK(gline->bits)) 
-              != gline->ipnum.s_addr)
+		      if (((cli_ip(acptr)).s_addr & NETMASK(gline->bits)) != gline->ipnum.s_addr)
 			      continue;
-	      }
-	      else {
+	      } else {
 		      if (match(gline->gl_host, cli_sockhost(acptr)) != 0)
 			      continue;
 	      }
@@ -422,7 +434,7 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
 {
   struct Gline *agline;
   char uhmask[USERLEN + HOSTLEN + 2];
-  char *user, *host;
+  char *user, *host, *type;
   int tmp;
 
   assert(0 != userhost);
@@ -452,10 +464,8 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
   ) {
     switch (*userhost == '$' ? userhost[1] : userhost[3]) {
       case 'R': flags |= GLINE_REALNAME; break;
+      case 'X': flags |= GLINE_REGEXP; break;
       default:
-        /* uh, what to do here? */
-        /* The answer, my dear Watson, is we throw a protocol_violation()
-           -- hikari */
         return protocol_violation(sptr,"%s has been smoking the sweet leaf and sent me a whacky gline",cli_name(sptr));
         break;
     }
@@ -495,25 +505,33 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
 
   expire += CurrentTime; /* convert from lifetime to timestamp */
 
+  /* Determine type for decent logging and notice */
+  if (flags & GLINE_BADCHAN)
+    type = "BADCHAN";
+  else if (flags & GLINE_REALNAME)
+    type = "REALNAME GLINE";
+  else if (flags & GLINE_REGEXP)
+    type = "REGEXP GLINE";
+  else
+    type = "GLINE";
+
   /* Inform ops... */
   sendto_opmask_butone(0, ircd_strncmp(reason, "AUTO", 4) ? SNO_GLINE :
 		       SNO_AUTO, "%s adding %s %s for %s%s%s, expiring at "
 		       "%Tu: %s",
 		       feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
-		       flags & GLINE_LOCAL ? "local" : "global",
-		       flags & GLINE_BADCHAN ? "BADCHAN" : "GLINE", user,
-		       flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : "@",
-		       flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : host,
+                       flags & GLINE_LOCAL ? "local" : "global", type, user,
+                       flags & (GLINE_BADCHAN|GLINE_REALNAME|GLINE_REGEXP) ? "" : "@",
+                       flags & (GLINE_BADCHAN|GLINE_REALNAME|GLINE_REGEXP) ? "" : host,
 		       expire + TSoffset, reason);
 
   /* and log it */
   log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
 	    "%#C adding %s %s for %s%s%s, expiring at %Tu: %s", sptr,
-	    flags & GLINE_LOCAL ? "local" : "global",
-	    flags & GLINE_BADCHAN ? "BADCHAN" : "GLINE", user,
-	    flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : "@",
-	    flags & (GLINE_BADCHAN|GLINE_REALNAME) ? "" : host,
+	    flags & GLINE_LOCAL ? "local" : "global", type, user,
+            flags & (GLINE_BADCHAN|GLINE_REALNAME|GLINE_REGEXP) ? "" : "@",
+            flags & (GLINE_BADCHAN|GLINE_REALNAME|GLINE_REGEXP) ? "" : host,
 	    expire + TSoffset, reason);
 
   /* make the gline */
@@ -531,6 +549,7 @@ int
 gline_activate(struct Client *cptr, struct Client *sptr, struct Gline *gline,
 	       time_t lastmod, unsigned int flags)
 {
+  char *type;
   unsigned int saveflags = 0;
 
   assert(0 != gline);
@@ -553,20 +572,28 @@ gline_activate(struct Client *cptr, struct Client *sptr, struct Gline *gline,
   if ((saveflags & GLINE_ACTMASK) == GLINE_ACTIVE)
     return 0; /* was active to begin with */
 
+   /* Determine type for decent logging and notice */
+   if (flags & GLINE_BADCHAN)
+     type = "BADCHAN";
+   else if (flags & GLINE_REALNAME)
+     type = "REALNAME GLINE";
+   else if (flags & GLINE_REGEXP)
+     type = "REGEXP GLINE";
+   else
+     type = "GLINE";
+
   /* Inform ops and log it */
   sendto_opmask_butone(0, SNO_GLINE, "%s activating global %s for %s%s%s, "
 		       "expiring at %Tu: %s",
 		       feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
-		       GlineIsBadChan(gline) ? "BADCHAN" : "GLINE",
-		       gline->gl_user, gline->gl_host ? "@" : "",
+                       type, gline->gl_user, gline->gl_host ? "@" : "",
 		       gline->gl_host ? gline->gl_host : "",
 		       gline->gl_expire + TSoffset, gline->gl_reason);
 
   log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
 	    "%#C activating global %s for %s%s%s, expiring at %Tu: %s", sptr,
-	    GlineIsBadChan(gline) ? "BADCHAN" : "GLINE", gline->gl_user,
-	    gline->gl_host ? "@" : "",
+            type, gline->gl_user,gline->gl_host ? "@" : "",
 	    gline->gl_host ? gline->gl_host : "",
 	    gline->gl_expire + TSoffset, gline->gl_reason);
 
@@ -580,8 +607,8 @@ int
 gline_deactivate(struct Client *cptr, struct Client *sptr, struct Gline *gline,
 		 time_t lastmod, unsigned int flags)
 {
+  char *msg, *type;
   unsigned int saveflags = 0;
-  char *msg;
 
   assert(0 != gline);
 
@@ -612,20 +639,28 @@ gline_deactivate(struct Client *cptr, struct Client *sptr, struct Gline *gline,
       return 0; /* was inactive to begin with */
   }
 
+   /* Determine type for decent logging and notice */
+   if (flags & GLINE_BADCHAN)
+     type = "BADCHAN";
+   else if (flags & GLINE_REALNAME)
+     type = "REALNAME GLINE";
+   else if (flags & GLINE_REGEXP)
+     type = "REGEXP GLINE";
+   else
+     type = "GLINE";
+
   /* Inform ops and log it */
   sendto_opmask_butone(0, SNO_GLINE, "%s %s %s for %s%s%s, expiring at %Tu: "
 		       "%s",
 		       feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
 		       cli_name(sptr) : cli_name((cli_user(sptr))->server),
-		       msg, GlineIsBadChan(gline) ? "BADCHAN" : "GLINE",
-		       gline->gl_user, gline->gl_host ? "@" : "",
+                       msg, type, gline->gl_user, gline->gl_host ? "@" : "",
 		       gline->gl_host ? gline->gl_host : "",
 		       gline->gl_expire + TSoffset, gline->gl_reason);
 
   log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
-	    "%#C %s %s for %s%s%s, expiring at %Tu: %s", sptr, msg,
-	    GlineIsBadChan(gline) ? "BADCHAN" : "GLINE", gline->gl_user,
-	    gline->gl_host ? "@" : "",
+	    "%#C %s %s for %s%s%s, expiring at %Tu: %s", sptr, msg, type,
+	    gline->gl_user, gline->gl_host ? "@" : "",
 	    gline->gl_host ? gline->gl_host : "",
 	    gline->gl_expire + TSoffset, gline->gl_reason);
 
@@ -674,7 +709,7 @@ gline_find(char *userhost, unsigned int flags)
 
   if(BadPtr(user))
     return 0;
-
+ 
   for (gline = GlobalGlineList; gline; gline = sgline) {
     sgline = gline->gl_next;
 
@@ -710,6 +745,9 @@ gline_lookup(struct Client *cptr, unsigned int flags)
   struct Gline *gline;
   struct Gline *sgline;
 
+  regex_t *needle;
+  char *haystack;
+
   for (gline = GlobalGlineList; gline; gline = sgline) {
     sgline = gline->gl_next;
 
@@ -728,6 +766,23 @@ gline_lookup(struct Client *cptr, unsigned int flags)
 	continue;
       if (!GlineIsActive(gline))
         continue;
+      return gline;
+    }
+    else if (GlineIsRegExp(gline)) {
+      /* Construct the haystack */
+      ircd_snprintf(0, haystack, sizeof(haystack), "%s!%s@%s :%s",
+                   cli_name(cptr), (cli_user(cptr))->username,
+                   (cli_user(cptr))->realhost, cli_info(cptr));
+
+      Debug((DEBUG_DEBUG,"regexp gline: '%s' '%s'",gline->gl_user,haystack));
+      if (regcomp(needle, gline->gl_user+2, REG_EXTENDED) != 0)
+        continue;
+      if (regexec(needle, haystack, 0, NULL,0) != 0)
+        continue;
+
+      if (!GlineIsActive(gline))
+        continue;
+
       return gline;
     }
     else {

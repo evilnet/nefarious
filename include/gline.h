@@ -62,8 +62,9 @@ struct Gline {
 #define GLINE_LASTMOD	0x0200	/* find only glines with non-zero lastmod */
 #define GLINE_OPERFORCE	0x0400	/* oper forcing gline to be set */
 #define GLINE_REALNAME	0x0800	/* gline matches only the realname field */
+#define GLINE_REGEXP	0x1000  /* gline matches the regexp of n!u@h :gecos */
 
-#define GLINE_MASK	(GLINE_ACTIVE | GLINE_BADCHAN | GLINE_LOCAL | GLINE_REALNAME )
+#define GLINE_MASK	(GLINE_ACTIVE | GLINE_BADCHAN | GLINE_LOCAL | GLINE_REALNAME | GLINE_REGEXP )
 #define GLINE_ACTMASK	(GLINE_ACTIVE | GLINE_LDEACT)
 
 #define GlineIsActive(g)	(((g)->gl_flags & GLINE_ACTMASK) == \
@@ -73,6 +74,7 @@ struct Gline {
 #define GlineIsRealName(g)	((g)->gl_flags & GLINE_REALNAME)
 #define GlineIsBadChan(g)	((g)->gl_flags & GLINE_BADCHAN)
 #define GlineIsLocal(g)		((g)->gl_flags & GLINE_LOCAL)
+#define GlineIsRegExp(g)	((g)->gl_flags & GLINE_REGEXP)
 
 #define GlineUser(g)		((g)->gl_user)
 #define GlineHost(g)		((g)->gl_host)
