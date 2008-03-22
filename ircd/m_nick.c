@@ -206,7 +206,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /*
      * No collisions, all clear...
      */
-    return set_nick_name(cptr, sptr, nick, parc, parv);
+    return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }
 
   if (IsServer(acptr)) {
@@ -231,7 +231,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       /*
        * Allows change of case in his/her nick
        */
-      return set_nick_name(cptr, sptr, nick, parc, parv);
+      return set_nick_name(cptr, sptr, nick, parc, parv, 0);
     }
     /*
      * This is just ':old NICK old' type thing.
@@ -264,7 +264,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     ++ServerStats->is_ref;
     IPcheck_connect_fail(cli_ip(acptr));
     exit_client(cptr, acptr, &me, "Overridden by other sign on");
-    return set_nick_name(cptr, sptr, nick, parc, parv);
+    return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }
   /*
    * NICK is coming from local client connection. Just
@@ -368,7 +368,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /*
      * No collisions, all clear...
      */
-    return set_nick_name(cptr, sptr, nick, parc, parv);
+    return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }
   assert(0 != acptr);
 
@@ -392,7 +392,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       /*
        * Allows change of case in his/her nick
        */
-      return set_nick_name(cptr, sptr, nick, parc, parv);
+      return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }
 
   /*
@@ -410,7 +410,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     ++ServerStats->is_ref;
     IPcheck_connect_fail(cli_ip(acptr));
     exit_client(cptr, acptr, &me, "Overridden by other sign on");
-    return set_nick_name(cptr, sptr, nick, parc, parv);
+    return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }
   /*
    * Decide, we really have a nick collision and deal with it
@@ -537,5 +537,5 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0;
 
   assert(0 != sptr);
-  return set_nick_name(cptr, sptr, nick, parc, parv);
+  return set_nick_name(cptr, sptr, nick, parc, parv, 0);
 }

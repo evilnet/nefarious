@@ -1019,7 +1019,7 @@ static const struct UserMode {
 static char umodeBuf[BUFSIZE];
 
 int set_nick_name(struct Client* cptr, struct Client* sptr,
-                  const char* nick, int parc, char* parv[])
+                  const char* nick, int parc, char* parv[], int svsnick)
 {
   if (IsServer(sptr)) {
     int   i;
@@ -1147,7 +1147,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       const char* channel_name;
       struct Membership *member;
       if ((channel_name = find_no_nickchange_channel(sptr)) &&
-	  !IsXtraOp(sptr)) {
+	  !IsXtraOp(sptr) && !svsnick) {
         return send_reply(cptr, ERR_BANNICKCHANGE, channel_name);
       }
       /*
@@ -1158,21 +1158,23 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
        * however, allow to do two nick changes immedately after another
        * before limiting the nick flood. -Run
        */
-      if (CurrentTime < cli_nextnick(cptr)) {
-        cli_nextnick(cptr) += 2;
-        send_reply(cptr, ERR_NICKTOOFAST, parv[1],
-                   cli_nextnick(cptr) - CurrentTime);
-        /* Send error message */
-        sendcmdto_one(cptr, CMD_NICK, cptr, "%s", cli_name(cptr));
-        /* bounce NICK to user */
-        return 0;                /* ignore nick change! */
-      }
-      else {
-        /* Limit total to 1 change per NICK_DELAY seconds: */
-        cli_nextnick(cptr) += feature_int(FEAT_NICK_DELAY);
-        /* However allow _maximal_ 1 extra consecutive nick change: */
-        if (cli_nextnick(cptr) < CurrentTime)
-          cli_nextnick(cptr) = CurrentTime;
+      if (!svsnick) {
+        if (CurrentTime < cli_nextnick(cptr)) {
+          cli_nextnick(cptr) += 2;
+          send_reply(cptr, ERR_NICKTOOFAST, parv[1],
+                     cli_nextnick(cptr) - CurrentTime);
+          /* Send error message */
+          sendcmdto_one(cptr, CMD_NICK, cptr, "%s", cli_name(cptr));
+          /* bounce NICK to user */
+          return 0;                /* ignore nick change! */
+        }
+        else {
+          /* Limit total to 1 change per NICK_DELAY seconds: */
+          cli_nextnick(cptr) += feature_int(FEAT_NICK_DELAY);
+          /* However allow _maximal_ 1 extra consecutive nick change: */
+          if (cli_nextnick(cptr) < CurrentTime)
+            cli_nextnick(cptr) = CurrentTime;
+        }
       }
       /* Invalidate all bans against the user so we check them again */
       for (member = (cli_user(cptr))->channel; member;

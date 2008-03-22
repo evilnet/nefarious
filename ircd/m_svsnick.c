@@ -175,7 +175,7 @@ int ms_svsnick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     }
   }
 
-  set_nick_name(acptr, acptr, nick, parc, parv);  
+  set_nick_name(acptr, acptr, nick, parc, parv, 1);
   sendcmdto_serv_butone(sptr, CMD_SVSNICK, cptr, "%s %s", parv[1], nick);
   return 0;
 }

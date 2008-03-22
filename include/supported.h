@@ -34,6 +34,7 @@
 #define FEATURES1 \
                 "WHOX"\
                 " NAMESX" \
+                " UHNAMES" \
                 " WALLCHOPS"\
 		" WALLVOICES"\
                 " USERIP"\

@@ -199,6 +199,14 @@ void do_names(struct Client* sptr, struct Channel* chptr, int filter)
       }
     }
     strcat(buf, cli_name(c2ptr));
+
+    if (IsUHNames(sptr)) {
+      strcat(buf, "!");
+      strcat(buf, cli_user(c2ptr)->username);
+      strcat(buf, "@");
+      strcat(buf, cli_user(c2ptr)->host);
+    }
+
     idx += strlen(cli_name(c2ptr));
     flag = 1;
     if (mlen + idx + NICKLEN + 5 > BUFSIZE)

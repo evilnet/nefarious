@@ -3,6 +3,29 @@
 
 2008-03-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/client.h: Added UHNAMES.
+
+	* include/s_user.h: Added extra param to set_nick_name.
+
+	* include/supported.h: Added UHNAMES.
+
+	* ircd/m_names.c: Added UHNAMES support, if a client supports this
+	then it will send a PROTOCTL UHNAMES on connect. From there on
+	any NAMES output will contain the full username!ident@hostname.
+	This saves on clients having to use WHO to get user hosts. Currently
+	mIRC and Klient support this.
+
+	* ircd/m_nick.c: Added extra param to set_nick_name.
+
+	* ircd/m_protoctl.c: Added UHNAMES.
+
+	* ircd/m_svsnick.c: Added extra param to set_nick_name.
+
+	* ircd/s_user.c: Allow nick changes via SVSNICK to skip limit
+	and U:line checkss.
+
+2008-03-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_svsjoin.c: Added support for SVSJOIN 0 to part all
 	channels.
 

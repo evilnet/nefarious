@@ -119,6 +119,11 @@ int m_protoctl(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       {
         SetNamesX(cptr);
       }
+
+      if ( ircd_strcmp(parv[i], "UHNAMES") == 0 )
+      {
+        SetUHNames(cptr);
+      }
     }
   }
 
