@@ -187,6 +187,7 @@ enum Flag {
 
     FLAG_NAMESX,                    /**< Client supports extended NAMES replies */
     FLAG_UHNAMES,                   /**< Client supports extended NAMES replies */
+    FLAG_PROPAGATED,                /**< Client has been propagated to other servers */
 
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /**< First local mode flag */
@@ -707,6 +708,8 @@ struct Client {
 #define IsNamesX(x)             HasFlag(x, FLAG_NAMESX)
 /** Return non-zero if the client supports extended NAMES */
 #define IsUHNames(x)             HasFlag(x, FLAG_UHNAMES)
+/** Return non-zero if the client has been propagted to servers */
+#define IsPropagated(x)         HasFlag(x, FLAG_PROPAGATED)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -786,6 +789,8 @@ struct Client {
 #define SetNamesX(x)            SetFlag(x, FLAG_NAMESX)
 /** Mark a client as supporting extended NAMES. */
 #define SetUHNames(x)            SetFlag(x, FLAG_UHNAMES)
+/** Mark a client as having been propagated. */
+#define SetPropagated(x)        SetFlag(x, FLAG_PROPAGATED)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -849,6 +854,8 @@ struct Client {
 #define ClearNamesX(x)          ClrFlag(x, FLAG_NAMESX)
 /** Client no longer supports extended names. */
 #define ClearUHNames(x)          ClrFlag(x, FLAG_UHNAMES)
+/** Client has no longer been propagated. */
+#define ClearPropagated(x)      ClrFlag(x, FLAG_PROPAGATED)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \

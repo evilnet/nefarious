@@ -1,6 +1,15 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Fix by Jobe.
+
+	* include/client.h: Added FLAG_PROPAGATED.
+
+	* ircd/s_user.c: Fixed an issue with default user modes being sent
+	before the N token.
+
 2008-03-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Reverted last commit for now.

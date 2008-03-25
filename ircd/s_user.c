@@ -889,6 +889,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
 			inttobase64(ip_base64, ntohl(cli_ip(sptr).s_addr), 6),
 			NumNick(sptr), cli_info(sptr));
   
+  SetPropagated(sptr);
+
   /* Send umode to client */
   if (MyUser(sptr))
   {
@@ -1465,7 +1467,7 @@ void send_umode_out(struct Client *cptr, struct Client *sptr, struct Flags *old,
 
   for (i = HighestFd; i >= 0; i--) {
     if ((acptr = LocalClientArray[i]) && IsServer(acptr) &&
-        (acptr != cptr) && (acptr != sptr) && *umodeBuf)
+        (acptr != cptr) && (acptr != sptr) && *umodeBuf && IsPropagated(sptr))
       sendcmdto_one(sptr, CMD_MODE, acptr, "%s %s", cli_name(sptr), umodeBuf);
   }
   if (cptr && MyUser(cptr))
