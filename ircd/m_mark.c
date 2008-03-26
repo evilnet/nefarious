@@ -193,7 +193,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     }
 
   } else
-    return protocol_violation(sptr, "Unknown MARK received [%s]", parv[2]);
+    log_write(LS_NETWORK, L_INFO, 0, "Unknown MARK received [%s]", parv[2]);
 
   return 0;
 }

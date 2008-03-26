@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_mark.c: Turned the protocol violation into just simple
+	logging. This way in the future we if theres new marks that dont
+	have F:lines they wont spam the network with protocol_violations
+	during network upgrades.
+
 2008-03-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Fix by Jobe.
