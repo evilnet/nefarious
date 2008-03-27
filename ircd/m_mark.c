@@ -174,7 +174,7 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
     if ((acptr = FindNServer(parv[1]))) {
       process_exempts(acptr, parv[3], atoi(parv[4]));
 
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s %s %s", cli_name(acptr), MARK_EXEMPT_UPDATE,
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%C %s %s %s", acptr, MARK_EXEMPT_UPDATE,
                             parv[3], parv[4]);
 
     } else
