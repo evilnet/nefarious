@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-03-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/handlers.h: Added ms_svsquit decleration.
+
+	* ircd/msg.h: Added SVSQUIT as SQ token.
+
+	* ircd/m_svsquit.c: When sent from another server this will make
+	a client quit on the server as if the client did /quit <msg>.
+
+	* ircd/parse.c: Added SVSQUIT.
+
 2008-03-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_mark.c: Must of been on something when i did this. Send

@@ -767,6 +767,13 @@ struct Message msgtab[] = {
     { m_ignore, m_ignore, ms_svsinfo, m_ignore, m_ignore }
   },
   {
+    MSG_SVSQUIT,
+    TOK_SVSQUIT,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_ignore, ms_svsquit, m_ignore, m_ignore }
+  },
+  {
     MSG_SVSNOOP,
     TOK_SVSNOOP,
     0, MAXPARA, MFLG_SLOW, 0,
