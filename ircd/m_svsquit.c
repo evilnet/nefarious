@@ -54,7 +54,7 @@ int ms_svsquit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return 0; /* Ignore svsquit for a user that has quit */
 
   if (parc > 1 && !BadPtr(parv[parc - 1]))
-    return exit_client_msg(acptr, acptr, acptr, "Quit: %s", parv[parc - 1]);
+    return exit_client_msg(acptr, acptr, acptr, "%s", parv[parc - 1]);
   else
     return exit_client(acptr, acptr, acptr, "Quit");
 

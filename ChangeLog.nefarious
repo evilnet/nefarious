@@ -3,6 +3,10 @@
 
 2008-03-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_svsquit.c: Removed the prefixing.
+
+2008-03-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/handlers.h: Added ms_svsquit decleration.
 
 	* ircd/msg.h: Added SVSQUIT as SQ token.
