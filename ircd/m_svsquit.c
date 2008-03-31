@@ -53,6 +53,15 @@ int ms_svsquit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!(acptr = findNUser(parv[1])))
     return 0; /* Ignore svsquit for a user that has quit */
 
+  if (!MyConnect(acptr)) {
+    if (parc > 1 && !BadPtr(parv[parc - 1]))
+      sendcmdto_serv_butone(sptr, CMD_SVSQUIT, cptr, "%C :%s", acptr, parv[parc - 1]);
+    else
+      sendcmdto_serv_butone(sptr, CMD_SVSQUIT, cptr, "%C", acptr);
+
+    return 0;
+  }
+
   if (parc > 1 && !BadPtr(parv[parc - 1]))
     return exit_client_msg(acptr, acptr, acptr, "%s", parv[parc - 1]);
   else

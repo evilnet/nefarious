@@ -1,7 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2008-03-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+2008-04-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_svsquit.c: Send SVSQUIT's to remote servers if we need	
+	to.
+
+2008-04-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/msg.h: Im a dumbass, changed the prefix for SVSQUIT
 	from SQ to SX as SQ is already in use with SQUIT.
