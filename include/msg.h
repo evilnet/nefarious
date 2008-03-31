@@ -263,7 +263,7 @@ struct Client;
 #define CMD_PART		MSG_PART, TOK_PART
 
 #define MSG_SVSQUIT             "SVSQUIT"	/* SVSQ */
-#define TOK_SVSQUIT             "SQ"
+#define TOK_SVSQUIT             "SX"
 #define CMD_SVSQUIT		MSG_SVSQUIT, TOK_SVSQUIT
 
 #define MSG_SVSPART             "SVSPART"	/* SVPA */
