@@ -377,8 +377,10 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    send_reply(sptr, RPL_DATASTR, outbuf);
 
    if (cli_version(acptr)) {
-     ircd_snprintf(0, outbuf, sizeof(outbuf), "   CTCP Version:: %s", cli_version(acptr));
-     send_reply(sptr, RPL_DATASTR, outbuf);
+     if (strlen(cli_version(acptr)) > 0) {
+       ircd_snprintf(0, outbuf, sizeof(outbuf), "   CTCP Version:: %s", cli_version(acptr));
+       send_reply(sptr, RPL_DATASTR, outbuf);
+     }
    }
 
    /* +s (SERV_NOTICE) is not relayed to us from remote servers,
