@@ -344,6 +344,9 @@ enum Feature {
   FEAT_CTCP_VERSIONING_USEMSG, /* added by Vadtec 02/28/2008 */
   FEAT_CTCP_VERSIONING_NOTICE,
 
+  /* Added to allow configuring sending host with LOC */
+  FEAT_LOC_SENDHOST,
+
   /* Really special features (tm) */
   FEAT_NETWORK_REHASH,
   FEAT_NETWORK_RESTART,

@@ -602,9 +602,16 @@ int register_user(struct Client *cptr, struct Client *sptr,
       } while (!cli_loc(sptr)->cookie);
       sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Attempting service login to %s",
 	            sptr, cli_loc(sptr)->service);
-      sendcmdto_one(&me, CMD_ACCOUNT, acptr, "%C C .%u.%u %s :%s", acptr,
-	            cli_fd(sptr), cli_loc(sptr)->cookie,
-	            cli_loc(sptr)->account, cli_loc(sptr)->password);
+      if ( feature_bool(FEAT_LOC_SENDHOST) ) {
+        sendcmdto_one(&me, CMD_ACCOUNT, acptr, "%C H .%u.%u %s@%s:%s %s :%s", acptr,
+                      cli_fd(sptr), cli_loc(sptr)->cookie, cli_user(sptr)->username,
+                      (cli_user(sptr)->host ? cli_user(sptr)->host : cli_sock_ip(sptr)),
+                      cli_sock_ip(sptr), cli_loc(sptr)->account, cli_loc(sptr)->password);
+      } else {
+        sendcmdto_one(&me, CMD_ACCOUNT, acptr, "%C C .%u.%u %s :%s", acptr,
+	              cli_fd(sptr), cli_loc(sptr)->cookie,
+	              cli_loc(sptr)->account, cli_loc(sptr)->password);
+      }
       ServerStats->is_login++;
     }
     return 0;
