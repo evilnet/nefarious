@@ -1631,13 +1631,13 @@ read_actual_config(const char *cfile)
     if (field_count < 2 || EmptyString(field_vector[0]))
       continue;
 
-    if (aconf)
-      free_conf(aconf);
-
     if (0 == ircd_strcmp(field_vector[0], "include")) {
       read_actual_config(field_vector[1]);
       continue;
     }
+    if (aconf)
+      free_conf(aconf);
+
 
     aconf = make_conf();
 

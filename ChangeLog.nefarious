@@ -3,6 +3,10 @@
 
 2008-04-02  Alex Schumann  <rubin@afternet.org>
 
+	* ircd/s_conf.c: fix bug in ircd.conf include line (using memory we just free'd)
+
+2008-04-02  Alex Schumann  <rubin@afternet.org>
+
 	* ircd/m_account.c: LOC send host patch by Jobe
 
 	* ircd/s_user.c: LOC send host patch by Jobe
