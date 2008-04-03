@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_serv.c: Only send MARK CVERSION's if there is a version
+	available.
+
 2008-04-02  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_conf.c: fix bug in ircd.conf include line (using memory we just free'd)
