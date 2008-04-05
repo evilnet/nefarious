@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* help/users/index: Fixed index display.
+
+	* help/opers/index: Fixed index display.
+
 2008-04-05  Alex Schumann  <rubin@afternet.org>
 
 	* help/Makefile.in: fix distclean bug
