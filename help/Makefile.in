@@ -3,11 +3,11 @@
 
 INSTALL=	@INSTALL@
 INSTALL_DATA=	@INSTALL_DATA@
-RM=		@RM@
+RM=		@RMPROG@
 DPATH =         @DPATH@
 top_srcdir =    @top_srcdir@
 prefix=		@DPATH@
-exec_prefix=	@execprefix@
+exec_prefix=	@prefix@
 uhelpdir=	${DPATH}/help/users
 ohelpdir=	${DPATH}/help/opers
 
