@@ -330,6 +330,7 @@ enum Feature {
   FEAT_HIS_STATS_Z,
   FEAT_HIS_ZLINE_REASON,
   FEAT_NICK_DELAY,
+  FEAT_HELP_PACE,
 
   /* Added as part of WEBIRC support */
   FEAT_HIS_STATS_W,

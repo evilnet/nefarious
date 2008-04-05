@@ -3,6 +3,33 @@
 
 2008-04-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* configure: Regenerated.
+
+	* configure.in: Process the Makefile in the help directory.
+
+	* Makefile.in: Process the help directory.
+
+	* doc/example.conf: Added F:HELP_PACE:5.
+
+	* help/*: Help files.
+
+	* include/ircd_features.h: Added FEAT_HELP_PACE.
+
+	* include/msg.h: Added UHELP.
+
+	* include/numeric.h: Added numerics for new help system.
+
+	* ircd/ircd_features.c: Added HELP_PACE, default 5. By default help
+	can be requested every 5 seconds.
+
+	* ircd/m_help.c: Re did the help system using the code from hybrid.
+
+	* ircd/parse.c: Added UHELP so opers can request user help files.
+
+	* ircd/s_err.c: Added numerics.
+
+2008-04-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/CIDR.txt: This should be of some use to people. Explains
 	CIDR masks. (Grabbed from hybrid docs dir).
 

@@ -1243,6 +1243,16 @@ static Numeric replyTable[] = {
   { RPL_WATCHLIST, ":%s", "606" },
 /* 557 */
   { RPL_ENDOFWATCHLIST, ":End of WATCH %c", "607" },
+/* 608 */
+  { ERR_HELPNOTFOUND, "%s :Help not found", "608" },
+/* 609 */
+  { RPL_HELPSTART, ":%s", "609" },
+/* 610 */
+  { RPL_HELPTXT, "%s :%s", "610" },
+/* 611 */
+  { RPL_ENDOFHELP, "%s :End of /HELP", "611" },
+/* 612 */
+  { RPL_LOAD2HI,  ":Server load is temporarily too heavy. Please wait a while and try again", "612" },
 };
 
 const struct Numeric* get_error_numeric(int n)

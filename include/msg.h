@@ -154,6 +154,10 @@ struct Client;
 #define TOK_HELP                "HELP"
 #define CMD_HELP		MSG_HELP, TOK_HELP
 
+#define MSG_UHELP               "UHELP"          /* UHELP */
+#define TOK_UHELP               "UHELP"
+#define CMD_UHELP		MSG_UHELP, TOK_UHELP
+
 #define MSG_ERROR               "ERROR"         /* ERRO */
 #define TOK_ERROR               "Y"
 #define CMD_ERROR		MSG_ERROR, TOK_ERROR

@@ -892,6 +892,6 @@ if test "$host_os" = "cygwin"; then
 fi
 
 dnl Finally really generate all output files:
-AC_CONFIG_FILES([Makefile ircd/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile help/Makefile ircd/Makefile doc/Makefile])
 AC_CONFIG_COMMANDS([default],[[echo timestamp > stamp-h]],[[]])
 AC_OUTPUT

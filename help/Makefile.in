@@ -1,0 +1,49 @@
+# Makefile to install help files
+# $Id: Makefile.in 33 2005-10-02 20:50:00Z knight $
+
+INSTALL=	@INSTALL@
+INSTALL_DATA=	@INSTALL_DATA@
+RM=		@RM@
+DPATH =         @DPATH@
+top_srcdir =    @top_srcdir@
+prefix=		@DPATH@
+exec_prefix=	@execprefix@
+uhelpdir=	${DPATH}/help/users
+ohelpdir=	${DPATH}/help/opers
+
+SYMLINKS=	
+
+all:
+build:
+clean:
+depend:
+
+install: 
+	@echo installing help files...
+	-@if test ! -d $(prefix)/help; then \
+		echo "mkdir $(prefix)/help"; \
+		mkdir $(prefix)/help; \
+		echo "mkdir $(prefix)/help/users"; \
+		mkdir $(prefix)/help/users; \
+		echo "mkdir $(prefix)/help/opers"; \
+		mkdir $(prefix)/help/opers; \
+	fi
+	@for help in ${top_srcdir}/help/opers/*; do \
+	if [ -f $$help ]; then \
+		${INSTALL_DATA} $$help $(ohelpdir); \
+	fi \
+	done
+	@for help in ${top_srcdir}/help/users/*; do \
+	if [ -f $$help ]; then \
+		$(INSTALL_DATA) $$help $(uhelpdir); \
+	fi \
+	done
+	@for link in $(SYMLINKS); do \
+		rm -f $(uhelpdir)/$$link; \
+		ln -s $(ohelpdir)/$$link $(uhelpdir); \
+	done
+
+distclean:
+	${RM} -f Makefile
+
+depend:

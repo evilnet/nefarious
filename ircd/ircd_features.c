@@ -551,6 +551,7 @@ static struct FeatureDesc {
   F_B(HIS_STATS_Z, 0, 1, 0),
   F_B(HIS_ZLINE_REASON, 0, 1, 0),
   F_I(NICK_DELAY, 0, 30, 0),
+  F_I(HELP_PACE, 0, 5, 0),
 
   /* Added as part of WEBIRC support */
   F_B(HIS_STATS_W, 0, 1, 0),

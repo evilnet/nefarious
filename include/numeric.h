@@ -512,7 +512,14 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_NOWOFF           605        /* Dalnet extension */
 #define RPL_WATCHLIST        606        /* Dalnet extension */
 #define RPL_ENDOFWATCHLIST   607        /* Dalnet extension */
-#define ERR_LASTERROR        608
+
+#define ERR_HELPNOTFOUND     608
+#define RPL_HELPSTART        609
+#define RPL_HELPTXT          610
+#define RPL_ENDOFHELP        611
+#define RPL_LOAD2HI          612
+
+#define ERR_LASTERROR        613
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal
