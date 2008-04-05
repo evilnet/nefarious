@@ -141,6 +141,9 @@ int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **
     return ERR_NOOPERHOST;
    assert(0 != (aconf->status & CONF_OPS));
 
+  if (aconf->port & OFLAG_RSA)
+     return ERR_RSA_LINE;
+
   if (oper_password_match(password, aconf->passwd)) {
     int attach_result = attach_conf(sptr, aconf);
     if ((ACR_OK != attach_result) && (ACR_ALREADY_AUTHORIZED != attach_result)) {
@@ -195,6 +198,10 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return need_more_params(sptr, "OPER");
 
     switch (can_oper(sptr, name, password, &aconf)) {
+    case ERR_RSA_LINE:
+     send_reply(sptr, ERR_RSA_LINE);
+     return 0;
+     break;
     case ERR_NOOPERHOST:
      sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
 			 parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
@@ -329,6 +336,10 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
     /* Check login */
     switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
+        case ERR_RSA_LINE:
+         send_reply(sptr, ERR_RSA_LINE);
+         return 0;
+         break;
 	case ERR_NOOPERHOST:
 	 sendto_allops(&me, SNO_OLDREALOP, 
 		"Failed OPER attempt by %s (%s@%s) (No O:line)", 

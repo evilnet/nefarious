@@ -250,6 +250,10 @@ struct Client;
 #define TOK_CNOTICE             "CN"
 #define CMD_CNOTICE		MSG_CNOTICE, TOK_CNOTICE
 
+#define MSG_CHALLENGE           "CHALLENGE"       /* CHAL */
+#define TOK_CHALLENGE           "CH"
+#define CMD_CHALLENGE		MSG_CHALLENGE, TOK_CHALLENGE
+
 #define MSG_JOIN                "JOIN"          /* JOIN */
 #define TOK_JOIN                "J"
 #define CMD_JOIN		MSG_JOIN, TOK_JOIN

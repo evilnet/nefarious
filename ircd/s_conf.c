@@ -100,6 +100,7 @@ static int dnsbl_flags[] = {
 static int oper_access[] = {
 	OFLAG_GLOBAL,	'O',
 	OFLAG_ADMIN,	'A',
+	OFLAG_RSA,	'R',
 	0, 0
 };
 
@@ -654,7 +655,8 @@ struct ConfItem* find_conf_exact(const char* name, const char* user,
      * socket host) matches *either* host or name field
      * of the configuration.
      */
-    if (match(tmp->host, userhost))
+
+   if (match(tmp->host, userhost))
       continue;
     if (tmp->status & (CONF_OPERATOR | CONF_LOCOP)) {
       if (tmp->clients < MaxLinks(tmp->conn_class))

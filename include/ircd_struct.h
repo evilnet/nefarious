@@ -89,6 +89,8 @@ struct User {
   char               dnsblhost[HOSTLEN + 40];
   char               shunreason[BUFSIZE + 1];
   char*              swhois;         /* pointer to swhois message */
+  char               response[BUFSIZE + 1];
+  char               auth_oper[NICKLEN + 1 ];
 };
 
 struct LOCInfo {

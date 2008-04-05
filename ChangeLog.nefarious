@@ -1,6 +1,43 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/challenge.txt: Document detailing on the new challenge system.
+
+	* doc/example.conf: Added a section to the O:line section detailing
+	how to use RSA keys with O:lines.
+
+	* include/client.h: Added O:line flag R (RSA).
+
+	* include/handlers.h: Added handler for m_challenge.
+
+	* include/ircd_struct.h: Added some entries into the client struct.
+
+	* include/msg.h: Added CHALLENGE.
+
+	* include/numeric.h: Added numerics for challenge system.
+
+	* include/ssl.h: Declare new functions for handling RSA keys.
+
+	* ircd/Makefile.in: Run mkkeypair after compiling.
+
+	* ircd/m_challenge.c: Added a port of hybrids challenge system. The
+	system uses RSA keys to authenticate opers.
+
+	* ircd/m_oper.c: If an O:line has an R flag then deny normal /OPER'ing
+
+	* ircd/s_err.c: Added numerics for challenge system.
+
+	* ircd/parse.c: Added CHALLENGE command.
+
+	* ircd/ssl.c: Added functions to handle RSA keys.
+
+	* tools/mkkeypair: Generates a RSA key for the server.
+
+	* tools/rsa_respond*: Program that turns the challenge output into
+	a response.
+
 2008-04-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_check.c: Only show the version in CHECK if its set.

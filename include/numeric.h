@@ -478,6 +478,11 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_WHOSYNTAX	     522        dalnet
 	ERR_WHOLIMEXCEED     523	dalnet */
 #define ERR_QUARANTINED      524	/* Undernet extension -Vampire */
+#define RPL_RSACHALLENGE     525
+#define RPL_INVALID_KEY      526
+#define RPL_NO_KEY           527
+#define RPL_NO_CHALL         528
+#define ERR_RSA_LINE         529
 #define ERR_BADHOSTMASK      530	/* QuakeNet extension -froo */
 #define ERR_HOSTUNAVAIL      531	/* QuakeNet extension -froo */
 

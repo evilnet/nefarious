@@ -1078,15 +1078,15 @@ static Numeric replyTable[] = {
 /* 524 */
   { ERR_QUARANTINED, "%s :%s", "524" },
 /* 525 */
-  { 0 },
+  { RPL_RSACHALLENGE, ":Key %s", "535"},
 /* 526 */
-  { 0 },
+  { RPL_INVALID_KEY, ":Your key is invalid", "526"},
 /* 527 */
-  { 0 },
+  { RPL_NO_KEY, ":Your key does not exist on the server.", "527" },
 /* 528 */
-  { 0 },
+  { RPL_NO_CHALL, ":Challenge Authentication is disabled for your O:line", "528" },
 /* 529 */
-  { 0 },
+  { ERR_RSA_LINE, ":The O:line you are using requires /CHALLENGE authentication", "529" },
 /* 530 */
   { ERR_BADHOSTMASK, "%s :Invalid username/hostmask", "530" },
 /* 531 */

@@ -57,5 +57,10 @@ extern void ssl_add_connection(struct Listener *listener, int fd);
 extern void ssl_free(struct Socket *socket);
 extern void ssl_init(void);
 
+extern void report_crypto_errors(void);
+extern int verify_private_key(void);
+extern int generate_challenge(char **, RSA *, struct Client *sptr);
+extern int get_randomness(unsigned char *, int);
+
 #endif /* USE_SSL */
 #endif /* INCLUDED_ssl_h */

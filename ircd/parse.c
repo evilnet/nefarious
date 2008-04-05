@@ -49,6 +49,7 @@
 #include "send.h"
 #include "shun.h"
 #include "ircd_struct.h"
+#include "ssl.h"
 #include "sys.h"
 #include "whocmds.h"
 #include "whowas.h"
@@ -157,6 +158,15 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_unregistered, m_cnotice, m_ignore, m_cnotice, m_ignore }
   },
+#ifdef USE_SSL
+  {
+    MSG_CHALLENGE,
+    TOK_CHALLENGE,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_challenge, m_ignore, m_challenge, m_ignore }
+  },
+#endif
   {
     MSG_JOIN,
     TOK_JOIN,

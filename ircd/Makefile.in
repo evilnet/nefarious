@@ -114,6 +114,7 @@ IRCD_SRC = \
 	m_asll.c \
 	m_away.c \
 	m_burst.c \
+	m_challenge.c \
 	m_check.c \
 	m_clearmode.c \
 	m_close.c \
@@ -327,6 +328,7 @@ install-with-symlink: build mkbindir
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.motd ${DPATH}	
 	${top_srcdir}/tools/makepem/makepem ${DPATH} ${top_srcdir}
+	${top_srcdir}/tools/mkkeypair ${DPATH} ${top_srcdir}
 	${RM} -f ${top_srcdir}/ircd/version.c
 # 	( cd ${DPATH}; \
 # 	  ${TOUCH} ${MPATH}; \

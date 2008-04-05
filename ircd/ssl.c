@@ -26,6 +26,7 @@
 #include "ircd.h"  
 #include "ircd_defs.h"
 #include "ircd_events.h"
+#include "ircd_log.h"
 #include "ircd_snprintf.h"
 #include "ircd_alloc.h"
 #include "s_debug.h"
@@ -43,6 +44,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+
+int bio_spare_fd = -1;
+RSA *server_rsa_private_key;
 
 SSL_CTX *ctx;
 static unsigned int ssl_inuse = 0;
@@ -357,6 +361,8 @@ static void sslfail(char *txt)
 void ssl_init(void)
 {
   char pemfile[1024];
+  char pemfile2[1024];
+  BIO *file;
 
   SSLeay_add_ssl_algorithms();
   SSL_load_error_strings();
@@ -377,6 +383,42 @@ void ssl_init(void)
     sslfail("SSL_CTX_use_certificate_file");
   if (!SSL_CTX_use_RSAPrivateKey_file(ctx, pemfile, SSL_FILETYPE_PEM))
     sslfail("SSL_CTX_use_RSAPrivateKey_file");
+
+  ircd_snprintf(0, pemfile, sizeof(pemfile), "%s/rsa.key", DPATH);
+  Debug((DEBUG_DEBUG, "RSA: using key file: %s", pemfile));
+
+  if (server_rsa_private_key)
+  {
+    RSA_free(server_rsa_private_key);
+    server_rsa_private_key = NULL;
+  }
+
+  if ((file = BIO_new_file(pemfile, "r")) == NULL)
+  {
+    Debug((DEBUG_DEBUG, "File doesn't exist (%s)", pemfile));
+    return;
+  }
+
+  server_rsa_private_key = (RSA *) PEM_read_bio_RSAPrivateKey(file, NULL,
+    0, NULL);
+
+  BIO_set_close(file, BIO_CLOSE);
+  BIO_free(file);
+
+  if (!server_rsa_private_key) {
+    Debug((DEBUG_DEBUG, "key invalid; check key syntax"));
+  } else if (!RSA_check_key(server_rsa_private_key))
+  {
+    RSA_free(server_rsa_private_key);
+    server_rsa_private_key = NULL;
+    Debug((DEBUG_DEBUG, "invalid key, ignoring"));
+  }
+  else if (RSA_size(server_rsa_private_key) != 2048/8)
+  {
+    RSA_free(server_rsa_private_key);
+    server_rsa_private_key = NULL;
+    Debug((DEBUG_DEBUG, "not a 2048-bit key, ignoring"));
+  }
 
   Debug((DEBUG_DEBUG, "SSL: init ok"));
 }
@@ -404,6 +446,190 @@ char *my_itoa(int i)
   static char buf[128];
   ircd_snprintf(0, buf, sizeof(buf), "%d", i);
   return (buf);
+}
+
+static void binary_to_hex(unsigned char *bin, char *hex, int length);
+
+/*
+ * report_crypto_errors - Dump crypto error list to log
+ */
+void
+report_crypto_errors(void)
+{
+  unsigned long e   = 0;
+  unsigned long cnt = 0;
+
+  ERR_load_crypto_strings();
+
+  while ((cnt < 100) && (e = ERR_get_error()))
+  {
+    log_write(LS_SYSTEM, L_INFO, 0,  "SSL error: %s", ERR_error_string(e, 0));
+    cnt++;
+  }
+}
+
+/*
+ * verify_private_key - reread private key and verify against inmem key
+ */
+int
+verify_private_key(void)
+{
+  BIO *file;
+  RSA *key;
+  RSA *mkey;
+  char pemfile[1024];
+
+  ircd_snprintf(0, pemfile, sizeof(pemfile), "%s/rsa.key", DPATH);
+  Debug((DEBUG_DEBUG, "RSA: using key file: %s", pemfile));
+
+  /* If the rsa_private_key directive isn't found, error out. */
+
+  if (server_rsa_private_key == NULL)
+  {
+    log_write(LS_SYSTEM, L_INFO, 0, "rsa_private_key in serverinfo{} is not defined.");
+    return -1;
+  }
+
+  if (bio_spare_fd > -1)
+    close(bio_spare_fd);
+
+  file = BIO_new_file(pemfile, "r");
+
+  /*
+   * If BIO_new_file returned NULL (according to OpenSSL docs), then
+   * an error occurred.
+   */
+  if (file == NULL)
+  {
+    log_write(LS_SYSTEM, L_INFO, 0, "Failed to open private key file - can't validate it");
+    return -1;
+  }
+
+  /*
+   * jdc -- Let's do this a little differently.  According to the
+   *        OpenSSL documentation, you need to METHOD_free(key) before
+   *        assigning it.  Don't believe me?  Check out the following
+   *        URL:  http://www.openssl.org/docs/crypto/pem.html#BUGS
+   * P.S. -- I have no idea why the key= assignment has to be typecasted.
+   *         For some reason the system thinks PEM_read_bio_RSAPrivateKey
+   *         is returning an int, not a RSA *.
+   * androsyn -- Thats because you didn't have a prototype and including
+   * 		 pem.h breaks things for some reason..
+   */
+  key = (RSA *) PEM_read_bio_RSAPrivateKey(file, NULL, 0, NULL);
+
+  if (key == NULL)
+  {
+    log_write(LS_SYSTEM, L_INFO, 0, "PEM_read_bio_RSAPrivateKey() failed; possibly not RSA?");
+    report_crypto_errors();
+    return -1;
+  }
+
+  BIO_set_close(file, BIO_CLOSE);
+  BIO_free(file);
+
+  mkey = server_rsa_private_key;
+
+  /*
+   * Compare the in-memory key to the key we just loaded above.  If
+   * any of the portions don't match, then logically we have a different
+   * in-memory key vs. the one we just loaded.  This is bad, mmmkay?
+   */
+  if (mkey->pad != key->pad)
+    log_write(LS_SYSTEM, L_INFO, 0, "Private key corrupted: pad %i != pad %i",
+                 mkey->pad, key->pad);
+  
+  if (mkey->version != key->version)
+  {
+#if (OPENSSL_VERSION_NUMBER & 0x00907000) == 0x00907000
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: version %li != version %li",
+                 mkey->version, key->version);
+#else
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: version %i != version %i",
+                 mkey->version, key->version);
+#endif
+  }    
+
+  if (BN_cmp(mkey->n, key->n))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: n differs");
+  if (BN_cmp(mkey->e, key->e))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: e differs");
+  if (BN_cmp(mkey->d, key->d))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: d differs");
+  if (BN_cmp(mkey->p, key->p))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: p differs");
+  if (BN_cmp(mkey->q, key->q))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: q differs");
+  if (BN_cmp(mkey->dmp1, key->dmp1))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: dmp1 differs");
+  if (BN_cmp(mkey->dmq1, key->dmq1))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: dmq1 differs");
+  if (BN_cmp(mkey->iqmp, key->iqmp))
+    log_write(LS_SYSTEM, L_CRIT, 0, "Private key corrupted: iqmp differs");
+
+  RSA_free(key);
+  return 0;
+}
+
+
+static void
+binary_to_hex(unsigned char *bin, char *hex, int length)
+{
+  static const char trans[] = "0123456789ABCDEF";
+  int i;
+
+  for(i = 0; i < length; i++)
+  {
+    hex[i  << 1]      = trans[bin[i] >> 4];
+    hex[(i << 1) + 1] = trans[bin[i] & 0xf];
+  }
+
+  hex[i << 1] = '\0';
+}
+
+int
+get_randomness(unsigned char *buf, int length)
+{
+  // Seed OpenSSL PRNG with EGD enthropy pool -kre
+  /*
+  if (General.use_egd && General.egdpool_path != NULL)
+    if (RAND_egd(General.egdpool_path) == -1)
+      return -1;
+  */
+
+  if (RAND_status())
+    return RAND_bytes(buf, length);
+  else // XXX - abort?
+    return RAND_pseudo_bytes(buf, length);
+}
+
+int
+generate_challenge(char **r_challenge, RSA *rsa, struct Client *sptr)
+{
+  unsigned char secret[32], *tmp;
+  unsigned long length;
+  int ret = -1;
+
+  if (!rsa)
+  	return -1;
+  get_randomness(secret, 32);
+  binary_to_hex(secret, cli_user(sptr)->response, 32);
+
+  length = RSA_size(rsa);
+  tmp = MyMalloc(length);
+  ret = RSA_public_encrypt(32, secret, tmp, rsa, RSA_PKCS1_PADDING);
+
+  *r_challenge = MyMalloc((length << 1) + 1);
+  binary_to_hex( tmp, *r_challenge, length);
+  (*r_challenge)[length<<1] = 0;
+  MyFree(tmp);
+
+  if (ret < 0)
+  {
+    report_crypto_errors();
+    return -1;
+  }
+  return 0;
 }
 
 #endif /* USE_SSL */

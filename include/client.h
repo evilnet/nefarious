@@ -866,21 +866,29 @@ struct Client {
 #define OFLAG_GLOBAL	0x001
 /** Oper flag admin (+A). */
 #define OFLAG_ADMIN	0x002
+/** Oper flag password is rsa key (+R). */
+#define OFLAG_RSA	0x004
 
 /** Return non-zero if the client is an global oper. */
 #define OIsGlobal(x)		(cli_oflags(x) & OFLAG_GLOBAL)
 /** Return non-zero if the client is an admin. */
 #define OIsAdmin(x)		(cli_oflags(x) & OFLAG_ADMIN)
+/** Return non-zero if the client is using rsa */
+#define OIsRSA(x)              (cli_oflags(x) & OFLAG_RSA)
 
 /** Mark a client as being an global oper. */
 #define OSetGlobal(x)		(cli_oflags(x) |= OFLAG_GLOBAL)
 /** Mark a client as being an admin. */
 #define OSetAdmin(x)		(cli_oflags(x) |= OFLAG_ADMIN)
+/** Mark a client as being rsa */
+#define OSetRSA(x)             (cli_oflags(x) |= OFLAG_RSA)
 
 /** Clear the client's global oper status. */
 #define OClearGlobal(x)		(cli_oflags(x) &= ~OFLAG_GLOBAL)
 /** Clear the client's admin status. */
 #define OClearAdmin(x)		(cli_oflags(x) &= ~OFLAG_ADMIN)
+/** Clear the client's rsa status */
+#define OClearRSA(x) )          (cli_oflags(x) &= ~OFLAG_RSA)
 
 /*
  * X:Line flags

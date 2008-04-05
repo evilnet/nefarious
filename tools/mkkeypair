@@ -1,0 +1,74 @@
+#!/bin/sh
+# $Id: mkkeypair 33 2005-10-02 20:50:00Z knight $
+#
+# mkkeypair - short shell script to generate a OpenSSL RSA key
+#
+# (C) 2003 Joshua Kwan and the IRCD-Hybrid team
+# See LICENSE for the terms of copying.
+
+case $# in
+0|1)      echo 'Usage: mkkeypair /dpath /top_srcdir' 1>&2; exit 2
+esac
+
+if test -f $2/config.h
+then
+  grep USE_SSL $2/config.h | awk '{
+    if ($1 != "#define") {
+      printf "SSL Disabled, Skipping RSA key Generation\n"
+      system("touch /tmp/ssltempdata")
+    }
+  }'
+fi
+
+if test -f /tmp/ssltempdata
+then
+  rm -f /tmp/ssltempdata
+else
+  echo 'Generating RSA keys...'
+
+if test -f $1/rsa.key; then
+        echo 'rsa.key already exists, exiting. Remove rsa.key and rsa.pub then run make install again to create a new one'
+	exit 0;
+fi
+
+if test -f $1/rsa.pub; then
+        echo 'rsa.key already exists, exiting. Remove rsa.key and rsa.pub then run make install again to create a new one'
+	exit 0;
+fi
+
+echo Generating random bytes
+
+if test -c /dev/urandom; then
+	RANDGEN=/dev/urandom
+elif test -c /dev/random; then
+	RANDGEN=/dev/random
+else
+	RANDGEN=input
+fi
+
+if test "$RANDGEN" = input; then
+	echo "Your system doesn't have a suitable random data generator,"
+	echo "so type 150 characters of gibberish here to simulate it."
+	read -n 150 randomdata
+	echo
+	echo "$randomdata" > /tmp/randdata
+	sort < /tmp/randdata >> /tmp/randdata.1
+	cat /tmp/randdata.1 >> /tmp/randdata
+	rm -f /tmp/randdata.1
+else
+	dd if=$RANDGEN of=/tmp/randdata count=1 bs=2048
+fi
+
+echo Creating the private key.
+openssl genrsa -rand /tmp/randdata -out $1/rsa.key 2048 || exit 1
+chmod 600 $1/rsa.key
+echo Creating the public key from the private key.
+openssl rsa -in $1/rsa.key -out $1/rsa.pub -pubout || exit 1
+chmod 644 $1/rsa.pub
+
+echo
+echo Private key now exists as rsa.key in $1
+echo Public key now exists as rsa.pub in $1
+
+rm -f /tmp/randdata
+fi
