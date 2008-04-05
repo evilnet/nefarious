@@ -3,6 +3,11 @@
 
 2008-04-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/CIDR.txt: This should be of some use to people. Explains
+	CIDR masks. (Grabbed from hybrid docs dir).
+
+2008-04-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/challenge.txt: Document detailing on the new challenge system.
 
 	* doc/example.conf: Added a section to the O:line section detailing
