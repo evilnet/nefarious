@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-05  Alex Schumann  <rubin@afternet.org>
+
+	* help/Makefile.in: fix distclean bug
+
 2008-04-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenerated.
