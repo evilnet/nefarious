@@ -1078,7 +1078,7 @@ static Numeric replyTable[] = {
 /* 524 */
   { ERR_QUARANTINED, "%s :%s", "524" },
 /* 525 */
-  { RPL_RSACHALLENGE, ":Key %s", "535"},
+  { RPL_RSACHALLENGE, ":Key %s", "525"},
 /* 526 */
   { RPL_INVALID_KEY, ":Your key is invalid", "526"},
 /* 527 */
