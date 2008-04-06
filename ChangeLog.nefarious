@@ -3,6 +3,12 @@
 
 2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/opers/: Added ison join kick help motd opermotd.
+
+	* help/Makefile.in: Added ison join kick help motd into SYMLINKS.
+
+2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/Makefile.in: Added new help files to SYMLINK line. Any help files
 	that are written for both opers and users just need to be put in the
 	opers dir, added to the SYMLINK line and make install will create a 

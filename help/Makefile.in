@@ -11,7 +11,8 @@ exec_prefix=	@exec_prefix@
 uhelpdir=	${DPATH}/help/users
 ohelpdir=	${DPATH}/help/opers
 
-SYMLINKS=	admin away challenge invite names nick version
+SYMLINKS=	admin away challenge invite names nick version \
+		ison join kick help motd
 
 all:
 build:
