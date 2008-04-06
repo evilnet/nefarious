@@ -3,6 +3,19 @@
 
 2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/Makefile.in: Added new help files to SYMLINK line. Any help files
+	that are written for both opers and users just need to be put in the
+	opers dir, added to the SYMLINK line and make install will create a 
+	symlink in the users dir to the command in the opers dir.
+
+	* help/opers/: Added admin away challenge invite names nick version.
+
+	* ircd/m_help.c: Fixed a small bug.
+
+	* ircd/s_err.c: Fixed a small bug.
+
+2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/users/index: Fixed index display.
 
 	* help/opers/index: Fixed index display.

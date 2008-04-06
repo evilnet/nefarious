@@ -11,7 +11,7 @@ exec_prefix=	@exec_prefix@
 uhelpdir=	${DPATH}/help/users
 ohelpdir=	${DPATH}/help/opers
 
-SYMLINKS=	
+SYMLINKS=	admin away challenge invite names nick version
 
 all:
 build:

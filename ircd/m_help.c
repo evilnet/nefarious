@@ -125,7 +125,7 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
   else if (line[0] != '#')
   {
     line[strlen(line) - 1] = '\0';
-    send_reply(sptr, RPL_HELPSTART, topic);
+    send_reply(sptr, RPL_HELPSTART, topic, line);
     started = 1;
   }
 

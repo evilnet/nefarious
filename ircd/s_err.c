@@ -1246,7 +1246,7 @@ static Numeric replyTable[] = {
 /* 608 */
   { ERR_HELPNOTFOUND, "%s :Help not found", "608" },
 /* 609 */
-  { RPL_HELPSTART, ":%s", "609" },
+  { RPL_HELPSTART, "%s :%s", "609" },
 /* 610 */
   { RPL_HELPTXT, "%s :%s", "610" },
 /* 611 */
