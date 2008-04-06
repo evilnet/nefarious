@@ -3,9 +3,15 @@
 
 2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
-	* help/opers/: Added ison join kick help motd opermotd.
+	* help/Makefile.in: Added user relevent help files..
+
+	* help/opers/: More help files.
+
+2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* help/Makefile.in: Added ison join kick help motd into SYMLINKS.
+
+	* help/opers/: Added ison join kick help motd opermotd.
 
 2008-04-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 

@@ -1,0 +1,10 @@
+OPER [server] <name> <password>
+
+The OPER command requires two arguments to be given. The first
+argument is the name of the operator as specified in the
+configuration file. The second argument is the password for
+the operator matching the name and host.
+
+If enabled, a server name cane be specified. The server name is
+the of the server your O:line is on. So you can be on any server
+on the network and be able to oper up.

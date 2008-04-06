@@ -12,7 +12,7 @@ uhelpdir=	${DPATH}/help/users
 ohelpdir=	${DPATH}/help/opers
 
 SYMLINKS=	admin away challenge invite names nick version \
-		ison join kick help motd
+		ison join kick help motd oper part quit time
 
 all:
 build:
