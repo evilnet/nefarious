@@ -43,7 +43,9 @@ struct Socket;
 struct Listener;
 
 char *my_itoa(int i);
- 
+
+extern int bio_spare_fd;
+
 extern IOResult ssl_recv(struct Socket *socket, char* buf, unsigned int length, unsigned int* count_out);
 extern IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf, unsigned int* count_in, unsigned int* count_out);
 
@@ -61,6 +63,8 @@ extern void report_crypto_errors(void);
 extern int verify_private_key(void);
 extern int generate_challenge(char **, RSA *, struct Client *sptr);
 extern int get_randomness(unsigned char *, int);
+
+extern int save_spare_fd(const char *);
 
 #endif /* USE_SSL */
 #endif /* INCLUDED_ssl_h */

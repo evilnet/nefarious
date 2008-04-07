@@ -38,6 +38,7 @@
 
 #ifdef USE_SSL
 #define _XOPEN_SOURCE
+#include <fcntl.h>
 #include <limits.h>
 #include <sys/uio.h>
 #include <assert.h>
@@ -56,6 +57,26 @@ struct ssl_data {
   struct Listener *listener;
   int fd;
 };
+
+int
+save_spare_fd(const char *spare_purpose)
+{
+  int spare_fd = open(PATH_DEVNULL, O_RDONLY, 0);
+
+  if (spare_fd < 0)
+  {
+    log_write(LS_SYSTEM, L_INFO, 0, "Failed to reserve low fd for %s - open failed", spare_purpose);
+    return -1;
+  }
+  else if (spare_fd > 255)
+  {
+    log_write(LS_SYSTEM, L_INFO, 0, "Failed to reserve low fd for %s - too high", spare_purpose);
+    close(spare_fd);
+    return -1;
+  }
+
+  return spare_fd;
+}
 
 static void abort_ssl(struct ssl_data *data)
 {
@@ -420,6 +441,7 @@ void ssl_init(void)
     Debug((DEBUG_DEBUG, "not a 2048-bit key, ignoring"));
   }
 
+  bio_spare_fd = save_spare_fd("SSL private key validation");
   Debug((DEBUG_DEBUG, "SSL: init ok"));
 }
 
@@ -501,6 +523,7 @@ verify_private_key(void)
    */
   if (file == NULL)
   {
+    bio_spare_fd = save_spare_fd("SSL private key validation");
     log_write(LS_SYSTEM, L_INFO, 0, "Failed to open private key file - can't validate it");
     return -1;
   }
@@ -527,6 +550,7 @@ verify_private_key(void)
 
   BIO_set_close(file, BIO_CLOSE);
   BIO_free(file);
+  bio_spare_fd = save_spare_fd("SSL private key validation");
 
   mkey = server_rsa_private_key;
 

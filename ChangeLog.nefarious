@@ -3,6 +3,20 @@
 
 2008-04-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* config.h.in: Ran autoheader.
+
+	* configure: Regenerated.
+
+	* configure.in: Added dev null check.
+
+	* include/ssl.h: Added fd check function i nearly forgot about.
+
+	* ircd/Makefile.in: Ran make depend.
+
+	* ircd/ssl.c: Added fd check function i nearly forgot about.
+
+2008-04-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_names.c: Fixed a buffer overflow with m_names with the
 	new UHNAMES functionality.
 
