@@ -205,11 +205,15 @@ void do_names(struct Client* sptr, struct Channel* chptr, int filter)
       strcat(buf, cli_user(c2ptr)->username);
       strcat(buf, "@");
       strcat(buf, cli_user(c2ptr)->host);
+      idx += strlen(cli_user(c2ptr)->username);
+      idx += strlen(cli_user(c2ptr)->host);
+      idx += 2; /* ! and @ */
     }
 
     idx += strlen(cli_name(c2ptr));
     flag = 1;
-    if (mlen + idx + NICKLEN + 5 > BUFSIZE)
+
+    if (mlen + idx + NICKLEN + USERLEN + HOSTLEN + 7 > BUFSIZE)
       /* space, modifier, nick, \r \n \0 */
     { 
       send_reply(sptr, RPL_NAMREPLY, buf);
