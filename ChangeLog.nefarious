@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/snomask.html: Updated.
+
+	* include/client.h: Added SNO_NICKCHG.
+
+	* ircd/s_user.c: Added SNO_NICKCHG, only send nick changes if a
+	person has this sno mask set. Rather than sending them with
+	client connects and quits.
+
 2008-04-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* config.h.in: Ran autoheader.

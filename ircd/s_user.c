@@ -1223,7 +1223,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
      * cli_name(sptr) is overwritten with the new nick. -reed
      */
     if (MyUser(sptr) && feature_bool(FEAT_CONNEXIT_NOTICES))
-      sendto_allops(&me, SNO_CONNEXIT,
+      sendto_allops(&me, SNO_NICKCHG,
 			 "Nick change: From %s to %s [%s@%s] <%s%s>",
 			 cli_name(sptr), nick,
 			 cli_user(sptr)->username,

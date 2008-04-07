@@ -933,6 +933,7 @@ struct Client {
 #define SNO_CONNEXIT    0x4000  /**< client connect/exit (ugh) */
 #define SNO_AUTO        0x8000  /**< AUTO G-Lines */
 #define SNO_DEBUG       0x10000 /**< debugging messages (DEBUGMODE only) */
+#define SNO_NICKCHG     0x20000 /**< nick change notices */
 
 #ifdef DEBUGMODE
 # define SNO_ALL        0x1ffff  /**< Bitmask of all valid server
