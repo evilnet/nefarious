@@ -61,6 +61,7 @@
 int m_watch(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
   char *s, *p = 0;
+  int i = 0;
 
   if (parc < 2)
   {
@@ -72,148 +73,150 @@ int m_watch(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   /*
    * The parameters can be separated for " " or "," or both.
    */
-  for (s = ircd_strtok(&p, parv[1], ", "); s; s = ircd_strtok(&p, NULL, ", "))
-  {
-    /*
-     * Prefix: "+" (add) "-" (delete)
-     */
-    if (*s == '+' || *s == '-')
-    {
-      char *nick, *p2;
-      char c = *s;
-
-      *s++ = '\0';
-
-      /* If nick!user@host is received we truncated it */
-      if (!(nick = ircd_strtok(&p2, s, "!")))
-	nick = s;
-
-      /* Do not admit servers, neither @, nor jockers */
-      if (strchr(nick, '*') || strchr(nick, '.') || strchr(nick, '@'))
-	continue;
-
-      if (strlen(nick) > NICKLEN)
-	nick[NICKLEN] = '\0';
-
-      if (!*nick)
-	continue;
-
-      if (c == '+')		/* Add nick */
-      {
-	if (cli_user(sptr)->watches >= feature_int(FEAT_MAXWATCHS))
-	{
-	  send_reply(sptr, ERR_TOOMANYWATCH, nick, feature_int(FEAT_MAXWATCHS));
-	  continue;
-	}
-
-	add_nick_watch(sptr, nick);
-	show_status_watch(sptr, nick, RPL_NOWON, RPL_NOWOFF);
-
-      }
-      else if (c == '-')	/* Deletes nick */
-      {
-	del_nick_watch(sptr, nick);
-	show_status_watch(sptr, nick, RPL_WATCHOFF, RPL_WATCHOFF);
-      }
-      continue;
-    }
-
-    /*
-     * Parameter C/c
-     *
-     * Deletes all the WATCH list.
-     */
-    if (*s == 'C' || *s == 'c')
-    {
-      del_list_watch(sptr);
-      continue;
-    }
-
-    /*
-     * Parametr S/s
-     *
-     * Status the WATCH List.
-     */
-    if (*s == 'S' || *s == 's')
-    {
-      struct Watch *wptr;
-      struct SLink *lp;
-      char line[BUFSIZE * 2];
-      int count = 0;
-
-      wptr = FindWatch(cli_name(sptr));
-
-      if (wptr)
-	for (lp = wt_watch(wptr), count = 1; (lp = lp->next); count++);
-
-      send_reply(sptr, RPL_WATCHSTAT, cli_user(sptr)->watches, count);
-
-      lp = cli_user(sptr)->watch;
-      if (lp)
-      {
-	*line = '\0';
-	strcpy(line, lp->value.wptr->wt_nick);
-	count = strlen(parv[0]) + strlen(cli_name(&me)) + 10 + strlen(line);
-
-	while ((lp = lp->next))
-	{
-	  if ((count + strlen(lp->value.wptr->wt_nick) + 1) > 512)
+  for (i = 0; i < parc; i++) {
+	  for (s = ircd_strtok(&p, parv[1], ", "); s; s = ircd_strtok(&p, NULL, ", "))
 	  {
-	    send_reply(sptr, RPL_WATCHLIST, line);
-	    *line = '\0';
-	    count = strlen(cli_name(sptr)) + strlen(cli_name(&me)) + 10;
+	    /*
+	     * Prefix: "+" (add) "-" (delete)
+	     */
+	    if (*s == '+' || *s == '-')
+	    {
+	      char *nick, *p2;
+	      char c = *s;
+	
+	      *s++ = '\0';
+	
+	      /* If nick!user@host is received we truncated it */
+	      if (!(nick = ircd_strtok(&p2, s, "!")))
+		nick = s;
+	
+	      /* Do not admit servers, neither @, nor jockers */
+	      if (strchr(nick, '*') || strchr(nick, '.') || strchr(nick, '@'))
+		continue;
+	
+	      if (strlen(nick) > NICKLEN)
+		nick[NICKLEN] = '\0';
+	
+	      if (!*nick)
+		continue;
+	
+	      if (c == '+')		/* Add nick */
+	      {
+		if (cli_user(sptr)->watches >= feature_int(FEAT_MAXWATCHS))
+		{
+		  send_reply(sptr, ERR_TOOMANYWATCH, nick, feature_int(FEAT_MAXWATCHS));
+		  continue;
+		}
+	
+		add_nick_watch(sptr, nick);
+		show_status_watch(sptr, nick, RPL_NOWON, RPL_NOWOFF);
+	
+	      }
+	      else if (c == '-')	/* Deletes nick */
+	      {
+		del_nick_watch(sptr, nick);
+		show_status_watch(sptr, nick, RPL_WATCHOFF, RPL_WATCHOFF);
+	      }
+	      continue;
+	    }
+	
+	    /*
+	     * Parameter C/c
+	     *
+	     * Deletes all the WATCH list.
+	     */
+	    if (*s == 'C' || *s == 'c')
+	    {
+	      del_list_watch(sptr);
+	      continue;
+	    }
+	
+	    /*
+	     * Parametr S/s
+	     *
+	     * Status the WATCH List.
+	     */
+	    if (*s == 'S' || *s == 's')
+	    {
+	      struct Watch *wptr;
+	      struct SLink *lp;
+	      char line[BUFSIZE * 2];
+	      int count = 0;
+	
+	      wptr = FindWatch(cli_name(sptr));
+	
+	      if (wptr)
+		for (lp = wt_watch(wptr), count = 1; (lp = lp->next); count++);
+	
+	      send_reply(sptr, RPL_WATCHSTAT, cli_user(sptr)->watches, count);
+	
+	      lp = cli_user(sptr)->watch;
+	      if (lp)
+	      {
+		*line = '\0';
+		strcpy(line, lp->value.wptr->wt_nick);
+		count = strlen(parv[0]) + strlen(cli_name(&me)) + 10 + strlen(line);
+	
+		while ((lp = lp->next))
+		{
+		  if ((count + strlen(lp->value.wptr->wt_nick) + 1) > 512)
+		  {
+		    send_reply(sptr, RPL_WATCHLIST, line);
+		    *line = '\0';
+		    count = strlen(cli_name(sptr)) + strlen(cli_name(&me)) + 10;
+		  }
+		  strcat(line, " ");
+		  strcat(line, lp->value.wptr->wt_nick);
+		  count += (strlen(lp->value.wptr->wt_nick) + 1);
+		}
+		send_reply(sptr, RPL_WATCHLIST, line);
+	      }
+	      send_reply(sptr, RPL_ENDOFWATCHLIST, *s);
+	
+	      continue;
+	    }
+	
+	    /*
+	     * Parameter L/l
+	     *
+	     * List users online and if we also especified "L" offline.
+	     */
+	    if (*s == 'L' || *s == 'l')
+	    {
+	      struct Client *acptr;
+	      struct SLink *lp = cli_user(sptr)->watch;
+	
+	
+	      while (lp)
+	      {
+		if ((acptr = FindUser(lp->value.wptr->wt_nick)))
+		{
+		  send_reply(sptr, RPL_NOWON, cli_name(acptr),
+		      cli_user(acptr)->username,
+		      HasHiddenHost(acptr) && !IsAnOper(sptr) ?
+		      cli_user(acptr)->host : cli_user(acptr)->realhost,
+		      cli_lastnick(acptr));
+		}
+		/*
+		 * If it specifies "L" to also send off-line.
+		 */
+		else if (*s == 'L')
+		{
+		  send_reply(sptr, RPL_NOWOFF, lp->value.wptr->wt_nick,
+		      "*", "*", lp->value.wptr->wt_lasttime);
+		}
+	
+		lp = lp->next;
+	      }
+	
+	      send_reply(sptr, RPL_ENDOFWATCHLIST, *s);
+	      continue;
+	    }
+	
+	    /* Unknown or not supported parameter.
+	     * Ignored it :)
+	     */
 	  }
-	  strcat(line, " ");
-	  strcat(line, lp->value.wptr->wt_nick);
-	  count += (strlen(lp->value.wptr->wt_nick) + 1);
-	}
-	send_reply(sptr, RPL_WATCHLIST, line);
-      }
-      send_reply(sptr, RPL_ENDOFWATCHLIST, *s);
-
-      continue;
-    }
-
-    /*
-     * Parameter L/l
-     *
-     * List users online and if we also especified "L" offline.
-     */
-    if (*s == 'L' || *s == 'l')
-    {
-      struct Client *acptr;
-      struct SLink *lp = cli_user(sptr)->watch;
-
-
-      while (lp)
-      {
-	if ((acptr = FindUser(lp->value.wptr->wt_nick)))
-	{
-	  send_reply(sptr, RPL_NOWON, cli_name(acptr),
-	      cli_user(acptr)->username,
-	      HasHiddenHost(acptr) && !IsAnOper(sptr) ?
-	      cli_user(acptr)->host : cli_user(acptr)->realhost,
-	      cli_lastnick(acptr));
-	}
-	/*
-	 * If it specifies "L" to also send off-line.
-	 */
-	else if (*s == 'L')
-	{
-	  send_reply(sptr, RPL_NOWOFF, lp->value.wptr->wt_nick,
-	      "*", "*", lp->value.wptr->wt_lasttime);
-	}
-
-	lp = lp->next;
-      }
-
-      send_reply(sptr, RPL_ENDOFWATCHLIST, *s);
-      continue;
-    }
-
-    /* Unknown or not supported parameter.
-     * Ignored it :)
-     */
   }
 
   return 0;
