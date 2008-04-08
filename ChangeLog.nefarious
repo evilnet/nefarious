@@ -3,6 +3,15 @@
 
 2008-04-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/client.h: Change SNO_ALL to account for the new snomask.
+
+	* ircd/ircd_log.c: Added NICKCHG to valid snomasks.
+
+	* ircd/s_user.c: Fixed up username and hostname display on snomask
+	nick changes.
+
+2008-04-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/snomask.html: Updated.
 
 	* include/client.h: Added SNO_NICKCHG.

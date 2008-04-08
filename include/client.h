@@ -936,10 +936,10 @@ struct Client {
 #define SNO_NICKCHG     0x20000 /**< nick change notices */
 
 #ifdef DEBUGMODE
-# define SNO_ALL        0x1ffff  /**< Bitmask of all valid server
+# define SNO_ALL        0x3ffff  /**< Bitmask of all valid server
                                   * notice bits. */
 #else
-# define SNO_ALL        0xffff
+# define SNO_ALL        0x2ffff
 #endif
 
 /** Server notice bits allowed to normal users. */

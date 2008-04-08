@@ -1226,8 +1226,8 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       sendto_allops(&me, SNO_NICKCHG,
 			 "Nick change: From %s to %s [%s@%s] <%s%s>",
 			 cli_name(sptr), nick,
-			 cli_user(sptr)->username,
-			 cli_user(sptr)->host,
+			 cli_user(sptr)->realusername,
+			 cli_user(sptr)->realhost,
 			 NumNick(sptr) /* Two %'s */
 			 );
 
