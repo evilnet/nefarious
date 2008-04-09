@@ -108,7 +108,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
       return;
     }
 
-    name = strdup(parv[1]);
+    name = strdup(cli_user(sptr)->auth_oper);
      
     aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_username(sptr),
                             MyUser(sptr) ? cli_sockhost(sptr) :
