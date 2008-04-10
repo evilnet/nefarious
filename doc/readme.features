@@ -317,6 +317,12 @@ This allows a user who has successfully authed to a service using login
 on connect (above) to bypass a DNSBL rejection if they got a positive
 result from the earlier check.
 
+LOC_DEFAULT_SERVICE
+  * type: string
+  * Default: authserv
+
+This is what nick on irc the login-on-connect account verification is sent to. User can override it (to any service that supports it) using 3 param LOC.
+
 DEFAULT_UMODE
  * Type: string
  * Default: "+"
