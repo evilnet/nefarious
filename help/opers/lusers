@@ -1,0 +1,5 @@
+/USERS [server] 
+
+Displays current server and network statistics, includes
+user, oper, server and channel counts.
+

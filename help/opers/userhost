@@ -1,0 +1,4 @@
+/USERHOST <nickname> 
+
+Returns the hostname for the given user.
+

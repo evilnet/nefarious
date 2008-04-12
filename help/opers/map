@@ -1,0 +1,4 @@
+/MAP [server] 
+
+Retrieves a map of servers and displays them without
+needing a client to generate the map.

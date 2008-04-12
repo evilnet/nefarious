@@ -1,0 +1,3 @@
+/GET <feature>
+
+Gets value set for the given F:line feature.

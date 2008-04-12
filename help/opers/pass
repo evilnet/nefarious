@@ -1,0 +1,5 @@
+/PASS :<password> 
+
+Clients use this to authenticate to password protected servers. Its
+also used for Login On Connect.
+

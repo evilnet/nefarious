@@ -1,0 +1,6 @@
+/TOPIC <#channel> [topic] 
+
+Sets a topic on a channel if a topic is specified. If
+just the channel is specified then the current topic
+will be displayed.
+

@@ -1,0 +1,6 @@
+/WALLVOICES <#channel> :<message> 
+
+Sends a message to the channel voices in the given channel.
+
+See Also: WALLCHOPS, WALLHOPS
+

@@ -1,0 +1,19 @@
+/QUOTE LIST [parameters]
+
+Where parameters is a space or comma seperated list of one or more of:
+
+  <max_users    ; Show all channels with less than max_users.
+  >min_users    ; Show all channels with more than min_users.
+  M<max_active  ; Show all active channels less than max_active ago.
+  M>min_active  ; Show all active channels more than min_active ago.
+  C<max_minutes ; Channels that exist less than max_minutes.
+  C>min_minutes ; Channels that exist more than min_minutes.
+  T<max_minutes ; Channels with a topic last set less than max_minutes ago.
+  T>min_minutes ; Channels with a topic last set more than min_minutes ago.
+  pattern       ; Channels with names matching pattern.
+  !pattern      ; Channels with names not matching pattern.
+
+Note: Patterns may contain * and ?. You may only give one pattern match constraint.
+
+Example: LIST <3,>1,C<10,T>0,#a*  ; 2 users, younger than 10 min., topic set., starts with #a
+

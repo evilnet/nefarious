@@ -1,0 +1,7 @@
+/CNOTICE <nickname> <#channel> :<message> 
+
+Allows a channel op to send notices to users
+in the channel without getting affected by
+the max target limit system.
+
+See Also: CPRIVMSG

@@ -1,0 +1,5 @@
+/WALLHOPS <#channel> :<message> 
+
+Sends a message to the channel half ops in the given channel.
+
+See Also: WALLCHOPS, WALLVOICES

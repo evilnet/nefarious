@@ -1,4 +1,4 @@
-AWAY :[MSG]
+/AWAY :[MSG]
 
 Without an argument, it will set you back.  With an argument,
 it will set you as AWAY with the specified message.

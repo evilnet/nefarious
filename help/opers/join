@@ -1,5 +1,5 @@
 # $Id: join 33 2005-10-02 20:50:00Z knight $
-JOIN <#channel1[,#channel2,#channel3...]> [key]
+/JOIN <#channel1[,#channel2,#channel3...]> [key]
 
 The JOIN command allows you to enter a public chat area known as
 a channel. Network wide channels are proceeded by a '#'. You can

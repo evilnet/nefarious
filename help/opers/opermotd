@@ -1,5 +1,5 @@
 # $Id: motd 33 2005-10-02 20:50:00Z knight $
-OPERMOTD [servername]
+/OPERMOTD [servername]
 
 OPERMOTD will display the message of the day for
 operators on the server name specified, or the

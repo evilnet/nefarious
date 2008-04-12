@@ -1,4 +1,4 @@
-OPER [server] <name> <password>
+/OPER [server] <name> <password>
 
 The OPER command requires two arguments to be given. The first
 argument is the name of the operator as specified in the

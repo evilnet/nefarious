@@ -1,4 +1,4 @@
-NAMES [channel]
+/NAMES [channel]
 
 With no channel argument, NAMES shows the names (nicks) of all clients
 logged in to the server that do not have +i flag.

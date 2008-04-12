@@ -12,7 +12,10 @@ uhelpdir=	${DPATH}/help/users
 ohelpdir=	${DPATH}/help/opers
 
 SYMLINKS=	admin away challenge invite names nick version \
-		ison join kick help motd oper part quit time
+		ison join kick help motd oper part quit time cnotice \
+		cprivmsg credits copyright info ircops ison links \
+		lusers map notice pass rules silence sethost topic \
+		userhost userip wallchops wallhops wallvoices whois
 
 all:
 build:

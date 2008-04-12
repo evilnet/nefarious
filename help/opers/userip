@@ -1,0 +1,4 @@
+/USERIP <nickname> 
+
+Returns the IP for the given user.
+

@@ -1,0 +1,7 @@
+/RULES [server] 
+
+Retrieves the rules from the server you are on
+(without a server specified). If one is specified
+then the rules will be retrieved from the given
+server.
+

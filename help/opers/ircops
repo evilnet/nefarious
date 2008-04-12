@@ -1,0 +1,6 @@
+/IRCOPS [server] 
+
+Retrives a list of all available IRC Operators.
+If a server is specified then a list will be
+retrieved from the specified server.
+

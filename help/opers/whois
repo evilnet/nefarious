@@ -1,0 +1,8 @@
+/WHOIS [server/nickname] <nickname1,nickname2> 
+
+Retrives information on the given nickname(s). If a server or
+a nick representing a server is specified then the information
+will be retrieved from that server (or from the server the given
+nick is on).
+
+See Also: WHO

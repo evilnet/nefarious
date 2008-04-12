@@ -1,4 +1,4 @@
-CHALLENGE <nick|+response>
+/CHALLENGE <nick|+response>
 
 CHALLENGE is used in the RSA controlled
 O:line system.  CHALLENGE requires you to

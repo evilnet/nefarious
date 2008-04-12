@@ -1,0 +1,7 @@
+/LINKS [server] [server mask] 
+
+Retrieves a map of servers, most clients use this to
+generate their own map screens.
+
+See Also MAP
+

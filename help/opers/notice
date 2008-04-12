@@ -1,0 +1,5 @@
+/NOTICE <nickname/#channel :<message> 
+
+Sends a notice to a given channel or nickname.
+
+See Also: PRIVMSG

@@ -1,0 +1,4 @@
+/SETHOST <hostname> <password> 
+
+Sets your sethost, these are managed via S:lines. To unset
+your set host do /SETHOST undo
