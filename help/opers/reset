@@ -1,0 +1,6 @@
+/RESET FEAT_<setting> 
+
+Resets the given F:line setting to the default value.
+
+See Also: SET, GET
+

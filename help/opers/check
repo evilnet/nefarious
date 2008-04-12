@@ -1,0 +1,15 @@
+/CHECK <channel|nick|server|hostmask> [-flags] 
+
+Where valid flags are:
+ -c: Show channels when checking a hostmask.
+ -i: Show IPs instead of hostnames when displaying results.
+ -o: Only show channel operators when checking a channel.
+ -u: Hide users when checking a channel.
+
+<hostmask> can be of the form host, user@host, nick!user@host,
+with host being host.domain.cc, 127.0.0.1 or 127.0.0.0/24.
+Wildcards are supported.
+
+CHECK Returns extended information about the given nick/server/channel.
+
+See Also: WHOIS

@@ -1,0 +1,12 @@
+/REHASH <flags> [remote server] 
+
+Reloads the ircd.conf file by default. Specify a remote server to
+rehash that server. The following flags are available:
+
+m - flushes the MOTD cache
+l - reopens the log files
+s - reopens the SSL pem file
+q - to not rehash the resolver
+
+See Also: RESTART, DIE
+

@@ -1,0 +1,8 @@
+/DNS <flags> 
+
+Specifying DNS with no flags will show the internal DNS statistics.
+The following flags are available:
+
+r - Restart DNS resolver
+l - DNS Cache contents
+

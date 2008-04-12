@@ -1,3 +1,5 @@
-/GET <feature>
+/GET FEAT_<feature>
 
 Gets value set for the given F:line feature.
+
+See Also: RESET, SET

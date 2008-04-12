@@ -1,0 +1,5 @@
+/PRIVS [nickname] 
+
+As an oper you can display the privilages set for a user. A
+server can set and unset privilages.
+

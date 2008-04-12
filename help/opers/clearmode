@@ -1,0 +1,8 @@
+/CLEARMODE [!]<#channel> <modes> 
+
+Removes the given modes from the given channel. If the
+channel is registered then you will need to include a !
+before the channel.
+
+See Also: OPMODE
+

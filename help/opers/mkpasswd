@@ -1,0 +1,5 @@
+/MKPASSWD <password> [DES/MD5] 
+
+Encrypts the specified password, if not encryption type is specified
+then the password will be encrypted in DES.
+

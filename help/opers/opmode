@@ -1,0 +1,7 @@
+/OPMODE [!]<#channel> <parameters> 
+
+Senders server will perform mode changes on a channel. If the
+channel is registered then you will need to add a ! to the
+front of the channel to force the change.
+
+See Also: CLEARMODE

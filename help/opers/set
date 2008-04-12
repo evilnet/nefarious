@@ -1,0 +1,6 @@
+/SET FEAT_<setting> :<value> 
+
+Changes the given F:line setting to the specified value
+
+See Also RESET, GET
+

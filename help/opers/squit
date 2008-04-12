@@ -1,0 +1,6 @@
+/SQUIT <server> :<reason> 
+
+Disconnects the given server from the network.
+
+See Also: CONNECT
+

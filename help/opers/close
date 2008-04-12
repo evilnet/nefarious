@@ -1,0 +1,6 @@
+/CLOSE 
+
+Closes unregistered connections. Please note that
+unregistered connections is not services related,
+its connections not registered with the IRCd.
+

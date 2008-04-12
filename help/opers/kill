@@ -1,0 +1,4 @@
+/KILL <nickname> :<reason> 
+
+Disconnects another user from IRC with the given <reason>.
+

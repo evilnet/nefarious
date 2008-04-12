@@ -1,0 +1,9 @@
+/RESTART [delay] :<reason> 
+
+Restarts the server, the given reason will be broadcast out.
+If a delay in seconds is specified then the server will stop
+allowing new connections and restart the server after [delay]
+seconds.
+
+See Also REHASH, DIE
+

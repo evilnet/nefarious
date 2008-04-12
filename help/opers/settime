@@ -1,0 +1,8 @@
+/SETTIME <new time> [server] 
+
+Sets the given time on the specified server. If no server
+is specified, the time will be set on the server the oper
+is on.
+
+See Also: TIME
+

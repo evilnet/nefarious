@@ -1,0 +1,35 @@
+/STATS <flag> [server] 
+
+Retrieves statistical information for the given flag.
+
+* B - Service mappings.
+* c - Remote server connection lines.
+* d - Dynamic routing configuration.
+* e - Report server event loop engine.
+* f - Feature settings.
+* g - Global bans (G-lines).
+* h - Hubs information.
+* i - Connection authorization lines.
+* j - Message length histogram.
+* k - Local bans (K-Lines).
+* l - Current connections information.
+* m - Message usage information.
+* o - Operator information.
+* p - Listening ports.
+* q - Quarantined channels list.
+* R - Connection Redirection information.
+* r - System resource usage (Debug only).
+* S - Global Shuns.
+* s - Spoofed hosts information.
+* T - Configured Message Of The Day files.
+* t - Local connection statistics (Total SND/RCV, etc).
+* U - Service server & nick jupes information.
+* u - Current uptime & highest connection count.
+* v - Verbose server information.
+* w - Userload statistics.
+* x - List usage information (Debug only).
+* X - Configured DNSBL hosts.
+* y - Connection classes.
+* z - Memory/Structure allocation information.
+
+Some flags are limited to opers only.

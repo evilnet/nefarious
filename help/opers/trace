@@ -1,0 +1,5 @@
+/TRACE <nick/servername> [target server] 
+
+Traces the specified nick or server name across the
+network to the actual server.
+
