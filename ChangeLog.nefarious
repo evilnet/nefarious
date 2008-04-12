@@ -3,6 +3,10 @@
 
 2008-04-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_challenge.c: Small tweak to header.
+
+2008-04-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/handlers.h: Added ms_challenge and mo_challenge.
 
 	* ircd/m_challenge.c: Added support for remote challenge's.

@@ -1,5 +1,5 @@
 /*
- * IRC - Internet Relay Chat, ircd/m_oper.c
+ * IRC - Internet Relay Chat, ircd/m_challenge.c
  * Copyright (C) 1990 Jarkko Oikarinen and
  *                    University of Oulu, Computing Center
  * Copyright (C) 2002 by the past and present hybird-ircd coders,
