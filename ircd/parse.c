@@ -164,7 +164,7 @@ struct Message msgtab[] = {
     TOK_CHALLENGE,
     0, MAXPARA, MFLG_SLOW, 0,
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
-    { m_unregistered, m_challenge, m_ignore, m_challenge, m_ignore }
+    { m_unregistered, m_challenge, ms_challenge, mo_challenge, m_ignore }
   },
 #endif
   {
