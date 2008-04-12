@@ -11,7 +11,8 @@
 
 	* ircd/m_challenge.c: Added support for remote challenge's.
 
-	* ircd/parse.c: Added ms_challenge and mo_challenge.
+	* ircd/parse.c: Added ms_challenge and mo_challenge into challenge
+	command.
 
 2008-04-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
