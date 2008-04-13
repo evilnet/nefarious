@@ -102,12 +102,96 @@
 #define UHPATH DPATH "/help/users"
 #define HELPLEN 400
 
+char message[BUFSIZE + 1];
+
+char *format_help_message(char *network, char *nick, char *ident, char *host, 
+                          char *ip, char *server, char *format)
+{
+   unsigned short pos = 0;   /* position in format */
+   unsigned short len = 0;   /* position in message */
+   unsigned short size = 0;  /* temporary size buffer */
+
+   unsigned int i;
+
+   struct message_format_assoc table[] = {
+     {'N',   (void *) NULL,         FORMATTYPE_STRING },
+     {'n',   (void *) NULL,         FORMATTYPE_STRING },
+     {'u',   (void *) NULL,         FORMATTYPE_STRING },
+     {'h',   (void *) NULL,         FORMATTYPE_STRING },
+     {'i',   (void *) NULL,         FORMATTYPE_STRING },
+     {'s',   (void *) NULL,         FORMATTYPE_STRING },
+   };
+
+   table[0].data = network;
+   table[1].data = nick;
+   table[2].data = ident;
+   table[3].data = host;
+   table[4].data = ip;
+   table[5].data = server;
+
+   /*
+    * Copy format to message character by character, inserting any matching
+    * data after %.
+    */
+   while(format[pos] != '\0' && len < (BUFSIZE - 1)) {
+      switch(format[pos]) {
+
+         case '%':
+            /* % is the last char in the string, move on */
+            if(format[pos + 1] == '\0')
+               continue;
+
+            /* %% escapes % and becomes % */
+            if(format[pos + 1] == '%') {
+               message[len++] = '%';
+               pos++; /* skip past the escaped % */
+               break;
+            }
+            /* Safe to check against table now */
+            for(i = 0; i < (sizeof(table) / sizeof(struct message_format_assoc)); i++) {
+               if(table[i].key == format[pos + 1]) {
+                  switch(table[i].type) {
+                     case FORMATTYPE_STRING:
+
+                        size = strlen( (char *) table[i].data);
+
+                        /* Check if the new string can fit! */
+                        if( (size + len) > BUFSIZE )
+                           break;
+                        else {
+                           strcat(message, (char *) table[i].data);
+                           len += size;
+                        }
+
+                     default:
+                        break;
+                  }
+               }
+            }
+            /* Skip key character */
+            pos++;
+            break;
+
+         default:
+            message[len++] = format[pos];
+            message[len] = '\0';
+            break;
+      }
+      /* continue to next character in format */
+      pos++;
+   }
+
+  return message;
+}
+
+
 static void
 sendhelpfile(struct Client *sptr, const char *path, const char *topic)
 {
   FBFILE *file;
   char line[HELPLEN];
   char started = 0;
+  char format_reply[HELPLEN];
   int type;
 
   if ((file = fbopen(path, "r")) == NULL)
@@ -132,6 +216,7 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
   while (fbgets(line, sizeof(line), file))
   {
     line[strlen(line) - 1] = '\0';
+
     if(line[0] != '#')
     {
       if (!started)
@@ -142,7 +227,14 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
       else
         type = RPL_HELPTXT;
 
-      send_reply(sptr, RPL_HELPTXT, topic, line);
+      if (strlen(line) > 1) {
+        ircd_snprintf(0, format_reply, sizeof(format_reply), "%s", format_help_message((char*)feature_str(FEAT_NETWORK), cli_name(sptr),
+                         sptr->cli_user->username, cli_user(sptr)->host, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
+                         cli_name(sptr->cli_user->server), line));
+        format_reply[strlen(format_reply) + 1] = '\0';
+        send_reply(sptr, RPL_HELPTXT, topic, format_reply);
+      } else
+        send_reply(sptr, RPL_HELPTXT, topic, line);
     }
   }
 
