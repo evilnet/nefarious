@@ -1,0 +1,7 @@
+/ZLINE [<mask>]
+
+Displays a list of currently set zlines. If <mask> is given, and if a Z-line for
+that server exists, all the information about that Z-line is displayed.  If
+<mask> is not given, an error is returned.
+
+See Also: GLINE, SHUN

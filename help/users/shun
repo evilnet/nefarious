@@ -1,0 +1,7 @@
+/SHUN [<mask>]
+
+Displays a list of currently set shuns. If <mask> is given, and if a Shun for
+that server exists, all the information about that Shun is displayed.  If
+<mask> is not given, an error is returned.
+
+See Also: GLINE, ZLINE

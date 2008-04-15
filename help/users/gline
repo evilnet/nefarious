@@ -1,0 +1,8 @@
+/GLINE [<mask>]
+
+Displays a list of currently set glines. If <mask> is given, and if a G-line for
+that server exists, all the information about that G-line is displayed.  If
+<mask> is not given, an error is returned.
+
+See Also: SHUN, ZLINE
+

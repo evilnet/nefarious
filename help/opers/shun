@@ -1,0 +1,12 @@
+/SHUN [[!][+|-][$<type>]<mask> [[<target>] <expiration> :<reason>]]
+
+Sets (+), removes (-) or lists shuns. The target can either be specified
+as * for a global shun (all servers) or a specific server can be
+specified for a local shun confined to the specified server. The <type>
+argument can be used to Shun user Realnames by using $R. The expiration
+can be specified either in seconds or as a formatted time, eg 2d5m3s
+(2 days 5 minutes 3 seconds. If the mask would not be permitted due
+to it being too wide or affecting too many users, the "!" prefix may be
+used to force the Shun to be set anyway.
+
+See Also: GLINE, ZLINE
