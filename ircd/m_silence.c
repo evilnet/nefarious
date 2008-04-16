@@ -167,7 +167,8 @@ int ms_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   acptr = findNUser(parv[1]);
 
-  assert(0 != acptr);
+  if (!acptr)
+    return 0; /* Ignore silences for a user that has quit */
 
   if (*parv[2] == '-')
     del_silence(acptr, parv[2] + 1);

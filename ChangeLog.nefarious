@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_silence.c: Patch from ButtaKnife. Ignore silences for users
+	that have quit.
+
 2008-04-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* help/*: Quick snomask help file based on snomask.html.
