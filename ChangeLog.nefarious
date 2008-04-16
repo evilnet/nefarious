@@ -3,6 +3,10 @@
 
 2008-04-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/*: Quick snomask help file based on snomask.html.
+
+2008-04-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/*: Added who commands.
 
 2008-04-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
