@@ -1,0 +1,82 @@
+/WHO <mask1> [<options> [<mask2>]]
+
+WHO is a powerful tool for searching for users.
+
+<mask2> is optional, if mask2 is present it's used for matching and mask1 is
+ignored, otherwise mask1 is used for matching, since mask2 is the last
+parameter it *can* contain a space and this can help when trying to match a
+"realname".
+
+When matching IP numbers the <mask> can be in 3 forms:
+
+- The old and well known IRC masks using * and ? as wanted
+- The IPmask form a.b.c.d/e.f.g.h as used in most firewalls and
+  system configurations, where what is before the / are the bits we expect
+  in the IP number and what is after the / is the "filter mask" telling wich
+  bits whould be considered and wich should be ignored.
+- The IPmask form a.b.c.d/bitcount where bitcount is an integer between 0
+  and 31 (inclusive), the matching will be for the IPs whose first
+  "bitcount" bits are equal to those in a.b.c.d
+
+The "options2" part can be as follows:
+
+ [<flags>][%[<fields>[,<querytype>]]]
+
+in which:
+
+ <flags>: can be a sequence of field matching flags, use mode matching flags
+          and special purpose flags
+
+   Field matching flags, when one of these is specified the field in
+   question is matched against the mask, otherwise it's not matched.
+
+   n   Nick (in nick!user@host)
+   u   Username (in nick!user@host)
+   h   Hostname (in nick!user@host)
+   i   Numeric IP (the unresolved host)
+   s   Servername (the canonic name of the server the guy is on)
+   r   Info text (formerly "Realname")
+   a   Account name
+
+   If no field-matching flags are specified they default to: nuhsr
+
+User mode matching flags (specifying one of these means that only clients
+   with that umode are considered, what is not specified is always matched):
+
+   o   Irc operator
+       [In the future more flags will be supported, basically all
+        usermodes plus the +/- specificators to revert the filtering]
+
+   Special purpose flags:
+
+   x   If this is specified the extended visibility of information for opers
+       is applied, what this means depends on the fact that you are local or
+       global operator and on how the admin configured the server (global
+       and eventually local irc opers might be allowed with this flag to see
+       +i local users, to see all +i users, to see users into +p and/or +s
+       channels, and so on). Using the 'x' flag while not being an irc
+       operator is meaningless (it will be ignored), using it while oper'd
+       means that the query is almost certainly logged and the admin might
+       (rightfully) ask you an explanation on why you did.
+
+   The rest, what follows the %, that is [%[fields[,<querytype>]]], is as it
+   has always been since the first who.patch, the <fields> part specifies
+   wich fields to include in the output as:
+
+   c : Include (first) channel name
+   d : Include "distance" in hops (hopcount)
+   f : Include flags (all of them)
+   h : Include hostname
+   i : Include IP
+   l : Include idle time (0 for remote users) [2.10.11+]
+   n : Include nick
+   r : Include real name
+   s : Include server name
+   t : Include the querytype in the reply
+   u : Include userID with eventual ~
+   a : Include account name
+
+And the ,<querytype> final option can be used to specify what you want the
+server to say in the querytype field of the output, useful to filter the
+output in scripts that do a kind of "on 354 ..."
+
