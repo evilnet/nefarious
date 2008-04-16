@@ -3,6 +3,10 @@
 
 2008-04-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/*: User and channel modes help files, cheers Jobe.
+
+2008-04-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/*: Help files for gline, shun and zline.
 
 2008-04-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

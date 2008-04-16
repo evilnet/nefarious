@@ -1,0 +1,8 @@
+B	Bot (Only a status line in /WHOIS output)
+d	Deaf (cannot see messages in channels)
+i	Invisible (Not shown in /WHO unless on the same channel)
+R	Only registered users can PM you
+s	Server notices (see Server Notice Masks for more information on server notices)
+x	Hide you IP/Host
+z	Is an SSL user (cannot be +'ed or -'ed)
+

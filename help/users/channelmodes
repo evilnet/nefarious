@@ -1,0 +1,28 @@
+o <nick>	Channel operator (@ prefix)
+h <nick>	Channel half operator (% prefix)
+v <nick>	Voiced user (+ prefix)
+
+b <mask>	Channel ban (users matching <mask> cannot /JOIN)
+e <mask>	Ban Exception (Users matching <mask> can /JOIN even if +b'ed)
+
+i		Invite only (must be /INVITE'ed)
+m		Moderated (must have +v, +h or +o to speak)
+n		Must have /JOIN'ed to speak in the channel
+t		Must have +h or +o to set the channels topic
+p		Private channel (shows as *private*)
+s		Secret channel (does not appear in /LIST etc..)
+k <key>		Key/password (sets key/password needed to /JOIN)
+l <count>	Limit (sets the maximum number of users for the channel)
+
+M		Same as +m but registered and identified users may speak too
+r		Only registered and identified users may /JOIN
+c		Block control codes (colours)
+S		Strip control codes (colours)
+C		Block CTCP's to the channel
+N		No notices to the channel
+L		Channels modes do not show in /LIST
+Q		Strip quit/part message reasons
+T		Attempt to prevent amsg's
+Z		Only SSL users may join
+z		Persistent channel (retains modes and topic even when empty)
+
