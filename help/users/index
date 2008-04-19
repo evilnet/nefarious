@@ -1,2 +1,28 @@
 # $Id: $
-todo :)
+-----------------------------------------------------------------------------------------
+| %N IRC Network Help
+-----------------------------------------------------------------------------------------
+Hi there %n,
+
+Below are a list of commands relevant to you. You can get help on each
+command by typing /HELP <command> where <command> is the command
+you need help with.
+
+
+ADMIN           AWAY            CHALLENGE       CNOTICE         COPYRIGHT       CPRIVMSG
+CREDITS         GLINE           INVITE          INFO            IRCOPS          ISON
+JOIN            KICK            LINKS           LIST            LUSERS          MAP
+MOTD            NAMES           NICK            NOTICE          OPER            PART
+PASS            QUIT            RULES           SETHOST         SHUN            SILENCE
+STATS           TIME            TOPIC           USERHOST        USERIP          WALLCHOPS
+WALLHOPS        WALLVOICES      WHO             WHOIS           ZLINE
+
+
+Other help which may be of use:
+
+CHANNELMODES    - Channel mode list with descriptions
+USERMODES       - Usermode list with descriptions
+
+If you need any further help just type /JOIN #%N
+
+-----------------------------------------------------------------------------------------

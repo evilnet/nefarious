@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* help/users/index: Index file for user help.
+
 2008-04-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_silence.c: Patch from ButtaKnife. Ignore silences for users
