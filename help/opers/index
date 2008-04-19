@@ -1,2 +1,33 @@
 # $Id: $
-todo :)
+-----------------------------------------------------------------------------------------
+| %N IRC Network Oper Help
+-----------------------------------------------------------------------------------------
+Hi there %n,
+
+Below are a list of commands relevant to you. You can get help on each
+command by typing /HELP <command> where <command> is the command
+you need help with.
+
+
+ADMIN           AWAY            CHALLENGE       CLEARMODE       CLOSE           CNOTICE
+CONNECT         COPYRIGHT       CPRIVMSG        CREDITS         DIE             DNS
+EXEMPT          GET             GLINE           HASH            INVITE          INFO
+IRCOPS          ISON            JOIN            KICK            KILL            LINKS
+LIST            LUSERS          MAP             MKPASSWD        MOTD            NAMES
+NICK            NOTICE          OPER            OPERMOTD        OPMODE          PART
+PASS            PRIVS           QUIT            REHASH          RESET           RESTART
+RULES           SET             SETTIME         SETHOST         SHUN            SILENCE
+SQUIT           STATS           TIME            TOPIC           TRACE           UHELP
+USERHOST        USERIP          WALLCHOPS       WALLHOPS        WALLVOICES      WHO
+WHOIS           ZLINE
+
+
+Other help which may be of use:
+
+CHANNELMODES    - Channel mode list with descriptions
+USERMODES       - Usermode list with descriptions
+SNOMASKS        - List of masks that can be used with oper usermode +s
+
+If you need any further help just type /JOIN #%N
+
+-----------------------------------------------------------------------------------------
