@@ -94,6 +94,7 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
+#include "IPcheck.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -114,6 +115,8 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char*        hostname;
   char*        ipaddr;
   char*        password;
+
+  time_t       next_target = 0;
 
   struct in_addr webirc_addr;
   struct ConfItem *aconf;
@@ -170,9 +173,17 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   inet_aton(ipaddr, &webirc_addr);
 
-  cli_ip(sptr).s_addr = webirc_addr.s_addr;
+  IPcheck_connect_fail(cli_ip(cptr));
+  IPcheck_disconnect(cptr);
 
-  ircd_strncpy(cli_sock_ip(sptr), ipaddr, SOCKIPLEN);
+  cli_ip(cptr).s_addr = webirc_addr.s_addr;
+
+  if (!IPcheck_local_connect(cli_ip(cptr), &next_target)) {
+    IPcheck_connect_fail(cli_ip(cptr));
+    return exit_client(cptr, sptr, &me, "Too many connections from your host");
+  }
+
+  ircd_strncpy(cli_sock_ip(cptr), ipaddr, SOCKIPLEN);
   ircd_strncpy(cli_sockhost(cptr), hostname, HOSTLEN);
 
   SetWebIRC(cptr);
