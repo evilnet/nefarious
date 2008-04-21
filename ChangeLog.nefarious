@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_watch.c: Patch from Jobe, WATCH tweak.
+
 2008-04-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_webirc.c: Patch from Jobe, fixes for throttle checks.

@@ -74,7 +74,7 @@ int m_watch(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    * The parameters can be separated for " " or "," or both.
    */
   for (i = 0; i < parc; i++) {
-	  for (s = ircd_strtok(&p, parv[1], ", "); s; s = ircd_strtok(&p, NULL, ", "))
+	  for (s = ircd_strtok(&p, parv[i], ", "); s; s = ircd_strtok(&p, NULL, ", "))
 	  {
 	    /*
 	     * Prefix: "+" (add) "-" (delete)
