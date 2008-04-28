@@ -508,6 +508,7 @@ static struct FeatureDesc {
   F_B(OPER_WHOIS_SECRET, 0, 1, 0),
   F_B(AUTOINVISIBLE, 0, 0, 0),
   F_B(SWHOIS, 0, 0, 0),
+  F_B(CHMODE_e_CHMODEEXCEPTION, 0, 0, 0),
   F_B(CHMODE_a, 0, 1, 0),
   F_B(CHMODE_c, 0, 1, 0),
   F_B(CHMODE_z, 0, 1, 0),

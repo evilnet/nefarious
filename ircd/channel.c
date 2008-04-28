@@ -1550,6 +1550,7 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
 {
   int overrideJoin = 0;  
   int keyv = 0;
+  int exception_join = 0;
   
   /*
    * Now a banned user CAN join if invited -- Nemesi
@@ -1577,21 +1578,31 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
     return 0;
 
   /*
+   * See if CHMODE_e_CHMODEEXCEPTION is enabled,
+   * if so and they have exception, they override chmode +i +k +l
+   * -Osiris
+   */
+  if (feature_bool(FEAT_CHMODE_e_CHMODEEXCEPTION)) {
+    if (is_excepted(sptr, chptr, NULL))
+      exception_join = 1;
+  }
+
+  /*
    * now using compall (above) to test against a whole key ring -Kev
    */
   if (*chptr->mode.key && !is_excepted(sptr, chptr, NULL) && (EmptyString(key) ||
-      compall(chptr->mode.key, key)))
+      compall(chptr->mode.key, key)) && (exception_join == 0))
         return overrideJoin + ERR_BADCHANNELKEY;
 
-  if (*chptr->mode.key)
+  if (*chptr->mode.key && (exception_join == 0))
     keyv = 1;
 
   if ((chptr->mode.mode & MODE_INVITEONLY) && !is_excepted(sptr, chptr, NULL) && ((keyv == 0) ||
-     (!feature_bool(FEAT_FLEXABLEKEYS))))
+     (!feature_bool(FEAT_FLEXABLEKEYS))) && (exception_join == 0))
   	return overrideJoin + ERR_INVITEONLYCHAN;
 
   if (chptr->mode.limit && chptr->users >= chptr->mode.limit && !is_excepted(sptr, chptr, NULL)
-     && ((keyv == 0) || (!feature_bool(FEAT_FLEXABLEKEYS))))
+     && ((keyv == 0) || (!feature_bool(FEAT_FLEXABLEKEYS))) && (exception_join == 0))
   	return overrideJoin + ERR_CHANNELISFULL;
 
   if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr) && !is_excepted(sptr, chptr, NULL)

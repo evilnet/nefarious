@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-04-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Patch below by Osiris (1479281)
+
+	* include/ircd_features.h: Added F:line CHMODE_e_CHMODEEXCEPTION.
+
+	* ircd/channel.c: Added CHMODE_e_CHMODEEXCEPTION. Allows +e to be
+	used as a general exemption to +k/+i/+l
+
+	* ircd/ircd_features.c: Added CHMODE_e_CHMODEEXCEPTION. Default FALSE.
+
 2008-04-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_watch.c: Patch from Jobe, WATCH tweak.
