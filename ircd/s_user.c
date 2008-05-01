@@ -475,6 +475,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     if (!EmptyString(aconf->passwd)
         && !(IsDigit(*aconf->passwd) && !aconf->passwd[1])
+        && !(IsDigit(*aconf->passwd) && IsDigit(aconf->passwd[1]) && !aconf->passwd[2])
         && strcmp(cli_passwd(sptr), aconf->passwd))
     {
       ServerStats->is_ref++;

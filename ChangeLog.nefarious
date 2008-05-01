@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-05-01  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for issue where I:Line overriding max per IP limit
+	with a number greater then 9 causes a Bad Password error on connect
+
 2008-04-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Patch below by Osiris (1479281)
