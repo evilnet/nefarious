@@ -147,7 +147,7 @@ void check_status_watch(struct Client *cptr, int raw)
     send_reply(lp->value.cptr, raw, cli_name(cptr),
 	IsUser(cptr) ? cli_user(cptr)->username : "<N/A>",
 	IsUser(cptr) ? 
- 	  (HasHiddenHost(cptr) && !IsAnOper(lp->value.cptr) ?
+ 	  (!IsAnOper(lp->value.cptr) ?
 	  cli_user(cptr)->host : cli_user(cptr)->realhost)
 	: "<N/A>",
 	wt_lasttime(wptr));

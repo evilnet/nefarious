@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-05-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/watch.c: Fix for bug where a user could get any other user's
+	real IP/host by adding them to their watch list.
+
 2008-05-01  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fix for issue where I:Line overriding max per IP limit
