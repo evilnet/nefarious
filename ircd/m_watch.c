@@ -193,7 +193,7 @@ int m_watch(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 		{
 		  send_reply(sptr, RPL_NOWON, cli_name(acptr),
 		      cli_user(acptr)->username,
-		      HasHiddenHost(acptr) && !IsAnOper(sptr) ?
+		      !IsAnOper(sptr) ?
 		      cli_user(acptr)->host : cli_user(acptr)->realhost,
 		      cli_lastnick(acptr));
 		}

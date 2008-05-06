@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-05-06  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/watch.c: Missed a line for previous fix for watch
+
+	* ircd/m_watch.c: Missed a line for previous fix for watch
+
 2008-05-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/watch.c: Fix for bug where a user could get any other user's

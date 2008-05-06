@@ -167,7 +167,7 @@ void show_status_watch(struct Client *cptr, char *nick, int raw1, int raw2)
   if ((acptr = FindUser(nick)))
   {
     send_reply(cptr, raw1, cli_name(acptr), cli_user(acptr)->username,
-        HasHiddenHost(acptr) && !IsAnOper(cptr) ?
+        !IsAnOper(cptr) ?
         cli_user(acptr)->host : cli_user(acptr)->realhost,
 	cli_lastnick(acptr));
   }
