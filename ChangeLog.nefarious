@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-05-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for missing and duplicated "logged on"
+	messages in watch list handling
+
 2008-05-06  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/watch.c: Missed a line for previous fix for watch
