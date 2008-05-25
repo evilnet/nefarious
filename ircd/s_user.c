@@ -1448,7 +1448,7 @@ int whisper(struct Client* source, const char* nick, const char* channel,
 
   if (IsAccountOnly(dest) && !IsAccount(source) && !IsOper(source) &&
       (dest != source))
-    send_reply(source, ERR_ACCOUNTONLY, cli_name(source),
+    send_reply(source, ERR_ACCOUNTONLY, cli_name(dest),
 	       (is_notice) ? "CNOTICE" : "CPRIVMSG", cli_name(dest));
   else if (is_notice)
     sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);

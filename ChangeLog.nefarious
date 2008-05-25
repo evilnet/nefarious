@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-05-25  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_opermotd.c: Fixed "Permission denied" error during
+	remote oper
+
+	* ircd/ircd_relay.c: Fix to prevent user mode +R evasion bug
+
+	* ircd/s_user.c: Fix for ERR_ACCOUNTONLY reply sending source
+	twice instead of source and destination 
+
 2008-05-11  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fix for missing and duplicated "logged on"
