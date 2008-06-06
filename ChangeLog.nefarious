@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-06-06  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/channel.c: Fix for auto channel mode propagation
+
+	* include/supported.h: Minor tweak to numeric 005 output
+
 2008-05-25  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_opermotd.c: Fixed "Permission denied" error during

@@ -1750,7 +1750,7 @@ struct Channel *get_channel(struct Client *cptr, char *chname, ChannelGetType fl
     chptr->next = GlobalChannelList;
     chptr->creationtime = MyUser(cptr) ? TStime() : (time_t) 0;
     if (feature_bool(FEAT_AUTOCHANMODES) && feature_str(FEAT_AUTOCHANMODES_LIST) && 
-        strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0)
+        (strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) && MyUser(cptr))
       SetAutoChanModes(chptr);
     GlobalChannelList = chptr;
     hAddChannel(chptr);

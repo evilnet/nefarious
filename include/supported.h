@@ -45,7 +45,9 @@
                 " MODES=%i" \
                 " MAXCHANNELS=%i" \
                 " MAXBANS=%i" \
-                " MAXEXCEPTS=%i " \
+                " MAXEXCEPTS=%i" \
+                " MAXLIST=b:%i,e:%i" \
+                " EXCEPTS=e"\
                 " NICKLEN=%i" \
                 " MAXNICKLEN=%i"
 
@@ -67,6 +69,8 @@
 			feature_int(FEAT_MAXCHANNELSPERUSER), \
 			feature_int(FEAT_MAXBANS), \
 			feature_int(FEAT_MAXEXCEPTS), \
+                        feature_int(FEAT_MAXBANS), \
+                        feature_int(FEAT_MAXEXCEPTS), \
 			feature_int(FEAT_NICKLEN), NICKLEN
 
 #define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, feature_int(FEAT_CHANNELLEN), \
