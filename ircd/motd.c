@@ -332,14 +332,18 @@ motd_recache(void)
  * ircd.motd and remote.motd files into cache
  */
 void
-motd_init(void)
+motd_init_local(void)
 {
   if (MotdList.local) /* destroy old local... */
     motd_destroy(MotdList.local);
 
   MotdList.local = motd_create(0, feature_str(FEAT_MPATH), MOTD_MAXLINES);
   motd_cache(MotdList.local); /* init local and cache it */
+}
 
+void
+motd_init_remote(void)
+{
   if (MotdList.remote) /* destroy old remote... */
     motd_destroy(MotdList.remote);
 

@@ -121,4 +121,10 @@ extern int do_nick_name(char* nick);
 
 void do_names(struct Client* sptr, struct Channel* chptr, int filter);
 
+extern void init_isupport(void);
+extern void add_isupport_i(const char *name, int value);
+extern void add_isupport_s(const char *name, const char *value);
+extern void del_isupport(const char *name);
+extern int send_supported(struct Client *cptr);
+
 #endif /* INCLUDED_s_user_h */

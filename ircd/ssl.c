@@ -381,9 +381,9 @@ static void sslfail(char *txt)
 
 void ssl_init(void)
 {
-  char pemfile[1024];
-  char pemfile2[1024];
-  BIO *file;
+  char pemfile[1024] = "";
+  char pemfile2[1024] = "";
+  BIO *file = NULL;
 
   SSLeay_add_ssl_algorithms();
   SSL_load_error_strings();

@@ -374,6 +374,7 @@ extern void feature_report(struct Client* to, struct StatDesc* sd, int stat,
 
 extern int feature_int(enum Feature feat);
 extern int feature_bool(enum Feature feat);
+extern unsigned int feature_uint(enum Feature feat);
 extern const char *feature_str(enum Feature feat);
 
 #endif /* INCLUDED_features_h */

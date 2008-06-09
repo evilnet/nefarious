@@ -18,68 +18,12 @@
  *
  * $Id$
  *
- * Description: This file has the featureset that ircu announces on connecting
- *              a client.  It's in this .h because it's likely to be appended
- *              to frequently and s_user.h is included by basically everyone.
  */
 #ifndef INCLUDED_supported_h
 #define INCLUDED_supported_h
 
 #include "channel.h"
 #include "ircd_defs.h"
-
-/* 
- * 'Features' supported by this ircd
- */
-#define FEATURES1 \
-                "WHOX"\
-                " NAMESX" \
-                " UHNAMES" \
-                " WALLCHOPS"\
-		" WALLVOICES"\
-                " USERIP"\
-                " CPRIVMSG"\
-                " CNOTICE"\
-                " WATCH=%i"\
-                " SILENCE=%i" \
-                " MODES=%i" \
-                " MAXCHANNELS=%i" \
-                " MAXBANS=%i" \
-                " MAXEXCEPTS=%i" \
-                " MAXLIST=b:%i,e:%i" \
-                " EXCEPTS=e"\
-                " NICKLEN=%i" \
-                " MAXNICKLEN=%i"
-
-#define FEATURES2 "TOPICLEN=%i" \
-                " AWAYLEN=%i" \
-                " KICKLEN=%i" \
-                " CHANNELLEN=%i" \
-                " MAXCHANNELLEN=%i" \
-		" CHANTYPES=%s" \
-                " PREFIX=%s" \
-                " ELIST=MNUCT" \
-                " STATUSMSG=%s" \
-                " CHANMODES=%s" \
-                " CASEMAPPING=%s" \
-                " NETWORK=%s"
-
-#define FEATURESVALUES1 feature_int(FEAT_MAXWATCHS), \
-			feature_int(FEAT_MAXSILES), MAXMODEPARAMS, \
-			feature_int(FEAT_MAXCHANNELSPERUSER), \
-			feature_int(FEAT_MAXBANS), \
-			feature_int(FEAT_MAXEXCEPTS), \
-                        feature_int(FEAT_MAXBANS), \
-                        feature_int(FEAT_MAXEXCEPTS), \
-			feature_int(FEAT_NICKLEN), NICKLEN
-
-#define FEATURESVALUES2 TOPICLEN, AWAYLEN, TOPICLEN, feature_int(FEAT_CHANNELLEN), \
-			CHANNELLEN, \
-			feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#", \
-			feature_bool(FEAT_HALFOPS) ? "(ohv)@%+" : "(ov)@+", \
-			feature_bool(FEAT_HALFOPS) ? "@%+" : "@+", \
-			"be,k,l,acimnprstzCLMNOQSTZ", "rfc1459", \
-			feature_str(FEAT_NETWORK)
 
 #define infochanmodes "abcehiklmnoprstvzCLMNOQSTZ"
 #define clearchanmodes "abcehiklmoprsvzCLMNOQSTZ" /* ditto except for +nt */

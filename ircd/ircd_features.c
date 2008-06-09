@@ -65,6 +65,26 @@ static struct LogTypes {
   { 0, 0, 0 }
 };
 
+char* itoa (int n){
+  int i=0,j;
+  char* s;
+  char* u;
+
+  s= (char*) malloc(17);
+  u= (char*) malloc(17);
+  
+  do{
+    s[i++]=(char)( n%10+48 );
+    n-=n%10;
+  }
+  while((n/=10)>0);
+  for (j=0;j<i;j++)
+  u[i-1-j]=s[j];
+
+  u[j]='\0';
+  return u;
+}
+
 /** Handle an update to FEAT_HIS_SERVERNAME. */
 static void
 feature_notify_servername(void)
@@ -189,6 +209,90 @@ feature_log_get(struct Client* from, const char* const* fields, int count)
   }
 }
 
+static void
+set_isupport_halfops(void)
+{
+    add_isupport_s("PREFIX", feature_bool(FEAT_HALFOPS) ? "(ohv)@%+" : "(ov)@+");
+    add_isupport_s("STATUSMSG", feature_bool(FEAT_HALFOPS) ? "@%+" : "@+");
+}
+
+static void
+set_isupport_excepts(void)
+{
+    char imaxlist[BUFSIZE] = "";
+    char *buf = NULL;
+
+    if (feature_bool(FEAT_EXCEPTS)) {
+      add_isupport_s("EXCEPTS", "e");
+      add_isupport_i("MAXEXCEPTS", feature_int(FEAT_MAXEXCEPTS));
+    } else {
+      del_isupport("EXCEPTS");
+      del_isupport("MAXEXCEPTS");
+    }
+
+    add_isupport_s("CHANMODES", feature_bool(FEAT_EXCEPTS) ? "be,k,l,acimnprstzCLMNOQSTZ" : "b,k,l,acimnprstzCLMNOQSTZ");
+
+    strcat(imaxlist, "b:");
+    strcat(imaxlist, itoa(feature_int(FEAT_MAXBANS)));
+    if (feature_bool(FEAT_EXCEPTS)) {
+      strcat(imaxlist, "e:");
+      strcat(imaxlist, itoa(feature_int(FEAT_MAXEXCEPTS)));
+    }
+
+    add_isupport_s("MAXLIST", imaxlist);
+}
+
+static void
+set_isupport_watchs(void)
+{
+    add_isupport_i("WATCH", feature_int(FEAT_MAXWATCHS));
+}
+
+static void
+set_isupport_maxsiles(void)
+{
+    add_isupport_i("SILENCE", feature_int(FEAT_MAXSILES));
+}
+
+static void
+set_isupport_maxchannels(void)
+{
+    /* uint */
+    add_isupport_i("MAXCHANNELS", feature_int(FEAT_MAXCHANNELSPERUSER));
+}
+
+static void
+set_isupport_maxbans(void)
+{
+    add_isupport_i("MAXBANS", feature_int(FEAT_MAXBANS));
+}
+
+static void
+set_isupport_nicklen(void)
+{
+    /* uint */
+    add_isupport_i("NICKLEN", feature_int(FEAT_NICKLEN));
+}
+
+static void
+set_isupport_channellen(void)
+{
+    /* uint */
+    add_isupport_i("CHANNELLEN", feature_int(FEAT_CHANNELLEN));
+}
+
+static void
+set_isupport_chantypes(void)
+{
+    add_isupport_s("CHANTYPES", feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#");
+}
+
+static void
+set_isupport_network(void)
+{
+    add_isupport_s("NETWORK", feature_str(FEAT_NETWORK));
+}
+
 /* sets a feature to the given value */
 typedef int  (*feat_set_call)(struct Client*, const char* const*, int);
 /* gets the value of a feature */
@@ -206,7 +310,13 @@ typedef void (*feat_report_call)(struct Client*, int);
 #define FEAT_INT    0x0001	/* set if entry contains an integer value */
 #define FEAT_BOOL   0x0002	/* set if entry contains a boolean value */
 #define FEAT_STR    0x0003	/* set if entry contains a string value */
+#define FEAT_ALIAS  0x0004      /**< set if entry is alias for another entry */
+#define FEAT_DEP    0x0005      /**< set if entry is deprecated feature */
+#define FEAT_UINT   0x0006      /**< set if entry contains an unsigned value */
 #define FEAT_MASK   0x000f	/* possible value types */
+
+/** Extract just the feature type from a feature descriptor. */
+#define feat_type(feat)         ((feat)->flags & FEAT_MASK)
 
 #define FEAT_MARK   0x0010	/* set if entry has been changed */
 #define FEAT_NULL   0x0020	/* NULL string is permitted */
@@ -240,12 +350,23 @@ static struct FeatureDesc {
 #define F_I(type, flags, v_int, notify)					      \
   { FEAT_ ## type, #type, FEAT_INT | (flags), 0, (v_int), 0, 0,		      \
     0, 0, 0, (notify), 0, 0, 0 }
+/** Declare a feature that takes unsigned integer values. */
+#define F_U(type, flags, v_uint, notify)                                      \
+  { FEAT_ ## type, #type, FEAT_UINT | (flags), 0, (v_uint), 0, 0,             \
+    0, 0, 0, (notify), 0, 0, 0 }
 #define F_B(type, flags, v_int, notify)					      \
   { FEAT_ ## type, #type, FEAT_BOOL | (flags), 0, (v_int), 0, 0,	      \
     0, 0, 0, (notify), 0, 0, 0 }
 #define F_S(type, flags, v_str, notify)					      \
   { FEAT_ ## type, #type, FEAT_STR | (flags), 0, 0, 0, (v_str),		      \
     0, 0, 0, (notify), 0, 0, 0 }
+/** Declare a feature as an alias for another feature. */
+#define F_A(type, alias)                                                      \
+  { FEAT_ ## type, #type, FEAT_ALIAS, 0, FEAT_ ## alias, 0, 0,                \
+    0, 0, 0, 0, 0, 0, 0 }
+/** Declare a feature as deprecated. */
+#define F_D(type)                                                             \
+  { FEAT_ ## type, #type, FEAT_DEP, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
   /* Misc. features */
   F_N(LOG, FEAT_MYOPER, feature_log_set, feature_log_reset, feature_log_get,
@@ -274,13 +395,13 @@ static struct FeatureDesc {
 
   /* features that probably should not be touched */
   F_I(KILLCHASETIMELIMIT, 0, 30, 0),
-  F_I(MAXCHANNELSPERUSER, 0, 20, 0),
-  F_I(NICKLEN, 0, 15, 0),
-  F_I(CHANNELLEN, 0, 200, 0),
+  F_I(MAXCHANNELSPERUSER, 0, 20, set_isupport_maxchannels),
+  F_I(NICKLEN, 0, 15, set_isupport_nicklen),
+  F_I(CHANNELLEN, 0, 200, set_isupport_channellen),
   F_I(AVBANLEN, 0, 40, 0),
-  F_I(MAXBANS, 0, 45, 0),
-  F_I(MAXSILES, 0, 15, 0),
-  F_I(MAXWATCHS, 0, 128, 0),
+  F_I(MAXBANS, 0, 45, set_isupport_maxbans),
+  F_I(MAXSILES, 0, 15, set_isupport_maxsiles),
+  F_I(MAXWATCHS, 0, 128, set_isupport_watchs),
   F_I(HANGONGOODLINK, 0, 300, 0),
   F_I(HANGONRETRYDELAY, 0, 10, 0),
   F_I(CONNECTTIMEOUT, 0, 60, 0),
@@ -297,8 +418,8 @@ static struct FeatureDesc {
   F_I(IPCHECK_CLONE_DELAY, 0, 600, 0),  
 
   /* Some misc. default paths */
-  F_S(MPATH, FEAT_CASE | FEAT_MYOPER, "ircd.motd", motd_init),
-  F_S(RPATH, FEAT_CASE | FEAT_MYOPER, "remote.motd", motd_init),
+  F_S(MPATH, FEAT_CASE | FEAT_MYOPER, "ircd.motd", motd_init_local),
+  F_S(RPATH, FEAT_CASE | FEAT_MYOPER, "remote.motd", motd_init_remote),
   F_S(PPATH, FEAT_CASE | FEAT_MYOPER | FEAT_READ, "ircd.pid", 0),
 
   /* Networking features */
@@ -404,7 +525,7 @@ static struct FeatureDesc {
   F_S(HIS_URLSERVERS, 0, "http://sourceforge.net/projects/evilnet/", 0),
 
   /* Misc. random stuff */
-  F_S(NETWORK, 0, "Nefarious", 0),
+  F_S(NETWORK, 0, "Nefarious", set_isupport_network),
   F_S(URL_CLIENTS, 0, "http://www.ircreviews.org/clients/", 0),
 
   /* Nefarious features */
@@ -424,7 +545,7 @@ static struct FeatureDesc {
   F_B(REMOTE_OPER, 0, 1, 0),
   F_B(REMOTE_MOTD, 0, 0, 0),
   F_I(BOT_CLASS, 0, 0, 0),
-  F_B(LOCAL_CHANNELS, 0, 1, 0),
+  F_B(LOCAL_CHANNELS, 0, 1, set_isupport_chantypes),
   F_B(OPER_LOCAL_CHANNELS, 0, 1, 0),
   F_B(OPER_XTRAOP, 0, 0, 0),
   F_I(XTRAOP_CLASS, 0, 0, 0),
@@ -467,8 +588,8 @@ static struct FeatureDesc {
   F_S(DEFAULT_UMODE, 0, "+", 0),
   F_B(HOST_IN_TOPIC, 0, 1, 0),
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
-  F_B(HALFOPS, FEAT_READ, 0, 0),
-  F_B(EXCEPTS, FEAT_READ, 0, 0),
+  F_B(HALFOPS, FEAT_READ, 0, set_isupport_halfops),
+  F_B(EXCEPTS, FEAT_READ, 0, set_isupport_excepts),
   F_B(BREAK_P10, FEAT_READ, 0, 0),
   F_I(AVEXCEPTLEN, 0, 40, 0),
   F_I(MAXEXCEPTS, 0, 45, 0),
@@ -591,8 +712,30 @@ feature_desc(struct Client* from, const char *feature)
   assert(0 != feature);
 
   for (i = 0; features[i].type; i++) /* find appropriate descriptor */
-    if (!strcmp(feature, features[i].type))
+    if (!strcmp(feature, features[i].type)) {
+      if (feat_type(&features[i]) == FEAT_ALIAS) {
+        Debug((DEBUG_NOTICE, "Deprecated feature \"%s\" referenced; replace "
+               "with %s", feature, features[features[i].def_int].type));
+        if (from) /* report a warning */
+          send_reply(from, SND_EXPLICIT | ERR_NOFEATURE,
+                     "%s :Feature deprecated, use %s", feature,
+                     features[features[i].def_int].type);
+        else
+          log_write(LS_CONFIG, L_WARNING, 0, "Feature \"%s\" deprecated, "
+                    "use \"%s\"", feature, features[features[i].def_int].type);
+
+        return &features[features[i].def_int];
+      } else if (feat_type(&features[i]) == FEAT_DEP) {
+        Debug((DEBUG_NOTICE, "Deprecated feature \"%s\" referenced", feature));
+        if (from) /* report a warning */
+          send_reply(from, SND_EXPLICIT | ERR_NOFEATURE,
+                     "%s :Feature deprecated", feature);
+        else
+          log_write(LS_CONFIG, L_WARNING, 0, "Feature \"%s\" deprecated",
+                    feature);
+      }
       return &features[i];
+    }
 
   Debug((DEBUG_ERROR, "Unknown feature \"%s\"", feature));
   if (from) /* report an error */
@@ -623,7 +766,7 @@ feature_set(struct Client* from, const char* const* fields, int count)
     if (from && feat->flags & FEAT_READ)
       return send_reply(from, ERR_NOFEATURE, fields[0]);
 
-    switch (feat->flags & FEAT_MASK) {
+    switch (feat_type(feat)) {
     case FEAT_NONE:
       if (feat->set && (i = (*feat->set)(from, fields + 1, count - 1))) {
 	change++; /* feature handler wants a change recorded */
@@ -636,6 +779,7 @@ feature_set(struct Client* from, const char* const* fields, int count)
       }
 
     case FEAT_INT: /* an integer value */
+    case FEAT_UINT:
       tmp = feat->v_int; /* detect changes... */
 
       if (count < 2) { /* reset value */
@@ -753,7 +897,7 @@ feature_set(struct Client* from, const char* const* fields, int count)
         send_reply(from, SND_EXPLICIT | RPL_FEATURE, ":Value of %s changed",
                    feat->type);
 
-      switch (feat->flags & FEAT_MASK) {
+      switch (feat_type(feat)) {
         case FEAT_NONE:
           sendto_opmask_butone(0, SNO_OLDSNO, "%C changed %s",
                                from, feat->type);
@@ -799,7 +943,7 @@ feature_reset(struct Client* from, const char* const* fields, int count)
     if (from && feat->flags & FEAT_READ)
       return send_reply(from, ERR_NOFEATURE, fields[0]);
 
-    switch (feat->flags & FEAT_MASK) {
+    switch (feat_type(feat)) {
     case FEAT_NONE: /* None... */
       if (feat->reset && (i = (*feat->reset)(from, fields + 1, count - 1))) {
 	change++; /* feature handler wants a change recorded */
@@ -812,6 +956,7 @@ feature_reset(struct Client* from, const char* const* fields, int count)
       break;
 
     case FEAT_INT:  /* Integer... */
+    case FEAT_UINT:
     case FEAT_BOOL: /* Boolean... */
       if (feat->v_int != feat->def_int)
 	change++; /* change will be made */
@@ -863,7 +1008,7 @@ feature_get(struct Client* from, const char* const* fields, int count)
 	(feat->flags & FEAT_OPER && !IsAnOper(from))) /* check privs */
       return send_reply(from, ERR_NOPRIVILEGES);
 
-    switch (feat->flags & FEAT_MASK) {
+    switch (feat_type(feat)) {
     case FEAT_NONE: /* none, call the callback... */
       if (feat->get) /* if there's a callback, use it */
 	(*feat->get)(from, fields + 1, count - 1);
@@ -872,6 +1017,11 @@ feature_get(struct Client* from, const char* const* fields, int count)
     case FEAT_INT: /* integer, report integer value */
       send_reply(from, SND_EXPLICIT | RPL_FEATURE,
 		 ":Integer value of %s: %d", feat->type, feat->v_int);
+      break;
+
+    case FEAT_UINT: /* unsigned integer, report its value */
+      send_reply(from, SND_EXPLICIT | RPL_FEATURE,
+                 ":Unsigned value of %s: %u", feat->type, feat->v_int);
       break;
 
     case FEAT_BOOL: /* boolean, report boolean value */
@@ -916,7 +1066,7 @@ feature_mark(void)
   for (i = 0; features[i].type; i++) {
     change = 0;
 
-    switch (features[i].flags & FEAT_MASK) {
+    switch (feat_type(&features[i])) {
     case FEAT_NONE:
       if (features[i].mark &&
 	  (*features[i].mark)(features[i].flags & FEAT_MARK ? 1 : 0))
@@ -924,6 +1074,7 @@ feature_mark(void)
       break;
 
     case FEAT_INT:  /* Integers or Booleans... */
+    case FEAT_UINT:
     case FEAT_BOOL:
       if (!(features[i].flags & FEAT_MARK)) { /* not changed? */
 	if (features[i].v_int != features[i].def_int)
@@ -956,26 +1107,30 @@ feature_init(void)
   int i;
 
   for (i = 0; features[i].type; i++) {
-    switch (features[i].flags & FEAT_MASK) {
+    struct FeatureDesc *feat = &features[i];
+
+    switch (feat_type(&features[i])) {
     case FEAT_NONE: /* you're on your own */
       break;
 
     case FEAT_INT:  /* Integers or Booleans... */
+    case FEAT_UINT:
     case FEAT_BOOL:
-      features[i].v_int = features[i].def_int;
+      feat->v_int = feat->def_int;
       break;
 
     case FEAT_STR:  /* Strings */
-      features[i].v_str = features[i].def_str;
-      assert(features[i].def_str || (features[i].flags & FEAT_NULL));
+      feat->v_str = feat->def_str;
+      assert(feat->def_str || (feat->flags & FEAT_NULL));
       break;
     }
-  }
+
+    if (feat->notify)
+     (*feat->notify)();
+ } 	  
 
   cli_magic(&his) = CLIENT_MAGIC;
   cli_status(&his) = STAT_SERVER;
-  feature_notify_servername();
-  feature_notify_serverinfo();
 }
 
 /* report all F-lines */
@@ -990,7 +1145,7 @@ feature_report(struct Client* to, struct StatDesc* sd, int stat, char* param)
 	(features[i].flags & FEAT_OPER && !IsAnOper(to)))
       continue; /* skip this one */
 
-    switch (features[i].flags & FEAT_MASK) {
+    switch (feat_type(&features[i])) {
     case FEAT_NONE:
       if (features[i].report) /* let the callback handle this */
 	(*features[i].report)(to, features[i].flags & FEAT_MARK ? 1 : 0);
@@ -1028,7 +1183,20 @@ int
 feature_int(enum Feature feat)
 {
   assert(features[feat].feat == feat);
-  assert((features[feat].flags & FEAT_MASK) == FEAT_INT);
+  assert(feat_type(&features[feat]) == FEAT_INT);
+
+  return features[feat].v_int;
+}
+
+/** Return a feature's unsigned integer value.
+ * @param[in] feat &Feature identifier.
+ * @return Unsigned integer value of feature.
+ */
+unsigned int
+feature_uint(enum Feature feat)
+{
+  assert(features[feat].feat == feat);
+  assert(feat_type(&features[feat]) == FEAT_UINT);
 
   return features[feat].v_int;
 }
@@ -1038,7 +1206,7 @@ int
 feature_bool(enum Feature feat)
 {
   assert(features[feat].feat == feat);
-  assert((features[feat].flags & FEAT_MASK) == FEAT_BOOL);
+  assert(feat_type(&features[feat]) == FEAT_BOOL);
 
   return features[feat].v_int;
 }
@@ -1048,7 +1216,7 @@ const char *
 feature_str(enum Feature feat)
 {
   assert(features[feat].feat == feat);
-  assert((features[feat].flags & FEAT_MASK) == FEAT_STR);
+  assert(feat_type(&features[feat]) == FEAT_STR);
 
   return features[feat].v_str;
 }

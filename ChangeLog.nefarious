@@ -1,6 +1,29 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-06-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/motd.h: Split motd_init into remote and local init
+	functions.
+
+	* include/ircd_features.h: Added uint F:lines.
+
+	* include/s_user.h: Backported UnderNet's .12 new isupport code.
+
+	* include/supported.h: Removed the old isupport code.
+
+	* ircd/ircd.c: Init isupport on load. Removed motd_init. Handled else
+	where now.
+
+	* ircd/ircd_features.c: Backported UnderNet's .12 new isupport code.
+	Also added support for alias and deprecated features
+
+	* ircd/motd.c: Split motd_init into remote and local init functions.
+
+	* ircd/s_user.c: Backported UnderNet's .12 new isupport code.
+
+	* ircd/ssl.c: Initilize a few variables in ssl_init.
+
 2008-06-06  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/channel.c: Fix for auto channel mode propagation

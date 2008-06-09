@@ -82,6 +82,7 @@
  * External stuff
  *--------------------------------------------------------------------------*/
 extern void init_counters(void);
+extern void init_isupport(void);
 
 /*----------------------------------------------------------------------------
  * Constants / Enums
@@ -892,6 +893,7 @@ int main(int argc, char **argv) {
   event_init(MAXCONNECTIONS);
 
   setup_signals();
+  init_isupport();
   feature_init(); /* initialize features... */
   log_init(*argv);
   set_nomem_handler(outofmemory);
@@ -910,8 +912,6 @@ int main(int argc, char **argv) {
   initstats();
 
   init_resolver();
-
-  motd_init();
 
   if (!init_conf()) {
     log_write(LS_SYSTEM, L_CRIT, 0, "Failed to read configuration file %s",
