@@ -3,6 +3,11 @@
 
 2008-06-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_check.c: Remote CHECK support. Plus a tweak for server user
+	counts.
+
+2008-06-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/motd.h: Split motd_init into remote and local init
 	functions.
 
