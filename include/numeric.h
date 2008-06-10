@@ -233,6 +233,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_WHOWASUSER       314        /* See also RPL_ENDOFWHOWAS */
 #define RPL_ENDOFWHO         315        /* See RPL_WHOREPLY/RPL_WHOSPCRPL */
 /*      RPL_WHOISCHANOP      316           removed from RFC1459 */
+#define RPL_WHOISPRIVDEAF    316        /* Nefarious extension */
 #define RPL_WHOISIDLE        317
 #define RPL_ENDOFWHOIS       318        /* See RPL_WHOISUSER/RPL_WHOISSERVER/
                                            RPL_WHOISOPERATOR/RPL_WHOISIDLE */
@@ -434,6 +435,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_CANTKICKADMIN    485	   PTlink */
 /*	ERR_HTMDISABLED      486	   unreal */
 #define ERR_ACCOUNTONLY      486	/* ASUKA/Nefarious extension */
+#define ERR_PRIVDEAF         487        /* Nefarious extension */
 /*      ERR_CHANTOORECENT    487           IRCnet extension (?) */
 /*      ERR_TSLESSCHAN       488           IRCnet extension (?) */
 #define ERR_EXCEPTLISTFULL   488	/* Nefarious extension */

@@ -251,8 +251,11 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (IsChannelService(acptr))
       send_reply(sptr, RPL_WHOISSERVICE, name, feature_str(FEAT_WHOIS_SERVICE));
 
-    if (IsAccountOnly(acptr))
+    if (IsAccountOnly(acptr) && !IsPrivDeaf(acptr))
       send_reply(sptr, RPL_WHOISACCOUNTONLY, name);
+
+    if (IsPrivDeaf(acptr))
+      send_reply(sptr, RPL_WHOISPRIVDEAF, name);
 
     if (IsBot(acptr))
       send_reply(sptr, RPL_WHOISBOT, name);

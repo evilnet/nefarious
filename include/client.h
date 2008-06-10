@@ -189,6 +189,8 @@ enum Flag {
     FLAG_UHNAMES,                   /**< Client supports extended NAMES replies */
     FLAG_PROPAGATED,                /**< Client has been propagated to other servers */
 
+    FLAG_PRIVDEAF,                  /**< Client is deaf to all private messages */
+
     _FLAG_COUNT,
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /**< First local mode flag */
     FLAG_GLOBAL_UMODES = FLAG_OPER  /**< First global mode flag */
@@ -710,6 +712,8 @@ struct Client {
 #define IsUHNames(x)             HasFlag(x, FLAG_UHNAMES)
 /** Return non-zero if the client has been propagted to servers */
 #define IsPropagated(x)         HasFlag(x, FLAG_PROPAGATED)
+/** Return non-zero if the client is private deaf */
+#define IsPrivDeaf(x)           HasFlag(x, FLAG_PRIVDEAF)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -791,6 +795,8 @@ struct Client {
 #define SetUHNames(x)            SetFlag(x, FLAG_UHNAMES)
 /** Mark a client as having been propagated. */
 #define SetPropagated(x)        SetFlag(x, FLAG_PROPAGATED)
+/** Mark a client as being private deaf. */
+#define SetPrivDeaf(x)          SetFlag(x, FLAG_PRIVDEAF)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -856,6 +862,8 @@ struct Client {
 #define ClearUHNames(x)          ClrFlag(x, FLAG_UHNAMES)
 /** Client has no longer been propagated. */
 #define ClearPropagated(x)      ClrFlag(x, FLAG_PROPAGATED)
+/** Client is no longer private deaf. */
+#define ClearPrivDeaf(x)        ClrFlag(x, FLAG_PRIVDEAF)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \

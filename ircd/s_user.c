@@ -1003,6 +1003,7 @@ static const struct UserMode {
   { FLAG_WALLOP,      'w' },
   { FLAG_SERVNOTICE,  's' },
   { FLAG_DEAF,        'd' },
+  { FLAG_PRIVDEAF,    'D' },
   { FLAG_CHSERV,      'k' },
   { FLAG_DEBUG,       'g' },
   { FLAG_ACCOUNT,     'r' },
@@ -1450,6 +1451,9 @@ int whisper(struct Client* source, const char* nick, const char* channel,
       (dest != source))
     send_reply(source, ERR_ACCOUNTONLY, cli_name(dest),
 	       (is_notice) ? "CNOTICE" : "CPRIVMSG", cli_name(dest));
+  else if (IsPrivDeaf(dest) && !IsOper(source) && (dest != source)) 
+    send_reply(source, ERR_PRIVDEAF, cli_name(source),
+               (is_notice) ? "CNOTICE" : "CPRIVMSG", cli_name(dest));
   else if (is_notice)
     sendcmdto_one(source, CMD_NOTICE, dest, "%C :%s", dest, text);
   else
@@ -2062,6 +2066,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           SetDeaf(acptr);
         else
           ClearDeaf(acptr);
+        break;
+      case 'D':
+        if (what == MODE_ADD)
+          SetPrivDeaf(acptr);
+        else
+          ClearPrivDeaf(acptr);
         break;
       case 'k':
         if (what == MODE_ADD)
