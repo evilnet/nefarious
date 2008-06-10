@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include "s_conf.h"
-#include "IPcheck.h"
+/*#include "IPcheck.h"*/
 #include "class.h"
 #include "client.h"
 #include "crule.h"
@@ -432,8 +432,8 @@ check_limit_and_attach(struct Client* cptr, struct ConfItem* aconf)
              !aconf->passwd[2])
       number = (*aconf->passwd-'0')*10+(aconf->passwd[1]-'0');
   }
-  if (IPcheck_nr(cptr) > number)
-    return ACR_TOO_MANY_FROM_IP;
+/*  if (IPcheck_nr(cptr) > number)
+ *  return ACR_TOO_MANY_FROM_IP; */
   return attach_conf(cptr, aconf);
 }
 

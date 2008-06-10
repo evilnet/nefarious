@@ -81,7 +81,7 @@
  */
 #include "config.h"
 
-#include "IPcheck.h"
+/* #include "IPcheck.h" */
 #include "client.h"
 #include "gline.h"
 #include "hash.h"
@@ -262,7 +262,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    */
   if (IsUnknown(acptr) && MyConnect(acptr)) {
     ++ServerStats->is_ref;
-    IPcheck_connect_fail(cli_ip(acptr));
+/*    IPcheck_connect_fail(cli_ip(acptr)); */
     exit_client(cptr, acptr, &me, "Overridden by other sign on");
     return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }
@@ -408,7 +408,7 @@ int ms_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    */
   if (IsUnknown(acptr) && MyConnect(acptr)) {
     ++ServerStats->is_ref;
-    IPcheck_connect_fail(cli_ip(acptr));
+/*    IPcheck_connect_fail(cli_ip(acptr)); */
     exit_client(cptr, acptr, &me, "Overridden by other sign on");
     return set_nick_name(cptr, sptr, nick, parc, parv, 0);
   }

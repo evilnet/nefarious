@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include "ircd.h"
-#include "IPcheck.h"
+/*#include "IPcheck.h"*/
 #include "channel.h"
 #include "class.h"
 #include "client.h"
@@ -921,7 +921,7 @@ int main(int argc, char **argv) {
 
   if (check_pid()) {
     Debug((DEBUG_FATAL, "Failed to acquire PID file lock after fork"));
-    exit(2);
+    //exit(2);
   }
 
   init_server_identity();
@@ -934,7 +934,7 @@ int main(int argc, char **argv) {
 
   stats_init();
 
-  IPcheck_init();
+/*  IPcheck_init(); */
   timer_add(timer_init(&connect_timer), try_connections, 0, TT_RELATIVE, 1);
   timer_add(timer_init(&ping_timer), check_pings, 0, TT_RELATIVE, 1);
   timer_add(timer_init(&alist_timer), send_alist, 0, TT_RELATIVE, 1);

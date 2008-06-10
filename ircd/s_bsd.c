@@ -23,7 +23,7 @@
 
 #include "s_bsd.h"
 #include "client.h"
-#include "IPcheck.h"
+/*#include "IPcheck.h"*/
 #include "channel.h"
 #include "class.h"
 #include "hash.h"
@@ -230,6 +230,7 @@ void close_connections(int close_stderr)
 int init_connection_limits(void)
 {
   int limit = os_set_fdlimit(MAXCONNECTIONS);
+  return 1; // hack by rubin for valgrind
   if (0 == limit)
     return 1;
   if (limit < 0) {
@@ -682,16 +683,16 @@ void add_connection(struct Listener* listener, int fd) {
    *
    * If they're throttled, murder them, but tell them why first.
    */
-  if (!IPcheck_local_connect(addr.sin_addr, &next_target) && !listener->server) {
-    ++ServerStats->is_ref;
-#ifdef USE_SSL
-     ssl_murder(ssl, fd, throttle_message);
-#else
-     write(fd, throttle_message, strlen(throttle_message));
-     close(fd);
-#endif /* USE_SSL */
-     return;
-  }
+/*  if (!IPcheck_local_connect(addr.sin_addr, &next_target) && !listener->server) {
+ *  ++ServerStats->is_ref;
+ * #ifdef USE_SSL
+ *      ssl_murder(ssl, fd, throttle_message);
+ * #else
+ *      write(fd, throttle_message, strlen(throttle_message));
+ *      close(fd);
+ * #endif * USE_SSL *
+ *      return;
+ *   } */
 
   new_client = make_client(0, ((listener->server) ? 
                                STAT_UNKNOWN_SERVER : STAT_UNKNOWN_USER));

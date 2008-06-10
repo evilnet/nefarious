@@ -31,7 +31,7 @@
 
 #include "s_auth.h"
 #include "client.h"
-#include "IPcheck.h"
+/* #include "IPcheck.h" */
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_chattr.h"
@@ -445,7 +445,7 @@ static void auth_kill_client(struct AuthRequest* auth)
 
   if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)))
     delete_resolver_queries(auth);
-  IPcheck_disconnect(auth->client);
+/*   IPcheck_disconnect(auth->client); */
   Count_unknowndisconnects(UserStats);
   cli_auth(auth->client) = 0;
   free_client(auth->client);

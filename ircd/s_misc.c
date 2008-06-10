@@ -25,7 +25,7 @@
 #include "config.h"
 
 #include "s_misc.h"
-#include "IPcheck.h"
+/*#include "IPcheck.h"*/
 #include "channel.h"
 #include "client.h"
 #include "hash.h"
@@ -296,8 +296,9 @@ static void exit_one_client(struct Client* bcptr, const char* comment)
   /*
    * Update IPregistry
    */
-  if (IsIPChecked(bcptr))
-    IPcheck_disconnect(bcptr);
+/*  if (IsIPChecked(bcptr))
+ *  IPcheck_disconnect(bcptr);
+ */
 
   /* 
    * Remove from serv->client_list

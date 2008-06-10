@@ -25,7 +25,7 @@
 #include "config.h"
 
 #include "s_user.h"
-#include "IPcheck.h"
+/*#include "IPcheck.h"*/
 #include "channel.h"
 #include "class.h"
 #include "client.h"
@@ -409,7 +409,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
                                get_client_name(sptr, SHOW_IP));
         }
         ++ServerStats->is_ref;
-        IPcheck_connect_fail(cli_ip(sptr));
+/*        IPcheck_connect_fail(cli_ip(sptr)); */
         return exit_client(cptr, sptr, &me,
                            "Sorry, your connection class is full - try "
                            "again later or try another server");
@@ -428,7 +428,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         /* Can this ever happen? */
       case ACR_BAD_SOCKET:
         ++ServerStats->is_ref;
-        IPcheck_connect_fail(cli_ip(sptr));
+/*        IPcheck_connect_fail(cli_ip(sptr));*/
         return exit_client(cptr, sptr, &me, "Unknown error -- Try again");
     }
 
@@ -837,7 +837,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 			  cli_info(sptr),
 			  NumNick(cptr) /* Two %'s */
 			  );
-    IPcheck_connect_succeeded(sptr);
+/*    IPcheck_connect_succeeded(sptr);*/
   }
   else
     /* if (IsServer(cptr)) */
@@ -867,15 +867,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
       if (IsBurst(acptr) || Protocol(acptr) < 10)
         break;
     }
-    if (!IPcheck_remote_connect(sptr, (acptr != &me))) {
+/*    if (!IPcheck_remote_connect(sptr, (acptr != &me))) { */
       /*
        * We ran out of bits to count this
        */
-      sendcmdto_one(&me, CMD_KILL, sptr, "%C :%s (Too many connections from "
-		    "your host -- Ghost)", sptr, cli_name(&me));
-      return exit_client(cptr, sptr, &me, "Too many connections from your"
-			 " host -- throttled");
-    }
+/*      sendcmdto_one(&me, CMD_KILL, sptr, "%C :%s (Too many connections from "
+ *		    "your host -- Ghost)", sptr, cli_name(&me));
+ *     return exit_client(cptr, sptr, &me, "Too many connections from your"
+ *			 " host -- throttled");
+ *   } */
   }
 
   /*
