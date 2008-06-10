@@ -118,6 +118,7 @@ IRCD_SRC = \
 	m_check.c \
 	m_clearmode.c \
 	m_close.c \
+	m_commands.c \
 	m_connect.c \
 	m_copyright.c \
 	m_cprivmsg.c \

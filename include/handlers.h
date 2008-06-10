@@ -89,6 +89,7 @@ extern int m_alist(struct Client*, struct Client*, int, char*[]);
 extern int m_away(struct Client*, struct Client*, int, char*[]);
 extern int m_challenge(struct Client*, struct Client*, int, char*[]);
 extern int m_cnotice(struct Client*, struct Client*, int, char*[]);
+extern int m_commands(struct Client*, struct Client*, int, char*[]);
 extern int m_copyright(struct Client*, struct Client*, int, char*[]);
 extern int m_cprivmsg(struct Client*, struct Client*, int, char*[]);
 extern int m_gline(struct Client*, struct Client*, int, char*[]);

@@ -150,6 +150,10 @@ struct Client;
 #define TOK_STATS               "R"
 #define CMD_STATS		MSG_STATS, TOK_STATS
 
+#define MSG_COMMANDS            "COMMANDS"      /* COMMANDS */
+#define TOK_COMMANDS            "COMMANDS"
+#define CMD_COMMANDS		MSG_COMMANDS, TOK_COMMANDS
+
 #define MSG_HELP                "HELP"          /* HELP */
 #define TOK_HELP                "HELP"
 #define CMD_HELP		MSG_HELP, TOK_HELP

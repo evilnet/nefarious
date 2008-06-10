@@ -1,6 +1,24 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-06-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* help/Makefile.in: Added COMMANDS symlink.
+
+	* help/opers/commands: Added COMMANDS help file.
+
+	* help/users/index: Added COMMANDS.
+
+	* include/handlers.h: Added m_commands.
+
+	* include/msg.h: Added COMMANDS.
+
+	* ircd/m_commands.c: Added COMMANDS command, this lists all commands
+	available including s2s commands. Pretty much what the old HELP
+	command used to do.
+
+	* ircd/parse.c: Added COMMANDS.
+
 2008-06-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_check.c: Remote CHECK support. Plus a tweak for server user
