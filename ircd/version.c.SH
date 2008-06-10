@@ -126,7 +126,7 @@ done;
 };
 
 const char *copyrighttext[] = {
-    "Nefarious IRCu is copyright (C) 2002-2005 by the past and present developers",
+    "Nefarious IRCu is copyright (C) 2002-2008 by the past and present developers",
     "of Nefarious IRCu. Refer to the documentation within doc/Authors and README for",
     "full credits and copyrights. An archive containing this documentation and",
     "Nefarious IRCu can be obtained from http://sourceforge.net/projects/evilnet/",

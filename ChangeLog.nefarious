@@ -3,6 +3,11 @@
 
 2008-06-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Cleaned up the last of the references to GPL 2, switched them to
+	GPL 3.
+
+2008-06-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/Makefile.in: Added COMMANDS symlink.
 
 	* help/opers/commands: Added COMMANDS help file.
