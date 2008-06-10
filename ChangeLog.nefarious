@@ -1,6 +1,26 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-06-10  Alex Schumann <rubin@afternet.org>
+
+	* ircd/s_bsd.c: disabling IPcheck (its very broken)
+
+	* ircd/s_misc.c: disabling IPcheck
+
+	* ircd/s_auth.c: disabling IPcheck
+
+	* ircd/m_webirc.c: disabling IPcheck
+
+	* ircd/s_serv.c: disabling IPcheck
+
+	* ircd/m_nick.c: disabling IPcheck
+
+	* ircd/ircd.c: disabling IPcheck
+
+	* ircd/s_user.c: disabling IPcheck
+
+	* ircd/s_conf.c: disabling IPcheck
+
 2008-06-10  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ircd_relay.c: Private message relay checks for usermode +D
