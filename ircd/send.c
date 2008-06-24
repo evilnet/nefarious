@@ -921,7 +921,7 @@ void vsendto_allusers_butserv(struct Client *one, struct Client *from, const cha
           if (IsOper(acptr))
             send_buffer(acptr, mb, 0);
           break;
-        case 'A':
+        case 'a':
           if (IsAdmin(acptr))
             send_buffer(acptr, mb, 0);
           break;

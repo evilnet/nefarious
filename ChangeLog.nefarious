@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-06-24  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/send.c: Small fix for 'A' that should have been an 'a'
+	in SMO handling.
+
 2008-06-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/handlers.h: Added globops and smp function declerations.
