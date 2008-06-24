@@ -595,6 +595,15 @@ IRCD_RES_RETRIES
 This is the number of attempts the irc daemon's resolver will have at 
 trying to solicit a response from the DNS server.
 
+IRCD_RES_TIMEOUT
+ * Type: integer
+ * Default: 4
+
+When a DNS query is sent, the irc daemon's resolver will wait this many
+seconds for a reply.  After this timeout has expired, it will retry again,
+for as many retries as IRCD_RES_RETRIES allows.  This can be cut short by
+AUTH_TIMEOUT expiring.
+
 AUTH_TIMEOUT
  * Type: integer
  * Default: 9
