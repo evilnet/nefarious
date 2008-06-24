@@ -134,6 +134,7 @@ IRCD_SRC = \
 	m_fakehost.c \
 	m_get.c \
 	m_gline.c \
+	m_globops.c \
 	m_help.c \
 	m_info.c \
 	m_invite.c \
@@ -178,6 +179,7 @@ IRCD_SRC = \
 	m_settime.c \
 	m_shun.c \
 	m_silence.c \
+	m_smo.c \
 	m_sno.c \
 	m_squit.c \
 	m_stats.c \

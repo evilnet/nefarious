@@ -483,6 +483,14 @@ struct Client;
 #define TOK_SNO                 "SNO"
 #define CMD_SNO                 MSG_SNO, TOK_SNO
 
+#define MSG_SMO                 "SMO"           /* SMO */
+#define TOK_SMO                 "SMO"
+#define CMD_SMO                 MSG_SMO, TOK_SMO
+
+#define MSG_GLOBOPS             "GLOBOPS"       /* GLOBOPS - not shortened as its not sent to other servers */
+#define TOK_GLOBOPS             "GLOBOPS"
+#define CMD_GLOBOPS             MSG_GLOBOPS, TOK_GLOBOPS
+
 /*
  * Constants
  */

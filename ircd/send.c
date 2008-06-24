@@ -868,6 +868,86 @@ void vsendto_allops_butserv(struct Client *one, struct Client *from, unsigned in
   }
 }
 
+/** Send a SMO to all opers
+ * @param[in] from Source of the command
+ * @param[in] mask 
+ * @param[in] pattern Format string for server notice.
+ */
+void sendto_allusers(struct Client *from, const char *mask, const char *pattern, ...)
+{
+  va_list vl;
+
+  va_start(vl, pattern);
+  vsendto_allusers_butserv(0, from, mask, pattern, vl);
+  va_end(vl);
+}
+
+/** Send a SMO to all opers
+ * @param[in] one Client direction to skip (or NULL).
+ * @param[in] from Source of the command
+ * @param[in] mask 
+ * @param[in] pattern Format string for server notice.
+ */
+void sendto_allusers_butserv(struct Client *one, struct Client *from, const char *mask,
+                                const char *pattern, ...)
+{
+  va_list vl;
+
+  va_start(vl, pattern);
+  vsendto_allusers_butserv(one, from, mask, pattern, vl);
+  va_end(vl);
+}
+
+void vsendto_allusers_butserv(struct Client *one, struct Client *from, const char *mask,
+                           const char *pattern, va_list vl)
+{
+  struct VarData vd;
+  struct MsgBuf *mb;
+  struct DLink *lp;
+  struct SLink *opslist;
+  int i = 0;
+  struct Client* acptr = 0;
+
+  vd.vd_format = pattern;
+  va_copy(vd.vd_args, vl);
+
+  /* send to local users */
+   mb = msgq_make(0, ":%s " MSG_NOTICE " * :*** Notice -- %v", cli_name(from),
+              &vd);
+  for (acptr = &me; acptr; acptr = cli_prev(acptr)) {
+    if (IsUser(acptr))  {
+      switch (*mask) {
+        case 'o':
+          if (IsOper(acptr))
+            send_buffer(acptr, mb, 0);
+          break;
+        case 'A':
+          if (IsAdmin(acptr))
+            send_buffer(acptr, mb, 0);
+          break;
+        default:
+          break; /* ignore, should only happen if incorrectly injected via raw */
+      }
+    }
+  }
+  msgq_clean(mb);
+  
+  if((lp = cli_serv(&me)->down)) {
+    va_copy(vd.vd_args, vl);
+
+    mb = msgq_make(&me, "%C " TOK_SMO " %s :%v", from, mask, &vd);
+
+    for (lp = cli_serv(&me)->down; lp; lp = lp->next)
+    {
+       if (one && lp->value.cptr == cli_from(one))
+         continue;
+      send_buffer(lp->value.cptr, mb, 1);
+    }
+
+    msgq_clean(mb);
+  }
+}
+
 /** Send a server notice to all local users on this server.
  * @param[in] pattern Format string for server notice.
  */

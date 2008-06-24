@@ -1,7 +1,28 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2008-06-10  Alex Schumann <rubin@afternet.org>
+2008-06-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/handlers.h: Added globops and smp function declerations.
+
+	* include/msg.h: Added GLOBOPS and SMO.
+
+	* include/send.h: SMO function declerations.
+
+	* ircd/Makefile.in: Added m_smo.c and m_globops.c.
+
+	* ircd/m_globops.c: Command that sends messages to all opers
+	using SMO.
+
+	* ircd/m_smo.c: Similar to SNO this sends messages to currently
+	all opers or admins on the network. It can be extended to handle
+	other user modes.
+
+	* ircd/parse.c: Added GLOBOPS and SMO.
+
+	* ircd/send.c: Functions to handle SMO.
+
+2008-06-10  Alex Schumann  <rubin@afternet.org>
 
 	* ircd/s_bsd.c: disabling IPcheck (its very broken)
 
