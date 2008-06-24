@@ -680,6 +680,7 @@ INSTALL_DATA
 LN_S
 RMPROG
 SHPROG
+BASH
 OSDEP_C
 ENGINE_C
 SSL_C
@@ -10318,6 +10319,53 @@ fi
 done
 test -n "$SHPROG" || SHPROG="/bin/sh"
 
+for ac_prog in bash
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_BASH+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $BASH in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_BASH="$BASH" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin/bash:/usr/bin/bash:/usr/local/bin/bash:$PATH"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_BASH="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+BASH=$ac_cv_path_BASH
+if test -n "$BASH"; then
+  { echo "$as_me:$LINENO: result: $BASH" >&5
+echo "${ECHO_T}$BASH" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$BASH" && break
+done
+test -n "$BASH" || BASH="/bin/bash"
+
 
 { echo "$as_me:$LINENO: checking for posix non-blocking" >&5
 echo $ECHO_N "checking for posix non-blocking... $ECHO_C" >&6; }
@@ -13087,6 +13135,7 @@ INSTALL_DATA!$INSTALL_DATA$ac_delim
 LN_S!$LN_S$ac_delim
 RMPROG!$RMPROG$ac_delim
 SHPROG!$SHPROG$ac_delim
+BASH!$BASH$ac_delim
 OSDEP_C!$OSDEP_C$ac_delim
 ENGINE_C!$ENGINE_C$ac_delim
 SSL_C!$SSL_C$ac_delim
@@ -13100,7 +13149,7 @@ DPATH!$DPATH$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 75; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 76; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

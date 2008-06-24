@@ -169,6 +169,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROGS(RMPROG, rm, /bin/rm)
 AC_PATH_PROGS(SHPROG, sh, /bin/sh)
+AC_PATH_PROGS(BASH, bash, /bin/bash, [/bin/bash:/usr/bin/bash:/usr/local/bin/bash:$PATH])
 
 unet_NONBLOCKING
 unet_SIGNALS

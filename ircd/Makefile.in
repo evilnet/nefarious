@@ -43,7 +43,8 @@ OSDEP_C = @OSDEP_C@
 ENGINE_C = @ENGINE_C@
 EXT = @EXEEXT@
 SVNDIR = @SVNDIR@
-BASH = /bin/bash
+#BASH = /bin/bash
+BASH = @BASH@
 @SET_MAKE@
 
 BINDIR = @bindir@
