@@ -1,6 +1,25 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-07-02  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/gline.c: PRIV_BADCHAN was not checked.
+
+	* ircd/m_jupe.c: Replaced PRIV_GLINE and PRIV_LOCAL_GLINE
+	with PRIV_JUPE and PRIV_LOCAL_JUPE
+
+	* ircd/m_list.c: PRIV_LIST_CHAN was not checked
+
+	* ircd/m_who.c: PRIV_WHOX had no effect
+
+	* ircd/client.c: Various PRIV_* flag fixes
+
+	* ircd/ircd_features.c: Added F:OPER_LIST_CHAN
+	for PRIV_LIST_CHAN
+
+	* include/ircd_features.h: Added F:OPER_LIST_CHAN
+	for PRIV_LIST_CHAN
+
 2008-06-25 Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* help/opers/index: Added GLOBOPS.

@@ -178,7 +178,7 @@ show_usage(struct Client *sptr)
              "matching \037pattern\037. ");
   send_reply(sptr, RPL_LISTUSAGE, "Note: Patterns may contain * and ?. "
              "You may only give one pattern match constraint.");
-  if (IsAnOper(sptr))
+  if (IsAnOper(sptr) && HasPriv(sptr, PRIV_LIST_CHAN))
     send_reply(sptr, RPL_LISTUSAGE,
 	       " \002S\002             ; Show secret channels.");
   send_reply(sptr, RPL_LISTUSAGE,
@@ -276,7 +276,7 @@ param_parse(struct Client *sptr, const char *param, struct ListingArgs *args,
 
     case 'S':
     case 's':
-      if (!IsAnOper(sptr))
+      if (!IsAnOper(sptr) || !HasPriv(sptr, PRIV_LIST_CHAN))
         return show_usage(sptr);
 
       args->flags |= LISTARG_SHOWSECRET;

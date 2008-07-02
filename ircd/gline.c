@@ -434,7 +434,7 @@ gline_add(struct Client *cptr, struct Client *sptr, char *userhost,
       || ((userhost[2] == '#' || userhost[2] == '&') && (userhost[1] == '@'))
 # endif /* OLD_GLINE */
       ) {
-    if ((flags & GLINE_LOCAL) && !HasPriv(sptr, PRIV_LOCAL_BADCHAN))
+    if (!HasPriv(sptr, (flags & GLINE_LOCAL ? PRIV_LOCAL_BADCHAN : PRIV_BADCHAN)))
       return send_reply(sptr, ERR_NOPRIVILEGES);
 
     flags |= GLINE_BADCHAN;
