@@ -376,8 +376,10 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    ircd_snprintf(0, outbuf, sizeof(outbuf), "      Real Name:: %s%c", cli_info(acptr), COLOR_OFF);
    send_reply(sptr, RPL_DATASTR, outbuf);
 
-   if (IsService(acptr) == -1)
+   if (IsService(acptr))
       send_reply(sptr, RPL_DATASTR, "         Status:: Network Service");
+   else if (IsAdmin(acptr))
+      send_reply(sptr, RPL_DATASTR, "         Status:: IRC Administrator");
    else if (IsAnOper(acptr))
       send_reply(sptr, RPL_DATASTR, "         Status:: IRC Operator");
 
