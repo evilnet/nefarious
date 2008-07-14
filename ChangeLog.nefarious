@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-07-14  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/listener.c: Fixed the P:Line flag H not actually hiding
+	ports in the STATS P output.
+
 2008-07-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_check.c: Added "IRC Administrator" to the status line

@@ -150,8 +150,9 @@ void show_ports(struct Client* sptr, struct StatDesc* sd, int stat,
 
     flags[len] = '\0';
 
-    send_reply(sptr, RPL_STATSPLINE, listener->port, listener->ref_count,
-	       flags, (listener->active) ? "active" : "disabled");
+    if (!listener->hidden || show_hidden)
+      send_reply(sptr, RPL_STATSPLINE, listener->port, listener->ref_count,
+	         flags, (listener->active) ? "active" : "disabled");
     if (--count == 0)
       break;
   }
