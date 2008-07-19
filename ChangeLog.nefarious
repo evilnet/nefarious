@@ -1,6 +1,18 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-07-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/gline.c: Show lastmod time in stats G and /gline.
+
+	* ircd/jupe.c: Show lastmod time in /jupe.
+
+	* ircd/s_err.c: Added extra %Tu for showing mod times.
+
+	* ircd/shun.c: Show lastmod time in stats S and /shun.
+
+	* ircd/zline.c: Show lastmod time in stats Z and /zline.
+
 2008-07-14  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/listener.c: Fixed the P:Line flag H not actually hiding
@@ -30,7 +42,7 @@
 	* include/ircd_features.h: Added F:OPER_LIST_CHAN
 	for PRIV_LIST_CHAN
 
-2008-06-25 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+2008-06-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* help/opers/index: Added GLOBOPS.
 

@@ -699,6 +699,7 @@ shun_list(struct Client *sptr, char *userhost)
     send_reply(sptr, RPL_SLIST, shun->sh_user, "",
 	       shun->sh_host ? shun->sh_host : "",
 	       shun->sh_expire + TSoffset,
+               shun->sh_lastmod + TSoffset,
 	       ShunIsLocal(shun) ? cli_name(&me) : "*",
 	       ShunIsActive(shun) ? '+' : '-', shun->sh_reason);
   } else {
@@ -712,6 +713,8 @@ shun_list(struct Client *sptr, char *userhost)
 		   shun->sh_host ? "@" : "", 
 		   shun->sh_host ? shun->sh_host : "",
 		   shun->sh_expire + TSoffset,
+                   shun->sh_lastmod + TSoffset,
+                   shun->sh_lastmod + TSoffset,
 		   ShunIsLocal(shun) ? cli_name(&me) : "*",
 		   ShunIsActive(shun) ? '+' : '-', shun->sh_reason);
     }
@@ -736,7 +739,8 @@ shun_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
       send_reply(sptr, RPL_STATSSHUN, 'S', shun->sh_user, 
 		 shun->sh_host ? "@" : "",
 		 shun->sh_host ? shun->sh_host : "",
-		 shun->sh_expire + TSoffset, shun->sh_reason);
+		 shun->sh_expire + TSoffset,
+                 shun->sh_lastmod + TSoffset, shun->sh_reason);
   }
 }
 

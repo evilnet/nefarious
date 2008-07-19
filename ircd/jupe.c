@@ -309,7 +309,7 @@ jupe_list(struct Client *sptr, char *server)
 
     /* send jupe information along */
     send_reply(sptr, RPL_JUPELIST, jupe->ju_server, jupe->ju_expire + TSoffset,
-	       JupeIsLocal(jupe) ? cli_name(&me) : "*",
+	      jupe->ju_lastmod + TSoffset, JupeIsLocal(jupe) ? cli_name(&me) : "*",
 	       JupeIsActive(jupe) ? '+' : '-', jupe->ju_reason);
   } else {
     for (jupe = GlobalJupeList; jupe; jupe = sjupe) { /* go through jupes */
@@ -319,7 +319,7 @@ jupe_list(struct Client *sptr, char *server)
 	jupe_free(jupe);
       else /* send jupe information along */
 	send_reply(sptr, RPL_JUPELIST, jupe->ju_server,
-		   jupe->ju_expire + TSoffset,
+		   jupe->ju_expire + TSoffset, jupe->ju_lastmod + TSoffset,
 		   JupeIsLocal(jupe) ? cli_name(&me) : "*",
 		   JupeIsActive(jupe) ? '+' : '-', jupe->ju_reason);
     }

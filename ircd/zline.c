@@ -648,9 +648,10 @@ zline_list(struct Client *sptr, char *userhost)
       return send_reply(sptr, ERR_NOSUCHZLINE, userhost);
 
     /* send zline information along */
-    send_reply(sptr, RPL_GLIST,
+    send_reply(sptr, RPL_ZLIST,
 	       zline->zl_host ? zline->zl_host : "",
 	       zline->zl_expire + TSoffset,
+               zline->zl_lastmod + TSoffset,
 	       ZlineIsLocal(zline) ? cli_name(&me) : "*",
 	       ZlineIsActive(zline) ? '+' : '-', zline->zl_reason);
   } else {
@@ -663,6 +664,7 @@ zline_list(struct Client *sptr, char *userhost)
 	send_reply(sptr, RPL_ZLIST,
 		   zline->zl_host ? zline->zl_host : "",
 		   zline->zl_expire + TSoffset,
+                   zline->zl_lastmod + TSoffset,
 		   ZlineIsLocal(zline) ? cli_name(&me) : "*",
 		   ZlineIsActive(zline) ? '+' : '-', zline->zl_reason);
     }
@@ -686,7 +688,8 @@ zline_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
     else
       send_reply(sptr, RPL_STATSZLINE, 'Z',
 		 zline->zl_host ? zline->zl_host : "",
-		 zline->zl_expire + TSoffset, zline->zl_reason);
+		 zline->zl_expire + TSoffset,
+                 zline->zl_lastmod + TSoffset, zline->zl_reason);
   }
 }
 

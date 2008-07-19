@@ -833,6 +833,7 @@ gline_list(struct Client *sptr, char *userhost)
 	       GlineIsBadChan(gline) ? "" : "@",
 	       gline->gl_host ? gline->gl_host : "",
 	       gline->gl_expire + TSoffset,
+               gline->gl_lastmod + TSoffset,
 	       GlineIsLocal(gline) ? cli_name(&me) : "*",
 	       GlineIsActive(gline) ? '+' : '-', gline->gl_reason);
   } else {
@@ -846,6 +847,7 @@ gline_list(struct Client *sptr, char *userhost)
 		   gline->gl_host ? "@" : "", 
 		   gline->gl_host ? gline->gl_host : "",
 		   gline->gl_expire + TSoffset,
+                   gline->gl_lastmod + TSoffset,
 		   GlineIsLocal(gline) ? cli_name(&me) : "*",
 		   GlineIsActive(gline) ? '+' : '-', gline->gl_reason);
     }
@@ -858,6 +860,7 @@ gline_list(struct Client *sptr, char *userhost)
       else
 	send_reply(sptr, RPL_GLIST, gline->gl_user, "", "",
 		   gline->gl_expire + TSoffset,
+                   gline->gl_lastmod + TSoffset,
 		   GlineIsLocal(gline) ? cli_name(&me) : "*",
 		   GlineIsActive(gline) ? '+' : '-', gline->gl_reason);
     }
@@ -882,7 +885,8 @@ gline_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
       send_reply(sptr, RPL_STATSGLINE, 'G', gline->gl_user, 
 		 gline->gl_host ? "@" : "",
 		 gline->gl_host ? gline->gl_host : "",
-		 gline->gl_expire + TSoffset, gline->gl_reason);
+		 gline->gl_expire + TSoffset,
+                 gline->gl_lastmod + TSoffset, gline->gl_reason);
   }
 }
 
