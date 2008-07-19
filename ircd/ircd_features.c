@@ -675,6 +675,7 @@ static struct FeatureDesc {
   F_I(NICK_DELAY, 0, 30, 0),
   F_I(HELP_PACE, 0, 5, 0),
   F_B(OPER_LIST_CHAN, 0, 1, 0),
+  F_B(LASTMOD_TWEAK, 0, 0, 0),
 
   /* Added as part of WEBIRC support */
   F_B(HIS_STATS_W, 0, 1, 0),

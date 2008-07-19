@@ -169,6 +169,9 @@ ms_gline(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     flags |= GLINE_LOCAL;
   }
 
+  if (feature_bool(FEAT_LASTMOD_TWEAK) && !lastmod) /* must have a lastmod parameter by now */
+    lastmod = CurrentTime;
+
   if (*mask == '-')
     mask++;
   else if (*mask == '+') {

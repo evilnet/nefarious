@@ -170,6 +170,9 @@ ms_zline(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     flags |= ZLINE_LOCAL;
   }
 
+  if (feature_bool(FEAT_LASTMOD_TWEAK) && !lastmod) /* must have a lastmod parameter by now */
+    lastmod = CurrentTime;
+
   if (*mask == '-')
     mask++;
   else if (*mask == '+') {

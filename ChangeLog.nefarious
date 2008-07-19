@@ -3,6 +3,21 @@
 
 2008-07-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/ircd_features.h: Added FEAT_LASTMOD_TWEAK. (undocumented)
+
+	* ircd/ircd_features.c: Added FEAT_LASTMOD_TWEAK (default FALSE).
+
+	* ircd/m_gline.c: If FEAT_LASTMOD_TWEAK is enabled then if a
+	server sends a gline without a lastmod then its set to CurrentTime.
+
+	* ircd/m_shun.c: If FEAT_LASTMOD_TWEAK is enabled then if a
+	server sends a shun without a lastmod then its set to CurrentTime.
+
+	* ircd/m_zline.c: If FEAT_LASTMOD_TWEAK is enabled then if a
+	server sends a zline without a lastmod then its set to CurrentTime.
+
+2008-07-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/gline.c: Show lastmod time in stats G and /gline.
 
 	* ircd/jupe.c: Show lastmod time in /jupe.

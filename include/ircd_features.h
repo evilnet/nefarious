@@ -333,6 +333,7 @@ enum Feature {
   FEAT_NICK_DELAY,
   FEAT_HELP_PACE,
   FEAT_OPER_LIST_CHAN,
+  FEAT_LASTMOD_TWEAK,
 
   /* Added as part of WEBIRC support */
   FEAT_HIS_STATS_W,
