@@ -3242,6 +3242,26 @@ mode_parse_client(struct ParseState *state, int *flag_p)
 }
 
 static void
+mode_parse_dummy(struct ParseState *state, int *flag_p)
+{
+  char *t_str;
+  struct Client *acptr;
+  int i;
+
+  if (MyUser(state->sptr) && state->max_args <= 0) /* drop if too many args */
+    return;
+
+  if (state->parc <= 0) /* return if not enough args */
+    return;
+
+  t_str = state->parv[state->args_used++]; /* grab arg */
+  state->parc--;
+  state->max_args--;
+
+  return;
+}
+
+static void
 mode_parse_client_voice(struct ParseState *state, int *flag_p)
 {
   char *t_str;
@@ -3527,6 +3547,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       case 'e': /* deal with excepts */
         if ((feature_bool(FEAT_EXCEPTS) && feature_bool(FEAT_BREAK_P10)) || IsServer(sptr))
           mode_parse_except(&state, flag_p);
+        else
+          mode_parse_dummy(&state, flag_p);
         break;
 
       case 'v': /* deal with voices */
@@ -3543,6 +3565,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
       case 'h': /* deal with halfops */
 	if (feature_bool(FEAT_HALFOPS) || IsServer(sptr))
 	  mode_parse_client(&state, flag_p);
+        else
+          mode_parse_dummy(&state, flag_p);
 	break;
 
       case 'c': /* MODE_NOCOLOUR */
