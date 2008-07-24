@@ -479,6 +479,7 @@ static struct FeatureDesc {
   /* HEAD_IN_SAND Features */
   F_B(HIS_SNOTICES, 0, 1, 0),
   F_B(HIS_SNOTICES_OPER_ONLY, 0, 1, 0),
+  F_B(HIS_SNOTICES_OPER_AND_BOT, 0, 0, 0),
   F_B(HIS_DESYNCS, 0, 1, 0),
   F_B(HIS_DEBUG_OPER_ONLY, 0, 1, 0),
   F_B(HIS_WALLOPS, 0, 1, 0),

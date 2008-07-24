@@ -2236,7 +2236,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearWallops(acptr);
 
     if (feature_bool(FEAT_HIS_SNOTICES_OPER_ONLY) && MyConnect(acptr) && 
-	!IsAnOper(acptr) && !IsBot(acptr) &&
+	!IsAnOper(acptr) &&
+        !(IsBot(acptr) && feature_bool(FEAT_HIS_SNOTICES_OPER_AND_BOT)) &&
 	!FlagHas(&setflags, FLAG_SERVNOTICE)) {
       ClearServNotice(acptr);
       set_snomask(acptr, 0, SNO_SET);

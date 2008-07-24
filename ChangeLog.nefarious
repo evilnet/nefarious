@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-07-24  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Added F:HIS_SNOTICES_OPER_AND_BOT to allow +B users
+	to override F:HIS_SNOTICES_OPER_ONLY
+
+	* ircd/ircd_features.c: Added F:HIS_SNOTICES_OPER_AND_BOT
+
+	* include/ircd_features.h: Added F:HIS_SNOTICES_OPER_AND_BOT
+
+	* doc/example.conf: Added F:HIS_SNOTICES_OPER_AND_BOT
+
 2008-07-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/patchlevel.h: Bump trunk version to 1.3.
