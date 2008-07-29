@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-07-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Happy Birthday to me ;P
+
+	* ircd/s_user.c: Fixed an issue with msntv clients disconnecting on connect.
+
 2008-07-24  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Added F:HIS_SNOTICES_OPER_AND_BOT to allow +B users

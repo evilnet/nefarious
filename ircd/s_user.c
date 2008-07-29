@@ -3005,7 +3005,7 @@ build_isupport_lines()
   struct ISupport *is;
   struct SLink **plink;
   char buf[BUFSIZE];
-  int used, len, usable;
+  int used, len, usable, item = 0;
 
   /* Extra buffer space for :me.name 005 ClientNick <etc> */
   assert(isupport_lines == 0);
@@ -3038,8 +3038,9 @@ build_isupport_lines()
       break;
     }
 
-    /* If it fits, move on; else flush buffer and try again. */
-    if (len + used < usable) {
+    item++;
+
+    if (item < 13) {
       used += len;
       is = is->is_next;
     } else {
@@ -3048,7 +3049,10 @@ build_isupport_lines()
       DupString((*plink)->value.cp, buf + 1);
       (*plink)->next = 0;
       plink = &(*plink)->next;
+      if (is->is_next)
+        is = is->is_next;
       used = 0;
+      item = 0;
     }
   }
 
