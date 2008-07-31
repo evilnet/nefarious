@@ -93,8 +93,9 @@
 #include "send.h"
 #include "ircd_features.h" /* FEAT_CTCP_VERSIONING - added by Vadtec 02/25/2008 */
 #include "ircd.h" /* &me - added by Vadtec 02/26/2008 */
-#include "s_misc.h" /* CPTR_KILLED - added by Vadtec 02/26/2008 */
 #include "s_bsd.h" /* HighestFd, LocalClientArray[] - added by Vadtec 02/26/2008 */
+#include "s_conf.h"
+#include "s_misc.h" /* CPTR_KILLED - added by Vadtec 02/26/2008 */
 #include "hash.h" /* FindChannel() - added by Vadtec 02/26/2008 */
 
 #include <assert.h>

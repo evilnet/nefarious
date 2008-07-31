@@ -289,7 +289,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
     case '%': /* parameter contains bans */
       if (parse_flags & MODE_PARSE_SET) {
-	char *banlist = parv[param] + 1, *p = 0, *ban, *ptr;
+	char *banlist = parv[param] + 1, *p = 0, *ban, *eptr;
 	struct SLink *newban;
 
 	for (ban = ircd_strtok(&p, banlist, " "); ban;
@@ -331,8 +331,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	        banstr[banpos++] = '%';
 	      } else
 	        banstr[banpos++] = ' ';
-	      for (ptr = ban; *ptr; ptr++) /* add ban to buffer */
-	        banstr[banpos++] = *ptr;
+	      for (eptr = ban; *eptr; eptr++) /* add ban to buffer */
+	        banstr[banpos++] = *eptr;
 
 	      newban = make_link(); /* create new ban */
 
@@ -344,7 +344,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	      newban->value.ban.when = TStime();
 
 	      newban->flags = CHFL_BAN | CHFL_BURST_BAN; /* set flags */
-	      if ((ptr = strrchr(ban, '@')) && check_if_ipmask(ptr + 1))
+	      if ((eptr = strrchr(ban, '@')) && check_if_ipmask(eptr + 1))
 	        newban->flags |= CHFL_BAN_IPMASK;
 
 	      newban->next = 0;

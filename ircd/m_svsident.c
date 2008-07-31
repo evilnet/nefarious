@@ -65,7 +65,7 @@ int ms_svsident(struct Client* cptr, struct Client* sptr, int parc, char* parv[]
 {
   struct Client *acptr;
   char *s;
-  char *newident;
+  char *newident = NULL;
   int legalident=1;
 
   if (parc < 3)

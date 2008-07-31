@@ -492,14 +492,14 @@ char *normalizeBuffer(char *buf)
             /* Color ctrl char */
         case 3:
             /* If the next character is a digit, its also removed */
-            if (isdigit(buf[i + 1])) {
+            if (IsDigit(buf[i + 1])) {
                 i++;
 
                 /* not the best way to remove colors
                  * which are two digit but no worse then
                  * how the Unreal does with +S - TSL
                  */
-                if (isdigit(buf[i + 1])) {
+                if (IsDigit(buf[i + 1])) {
                     i++;
                 }
 
@@ -509,14 +509,14 @@ char *normalizeBuffer(char *buf)
                 if (buf[i + 1] == ',') {
                     i++;
 
-                    if (isdigit(buf[i + 1])) {
+                    if (IsDigit(buf[i + 1])) {
                         i++;
                     }
                     /* not the best way to remove colors
                      * which are two digit but no worse then
                      * how the Unreal does with +S - TSL
                      */
-                    if (isdigit(buf[i + 1])) {
+                    if (IsDigit(buf[i + 1])) {
                         i++;
                     }
                 }

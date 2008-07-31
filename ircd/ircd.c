@@ -921,7 +921,7 @@ int main(int argc, char **argv) {
 
   if (check_pid()) {
     Debug((DEBUG_FATAL, "Failed to acquire PID file lock after fork"));
-    //exit(2);
+    exit(2);
   }
 
   init_server_identity();

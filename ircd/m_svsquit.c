@@ -33,6 +33,7 @@
 #include "numnicks.h"
 #include "send.h"
 #include "s_conf.h"
+#include "s_misc.h"
 #include "s_user.h"
 
 

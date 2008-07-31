@@ -40,6 +40,7 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "s_stats.h"
+#include "s_user.h"
 #include "send.h"
 #include "ircd_struct.h"
 #include "support.h"
@@ -220,7 +221,6 @@ static void
 set_isupport_excepts(void)
 {
     char imaxlist[BUFSIZE] = "";
-    char *buf = NULL;
 
     if (feature_bool(FEAT_EXCEPTS)) {
       add_isupport_s("EXCEPTS", "e");

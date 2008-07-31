@@ -2310,7 +2310,7 @@ modebuf_flush_int(struct ModeBuf *mbuf, int all)
  */
 void
 modebuf_init(struct ModeBuf *mbuf, struct Client *source,
-	     struct Client *connect, struct Channel *chan, unsigned int dest)
+	     struct Client *connecth, struct Channel *chan, unsigned int dest)
 {
   int i;
 
@@ -2324,7 +2324,7 @@ modebuf_init(struct ModeBuf *mbuf, struct Client *source,
   mbuf->mb_add = 0;
   mbuf->mb_rem = 0;
   mbuf->mb_source = source;
-  mbuf->mb_connect = connect;
+  mbuf->mb_connect = connecth;
   mbuf->mb_channel = chan;
   mbuf->mb_dest = dest;
   mbuf->mb_count = 0;
@@ -2370,7 +2370,7 @@ modebuf_mode(struct ModeBuf *mbuf, unsigned int mode)
  * of MODE_ADD or MODE_DEL
  */
 void
-modebuf_mode_uint(struct ModeBuf *mbuf, unsigned int mode, unsigned int uint)
+modebuf_mode_uint(struct ModeBuf *mbuf, unsigned int mode, unsigned int uinth)
 {
   assert(0 != mbuf);
   assert(0 != (mode & (MODE_ADD | MODE_DEL)));
@@ -2381,7 +2381,7 @@ modebuf_mode_uint(struct ModeBuf *mbuf, unsigned int mode, unsigned int uint)
   }
 
   MB_TYPE(mbuf, mbuf->mb_count) = mode;
-  MB_UINT(mbuf, mbuf->mb_count) = uint;
+  MB_UINT(mbuf, mbuf->mb_count) = uinth;
 
   /* when we've reached the maximal count, flush the buffer */
   if (++mbuf->mb_count >=
@@ -2396,12 +2396,12 @@ modebuf_mode_uint(struct ModeBuf *mbuf, unsigned int mode, unsigned int uint)
  */
 void
 modebuf_mode_string(struct ModeBuf *mbuf, unsigned int mode, char *string,
-		    int free)
+		    int freeh)
 {
   assert(0 != mbuf);
   assert(0 != (mode & (MODE_ADD | MODE_DEL)));
 
-  MB_TYPE(mbuf, mbuf->mb_count) = mode | (free ? MODE_FREE : 0);
+  MB_TYPE(mbuf, mbuf->mb_count) = mode | (freeh ? MODE_FREE : 0);
   MB_STRING(mbuf, mbuf->mb_count) = string;
 
   /* when we've reached the maximal count, flush the buffer */
@@ -3245,8 +3245,6 @@ static void
 mode_parse_dummy(struct ParseState *state, int *flag_p)
 {
   char *t_str;
-  struct Client *acptr;
-  int i;
 
   if (MyUser(state->sptr) && state->max_args <= 0) /* drop if too many args */
     return;
@@ -3760,17 +3758,17 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
  */
 void
 joinbuf_init(struct JoinBuf *jbuf, struct Client *source,
-	     struct Client *connect, unsigned int type, char *comment,
+	     struct Client *connecth, unsigned int type, char *comment,
 	     time_t create)
 {
   int i;
 
   assert(0 != jbuf);
   assert(0 != source);
-  assert(0 != connect);
+  assert(0 != connecth);
 
   jbuf->jb_source = source; /* just initialize struct JoinBuf */
-  jbuf->jb_connect = connect;
+  jbuf->jb_connect = connecth;
   jbuf->jb_type = type;
   jbuf->jb_comment = comment;
   jbuf->jb_create = create;

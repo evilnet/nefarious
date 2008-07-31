@@ -241,9 +241,11 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
   fbclose(file);
   send_reply(sptr, RPL_HELPTXT, topic, "");
   send_reply(sptr, RPL_ENDOFHELP, topic);
+
+  return;
 }
 
-dohelp(struct Client *sptr, const char *hpath, char *topic)
+int dohelp(struct Client *sptr, const char *hpath, char *topic)
 {
   char path[PATH_MAX + 1];
   const char *tmppath;
@@ -268,13 +270,13 @@ dohelp(struct Client *sptr, const char *hpath, char *topic)
   if (strpbrk(topic, "/\\"))
   {
     send_reply(sptr, ERR_HELPNOTFOUND, topic);
-    return;
+    return 0;
   }
 
   if (strlen(hpath) + strlen(topic) + 1 > PATH_MAX)
   {
     send_reply(sptr, ERR_HELPNOTFOUND, topic);
-    return;
+    return 0;
   }
 
   ircd_snprintf(0, path, sizeof(path), "%s/%s", hpath, topic);
@@ -283,12 +285,13 @@ dohelp(struct Client *sptr, const char *hpath, char *topic)
   {
     Debug((DEBUG_DEBUG, "help file %s not found", path));
     send_reply(sptr, ERR_HELPNOTFOUND, topic);
-    return;
+    return 0;
   }
 
   tmptopic = strdup(topic);
   tmppath = strdup(path);
   sendhelpfile(sptr, path, topic);
+  return 1;
 }
 
 int m_help(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
@@ -299,21 +302,24 @@ int m_help(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if ((last_used + feature_int(FEAT_HELP_PACE)) > CurrentTime)
   {
     send_reply(sptr, RPL_LOAD2HI);
-    return;
+    return 0;
   }
 
   last_used = CurrentTime;
 
   dohelp(sptr, UHPATH, parv[1]);
+  return 1;
 }
 
 
 int mo_help(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   dohelp(sptr, HPATH, parv[1]);
+  return 1;
 }
 
 int mo_uhelp(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   dohelp(sptr, UHPATH, parv[1]);
+  return 1;
 }

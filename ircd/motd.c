@@ -108,7 +108,7 @@ motd_create(const char *hostmask, const char *path, int maxcount)
 
 /* This function reads a motd out of a file (if needed) and caches it */
 static struct MotdCache *
-motd_cache(struct Motd *motd)
+motd_cache(struct Motd *motdh)
 {
   FBFILE*		file;
   struct MotdCache*	cache;
@@ -117,25 +117,25 @@ motd_cache(struct Motd *motd)
   char*			tmp;
   int			i;
 
-  assert(0 != motd);
-  assert(0 != motd->path);
+  assert(0 != motdh);
+  assert(0 != motdh->path);
 
-  if (motd->cache)
-    return motd->cache;
+  if (motdh->cache)
+    return motdh->cache;
 
   /* try to find it in the list of cached files... */
   for (cache = MotdList.cachelist; cache; cache = cache->next) {
-    if (!strcmp(cache->path, motd->path) &&
-	cache->maxcount == motd->maxcount) { /* found one... */
+    if (!strcmp(cache->path, motdh->path) &&
+	cache->maxcount == motdh->maxcount) { /* found one... */
       cache->ref++; /* increase reference count... */
-      motd->cache = cache; /* remember cache... */
-      return motd->cache; /* return it */
+      motdh->cache = cache; /* remember cache... */
+      return motdh->cache; /* return it */
     }
   }
 
   /* gotta read in the file, now */
-  if (!(file = fbopen(motd->path, "r"))) {
-    Debug((DEBUG_ERROR, "Couldn't open \"%s\": %s", motd->path,
+  if (!(file = fbopen(motdh->path, "r"))) {
+    Debug((DEBUG_ERROR, "Couldn't open \"%s\": %s", motdh->path,
 	   strerror(errno)));
     return 0;
   }
@@ -151,8 +151,8 @@ motd_cache(struct Motd *motd)
 				       (MOTD_LINESIZE * (MOTD_MAXLINES - 1)));
 
   cache->ref = 1;
-  DupString(cache->path, motd->path);
-  cache->maxcount = motd->maxcount;
+  DupString(cache->path, motdh->path);
+  cache->maxcount = motdh->maxcount;
 
   cache->modtime = *localtime((time_t *) &sb.st_mtime); /* store modtime */
 
@@ -171,31 +171,31 @@ motd_cache(struct Motd *motd)
   fbclose(file); /* close the file */
 
   /* trim memory usage a little */
-  motd->cache = (struct MotdCache *)MyRealloc(cache, sizeof(struct MotdCache) +
+  motdh->cache = (struct MotdCache *)MyRealloc(cache, sizeof(struct MotdCache) +
 					      (MOTD_LINESIZE *
 					       (cache->count - 1)));
 
   /* now link it in... */
-  motd->cache->next = MotdList.cachelist;
-  motd->cache->prev_p = &MotdList.cachelist;
+  motdh->cache->next = MotdList.cachelist;
+  motdh->cache->prev_p = &MotdList.cachelist;
   if (MotdList.cachelist)
-    MotdList.cachelist->prev_p = &motd->cache->next;
-  MotdList.cachelist = motd->cache;
+    MotdList.cachelist->prev_p = &motdh->cache->next;
+  MotdList.cachelist = motdh->cache;
 
-  return motd->cache;
+  return motdh->cache;
 }
 
 static void
-motd_decache(struct Motd *motd)
+motd_decache(struct Motd *motdh)
 {
   struct MotdCache* cache;
 
-  assert(0 != motd);
+  assert(0 != motdh);
 
-  if (!(cache = motd->cache)) /* we can be called for records with no cache */
+  if (!(cache = motdh->cache)) /* we can be called for records with no cache */
     return;
 
-  motd->cache = 0; /* zero the cache */
+  motdh->cache = 0; /* zero the cache */
 
   if (!--cache->ref) { /* reduce reference count... */
     if (cache->next) /* ref is 0, delink from list and free */
@@ -210,18 +210,18 @@ motd_decache(struct Motd *motd)
 
 /* This function destroys a struct Motd, destroying the cache if needed */
 static void
-motd_destroy(struct Motd *motd)
+motd_destroy(struct Motd *motdh)
 {
-  assert(0 != motd);
+  assert(0 != motdh);
 
-  MyFree(motd->path); /* we always must have a path */
-  if (motd->type == MOTD_HOSTMASK) /* free a host mask if any */
-    MyFree(motd->id.hostmask);
-  if (motd->cache) /* drop the cache */
-    motd_decache(motd);
+  MyFree(motdh->path); /* we always must have a path */
+  if (motdh->type == MOTD_HOSTMASK) /* free a host mask if any */
+    MyFree(motdh->id.hostmask);
+  if (motdh->cache) /* drop the cache */
+    motd_decache(motdh);
 
-  motd->next = MotdList.freelist;
-  MotdList.freelist = motd;
+  motdh->next = MotdList.freelist;
+  MotdList.freelist = motdh;
 }
 
 /* We use this routine to look up the struct Motd to send to any given
@@ -387,7 +387,7 @@ motd_clear(void)
 
 /* This is called to report T-lines */
 void
-motd_report(struct Client *to, struct StatDesc *sd, int stat, char *param)
+motd_report(struct Client *to, struct StatDesc *sd, int stath, char *param)
 {
   struct Motd *ptr;
 

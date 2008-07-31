@@ -38,6 +38,7 @@
 #include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
+#include "ircd_snprintf.h"
 #include "ircd_string.h"
 #include "ircd_xopen.h"
 #include "msg.h"
@@ -76,6 +77,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
   char *tmpname;
   char             chan[CHANNELLEN-1];
   char*            join[2];
+  int nl;
   struct Flags old_mode = cli_flags(sptr);
 
   if (!MyUser(sptr))
@@ -114,7 +116,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
   {
     /* Ignore it if we aren't expecting this... -A1kmm */
     if (cli_user(sptr)->response == NULL)
-      return;
+      return 0;
 
     if (ircd_strcmp(cli_user(sptr)->response, ++parv[1]))
     {
@@ -123,7 +125,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
                          parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
       tmpname = strdup(cli_user(sptr)->auth_oper);
       failed_challenge_notice(sptr, tmpname, "challenge failed");
-      return;
+      return 0;
     }
 
     name = strdup(cli_user(sptr)->auth_oper);
@@ -145,7 +147,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
       send_reply(sptr, ERR_NOOPERHOST);
       sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
                          parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
-      return;
+      return 0;
     }
 
     if (CONF_LOCOP == aconf->status) {
@@ -229,7 +231,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
     log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#C)", name, sptr);
 
     ircd_snprintf(0, cli_user(sptr)->response, BUFSIZE+1, "%s", "");
-    return;
+    return 0;
   }
 
   ircd_snprintf(0, cli_user(sptr)->response, BUFSIZE+1, "%s", "");
@@ -252,19 +254,19 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
     failed_challenge_notice(sptr, parv[1], "No o:line");
     sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
                        parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
-    return;
+    return 0;
   }
 
   if (!aconf->port & OFLAG_RSA)
   {
     send_reply(sptr, RPL_NO_CHALL);
-    return;
+    return 0;
   }
 
   if ((file = BIO_new_file(aconf->passwd, "r")) == NULL)
   {
     send_reply(sptr, RPL_NO_KEY);
-    return;
+    return 0;
   }
 
   rsa_public_key = (RSA *)PEM_read_bio_RSA_PUBKEY(file, NULL, 0, NULL);
@@ -277,12 +279,12 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
       send_reply(sptr, RPL_RSACHALLENGE, challenge);
       ircd_snprintf(0, cli_user(sptr)->auth_oper, NICKLEN + 1, "%s", aconf->name);
   }
-  BIO_set_close(file, BIO_CLOSE);
+  nl = BIO_set_close(file, BIO_CLOSE);
   BIO_free(file);
 
-  return 0;
+  return 1;
 #else
-  return 0;
+  return 1;
 #endif
 }
 
@@ -298,7 +300,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   char *tmpname;
   char             chan[CHANNELLEN-1];
   char*            join[2];
-  struct Flags old_mode = cli_flags(sptr);
+  int nl;
 
   if (!IsServer(cptr))
     return 0;
@@ -318,7 +320,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   {
     /* Ignore it if we aren't expecting this... -A1kmm */
     if (cli_user(sptr)->response == NULL)
-      return;
+      return 0;
 
     if (ircd_strcmp(cli_user(sptr)->response, ++parv[2]))
     {
@@ -327,7 +329,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
                          parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
       tmpname = strdup(cli_user(sptr)->auth_oper);
       failed_challenge_notice(sptr, tmpname, "challenge failed");
-      return;
+      return 0;
     }
 
     name = strdup(cli_user(sptr)->auth_oper);
@@ -349,7 +351,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
       send_reply(sptr, ERR_NOOPERHOST);
       sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
                          parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
-      return;
+      return 0;
     }
 
     if (CONF_LOCOP == aconf->status) {
@@ -428,7 +430,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
     log_write(LS_OPER, L_INFO, 0, "OPER (%s) by (%#C)", name, sptr);
 
     ircd_snprintf(0, cli_user(sptr)->response, BUFSIZE+1, "%s", "");
-    return;
+    return 0;
   }
 
   ircd_snprintf(0, cli_user(sptr)->response, BUFSIZE+1, "%s", "");
@@ -451,19 +453,19 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
     failed_challenge_notice(sptr, parv[2], "No o:line");
     sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
                        parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
-    return;
+    return 0;
   }
 
   if (!aconf->port & OFLAG_RSA)
   {
     send_reply(sptr, RPL_NO_CHALL);
-    return;
+    return 0;
   }
 
   if ((file = BIO_new_file(aconf->passwd, "r")) == NULL)
   {
     send_reply(sptr, RPL_NO_KEY);
-    return;
+    return 0;
   }
 
   rsa_public_key = (RSA *)PEM_read_bio_RSA_PUBKEY(file, NULL, 0, NULL);
@@ -476,18 +478,18 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
       send_reply(sptr, RPL_RSACHALLENGE, challenge);
       ircd_snprintf(0, cli_user(sptr)->auth_oper, NICKLEN + 1, "%s", aconf->name);
   }
-  BIO_set_close(file, BIO_CLOSE);
+  nl = BIO_set_close(file, BIO_CLOSE);
   BIO_free(file);
 
-  return 0;
+  return 1;
 #else
-  return 0;
+  return 1;
 #endif
 }
 
 int mo_challenge(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   send_reply(sptr, RPL_YOUREOPER);
-  return 0;
+  return 1;
 }
 

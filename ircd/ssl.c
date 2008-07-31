@@ -177,20 +177,20 @@ void ssl_add_connection(struct Listener *listener, int fd)
  *  0  if socket closed from other end
  *  -1 if an unrecoverable error occurred
  */
-IOResult ssl_recv(struct Socket *socket, char* buf,
+IOResult ssl_recv(struct Socket *socketh, char* buf,
                  unsigned int length, unsigned int* count_out)
 {
   int res;
    
-  assert(0 != socket);
+  assert(0 != socketh);
   assert(0 != buf);
   assert(0 != count_out);
   
   *count_out = 0;
   errno = 0;
   
-  res = SSL_read(socket->ssl, buf, length);
-  switch (SSL_get_error(socket->ssl, res)) {
+  res = SSL_read(socketh->ssl, buf, length);
+  switch (SSL_get_error(socketh->ssl, res)) {
   case SSL_ERROR_NONE:
     *count_out = (unsigned) res;
     return IO_SUCCESS;
@@ -204,7 +204,7 @@ IOResult ssl_recv(struct Socket *socket, char* buf,
       return IO_BLOCKED; /* ??? */
     break;
   case SSL_ERROR_ZERO_RETURN: /* close_notify received */
-    SSL_shutdown(socket->ssl); /* Send close_notify back */
+    SSL_shutdown(socketh->ssl); /* Send close_notify back */
     break;
   }
   return IO_FAILURE;
@@ -219,7 +219,7 @@ IOResult ssl_recv(struct Socket *socket, char* buf,
  *  0  if write call blocked, recoverable error   
  *  -1 if an unrecoverable error occurred
  */
-IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
+IOResult ssl_sendv(struct Socket *socketh, struct MsgQ* buf,
                   unsigned int* count_in, unsigned int* count_out)
 {
   int res;
@@ -231,7 +231,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
 
   errno = 0;
 
-  assert(0 != socket);
+  assert(0 != socketh);
   assert(0 != buf);
   assert(0 != count_in);
   assert(0 != count_out);
@@ -241,8 +241,8 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
 
   count = msgq_mapiov(buf, iov, IOV_MAX, count_in);
   for (k = 0; k < count; k++) {
-    res = SSL_write(socket->ssl, iov[k].iov_base, iov[k].iov_len);
-    ssl_err = SSL_get_error(socket->ssl, res);
+    res = SSL_write(socketh->ssl, iov[k].iov_base, iov[k].iov_len);
+    ssl_err = SSL_get_error(socketh->ssl, res);
     Debug((DEBUG_DEBUG, "SSL_write returned %d, error code %d.", res, ssl_err));
     switch (ssl_err) {
     case SSL_ERROR_NONE:
@@ -284,7 +284,7 @@ IOResult ssl_sendv(struct Socket *socket, struct MsgQ* buf,
       }
       */
     case SSL_ERROR_ZERO_RETURN:
-      SSL_shutdown(socket->ssl);
+      SSL_shutdown(socketh->ssl);
       return IO_FAILURE;
     default:
       Debug((DEBUG_DEBUG, "SSL_write return fell through - errno %d returning retval %d", errno, retval));
@@ -330,11 +330,11 @@ int ssl_murder(void *ssl, int fd, const char *buf)
   return 0;
 }
   
-void ssl_free(struct Socket *socket)
+void ssl_free(struct Socket *socketh)
 {
-  if (!socket->ssl)
+  if (!socketh->ssl)
     return;
-  SSL_free(socket->ssl);
+  SSL_free(socketh->ssl);
   --ssl_inuse;
 }
   
@@ -381,8 +381,8 @@ static void sslfail(char *txt)
 
 void ssl_init(void)
 {
+  int nl;
   char pemfile[1024] = "";
-  char pemfile2[1024] = "";
   BIO *file = NULL;
 
   SSLeay_add_ssl_algorithms();
@@ -423,7 +423,7 @@ void ssl_init(void)
   server_rsa_private_key = (RSA *) PEM_read_bio_RSAPrivateKey(file, NULL,
     0, NULL);
 
-  BIO_set_close(file, BIO_CLOSE);
+  nl = BIO_set_close(file, BIO_CLOSE);
   BIO_free(file);
 
   if (!server_rsa_private_key) {
@@ -499,6 +499,7 @@ verify_private_key(void)
   BIO *file;
   RSA *key;
   RSA *mkey;
+  int nl;
   char pemfile[1024];
 
   ircd_snprintf(0, pemfile, sizeof(pemfile), "%s/rsa.key", DPATH);
@@ -548,7 +549,7 @@ verify_private_key(void)
     return -1;
   }
 
-  BIO_set_close(file, BIO_CLOSE);
+  nl = BIO_set_close(file, BIO_CLOSE);
   BIO_free(file);
   bio_spare_fd = save_spare_fd("SSL private key validation");
 
@@ -614,7 +615,7 @@ binary_to_hex(unsigned char *bin, char *hex, int length)
 int
 get_randomness(unsigned char *buf, int length)
 {
-  // Seed OpenSSL PRNG with EGD enthropy pool -kre
+  /* Seed OpenSSL PRNG with EGD enthropy pool -kre */
   /*
   if (General.use_egd && General.egdpool_path != NULL)
     if (RAND_egd(General.egdpool_path) == -1)
@@ -623,7 +624,7 @@ get_randomness(unsigned char *buf, int length)
 
   if (RAND_status())
     return RAND_bytes(buf, length);
-  else // XXX - abort?
+  else 
     return RAND_pseudo_bytes(buf, length);
 }
 

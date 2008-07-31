@@ -904,8 +904,6 @@ void vsendto_allusers_butserv(struct Client *one, struct Client *from, const cha
   struct VarData vd;
   struct MsgBuf *mb;
   struct DLink *lp;
-  struct SLink *opslist;
-  int i = 0;
   struct Client* acptr = 0;
 
   vd.vd_format = pattern;

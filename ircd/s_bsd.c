@@ -230,7 +230,7 @@ void close_connections(int close_stderr)
 int init_connection_limits(void)
 {
   int limit = os_set_fdlimit(MAXCONNECTIONS);
-  return 1; // hack by rubin for valgrind
+/*  return 1;  hack by rubin for valgrind */
   if (0 == limit)
     return 1;
   if (limit < 0) {
@@ -643,9 +643,10 @@ void add_connection(struct Listener* listener, int fd) {
   time_t             next_target = 0;
   struct Zline*    azline = NULL;
   char zreason[256];
-
+/*
   const char* const throttle_message =
          "ERROR :Your host is trying to (re)connect too fast -- throttled\r\n";
+*/
        /* 12345678901234567890123456789012345679012345678901234567890123456 */
   const char* const register_message =
          "ERROR :Unable to complete your registration\r\n";

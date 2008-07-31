@@ -516,23 +516,23 @@ timer_run(void)
 
 /* Adds a signal to the event callback system */
 void
-signal_add(struct Signal* signal, EventCallBack call, void* data, int sig)
+signal_add(struct Signal* signalh, EventCallBack call, void* data, int sig)
 {
   struct sigaction act;
 
-  assert(0 != signal);
+  assert(0 != signalh);
   assert(0 != call);
   assert(0 != evInfo.engine);
 
   /* set up struct */
-  gen_init((struct GenHeader*) signal, call, data,
+  gen_init((struct GenHeader*) signalh, call, data,
 	   (struct GenHeader*) evInfo.gens.g_signal,
 	   (struct GenHeader**) &evInfo.gens.g_signal);
 
-  signal->sig_signal = sig;
+  signalh->sig_signal = sig;
 
   if (evInfo.engine->eng_signal)
-    (*evInfo.engine->eng_signal)(signal); /* tell engine */
+    (*evInfo.engine->eng_signal)(signalh); /* tell engine */
   else {
     act.sa_handler = signal_handler; /* set up signal handler */
     act.sa_flags = 0;

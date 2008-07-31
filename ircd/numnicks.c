@@ -196,7 +196,7 @@ void RemoveYXXClient(struct Client* server, const char* yxx)
 
 void SetServerYXX(struct Client* cptr, struct Client* server, const char* yxx)
 {
-  unsigned int index;
+  unsigned int indexh;
   if (5 == strlen(yxx)) {
     ircd_strncpy(cli_yxx(server), yxx, 2);
     ircd_strncpy(cli_serv(server)->nn_capacity, yxx + 2, 3);
@@ -208,10 +208,10 @@ void SetServerYXX(struct Client* cptr, struct Client* server, const char* yxx)
   }
   cli_serv(server)->nn_mask = base64toint(cli_serv(server)->nn_capacity);
 
-  index = base64toint(cli_yxx(server));
-  if (index >= lastNNServer)
-    lastNNServer = index + 1;
-  server_list[index] = server;
+  indexh = base64toint(cli_yxx(server));
+  if (indexh >= lastNNServer)
+    lastNNServer = indexh + 1;
+  server_list[indexh] = server;
 
   /* Note, exit_one_client uses the fact that `client_list' != NULL to
    * determine that SetServerYXX has been called - and then calls
@@ -258,9 +258,9 @@ void SetYXXServerName(struct Client* c, unsigned int numeric)
 
 void ClearServerYXX(const struct Client *server)
 {
-  unsigned int index = base64toint(cli_yxx(server));
-  if (server_list[index] == server)     /* Sanity check */
-    server_list[index] = 0;
+  unsigned int indexh = base64toint(cli_yxx(server));
+  if (server_list[indexh] == server)     /* Sanity check */
+    server_list[indexh] = 0;
 }
 
 /*

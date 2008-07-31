@@ -1936,12 +1936,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     if (IsServer(sptr)) {
       if (!MyConnect(acptr)) {
         /* Just propagate and ignore */
-        char buf[BUFSIZE] = "";
+        char bufh[BUFSIZE] = "";
         for (i=1;i<parc;i++) {
-          strcat(buf, " ");
-          strcat(buf, parv[i]);
+          strcat(bufh, " ");
+          strcat(bufh, parv[i]);
         }
-        sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s", buf);
+        sendcmdto_serv_butone(sptr, CMD_MODE, cptr, "%s", bufh);
         return 0;
       }
       force = 1;

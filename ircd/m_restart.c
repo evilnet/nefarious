@@ -92,6 +92,9 @@
 #include "numnicks.h"
 #include "opercmds.h"
 #include "s_user.h"
+#include "send.h"
+
+#include <string.h>
 
 /*
  * mo_restart - oper message handler

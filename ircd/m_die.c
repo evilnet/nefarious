@@ -94,13 +94,13 @@
 #include "s_user.h"
 #include "send.h"
 
+#include <string.h>
+
 /*
  * mo_die - oper message handler
  */
 int mo_die(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  struct Client *acptr;
-  int i;
   time_t when = 0;
   const char *reason = 0;
   char* password;

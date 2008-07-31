@@ -48,7 +48,7 @@
 #define KEY2 feature_str(FEAT_HOST_HIDING_KEY2)
 #define KEY3 feature_str(FEAT_HOST_HIDING_KEY3)
 
-static inline unsigned int downsample(char *i)
+static inline unsigned int downsample(unsigned char *i)
 {
 char r[4];
 
@@ -66,7 +66,8 @@ char r[4];
 char *hidehost_ipv4(char *host)
 {
 unsigned int a, b, c, d;
-static char buf[512], res[512], res2[512], result[128];
+static char buf[512], result[128];
+unsigned char res[512], res2[512];
 unsigned long n;
 unsigned int alpha, beta, gamma;
 
@@ -84,25 +85,25 @@ unsigned int alpha, beta, gamma;
 
 	/* ALPHA... */
 	ircd_snprintf(0, buf, HOSTLEN, "%s:%s:%s", KEY2, host, KEY3);
-	DoMD5(res, buf, strlen(buf));
-	strcpy(res+16, KEY1); /* first 16 bytes are filled, append our key.. */
-	n = strlen(res+16) + 16;
+	DoMD5(res, (unsigned char*) buf, strlen(buf));
+	strcpy((char *)res+16, KEY1); 
+	n = strlen((char *)res+16) + 16;
 	DoMD5(res2, res, n);
 	alpha = downsample(res2);
 
 	/* BETA... */
 	ircd_snprintf(0, buf, HOSTLEN, "%s:%d.%d.%d:%s", KEY3, a, b, c, KEY1); 
-	DoMD5(res, buf, strlen(buf));
-	strcpy(res+16, KEY2); /* first 16 bytes are filled, append our key.. */
-	n = strlen(res+16) + 16;
+	DoMD5(res, (unsigned char*) buf, strlen(buf));
+	strcpy((char *) res+16, KEY2);
+	n = strlen((char *)res+16) + 16;
 	DoMD5(res2, res, n);
 	beta = downsample(res2);
 
 	/* GAMMA... */
 	ircd_snprintf(0, buf, HOSTLEN, "%s:%d.%d:%s", KEY1, a, b, KEY2); 
-	DoMD5(res, buf, strlen(buf));
-	strcpy(res+16, KEY3); /* first 16 bytes are filled, append our key.. */
-	n = strlen(res+16) + 16;
+	DoMD5(res, (unsigned char*) buf, strlen(buf));
+ 	strcpy((char *) res+16, KEY3);
+	n = strlen((char *)res+16) + 16;
 	DoMD5(res2, res, n);
 	gamma = downsample(res2);
 
@@ -115,13 +116,14 @@ unsigned int alpha, beta, gamma;
 char *hidehost_normalhost(char *host)
 {
 char *p;
-static char buf[512], res[512], res2[512], result[HOSTLEN+1];
+static char buf[512], result[HOSTLEN+1];
+unsigned char res[512], res2[512];
 unsigned int alpha, n;
 
 	ircd_snprintf(0, buf, HOSTLEN, "%s:%s:%s", KEY1, host, KEY2);
-	DoMD5(res, buf, strlen(buf));
-	strcpy(res+16, KEY3); /* first 16 bytes are filled, append our key.. */
-	n = strlen(res+16) + 16;
+	DoMD5(res, (unsigned char*) buf, strlen(buf));
+        strcpy((char *) res+16, KEY3);
+	n = strlen((char *)res+16) + 16;
 	DoMD5(res2, res, n);
 	alpha = downsample(res2);
 

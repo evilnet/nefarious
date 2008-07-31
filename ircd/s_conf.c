@@ -401,14 +401,14 @@ const char* conf_eval_crule(const char* name, int mask)
  */
 void det_confs_butmask(struct Client* cptr, int mask)
 {
-  struct SLink* link;
+  struct SLink* linkh;
   struct SLink* next;
   assert(0 != cptr);
 
-  for (link = cli_confs(cptr); link; link = next) {
-    next = link->next;
-    if ((link->value.aconf->status & mask) == 0)
-      detach_conf(cptr, link->value.aconf);
+  for (linkh = cli_confs(cptr); linkh; linkh = next) {
+    next = linkh->next;
+    if ((linkh->value.aconf->status & mask) == 0)
+      detach_conf(cptr, linkh->value.aconf);
   }
 }
 
@@ -847,7 +847,6 @@ void conf_add_class(const char* const* fields, int count)
 
 void conf_add_listener(const char* const* fields, int count)
 {
-  int i = 1;
   int is_server = 0;
   int is_exempt = 0;
   int is_hidden = 0;

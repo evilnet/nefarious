@@ -1,6 +1,64 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-07-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* configure: regenerated.
+
+	* configure.in: Added check for -fno-strict-aliasing, if available use it.
+
+	* ircd/channel.c: Compile warnings cleanup.
+
+	* ircd/cloak.c: Compile warnings cleanup.
+
+	* ircd/ircd.c: Compile warnings cleanup.
+
+	* ircd/ircd_events.c: Compile warnings cleanup.
+
+	* ircd/ircd_features.c: Compile warnings cleanup.
+
+	* ircd/ircd_string.c: Compile warnings cleanup.
+
+	* ircd/m_burst.c: Compile warnings cleanup.
+
+	* ircd/m_challenge.c: Compile warnings cleanup.
+
+	* ircd/m_die.c: Compile warnings cleanup.
+
+	* ircd/m_help.c: Compile warnings cleanup.
+
+	* ircd/m_notice.c: Compile warnings cleanup.
+
+	* ircd/m_restart.c: Compile warnings cleanup.
+
+	* ircd/m_svsident.c: Compile warnings cleanup.
+
+	* ircd/m_svsquit.c: Compile warnings cleanup.
+
+	* ircd/m_webirc.c: Compile warnings cleanup.
+
+	* ircd/motd.c: Compile warnings cleanup.
+
+	* ircd/numnicks.c: Compile warnings cleanup.
+
+	* ircd/parse.c: Compile warnings cleanup.
+
+	* ircd/s_bsd.c: Compile warnings cleanup.
+
+	* ircd/s_conf.c: Compile warnings cleanup.
+
+	* ircd/s_debug.c: Compile warnings cleanup.
+
+	* ircd/s_misc.c: Compile warnings cleanup.
+
+	* ircd/s_user.c: Compile warnings cleanup.
+
+	* ircd/s_serv.c: Compile warnings cleanup.
+
+	* ircd/send.c: Compile warnings cleanup.
+
+	* ircd/ssl.c: Compile warnings cleanup.
+
 2008-07-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Happy Birthday to me ;P

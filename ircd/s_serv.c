@@ -266,7 +266,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 		      "%C :%s", acptr, cli_user(acptr)->swhois);
       if (IsDNSBLMarked(acptr)) /* Burst even if dnsbl is disabled */
       {
-        struct SLink*  lp;
+        struct SLink*  lph;
         char* dnsblhost = cli_user(acptr)->dnsblhost;
         if(!dnsblhost[0])
             dnsblhost = "notmarked";
@@ -274,9 +274,9 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
         sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s ma %s", cli_name(acptr), MARK_DNSBL,
                       dnsblhost);
 
-        for (lp = cli_sdnsbls(acptr); lp; lp = lp->next)
+        for (lph = cli_sdnsbls(acptr); lph; lph = lph->next)
            sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s %s", cli_name(acptr),
-                         MARK_DNSBL_DATA, lp->value.cp);
+                         MARK_DNSBL_DATA, lph->value.cp);
 
       }
 

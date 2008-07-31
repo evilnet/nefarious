@@ -235,7 +235,7 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
 		  char *param)
 {
   struct Client *acptr;
-  struct SLink *link;
+  struct SLink *linkh;
   struct Channel *chptr;
   struct ConfItem *aconf;
   const struct ConnectionClass* cltmp;
@@ -298,12 +298,12 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
     if (MyConnect(acptr))
     {
       cn++;
-      for (link = cli_confs(acptr); link; link = link->next)
+      for (linkh = cli_confs(acptr); linkh; linkh = linkh->next)
         lcc++;
     }
     if (cli_user(acptr))
     {
-      for (link = cli_user(acptr)->invited; link; link = link->next)
+      for (linkh = cli_user(acptr)->invited; linkh; linkh = linkh->next)
         usi++;
       for (member = cli_user(acptr)->channel; member; member = member->next_channel)
         ++memberships;
@@ -324,17 +324,17 @@ void count_memory(struct Client *cptr, struct StatDesc *sd, int stat,
   {
     ch++;
     chm += (strlen(chptr->chname) + sizeof(struct Channel));
-    for (link = chptr->invites; link; link = link->next)
+    for (linkh = chptr->invites; linkh; linkh = linkh->next)
       chi++;
-    for (link = chptr->banlist; link; link = link->next)
+    for (linkh = chptr->banlist; linkh; linkh = linkh->next)
     {
       chb++;
-      chbm += (strlen(link->value.cp) + 1 + sizeof(struct SLink));
+      chbm += (strlen(linkh->value.cp) + 1 + sizeof(struct SLink));
     }
-    for (link = chptr->exceptlist; link; link = link->next)
+    for (linkh = chptr->exceptlist; linkh; linkh = linkh->next)
     {
       che++;
-      chem += (strlen(link->value.cp) + 1 + sizeof(struct SLink));
+      chem += (strlen(linkh->value.cp) + 1 + sizeof(struct SLink));
     }
   }
 

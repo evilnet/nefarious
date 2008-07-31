@@ -84,19 +84,19 @@ static char *weekdays[] = {
 static struct ServerStatistics ircst;
 struct ServerStatistics* ServerStats = &ircst;
 
-char *date(time_t clock)
+char *date(time_t clockh)
 {
   static char buf[80], plus;
   struct tm *lt, *gm;
   struct tm gmbuf;
   int minswest;
 
-  if (!clock)
-    clock = CurrentTime;
-  gm = gmtime(&clock);
+  if (!clockh)
+    clockh = CurrentTime;
+  gm = gmtime(&clockh);
   memcpy(&gmbuf, gm, sizeof(gmbuf));
   gm = &gmbuf;
-  lt = localtime(&clock);
+  lt = localtime(&clockh);
 
   minswest = (gm->tm_hour - lt->tm_hour) * 60 + (gm->tm_min - lt->tm_min);
   if (lt->tm_yday != gm->tm_yday)
@@ -562,7 +562,7 @@ void initstats(void)
   memset(&ircst, 0, sizeof(ircst));
 }
 
-void tstats(struct Client *cptr, struct StatDesc *sd, int stat, char *param)
+void tstats(struct Client *cptr, struct StatDesc *sd, int stath, char *param)
 {
   struct Client *acptr;
   int i;

@@ -90,12 +90,14 @@
 #include "ircd_string.h"
 #include "numeric.h"
 #include "numnicks.h"
+#include "opercmds.h"
 #include "s_conf.h"
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
 /* #include "IPcheck.h" */
 
+#include <arpa/inet.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,11 +114,9 @@
  */
 int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
-  char*        hostname;
-  char*        ipaddr;
-  char*        password;
-
-  time_t       next_target = 0;
+  char*        hostname = NULL;
+  char*        ipaddr = NULL;
+  char*        password = NULL;
 
   struct in_addr webirc_addr;
   struct ConfItem *aconf;
