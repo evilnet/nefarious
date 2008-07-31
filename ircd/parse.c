@@ -1248,22 +1248,22 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
   else
   {
     char numeric_prefix[6];
-    int  ii;
-    for (ii = 0; ii < 5; ++i)
+    int  i;
+    for (i = 0; i < 5; ++i)
     {
-      if ('\0' == ch[ii] || ' ' == (numeric_prefix[i] = ch[ii]))
+      if ('\0' == ch[i] || ' ' == (numeric_prefix[i] = ch[i]))
       {
         break;
       }
     }
-    numeric_prefix[ii] = '\0';
+    numeric_prefix[i] = '\0';
 
     /*
      * We got a numeric nick as prefix
      * 1 or 2 character prefixes are from servers
      * 3 or 5 chars are from clients
      */
-    if (0 == ii)
+    if (0 == i)
     {
       log_write(LS_SYSTEM, L_WARNING, 0, "Missing Prefix: (%s) [%s]", cli_name(cptr), buffbackup);
       protocol_violation(cptr,"Missing Prefix");

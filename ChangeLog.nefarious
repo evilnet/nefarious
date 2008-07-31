@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/parse.c: Try this.
+
 2008-07-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: regenerated.
