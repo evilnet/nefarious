@@ -468,7 +468,7 @@ static Numeric replyTable[] = {
 /* 219 */
   { RPL_ENDOFSTATS, "%c :End of /STATS report", "219" },
 /* 220 */
-  { 0 },
+  { RPL_STATSWLINE, "W %s *", "220" },
 /* 221 */
   { RPL_UMODEIS, "%s", "221" },
 /* 222 */

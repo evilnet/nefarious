@@ -3,6 +3,22 @@
 
 2008-08-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Tweaked W:line syntax.
+
+	* include/numeric.h: Added RPL_STATSWLINE.
+
+	* include/s_conf.h: Re do the WebIRC conf lines.
+
+	* ircd/m_webirc.c: Re do the WebIRC conf lines.
+
+	* ircd/s_conf.c: Re do the WebIRC conf lines.
+
+	* ircd/s_err.c: Added RPL_STATSWLINE.
+
+	* ircd/s_stats.c: Re do the WebIRC conf lines.
+
+2008-08-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/parse.c: Try this.
 
 2008-07-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

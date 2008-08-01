@@ -79,6 +79,7 @@ struct sline*    GlobalSList = 0;
 struct csline*   GlobalConnStopList = 0;
 struct svcline*  GlobalServicesList = 0;
 struct blline*   GlobalBLList = 0;
+struct wline*    GlobalWList = 0;
 unsigned int     GlobalBLCount = 0;
 char*            GlobalForwards[256];
 
@@ -990,6 +991,34 @@ void clear_cslines(void)
   GlobalConnStopList = 0;
 }
 
+void conf_add_webirc_line(const char* const* fields, int count)
+{
+  struct wline *wline;
+
+  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]))
+  {
+    log_write(LS_CONFIG, L_CRIT, 0, "Your W: line must have 2 fields!");
+    return;
+  }
+
+  wline = (struct wline *) MyMalloc(sizeof(struct wline));
+  memset(wline, 0, sizeof(struct wline));
+  DupString(wline->mask, fields[1]);
+  DupString(wline->passwd, fields[2]);
+  wline->next = GlobalWList;
+  GlobalWList = wline;
+}
+
+void clear_webirc_list(void)
+{
+  struct wline *wline;
+  while ((wline = GlobalWList)) {
+    GlobalWList = wline->next;
+    MyFree(wline->mask);
+    MyFree(wline->passwd);
+  }
+  GlobalWList = 0;
+}
 
 void conf_add_dnsbl_line(const char* const* fields, int count)
 {
@@ -1686,7 +1715,8 @@ read_actual_config(const char *cfile)
       break;
     case 'W':                /* WEBIRC Auth lines */
     case 'w':
-      aconf->status = CONF_WEBIRC;
+      conf_add_webirc_line(field_vector, field_count);
+      aconf->status = CONF_ILLEGAL;
       break;
     case 'K':                /* Kill user line on irc.conf           */
       conf_add_deny(field_vector, field_count, 0);
@@ -1828,31 +1858,6 @@ read_actual_config(const char *cfile)
       }
     }
 
-    /* WEBIRC config */
-    if (aconf->status & CONF_WEBIRC) {
-      struct ConfItem *bconf;
-
-      if ((bconf = find_conf_entry(aconf, aconf->status))) {
-        delist_conf(bconf);
-        bconf->status &= ~CONF_ILLEGAL;
-        if (aconf->status == CONF_WEBIRC) {
-          /*
-           * copy the password field in case it changed
-           */
-          MyFree(bconf->passwd);
-          bconf->passwd = aconf->passwd;
-          aconf->passwd = 0;
-
-          ConfLinks(bconf) -= bconf->clients;
-          bconf->conn_class = aconf->conn_class;
-          if (bconf->conn_class)
-            ConfLinks(bconf) += bconf->clients;
-        }
-        free_conf(aconf);
-        aconf = bconf;
-      }
-    }
-       
     if (aconf->status & CONF_SERVER) {
       if (ccount > MAXCONFLINKS || !aconf->host || strchr(aconf->host, '*') ||
           strchr(aconf->host, '?') || !aconf->name)
@@ -1995,6 +2000,7 @@ int rehash(struct Client *cptr, int sig)
   clear_slines();
   clear_cslines();
   clear_dnsbl_list();
+  clear_webirc_list();
   clear_svclines();
   clear_lblines();
 

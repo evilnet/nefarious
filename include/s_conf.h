@@ -41,9 +41,6 @@ struct TRecord;
 #define CONF_HUB                0x4000
 #define CONF_UWORLD             0x8000
 
-/* WEBIRC CONF_ */
-#define CONF_WEBIRC             0x10000
-
 #define CONF_OPS                (CONF_OPERATOR | CONF_LOCOP)
 #define CONF_CLIENT_MASK        (CONF_CLIENT | CONF_OPS | CONF_SERVER)
 
@@ -209,6 +206,11 @@ struct blline {
   char *rank;
 };
 
+struct wline {
+  struct wline *next;
+  char *mask;
+  char *passwd;
+};
 
 /*
  * GLOBALS
@@ -224,6 +226,7 @@ extern struct sline*	GlobalSList;
 extern struct csline*	GlobalConnStopList;
 extern struct svcline*	GlobalServicesList;
 extern struct blline*	GlobalBLList;
+extern struct wline*    GlobalWList;
 extern unsigned int	GlobalBLCount;
 extern char*		GlobalForwards[256];
 

@@ -87,6 +87,7 @@
 #include "ircd_chattr.h"
 #include "ircd_features.h"
 #include "ircd_reply.h"
+#include "ircd_snprintf.h"
 #include "ircd_string.h"
 #include "numeric.h"
 #include "numnicks.h"
@@ -117,9 +118,12 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char*        hostname = NULL;
   char*        ipaddr = NULL;
   char*        password = NULL;
+  char i_host[SOCKIPLEN + USERLEN + 2];
+  char s_host[HOSTLEN + USERLEN + 2];
+  int invalidauth = 1, invalidpass = 0;
 
   struct in_addr webirc_addr;
-  struct ConfItem *aconf;
+  struct wline *wline;
  
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -134,27 +138,27 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     password = parv[1];
   }
 
-  /* Find W:Lines */
+  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(sptr), ircd_ntoa((const char*) &(cli_ip(sptr))));
+  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(sptr), cli_sockhost(sptr));
 
-  aconf = find_conf_exact("*", cli_username(sptr),
-                          cli_sockhost(sptr), CONF_WEBIRC);
-  if (!aconf)
-    aconf = find_conf_exact("*", cli_username(sptr),
-                            ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_WEBIRC);
+  for (wline = GlobalWList; wline; wline = wline->next) {
+    if ((match(wline->mask, s_host) == 0) || (match(wline->mask, i_host) == 0)) {
+      invalidauth = 0;
+      if (!oper_password_match(password, wline->passwd))
+        invalidpass = 1;
+      else
+        invalidpass = 0;
+    }
 
-  if (!aconf)
-    aconf = find_conf_cidr("*", cli_username(sptr),
-                            cli_ip(sptr), CONF_WEBIRC);
-
-  if (!aconf || IsIllegal(aconf))
-    return exit_client(cptr, cptr, &me, "WEBIRC Not authorized from your host");
-   assert(0 != (aconf->status & CONF_WEBIRC));
-
-  /* do validation */
-
-  if (!oper_password_match(password, aconf->passwd)) {
-    return exit_client(cptr, cptr, &me, "WEBIRC Password invalid for your host");
+    if (!invalidauth && !invalidpass)
+      break;
   }
+
+  if (invalidauth)
+    return exit_client(cptr, cptr, &me, "WEBIRC Not authorized from your host");
+
+  if (invalidpass)
+    return exit_client(cptr, cptr, &me, "WEBIRC Password invalid for your host");
 
   /* assume success and continue */
 
