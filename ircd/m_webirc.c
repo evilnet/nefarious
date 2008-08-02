@@ -104,6 +104,37 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int wline_flags[] = {
+  WFLAG_MARK,    'm'
+};
+
+char wflagstr(const char* wflags)
+{
+  unsigned int *flag_p;
+  unsigned int x_flag = 0;
+  const char *flagstr;
+
+  flagstr = wflags;
+
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)wline_flags; flag_p[0]; flag_p += 2) {
+      if (flag_p[1] == *flagstr)
+        break;
+    }
+
+    if (!flag_p[0])
+      continue;
+
+    x_flag |= flag_p[0];
+  }
+
+  return x_flag;
+}
+
+
 /*
  * m_webirc
  *
@@ -120,7 +151,8 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char*        password = NULL;
   char i_host[SOCKIPLEN + USERLEN + 2];
   char s_host[HOSTLEN + USERLEN + 2];
-  int invalidauth = 1, invalidpass = 0;
+  int invalidauth = 1, invalidpass = 0, mark = 0;
+  unsigned int w_flag = 0;
 
   struct in_addr webirc_addr;
   struct wline *wline;
@@ -142,6 +174,12 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(sptr), cli_sockhost(sptr));
 
   for (wline = GlobalWList; wline; wline = wline->next) {
+    w_flag = wflagstr(wline->flags);
+    if (w_flag & WFLAG_MARK)
+      mark = 1;
+    else
+      mark = 0;
+
     if ((match(wline->mask, s_host) == 0) || (match(wline->mask, i_host) == 0)) {
       invalidauth = 0;
       if (!oper_password_match(password, wline->passwd))
@@ -161,6 +199,9 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     return exit_client(cptr, cptr, &me, "WEBIRC Password invalid for your host");
 
   /* assume success and continue */
+
+  if (mark && !EmptyString(wline->desc))
+    ircd_strncpy(cli_webirc(cptr), wline->desc, BUFSIZE);
 
   /* 
    * Copy parameters into better documenting variables

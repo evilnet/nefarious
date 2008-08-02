@@ -1,6 +1,31 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Tweaked W:line section.
+
+	* include/client.h: Added cli_webirc.
+
+	* include/numeric.h: Added WHOISWEBIRC.
+
+	* include/s_conf.h: Added flags and description support.
+
+	* ircd/m_check.c: Show cli_webirc if available.
+
+	* ircd/m_mark.c: Handle MARK_WEBIRC.
+
+	* ircd/m_whois.c: Added WHOISWEBIRC.
+
+	* ircd/m_webirc.c: Added flags and description support.
+
+	* ircd/s_conf.c:  Added flags and description support.
+
+	* ircd/s_stats.c: Show description beside each W:line.
+
+	* ircd/s_user.c: Send out the W:line description after NICK using
+	MARK.
+
 2008-08-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Tweaked W:line syntax.

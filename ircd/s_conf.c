@@ -995,9 +995,9 @@ void conf_add_webirc_line(const char* const* fields, int count)
 {
   struct wline *wline;
 
-  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]))
+  if (count < 4 || EmptyString(fields[1]) || EmptyString(fields[2]) || EmptyString(fields[4]))
   {
-    log_write(LS_CONFIG, L_CRIT, 0, "Your W: line must have 2 fields!");
+    log_write(LS_CONFIG, L_CRIT, 0, "Your W: line must have 4 fields!");
     return;
   }
 
@@ -1005,6 +1005,8 @@ void conf_add_webirc_line(const char* const* fields, int count)
   memset(wline, 0, sizeof(struct wline));
   DupString(wline->mask, fields[1]);
   DupString(wline->passwd, fields[2]);
+  DupString(wline->flags, fields[3]);
+  DupString(wline->desc, fields[4]);
   wline->next = GlobalWList;
   GlobalWList = wline;
 }
@@ -1016,6 +1018,8 @@ void clear_webirc_list(void)
     GlobalWList = wline->next;
     MyFree(wline->mask);
     MyFree(wline->passwd);
+    MyFree(wline->flags);
+    MyFree(wline->desc);
   }
   GlobalWList = 0;
 }

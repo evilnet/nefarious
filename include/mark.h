@@ -27,6 +27,7 @@
 #define MARK_DNSBL_DATA		"DNSBL_DATA"
 #define MARK_EXEMPT_UPDATE	"EXEMPT"
 #define MARK_CVERSION		"CVERSION"
+#define MARK_WEBIRC		"WEBIRC"
 
 #endif /* INCLUDED_mark_h */
 

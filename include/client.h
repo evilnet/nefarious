@@ -293,6 +293,7 @@ struct Client {
   char cli_username[USERLEN + 1];    /**< username here now for auth stuff */
   char cli_info[REALLEN + 1];        /**< Free form additional client information */
   char cli_version[VERSIONLEN + 1];  /**< Free form client version information - added by Vadtec 02/26/2008 */
+  char cli_webirc[BUFSIZE + 1];      /**< webirc description */
   char cli_dnsbl[BUFSIZE + 1];       /**< dnsbl hostname identifier */
   char cli_dnsbls[BUFSIZE + 1];      /**< all dnsbls matched identifier */
   struct SLink*   cli_sdnsbls;       /**< chain of dnsbl pointer blocks */
@@ -353,6 +354,8 @@ struct Client {
 #define cli_username(cli)	((cli)->cli_username)
 /** Get client version (CTCP version). */
 #define cli_version(cli)	((cli)->cli_version)
+/** Get client webirc description */
+#define cli_webirc(cli)         ((cli)->cli_webirc)
 /** Get client realname (information field). */
 #define cli_info(cli)		((cli)->cli_info)
 /** Get client oper flags. */
@@ -912,6 +915,9 @@ struct Client {
 #define DFLAG_MARK	0x008
 /** Dont allow even if allowed */
 #define DFLAG_DENY	0x010
+
+/** Client webirc desc is sent */
+#define WFLAG_MARK	0x001
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/**< socket needs to be freed */

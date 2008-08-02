@@ -192,6 +192,17 @@ int ms_mark(struct Client* cptr, struct Client* sptr, int parc,
        sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s :%s", cli_name(acptr), MARK_CVERSION, parv[3]);
     }
 
+  } else if (!strcmp(parv[2], MARK_WEBIRC)) {
+    struct Client* acptr;
+
+    if(parc < 3)
+      return protocol_violation(sptr, "MARK webirc received too few parameters (%u)", parc);
+
+    if ((acptr = FindUser(parv[1]))) {
+      ircd_strncpy(cli_webirc(acptr), parv[3], BUFSIZE);
+      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s :%s", cli_name(acptr), MARK_WEBIRC, parv[3]);
+    }
+
   } else
     log_write(LS_NETWORK, L_INFO, 0, "Unknown MARK received [%s]", parv[2]);
 

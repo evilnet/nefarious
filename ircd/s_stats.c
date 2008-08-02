@@ -190,7 +190,7 @@ stats_webirc(struct Client* to, struct StatDesc* sd, int stat, char* param)
   struct wline *wline;
 
   for (wline = GlobalWList; wline; wline = wline->next)
-    send_reply(to, RPL_STATSWLINE, wline->mask);
+    send_reply(to, RPL_STATSWLINE, wline->mask, wline->desc);
 }
 
 /*
