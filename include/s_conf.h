@@ -210,6 +210,7 @@ struct wline {
   struct wline *next;
   char *mask;
   char *passwd;
+  char *ident;
   char *desc;
   char *flags;
 };

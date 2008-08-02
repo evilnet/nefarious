@@ -1,6 +1,27 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Tweaked W:line section.
+
+	* include/client.h: Added spoof andd userident W:line flags.
+
+	* include/ircd_features.h: Removed WEBIRC F:lines except for
+	HIS_STATS_W.
+
+	* include/s_conf.h: Added W:line ident field.
+
+	* ircd/ircd_features.c:  Removed WEBIRC F:lines except for HIS_STATS_W.
+
+	* ircd/m_webirc.c: Added spoof andd userident W:line flags.
+
+	* ircd/s_err.c: Tweaked stats W to handle extra fields.
+
+	* ircd/s_stats.c: Tweaked stats W to handle extra fields.
+
+	* ircd/s_user.c: Make use of userident W:line flag.
+
 2008-08-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Tweaked W:line section.

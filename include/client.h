@@ -184,6 +184,7 @@ enum Flag {
     FLAG_DNSBLDENIED,               /**< Only set if a client is found on a d X:line */
 
     FLAG_WEBIRC,                    /**< User registered with WEBIRC command */
+    FLAG_WEBIRC_UIDENT,             /**< Use USER method for getting IDENT */
 
     FLAG_NAMESX,                    /**< Client supports extended NAMES replies */
     FLAG_UHNAMES,                   /**< Client supports extended NAMES replies */
@@ -709,6 +710,8 @@ struct Client {
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
 /** Return non-zero if the client is a WEBIRC user. */
 #define IsWebIRC(x)             HasFlag(x, FLAG_WEBIRC)
+/** Return non-zero if the client is WEBIRC line uses USER method */
+#define IsWebIRCUserIdent(x)    HasFlag(x, FLAG_WEBIRC_UIDENT)
 /** Return non-zero if the client supports extended NAMES */
 #define IsNamesX(x)             HasFlag(x, FLAG_NAMESX)
 /** Return non-zero if the client supports extended NAMES */
@@ -792,6 +795,8 @@ struct Client {
 #define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
 /** Mark a client as being a WEBIRC user. */
 #define SetWebIRC(x)            SetFlag(x, FLAG_WEBIRC)
+/** Mark a WEBIRC client as using USER to send ident .*/
+#define SetWebIRCUserIdent(x)   SetFlag(x, FLAG_WEBIRC_UIDENT)
 /** Mark a client as supporting extended NAMES. */
 #define SetNamesX(x)            SetFlag(x, FLAG_NAMESX)
 /** Mark a client as supporting extended NAMES. */
@@ -918,6 +923,8 @@ struct Client {
 
 /** Client webirc desc is sent */
 #define WFLAG_MARK	0x001
+#define WFLAG_SIDENT    0x002
+#define WFLAG_UIDENT    0x004
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/**< socket needs to be freed */

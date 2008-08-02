@@ -508,6 +508,7 @@ static struct FeatureDesc {
   F_B(HIS_STATS_U, 0, 1, 0),
   F_B(HIS_STATS_v, 0, 1, 0),
   F_B(HIS_STATS_w, 0, 0, 0),
+  F_B(HIS_STATS_W, 0, 0, 0),
   F_B(HIS_STATS_x, 0, 1, 0),
   F_B(HIS_STATS_y, 0, 1, 0),
   F_B(HIS_STATS_z, 0, 1, 0),
@@ -677,12 +678,6 @@ static struct FeatureDesc {
   F_I(HELP_PACE, 0, 5, 0),
   F_B(OPER_LIST_CHAN, 0, 1, 0),
   F_B(LASTMOD_TWEAK, 0, 0, 0),
-
-  /* Added as part of WEBIRC support */
-  F_B(HIS_STATS_W, 0, 1, 0),
-  F_B(WEBIRC_SPOOFIDENT, 0, 0, 0),
-  F_S(WEBIRC_FAKEIDENT, 0, "webirc", 0),
-  F_B(WEBIRC_USERIDENT, 0, 0, 0),
 
   F_B(CTCP_VERSIONING, 0, 0, 0), /* added by Vadtec 02/25/2008 */
   F_B(CTCP_VERSIONING_KILL, 0, 0, 0), /* added by Vadtec 02/27/2008 */

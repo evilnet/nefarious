@@ -454,7 +454,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     aconf = cli_confs(sptr)->value.aconf;
 
-    if ( feature_bool(FEAT_WEBIRC_USERIDENT) && IsWebIRC(sptr) ) {
+    if ( IsWebIRCUserIdent(sptr) && IsWebIRC(sptr) ) {
       clean_user_id(user->username, username,
           HasFlag(sptr, FLAG_DOID) && !HasFlag(sptr, FLAG_GOTID)
           && !(HasSetHost(sptr))); /* No tilde for S-lined users. */
