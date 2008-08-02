@@ -3,6 +3,10 @@
 
 2008-08-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Makefile.in: Help file install tweak from branches.
+
+2008-08-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Tweaked W:line section.
 
 	* include/client.h: Added spoof andd userident W:line flags.
