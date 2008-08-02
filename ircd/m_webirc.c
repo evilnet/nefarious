@@ -89,6 +89,7 @@
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "match.h"
 #include "numeric.h"
 #include "numnicks.h"
 #include "opercmds.h"
