@@ -38,6 +38,11 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+
+#if HAVE_TIMES
+#include <sys/times.h>
+#endif
+
 #include <sys/uio.h>
 #include <unistd.h>
 
