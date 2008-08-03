@@ -2119,19 +2119,21 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	}
 	break;
       case 'C':
-        if (what == MODE_ADD) {
+        if ((what == MODE_ADD) && IsServer(cptr)) {
           if (*(p + 1)) {
             SetCloakHost(acptr);
             ircd_strncpy(cli_user(acptr)->virthost, *++p, HOSTLEN);
           }
         }
+        break;
       case 'c':
-        if (what == MODE_ADD) {
+        if ((what == MODE_ADD) && IsServer(cptr)) {
           if (*(p + 1)) {
             SetCloakIP(acptr);
             ircd_strncpy(cli_user(acptr)->virtip, *++p, HOSTLEN);
           }
         }
+        break;
       case 'h':
         if (what == MODE_ADD) {
           if (*(p + 1) && is_hostmask(*(p + 1))) {
