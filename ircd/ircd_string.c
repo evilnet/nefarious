@@ -26,6 +26,7 @@
 #include "ircd_log.h"
 #include "msg.h"
 #include "s_bsd.h"
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <regex.h>

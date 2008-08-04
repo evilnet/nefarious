@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ircd_string.c: Fix for compile warning.
+
 2008-08-03  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fix for user mode +c and +C handling.
