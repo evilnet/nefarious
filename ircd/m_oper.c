@@ -376,13 +376,13 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	   ClearAdmin(sptr);
 	 else {
 	   OSetGlobal(sptr);
-	   SetAdmin(sptr);
+           OSetAdmin(sptr);
 	 }
 	 sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
-		       (IsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
+		       (OIsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
 
-         if (IsAdmin(sptr)) {
+         if (OIsAdmin(sptr)) {
            sendto_allops(&me, SNO_OLDSNO,
                               "%s (%s@%s) is now an IRC Administrator",
                               parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost);
