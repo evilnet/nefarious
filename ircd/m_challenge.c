@@ -370,22 +370,20 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
 
       if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
         /* Global Oper */
-        SetOper(sptr);
         ClearAdmin(sptr);
       } else {
         /* Admin */
-        SetOper(sptr);
         OSetGlobal(sptr);
-        SetAdmin(sptr);
+        OSetAdmin(sptr);
       }
     }
 
     sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
-                  (IsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
+                  (OIsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 
     send_reply(sptr, RPL_YOUREOPER);
 
-    if (IsAdmin(sptr)) {
+    if (OIsAdmin(sptr)) {
       sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
                     parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
 
@@ -399,7 +397,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
         join[1] = chan;
         m_join(sptr, sptr, 2, join);
       }
-      if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+      if (feature_bool(FEAT_AUTOJOIN_OPER) && OIsGlobal(sptr)) {
         if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
               sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 
@@ -411,9 +409,9 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
     } else {
       sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c)",
                          parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
-                         IsOper(sptr) ? 'O' : 'o');
+                         OIsGlobal(sptr) ? 'O' : 'o');
 
-      if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+      if (feature_bool(FEAT_AUTOJOIN_OPER) && OIsGlobal(sptr)) {
         if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
               sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 

@@ -388,7 +388,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
                               parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost);
 
            /* Autojoin admins to admin channel and oper channel (if enabled) */
-           if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+           if (feature_bool(FEAT_AUTOJOIN_OPER) && OIsGlobal(sptr)) {
              if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
                sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 
@@ -397,7 +397,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
              join[1] = chan;
              m_join(sptr, sptr, 2, join);
            }
-           if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+           if (feature_bool(FEAT_AUTOJOIN_OPER) && OIsGlobal(sptr)) {
              if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
                sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 
@@ -411,7 +411,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
                                "%s (%s@%s) is now an IRC Operator (O)",
                                parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost);
 
-           if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr)) {
+           if (feature_bool(FEAT_AUTOJOIN_OPER) && OIsGlobal(sptr)) {
              if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
                sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 

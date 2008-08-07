@@ -3,6 +3,14 @@
 
 2008-08-07  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/m_challenge.c: Missed remote CHALLENGE from previous fix
+	and fixed remote challenge autojoin features
+
+	* ircd/m_oper.c: Fixed some issues with remote oper and the
+	autojoin features
+
+2008-08-07  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/m_oper.c: Fix for remote oper not sending user mode +a
 	out properly
 
