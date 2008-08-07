@@ -1044,6 +1044,7 @@ parse_client(struct Client *cptr, char *buffer, char *bufend)
 
   expire_shuns();
   if ((strcasecmp(ch, "NICK"))    &&  /* rejection handled in m_nick.c */
+      (strcasecmp(ch, "WEBIRC"))  &&  /* allow WEBIRC to still work */
       (strcasecmp(ch, "SERVER"))  &&  /* expiring shuns with this or matching
                                        * just causes major issues, we dont need
                                        * to check shuns with SERVER.
