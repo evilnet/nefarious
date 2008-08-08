@@ -3,6 +3,10 @@
 
 2008-08-08  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* doc/example.conf: Add F:HIS_STATS_E
+
+2008-08-08  Matthew Beeching  <jobe@mdbnet.co.uk>
+
         * ircd/gline.c: Added E:Line checks
 
         * ircd/shun.c: Added E:Line checks
