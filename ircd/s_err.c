@@ -472,7 +472,7 @@ static Numeric replyTable[] = {
 /* 221 */
   { RPL_UMODEIS, "%s", "221" },
 /* 222 */
-  { 0 },
+  { RPL_STATSELINE, "E %s * %s", "222" },
 /* 223 */
   { 0 },
 /* 224 */

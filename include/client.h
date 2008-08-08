@@ -926,6 +926,15 @@ struct Client {
 #define WFLAG_SIDENT    0x002
 #define WFLAG_UIDENT    0x004
 
+/** Exception for K:Lines */
+#define EFLAG_KLINE     0x001
+/** Exception for /GLINES */
+#define EFLAG_GLINE     0x002
+/** Exception for /ZLINES */
+#define EFLAG_ZLINE     0x004
+/** Exception for /SHUNS */
+#define EFLAG_SHUN      0x008
+
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/**< socket needs to be freed */
 #define FREEFLAG_TIMER	0x0002	/**< timer needs to be freed */

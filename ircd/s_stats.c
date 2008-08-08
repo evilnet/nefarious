@@ -185,6 +185,15 @@ stats_access(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_elines(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct eline *eline;
+
+  for (eline = GlobalEList; eline; eline = eline->next)
+    send_reply(to, RPL_STATSELINE, eline->mask, eline->flags ? eline->flags : "");
+}
+
+static void
 stats_webirc(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   struct wline *wline;
@@ -474,7 +483,10 @@ struct StatDesc statsinfo[] = {
   { 'd', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_d,
     stats_crule_list, 0,
     "Dynamic routing configuration." },
-  { 'e', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_e,
+  { 'E', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_E,
+    stats_elines, 0,
+    "Exception lines." },
+  { 'e', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_e,
     stats_engine, 0,
     "Report server event loop engine." },
   { 'f', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_f,

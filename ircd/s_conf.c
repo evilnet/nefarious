@@ -80,6 +80,7 @@ struct csline*   GlobalConnStopList = 0;
 struct svcline*  GlobalServicesList = 0;
 struct blline*   GlobalBLList = 0;
 struct wline*    GlobalWList = 0;
+struct eline*    GlobalEList = 0;
 unsigned int     GlobalBLCount = 0;
 char*            GlobalForwards[256];
 
@@ -88,6 +89,12 @@ static struct CRuleConf*  cruleConfList;
 static struct ServerConf* serverConfList;
 static struct DenyConf*   denyConfList;
 
+static int eline_flags[] = {
+  EFLAG_KLINE,    'k',
+  EFLAG_GLINE,    'g',
+  EFLAG_ZLINE,    'z',
+  EFLAG_SHUN,     's'
+};
 
 static int dnsbl_flags[] = {
   DFLAG_BITMASK,  'b',
@@ -104,6 +111,32 @@ static int oper_access[] = {
 	OFLAG_RSA,	'R',
 	0, 0
 };
+
+char eflagstr(const char* eflags)
+{
+  unsigned int *flag_p;
+  unsigned int x_flag = 0;
+  const char *flagstr;
+
+  flagstr = eflags;
+
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)eline_flags; flag_p[0]; flag_p += 2) {
+      if (flag_p[1] == *flagstr)
+        break;
+    }
+
+    if (!flag_p[0])
+      continue;
+
+    x_flag |= flag_p[0];
+  }
+
+  return x_flag;
+}
 
 char oflagbuf[128];
 
@@ -1026,6 +1059,35 @@ void clear_webirc_list(void)
   GlobalWList = 0;
 }
 
+void conf_add_except_line(const char* const* fields, int count)
+{
+  struct eline *eline;
+
+  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]))
+  {
+    log_write(LS_CONFIG, L_CRIT, 0, "Your E: line must have 2 fields!");
+    return;
+  }
+
+  eline = (struct eline *) MyMalloc(sizeof(struct eline));
+  memset(eline, 0, sizeof(struct eline));
+  DupString(eline->mask, fields[1]);
+  DupString(eline->flags, fields[2]);
+  eline->next = GlobalEList;
+  GlobalEList = eline;
+}
+
+void clear_eline_list(void)
+{
+  struct eline *eline;
+  while ((eline = GlobalEList)) {
+    GlobalEList = eline->next;
+    MyFree(eline->mask);
+    MyFree(eline->flags);
+  }
+  GlobalEList = 0;
+}
+
 void conf_add_dnsbl_line(const char* const* fields, int count)
 {
   struct blline *blline;
@@ -1706,6 +1768,11 @@ read_actual_config(const char *cfile)
       conf_add_crule(field_vector, field_count, CRULE_AUTO);
       aconf->status = CONF_ILLEGAL;
       break;
+    case 'E':                /* Exception lines */
+    case 'e':
+      conf_add_except_line(field_vector, field_count);
+      aconf->status = CONF_ILLEGAL;
+      break;
     case 'F':                /* Feature line */
     case 'f':
       feature_set(0, &field_vector[1], field_count - 1);
@@ -2007,6 +2074,7 @@ int rehash(struct Client *cptr, int sig)
   clear_cslines();
   clear_dnsbl_list();
   clear_webirc_list();
+  clear_eline_list();
   clear_svclines();
   clear_lblines();
 
@@ -2106,6 +2174,76 @@ int init_conf(void)
 }
 
 /*
+ * find_eline
+ * input:
+ *  client pointer
+ *  combination of EFLAG_*'s
+ * returns:
+ *  0: Client does not have an E:Line.
+ * -1: Client has an E:Line with 1 or more of the supplied flags.
+*/
+int find_eline(struct Client *cptr, unsigned int flags)
+{
+  char i_host[SOCKIPLEN + USERLEN + 2];
+  char s_host[HOSTLEN + USERLEN + 2];
+  int found = 0;
+  unsigned int e_flag = 0;
+  struct eline *eline;
+
+  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(cptr), ircd_ntoa((const char*) &(cli_ip(cptr))));
+  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(cptr), cli_sockhost(cptr));
+
+  for (eline = GlobalEList; eline; eline = eline->next) {
+    char* ip_s = NULL;
+    char* ip_start;
+    char* cidr_start;
+    in_addr_t cli_addr = 0;
+
+    e_flag = eflagstr(eline->flags);
+
+    if ((match(eline->mask, s_host) == 0) || (match(eline->mask, i_host) == 0)) {
+      if (e_flag & flags) {
+        found = 1;
+      }
+    }
+
+    if ((ip_start = strrchr(i_host, '@')))
+      cli_addr = inet_addr(ip_start + 1);
+
+    if ((ip_start = strrchr(eline->mask, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+      int bits = atoi(cidr_start + 1);
+      char* p = strchr(i_host, '@');
+
+      if (p) {
+        *p = *ip_start = 0;
+        if (match(eline->mask, i_host) == 0) {
+          if ((bits > 0) && (bits < 33)) {
+            in_addr_t ban_addr;
+            *cidr_start = 0;
+            ban_addr = inet_addr(ip_start + 1);
+            *cidr_start = '/';
+            if ((NETMASK(bits) & cli_addr) == ban_addr) {
+              *p = *ip_start = '@';
+              if (e_flag & flags) {
+                found = 1;
+              }
+            }
+          }
+        }
+        *p = *ip_start = '@';
+      }
+    }
+
+  }
+
+  if (found) {
+    return -1;
+  }
+
+  return 0;
+}
+
+/*
  * find_kill
  * input:
  *  client pointer
@@ -2166,7 +2304,7 @@ int find_kill(struct Client *cptr)
     else if (0 == match(deny->hostmask, host))
       break;
   }
-  if (deny) {
+  if (deny && !find_eline(cptr, EFLAG_KLINE)) {
     if (EmptyString(deny->message))
       send_reply(cptr, SND_EXPLICIT | ERR_YOUREBANNEDCREEP,
                  ":Connection from your host is refused on this server.");
@@ -2185,7 +2323,7 @@ int find_kill(struct Client *cptr)
     send_reply(cptr, SND_EXPLICIT | ERR_YOUREBANNEDCREEP, ":%s.", GlineReason(agline));
   }
 
-  if (deny)
+  if (deny && !find_eline(cptr, EFLAG_KLINE))
     return -1;
   if (agline)
     return -2;

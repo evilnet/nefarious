@@ -220,6 +220,11 @@ do_zline(struct Client *cptr, struct Client *sptr, struct Zline *zline)
           continue;
       }
 
+      /* Check if Z:Lined user matches an E:Line */
+      if (find_eline(acptr, EFLAG_ZLINE)) {
+        continue;
+      }
+
       /* ok, here's one that got Z-lined */
       send_reply(acptr, SND_EXPLICIT | ERR_YOUREBANNEDCREEP, ":%s",
       	   zline->zl_reason);
@@ -576,6 +581,11 @@ zline_lookup_oc(struct Client *cptr, unsigned int flags)
     else {
       if (match(zline->zl_host, (cli_user(cptr))->realhost) != 0) 
         continue;
+    }
+
+    /* Check if Z:Lined user matches an E:Line */
+    if (find_eline(cptr, EFLAG_ZLINE)) {
+      continue;;
     }
 
     if (ZlineIsActive(zline))

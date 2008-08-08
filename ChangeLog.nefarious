@@ -1,6 +1,32 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-08  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+        * ircd/gline.c: Added E:Line checks
+
+        * ircd/shun.c: Added E:Line checks
+
+        * ircd/zline.c: Added E:Line checks
+
+        * ircd/s_conf.c: Added E:Lines
+
+        * ircd/s_err.c: Added RPL_STATSELINE
+
+        * ircd/ircd_features.c: Added F:HIS_STATS_E
+
+        * ircd/s_stats.c: Added STATS E for E:Lines
+
+        * include/numeric.h: Added RPL_STATSELINE
+
+        * include/s_conf.h: Added E:Lines
+
+        * include/client.h: Added E:Line checks
+
+        * include/ircd_features.h: Added F:HIS_STATS_E
+
+        * doc/example.conf: Added E:Lines documentation
+
 2008-08-07  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/parse.c: Prevent SHUN from stopping WEBIRC users from

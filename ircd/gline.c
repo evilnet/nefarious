@@ -312,6 +312,11 @@ do_gline(struct Client *cptr, struct Client *sptr, struct Gline *gline)
 	      }
       } /* of Host/IP Gline */
 
+      /* Check if G:Lined user matches an E:Line */
+      if (find_eline(acptr, EFLAG_GLINE)) {
+        continue;;
+      }
+
       /* ok, here's one that got G-lined */
       send_reply(acptr, SND_EXPLICIT | ERR_YOUREBANNEDCREEP, ":%s",
       	   gline->gl_reason);
@@ -744,6 +749,12 @@ gline_lookup(struct Client *cptr, unsigned int flags)
           continue;
       }
     }
+
+    /* Check if G:Lined user matches an E:Line */
+    if (find_eline(cptr, EFLAG_GLINE)) {
+      continue;;
+    }
+
     if (GlineIsActive(gline))
       return gline;
   }

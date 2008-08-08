@@ -230,6 +230,10 @@ do_shun(struct Client *cptr, struct Client *sptr, struct Shun *shun)
 	      }
       } /* of Host/IP Shun */
 
+      /* Check if shunned user matches an E:Line */
+      if (find_eline(acptr, EFLAG_SHUN)) {
+        continue;;
+      }
 
       /* ok, here's one that got Shunned */
       if (!feature_bool(FEAT_HIS_SHUN_REASON))
@@ -622,6 +626,12 @@ shun_lookup(struct Client *cptr, unsigned int flags)
           continue;
       }
     }
+
+    /* Check if shunned user matches an E:Line */
+    if (find_eline(cptr, EFLAG_SHUN)) {
+      continue;;
+    }
+
     if (ShunIsActive(shun))
       return shun;
   }
