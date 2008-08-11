@@ -257,7 +257,7 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
     return 0;
   }
 
-  if (!aconf->port & OFLAG_RSA)
+  if (!(aconf->port & OFLAG_RSA))
   {
     send_reply(sptr, RPL_NO_CHALL);
     return 0;
@@ -454,7 +454,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
     return 0;
   }
 
-  if (!aconf->port & OFLAG_RSA)
+  if (!(aconf->port & OFLAG_RSA))
   {
     send_reply(sptr, RPL_NO_CHALL);
     return 0;
