@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-18  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/shun.c: Fixed a crash bug when listing shuns
+
 2008-08-11  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_challenge.c: Fixed O:Line flag R being ignored and

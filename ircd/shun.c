@@ -724,7 +724,6 @@ shun_list(struct Client *sptr, char *userhost)
 		   shun->sh_host ? shun->sh_host : "",
 		   shun->sh_expire + TSoffset,
                    shun->sh_lastmod + TSoffset,
-                   shun->sh_lastmod + TSoffset,
 		   ShunIsLocal(shun) ? cli_name(&me) : "*",
 		   ShunIsActive(shun) ? '+' : '-', shun->sh_reason);
     }
