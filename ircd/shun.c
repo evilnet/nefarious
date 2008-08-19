@@ -35,6 +35,7 @@
 #include "match.h"
 #include "numeric.h"
 #include "s_bsd.h"
+#include "s_conf.h"
 #include "s_debug.h"
 #include "s_misc.h"
 #include "s_stats.h"

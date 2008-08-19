@@ -331,7 +331,9 @@ int m_who(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
               continue;
             if (!Process(acptr))        /* This can't be moved before other checks */
               continue;
-            if (!(isthere || (SHOW_MORE(sptr, counter))))
+            if (!(isthere ||
+                 (IsOper(sptr) && (bitsel & WHOSELECT_EXTRA) && HasPriv(sptr, PRIV_SEE_CHAN)) ||
+                 (SHOW_MORE(sptr, counter))))
               break;
             do_who(sptr, acptr, chptr, fields, qrt);
           }

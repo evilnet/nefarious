@@ -196,6 +196,13 @@ struct Message msgtab[] = {
     { m_ignore, m_ignore, ms_burst, m_ignore, m_ignore }
   },
   {
+    MSG_REBURST,
+    TOK_REBURST,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_ignore, ms_reburst, m_ignore, m_ignore }
+  },
+  {
     MSG_CREATE,
     TOK_CREATE,
     0, MAXPARA, MFLG_SLOW, 0,

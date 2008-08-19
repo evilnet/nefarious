@@ -167,6 +167,7 @@ IRCD_SRC = \
 	m_proto.c \
 	m_protoctl.c \
 	m_quit.c \
+	m_reburst.c \
 	m_rehash.c \
 	m_reset.c \
 	m_restart.c \

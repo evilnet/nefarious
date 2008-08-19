@@ -1,6 +1,38 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/handlers.h: Added ms_reburst.
+
+	* include/msg.h: Added REBURST.
+
+	* ircd/channel.c: If HIS_BANWHO is enabled and an oper sets a ban on
+	a channel using OPMODE the setter in the ban list will be set to *.
+
+	* ircd/gline.c: Warning fix.
+
+	* ircd/Makefile.c: Added m_reburst.c
+
+	* ircd/m_check.c: Fix for showing client status's. Plus a truncated notice if
+	results are over the maximum allowed.
+
+	* ircd/m_reburst.c:  Command to reburst g,z lines, shuns and jupes. Mostly
+	for debugging.
+
+	* ircd/m_who.c: Remove some limits for opers.
+
+	* ircd/parse.c: Added REBURST.
+
+	* ircd/s_conf.c: Warning fix.
+
+	* ircd/s_user.c: Send the ctcp message using NOTICE AUTH instead of a
+	standard server notice
+
+	* ircd/shun.c: Warning fix.
+
+	* ircd/zline.c: Warning fix.
+
 2008-08-18  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/shun.c: Fixed a crash bug when listing shuns

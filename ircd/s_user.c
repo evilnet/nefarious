@@ -80,6 +80,14 @@
 static char *IsVhost(char *hostmask, int oper);
 static char *IsVhostPass(char *hostmask);
 
+#ifdef USE_SSL
+#define sendheader(c, m, l) \
+   ssl_send(c, m, l)
+#else
+#define sendheader(c, m, l) \
+   send(cli_fd(c), m, l, 0)
+#endif /* USE_SSL */
+
 static int userCount = 0;
 
 /*
@@ -789,8 +797,12 @@ int register_user(struct Client *cptr, struct Client *sptr,
     /* We do this here because CTCP VERSION isn't part of the RFC, so there is no reason to delay the user from 
        being able to join the network. */
     if (feature_bool(FEAT_CTCP_VERSIONING)) {
-      if (feature_str(FEAT_CTCP_VERSIONING_NOTICE))
-        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_CTCP_VERSIONING_NOTICE));
+      if (feature_str(FEAT_CTCP_VERSIONING_NOTICE)) {
+        char strver[BUFSIZE] = "";
+        ircd_snprintf(0, strver, strlen(feature_str(FEAT_CTCP_VERSIONING_NOTICE)) + 16, "NOTICE AUTH :%s\r\n",
+                      feature_str(FEAT_CTCP_VERSIONING_NOTICE));
+        sendheader(sptr, strver, strlen(strver));
+      }
       sendcmdto_one(&me, CMD_PRIVATE, sptr, "%C :\001VERSION\001", sptr);
     }
 

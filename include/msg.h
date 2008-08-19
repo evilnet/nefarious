@@ -374,6 +374,10 @@ struct Client;
 #define TOK_BURST               "B"
 #define CMD_BURST		MSG_BURST, TOK_BURST
 
+#define MSG_REBURST               "REBURST"         /* REBURST */
+#define TOK_REBURST               "RB"
+#define CMD_REBURST               MSG_REBURST, TOK_REBURST
+
 #define MSG_UPING               "UPING"         /* UPIN */
 #define TOK_UPING               "UP"
 #define CMD_UPING		MSG_UPING, TOK_UPING

@@ -2194,7 +2194,6 @@ int find_eline(struct Client *cptr, unsigned int flags)
   ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(cptr), cli_sockhost(cptr));
 
   for (eline = GlobalEList; eline; eline = eline->next) {
-    char* ip_s = NULL;
     char* ip_start;
     char* cidr_start;
     in_addr_t cli_addr = 0;

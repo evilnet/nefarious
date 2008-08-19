@@ -2923,7 +2923,14 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     newban->next = 0;
 
     DupString(newban->value.ban.banstr, t_str);
-    newban->value.ban.who = cli_name(state->sptr);
+
+    if (!IsUser(state->sptr) ||
+      (feature_bool(FEAT_HIS_BANWHO) && state->mbuf != NULL && (state->mbuf->mb_dest & MODEBUF_DEST_OPMODE))) {
+      newban->value.ban.who  = "*";
+    } else {
+      newban->value.ban.who = cli_name(state->sptr);
+    }
+
     newban->value.ban.when = TStime();
 
     newban->flags = CHFL_BAN | MODE_ADD;

@@ -376,12 +376,22 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    ircd_snprintf(0, outbuf, sizeof(outbuf), "      Real Name:: %s%c", cli_info(acptr), COLOR_OFF);
    send_reply(sptr, RPL_DATASTR, outbuf);
 
-   if (IsService(acptr))
-      send_reply(sptr, RPL_DATASTR, "         Status:: Network Service");
-   else if (IsAdmin(acptr))
-      send_reply(sptr, RPL_DATASTR, "         Status:: IRC Administrator");
-   else if (IsAnOper(acptr))
-      send_reply(sptr, RPL_DATASTR, "         Status:: IRC Operator");
+   if (IsService(cli_user(acptr)->server)) {
+     if (acptr)
+       send_reply(sptr, RPL_DATASTR, "         Status:: Network Service");
+     else if (IsAdmin(acptr))
+       send_reply(sptr, RPL_DATASTR, "         Status:: IRC Administrator (service)");
+     else if (IsAnOper(acptr))
+       send_reply(sptr, RPL_DATASTR, "         Status:: IRC Operator (service)");
+     else 
+       send_reply(sptr, RPL_DATASTR, "         Status:: Client (service)");
+   } else if (IsAdmin(acptr)) {
+     send_reply(sptr, RPL_DATASTR, "         Status:: IRC Administrator");
+   } else if (IsAnOper(acptr)) {
+     send_reply(sptr, RPL_DATASTR, "         Status:: IRC Operator");
+   } else {
+     send_reply(sptr, RPL_DATASTR, "         Status:: Client");
+   }
 
    ircd_snprintf(0, outbuf, sizeof(outbuf), "   Connected to:: %s", cli_name(acptr->cli_user->server));
    send_reply(sptr, RPL_DATASTR, outbuf);
@@ -636,6 +646,8 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int flags) {
       break;
 
     if(count > feature_int(FEAT_MAX_CHECK_OUTPUT)) { /* sanity stuff */
+      ircd_snprintf(0, outbuf, sizeof(outbuf), "More than %d results, truncating...", count);
+      send_reply(sptr, RPL_DATASTR, outbuf);
       send_reply(sptr, RPL_ENDOFCHECK, " ");
       break;
     }
