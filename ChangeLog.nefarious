@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-08-19  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_challenge.c: Added O:Line flags rXIWn
+
+	* ircd/m_oper.c: Added O:Line flags rXIWn
+
+	* ircd/s_user.c: Added handling for O:Line flags XIWn
+
+	* ircd/s_conf.c: Added O:Line flags rXIWn
+
+	* ircd/client.c: Added PRIV's for new O:Line flags
+
+	* include/client.h: Added O:Line flags rXIWn
+
+	* doc/example.conf: Added O:Line flags rXIWn
+
 2008-08-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/handlers.h: Added ms_reburst.

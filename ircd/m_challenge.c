@@ -93,6 +93,9 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
     else
       srv = find_match_server(parv[1]);
 
+    if (!feature_bool(FEAT_REMOTE_OPER))
+      return send_reply(sptr, ERR_NOOPERHOST);
+
     if (!srv)
       return send_reply(sptr, ERR_NOOPERHOST);
 
@@ -172,6 +175,19 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
       ++UserStats.opers;
     }
     cli_handler(cptr) = OPER_HANDLER;
+
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_WHOIS)) {
+      OSetWhois(sptr);
+    }
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_IDLE)) {
+      OSetIdle(sptr);
+    }
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_XTRAOP)) {
+      OSetXtraop(sptr);
+    }
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_HIDECHANS)) {
+      OSetHideChans(sptr);
+    }
 
     SetFlag(sptr, FLAG_WALLOP);
     SetFlag(sptr, FLAG_SERVNOTICE);
@@ -305,9 +321,6 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   if (!IsServer(cptr))
     return 0;
 
-  if (!feature_bool(FEAT_REMOTE_OPER))
-    return send_reply(sptr, ERR_NOOPERHOST);
-
   /* if theyre an oper, reprint oper motd and ignore */
   if (IsOper(sptr))
   {
@@ -361,6 +374,19 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
     else {
       /* This must be called before client_set_privs() */
       SetRemoteOper(sptr);
+
+      if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_WHOIS)) {
+        OSetWhois(sptr);
+      }
+      if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_IDLE)) {
+        OSetIdle(sptr);
+      }
+      if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_XTRAOP)) {
+        OSetXtraop(sptr);
+      }
+      if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_HIDECHANS)) {
+        OSetHideChans(sptr);
+      }
 
       /* Tell client_set_privs to send privileges to the user */
       client_set_privs(sptr);
@@ -451,6 +477,14 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
     failed_challenge_notice(sptr, parv[2], "No o:line");
     sendto_allops(&me, SNO_OLDREALOP, "Failed OPER attempt by %s (%s@%s) (No O:line)",
                        parv[0], cli_user(sptr)->realusername, cli_sockhost(sptr));
+    return 0;
+  }
+
+  if (!(aconf->port & OFLAG_REMOTE)) {
+    send_reply(sptr, ERR_NOOPERHOST);
+    sendto_allops(&me, SNO_OLDREALOP,
+      "Failed OPER attempt by %s (%s@%s) (Remote Oper)", parv[0],
+      cli_user(sptr)->realusername, cli_user(sptr)->realhost);
     return 0;
   }
 

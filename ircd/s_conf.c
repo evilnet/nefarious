@@ -109,6 +109,11 @@ static int oper_access[] = {
 	OFLAG_GLOBAL,	'O',
 	OFLAG_ADMIN,	'A',
 	OFLAG_RSA,	'R',
+        OFLAG_REMOTE,   'r',
+        OFLAG_WHOIS,    'W',
+        OFLAG_IDLE,     'I',
+        OFLAG_XTRAOP,   'X',
+        OFLAG_HIDECHANS, 'n',
 	0, 0
 };
 

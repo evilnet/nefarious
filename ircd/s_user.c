@@ -2224,17 +2224,21 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      */
     if (!FlagHas(&setflags, FLAG_CHSERV) &&
 	!(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr) &&
+        (HasPriv(acptr, PRIV_XTRAOP) ||
 	((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
-	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS)))))
+	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS))))))
       ClearChannelService(acptr);
     if (!FlagHas(&setflags, FLAG_XTRAOP) &&
 	!(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr) &&
-	((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
-	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS)))))
+	(HasPriv(acptr, PRIV_XTRAOP) ||
+        ((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
+	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS))))))
       ClearXtraOp(acptr);
-    if (!FlagHas(&setflags, FLAG_NOCHAN) && !(feature_bool(FEAT_OPER_HIDECHANS) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_NOCHAN) && !((feature_bool(FEAT_OPER_HIDECHANS) ||
+        HasPriv(acptr, PRIV_HIDE_CHANNELS)) && IsOper(acptr)))
       ClearNoChan(acptr);
-    if (!FlagHas(&setflags, FLAG_NOIDLE) && !(feature_bool(FEAT_OPER_HIDEIDLE) && IsOper(acptr)))
+    if (!FlagHas(&setflags, FLAG_NOIDLE) && !((feature_bool(FEAT_OPER_HIDEIDLE) ||
+        HasPriv(acptr, PRIV_HIDE_IDLE)) && IsOper(acptr)))
       ClearNoIdle(acptr);
 
     /*
@@ -2265,7 +2269,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearDebug(acptr);
 
     if (!FlagHas(&setflags, FLAG_WHOIS) &&
-	!(feature_bool(FEAT_OPER_WHOIS_PARANOIA) && IsOper(acptr)))
+	!((feature_bool(FEAT_OPER_WHOIS_PARANOIA) ||
+        HasPriv(acptr, PRIV_WHOIS_NOTICE)) && IsOper(acptr)))
       ClearWhois(acptr);
   }
 

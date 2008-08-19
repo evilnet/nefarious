@@ -179,6 +179,9 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     else
       srv = find_match_server(parv[1]);
 
+    if (!feature_bool(FEAT_REMOTE_OPER))
+      return send_reply(sptr, ERR_NOOPERHOST);
+
     if (!srv)
       return send_reply(sptr, ERR_NOOPERHOST);
 
@@ -238,6 +241,19 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       ++UserStats.opers;
     }
     cli_handler(cptr) = OPER_HANDLER;
+
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_WHOIS)) {
+      OSetWhois(sptr);
+    }
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_IDLE)) {
+      OSetIdle(sptr);
+    }
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_XTRAOP)) {
+      OSetXtraop(sptr);
+    }
+    if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_HIDECHANS)) {
+      OSetHideChans(sptr);
+    }
 
     SetFlag(sptr, FLAG_WALLOP);
     SetFlag(sptr, FLAG_SERVNOTICE);
@@ -331,8 +347,6 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		    parv[3]);
       return 0;
     }
-    if (!feature_bool(FEAT_REMOTE_OPER))
-      return send_reply(sptr, ERR_NOOPERHOST);
 
     /* Check login */
     switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
@@ -365,9 +379,30 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		  cli_user(sptr)->realhost);
 	   return 0;
 	 }
+         if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_REMOTE)) {
+           send_reply(sptr, ERR_NOOPERHOST);
+           sendto_allops(&me, SNO_OLDREALOP,
+                  "Failed OPER attempt by %s (%s@%s) (Remote Oper)",
+                  parv[0], cli_user(sptr)->realusername,
+                  cli_user(sptr)->realhost);
+           return 0;
+         }
 
 	 /* This must be called before client_set_privs() */
 	 SetRemoteOper(sptr);
+
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_WHOIS)) {
+           OSetWhois(sptr);
+         }
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_IDLE)) {
+           OSetIdle(sptr);
+         }
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_XTRAOP)) {
+           OSetXtraop(sptr);
+         }
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_HIDECHANS)) {
+           OSetHideChans(sptr);
+         }
 
 	 /* Tell client_set_privs to send privileges to the user */
 	 client_set_privs(sptr);

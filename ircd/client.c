@@ -209,7 +209,8 @@ static struct {
   P(DISPLAY),        P(SEE_OPERS),      P(WIDE_GLINE),    P(FORCE_OPMODE),
   P(FORCE_LOCAL_OPMODE), P(REMOTEREHASH), P(CHECK), P(SEE_SECRET_CHAN),
   P(SHUN),           P(LOCAL_SHUN),     P(WIDE_SHUN),     P(ZLINE),
-  P(LOCAL_ZLINE),    P(WIDE_ZLINE),     P(LIST_CHAN),
+  P(LOCAL_ZLINE),    P(WIDE_ZLINE),     P(LIST_CHAN),     P(WHOIS_NOTICE),
+  P(HIDE_IDLE),      P(XTRAOP),         P(HIDE_CHANNELS),
 #undef P
   { 0, 0 }
 };
@@ -280,6 +281,19 @@ client_set_privs(struct Client* client)
     PrivSet(&antiprivs, PRIV_JUPE);
     PrivSet(&antiprivs, PRIV_OPMODE);
     PrivSet(&antiprivs, PRIV_BADCHAN);
+  }
+
+  if (OIsWhois(client)) {
+    PrivSet(&privs, PRIV_WHOIS_NOTICE);
+  }
+  if (OIsIdle(client)) {
+    PrivSet(&privs, PRIV_HIDE_IDLE);
+  }
+  if (OIsXtraop(client)) {
+    PrivSet(&privs, PRIV_XTRAOP);
+  }
+  if (OIsHideChans(client)) {
+    PrivSet(&privs, PRIV_HIDE_CHANNELS);
   }
 
   for (i = 0; i <= _PRIV_IDX(PRIV_LAST_PRIV); i++)

@@ -111,6 +111,10 @@ enum Priv {
   PRIV_FORCE_LOCAL_OPMODE, /**< can hack modes on quarantined local channels */
   PRIV_CHECK,		/**< oper can use CHECK */
   PRIV_SEE_SECRET_CHAN,	/**< oper can see +s channels in whois */
+  PRIV_WHOIS_NOTICE,    /**< oper can set/unset user mode +W */
+  PRIV_HIDE_IDLE,       /**< oper can set/unset user mode +I */
+  PRIV_XTRAOP,          /**< oper can set/unset user mode +X */
+  PRIV_HIDE_CHANNELS,   /**< oper can set/unset user mode +n */
   PRIV_LAST_PRIV        /**< number of privileges */
 };
 
@@ -884,6 +888,16 @@ struct Client {
 #define OFLAG_ADMIN	0x002
 /** Oper flag password is rsa key (+R). */
 #define OFLAG_RSA	0x004
+/** Oper can OPER remotely (+r). */
+#define OFLAG_REMOTE    0x008
+/** Oper can set user mode +W. */
+#define OFLAG_WHOIS     0x010
+/** Oper can set user mode +I. */
+#define OFLAG_IDLE      0x020
+/** Oper can set user mode +X. */
+#define OFLAG_XTRAOP    0x040
+/** Oper can set user mode +n. */
+#define OFLAG_HIDECHANS 0x080
 
 /** Return non-zero if the client is an global oper. */
 #define OIsGlobal(x)		(cli_oflags(x) & OFLAG_GLOBAL)
@@ -891,6 +905,16 @@ struct Client {
 #define OIsAdmin(x)		(cli_oflags(x) & OFLAG_ADMIN)
 /** Return non-zero if the client is using rsa */
 #define OIsRSA(x)              (cli_oflags(x) & OFLAG_RSA)
+/** Return non-zero if the client is oper'ed remotely */
+#define OIsRemote(x)            (cli_oflags(x) & OFLAG_REMOTE)
+/** Return non-zero if the client can set user mode +W. */
+#define OIsWhois(x)             (cli_oflags(x) & OFLAG_WHOIS)
+/** Return non-zero if the client can set user mode +I. */
+#define OIsIdle(x)              (cli_oflags(x) & OFLAG_IDLE)
+/** Return non-zero if the client can set user mode +X. */
+#define OIsXtraop(x)            (cli_oflags(x) & OFLAG_XTRAOP)
+/** Return non-zero if the client can set user mode +n. */
+#define OIsHideChans(x)         (cli_oflags(x) & OFLAG_HIDECHANS)
 
 /** Mark a client as being an global oper. */
 #define OSetGlobal(x)		(cli_oflags(x) |= OFLAG_GLOBAL)
@@ -898,6 +922,16 @@ struct Client {
 #define OSetAdmin(x)		(cli_oflags(x) |= OFLAG_ADMIN)
 /** Mark a client as being rsa */
 #define OSetRSA(x)             (cli_oflags(x) |= OFLAG_RSA)
+/** Mark a client as being remote */
+#define OSetRemote(x)           (cli_oflags(x) |= OFLAG_REMOTE)
+/** Mark a client as able to set user mode +W */
+#define OSetWhois(x)            (cli_oflags(x) |= OFLAG_WHOIS)
+/** Mark a client as able to set user mode +I */
+#define OSetIdle(x)             (cli_oflags(x) |= OFLAG_IDLE)
+/** Mark a client as able to set user mode +X */
+#define OSetXtraop(x)           (cli_oflags(x) |= OFLAG_XTRAOP)
+/** Mark a client as able to set user mode +n */
+#define OSetHideChans(x)        (cli_oflags(x) |= OFLAG_HIDECHANS)
 
 /** Clear the client's global oper status. */
 #define OClearGlobal(x)		(cli_oflags(x) &= ~OFLAG_GLOBAL)
@@ -905,6 +939,16 @@ struct Client {
 #define OClearAdmin(x)		(cli_oflags(x) &= ~OFLAG_ADMIN)
 /** Clear the client's rsa status */
 #define OClearRSA(x) )          (cli_oflags(x) &= ~OFLAG_RSA)
+/** Clear the client's remote status */
+#define OClearRemote(x)         (cli_oflags(x) &= ~OFLAG_REMOTE)
+/** Clear the client's ability to set user mode +W */
+#define OClearWhois(x)          (cli_oflags(x) &= ~OFLAG_WHOIS)
+/** Clear the client's ability to set user mode +I */
+#define OClearIdle(x)           (cli_oflags(x) &= ~OFLAG_IDLE)
+/** Clear the client's ability to set user mode +X */
+#define OClearXtraop(x)         (cli_oflags(x) &= ~OFLAG_XTRAOP)
+/** Clear the client's ability to set user mode +n */
+#define OClearHideChans(x)      (cli_oflags(x) &= ~OFLAG_HIDECHANS)
 
 /*
  * X:Line flags
