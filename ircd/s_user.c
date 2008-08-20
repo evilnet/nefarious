@@ -1086,6 +1086,9 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
         }
       }
     }
+    if (HasFlag(new_client, FLAG_OPER)) {
+      GrantPriv(new_client, PRIV_PROPAGATE);
+    }
     /*
      * Set new nick name.
      */

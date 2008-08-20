@@ -3,6 +3,10 @@
 
 2008-08-20  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/s_user.c: Minor fix for bug caused PRIVS propagation fix
+
+2008-08-20  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* doc/example.conf: Fixed typo in F:HIS_STATS_E example
 
 2008-08-20  Matthew Beeching  <jobe@mdbnet.co.uk>
