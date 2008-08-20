@@ -231,7 +231,7 @@ client_set_privs(struct Client* client)
   memset(&privs, 0, sizeof(struct Privs));
   memset(&antiprivs, 0, sizeof(struct Privs));
 
-  if (!IsAnOper(client)) { /* clear privilege mask */
+  if (!IsAnOper(client) && !IsRemoteOper(client)) { /* clear privilege mask */
     memset(&(cli_privs(client)), 0, sizeof(struct Privs));
     return;
   } else if (!MyConnect(client) && !IsRemoteOper(client)) {
@@ -250,17 +250,17 @@ client_set_privs(struct Client* client)
       if (feattab[i].flag == FEATFLAG_DISABLES_PRIV) {
 	PrivSet(&antiprivs, feattab[i].priv);
       } else if (feattab[i].flag == FEATFLAG_ALL_OPERS) {
-	if (IsAnOper(client))
+	if (IsAnOper(client) || OIsGlobal(client) || OIsAdmin(client))
 	  PrivSet(&privs, feattab[i].priv);
       } else if (feattab[i].flag == FEATFLAG_GLOBAL_OPERS) {
-	if (IsOper(client))
+	if (IsOper(client) || OIsGlobal(client))
 	  PrivSet(&privs, feattab[i].priv);
       } else if (feattab[i].flag == FEATFLAG_ADMIN_OPERS) {
         if (feature_bool(FEAT_OPERFLAGS)) {
-          if (IsAdmin(client))
+          if (IsAdmin(client) || OIsAdmin(client))
             PrivSet(&privs, feattab[i].priv);
         } else {
-          if (IsOper(client))
+          if (IsOper(client) || OIsGlobal(client))
             PrivSet(&privs, feattab[i].priv);
         }
       } else if (feattab[i].flag == FEATFLAG_LOCAL_OPERS) {
@@ -311,9 +311,7 @@ client_set_privs(struct Client* client)
   if (IsRemoteOper(client)) {
     ClearRemoteOper(client);
     sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
-    /* Call client_set_privs() recursively so that privileges
-       are set for a remote user rather than like any oper */
-    client_set_privs(client);
+    sendcmdto_serv_butone(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
   } else
     sendcmdto_serv_butone(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
 }
@@ -351,7 +349,7 @@ char *client_print_privs(struct Client *client)
   for (i = 0; privtab[i].name; i++) {
     if (HasPriv(client, privtab[i].priv)) {
       strcat(privbufp, privtab[i].name);
-      strcat(privbufp, " ");
+      strcat(privbufp, ",");
     }
   }
   privbufp[strlen(privbufp)] = 0;

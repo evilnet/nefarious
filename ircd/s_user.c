@@ -1086,7 +1086,6 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
         }
       }
     }
-    client_set_privs(new_client); /* set privs on user */
     /*
      * Set new nick name.
      */
@@ -2293,7 +2292,6 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    */
   if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr)) { /* user now oper */
     ++UserStats.opers;
-    client_set_privs(acptr); /* may set propagate privilege */
   }
   if (HasPriv(acptr, PRIV_PROPAGATE)) /* remember propagate privilege setting */
     prop = 1;

@@ -404,15 +404,17 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
            OSetHideChans(sptr);
          }
 
-	 /* Tell client_set_privs to send privileges to the user */
-	 client_set_privs(sptr);
-
-	 if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN))
+	 if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
 	   ClearAdmin(sptr);
-	 else {
+           OSetGlobal(sptr);
+	 } else {
 	   OSetGlobal(sptr);
            OSetAdmin(sptr);
 	 }
+
+         /* Tell client_set_privs to send privileges to the user */
+         client_set_privs(sptr);
+
 	 sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
 		       (OIsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);

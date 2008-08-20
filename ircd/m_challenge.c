@@ -388,20 +388,21 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
         OSetHideChans(sptr);
       }
 
-      /* Tell client_set_privs to send privileges to the user */
-      client_set_privs(sptr);
-
       /* prevent someone from being both oper and local oper */
       ClearLocOp(sptr);
 
       if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
         /* Global Oper */
         ClearAdmin(sptr);
+        OSetGlobal(sptr);
       } else {
         /* Admin */
         OSetGlobal(sptr);
         OSetAdmin(sptr);
       }
+
+      /* Tell client_set_privs to send privileges to the user */
+      client_set_privs(sptr);
     }
 
     sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
