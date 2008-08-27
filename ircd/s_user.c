@@ -972,7 +972,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 #endif
 
     if (cli_webirc(sptr) && !EmptyString(cli_webirc(sptr)))
-      sendcmdto_serv_butone(sptr, CMD_MARK, cptr, "%s %s :%s", cli_name(cptr), MARK_WEBIRC, cli_webirc(sptr));
+      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(cptr), MARK_WEBIRC, cli_webirc(sptr));
 
     /* hack the 'old flags' so we don't send +r */
     if (HasFlag(sptr, FLAG_ACCOUNT))
