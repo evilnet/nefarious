@@ -91,6 +91,8 @@
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
+#include "s_conf.h"
+#include "s_misc.h"
 #include "send.h"
 
 #include <assert.h>
@@ -178,6 +180,7 @@ static void do_settopic(struct Client *sptr, struct Client *cptr,
  */
 int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  int ret = 0;
   struct Channel *chptr;
   char *topic = 0, *name, *p = 0, *topicnocolour = 0;
   int hascolour = -1;
@@ -229,6 +232,15 @@ int m_topic(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "(Moderated channel (+m))");
         continue;
       }
+
+      ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_TOPIC, parv[1]);
+      if (ret != 0) {
+        if (ret == 2)
+          return CPTR_KILLED;
+        else
+          return 0;
+      }
+
       if (chptr->mode.mode & MODE_NOCOLOUR) {
 	if (hascolour == -1) hascolour = HasColour(topic);
 	if (hascolour) {

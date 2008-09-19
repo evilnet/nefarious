@@ -492,6 +492,7 @@ static struct FeatureDesc {
   F_B(HIS_STATS_h, 0, 1, 0),
   F_B(HIS_STATS_k, 0, 1, 0),
   F_B(HIS_STATS_f, 0, 1, 0),
+  F_B(HIS_STATS_F, 0, 1, 0),
   F_B(HIS_STATS_i, 0, 1, 0),
   F_B(HIS_STATS_j, 0, 1, 0),
   F_B(HIS_STATS_M, 0, 1, 0),
@@ -686,6 +687,12 @@ static struct FeatureDesc {
   F_S(CTCP_VERSIONING_CHANNAME, 0, "#opers", 0), /* added by Vadtec 02/27/2008 */
   F_B(CTCP_VERSIONING_USEMSG, 0, 0, 0), /* added by Vadtec 02/28/2008 */
   F_S(CTCP_VERSIONING_NOTICE, 0, "*** Checking your client version", 0),
+
+  F_S(FILTER_ALERT_CHANNAME, 0, "#opers", 0),
+  F_B(FILTER_ALERT_USEMSG, 0, 0, 0),
+  F_I(FILTER_GLINE_LENGTH, 0, 3600, 0),
+  F_I(FILTER_ZLINE_LENGTH, 0, 3600, 0),
+  F_I(FILTER_SHUN_LENGTH, 0, 3600, 0),
 
   /* Allows configuring sending host in LOC */
   F_B(LOC_SENDHOST, 0, 0, 0),

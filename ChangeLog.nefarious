@@ -1,6 +1,85 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-09-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* config.h.in: Ran autoheader.
+
+	* configure: Regenerated.
+
+	* configure.in: Added checks for flex, yacc and tre as well as CFLAG2.
+
+	* doc/example.conf: Added Spam Filtering F:lines.
+
+	* doc/example2.conf: New configuration example file for the new
+	block format. This includes the configuration for the spam filtering
+	system.
+
+	* include/client.h: Added Flags for spam filtering system.
+
+	* include/ircd.h: Added configfile2.
+
+	* include/ircd_features.h: Added new features for the spam
+	filtering system. See ircd_features.c below for a list.
+
+	* include/numeric.h: Added STATSFILTERLINE.
+
+	* include/s_conf.h: Added new Spam Filtering System.
+
+	* ircd/ircd.c: Added CFLAG2 which holds the name of the new
+	configuration file (default: ircd2.conf).
+
+	* ircd/ircd_features.c: Added HIS_STATS_F, FILTER_ALERT_CHANNAME,
+	FILTER_ALERT_USEMSG, FILTER_GLINE_LENGTH, FILTER_ZLINE_LENGTH and
+	FILTER_SHUN_LENGTH.
+
+	* ircd/ircd_lexer.l: Backported .12 configuration file. There
+	is currently extra stuff in here not in use. It will complain
+	on compile however we will be moving everything over this new
+	format.
+
+	* ircd/ircd_parser.y: Backported .12 configuration file. There
+	is currently extra stuff in here not in use. It will complain
+	on compile however we will be moving everything over this new
+	format.
+
+	* ircd/m_away.c: Filter away's.
+
+	* ircd/m_notice.c: Filter notices (including DCC's).
+
+	* ircd/m_part.c: Filter part messages.
+
+	* ircd/m_privmsg.c: Filter privmsg's (including DCC's).
+
+	* ircd/m_topic.c: Filter topic's.
+
+	* ircd/m_quit.c: Filter quit messages.
+
+	* ircd/Makefile.in: Added extra parts for processing the new
+	configuration files.
+
+	* ircd/s_conf.c: Added new spam filtering system.
+
+	* ircd/s_err.c: Added STATSFILTERLINE.
+
+	* ircd/s_stats.c: Added /stats f (Filter Blocks).
+
+	* ircd/s_user.c: Check nick!ident@host:realname with the filtering
+	system.
+
+	* ircd/version.c.SH: Tweaks to the MD5 output.
+
+	* linesync2/linesync.conf: Configuration file for linesync that works
+	with the new configuration format.
+
+	* linesync2/linesync.sh: Configuration syncing script that works with
+	the new configuration format.
+
+	* tools/tre_install.sh: Pulled from X3, installs tre locally if
+	its not installed.
+
+	* tools/tre.tar.gz: Used with the tre_install.sh script.
+	
 2008-08-29  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/parse.c: Changed MKPASSWD to work for non-opers too.

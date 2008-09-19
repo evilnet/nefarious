@@ -106,6 +106,7 @@ int            GlobalRestartFlag = 0;   /* do a restart if set */
 time_t         CurrentTime;          /* Updated every time we leave select() */
 
 char          *configfile        = CPATH; /* Server configuration file */
+char          *configfile2       = CPATH2;
 char          *logfile           = LPATH;
 int            debuglevel        = -1;    /* Server debug level  */
 char          *debugmode         = "";    /* Server debug level */
@@ -453,7 +454,7 @@ static int check_pid(void)
     return fcntl(thisServer.pid_fd, F_SETLK, &lock);
   return 0;
 }
-  
+
 
 static void send_alist(struct Event* ev) {
   time_t next, cur;

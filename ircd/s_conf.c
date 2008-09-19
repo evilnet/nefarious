@@ -23,12 +23,14 @@
 
 #include "s_conf.h"
 /*#include "IPcheck.h"*/
+#include "channel.h"
 #include "class.h"
 #include "client.h"
 #include "crule.h"
 #include "ircd_features.h"
 #include "fileio.h"
 #include "gline.h"
+#include "handlers.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -41,6 +43,7 @@
 #include "listener.h"
 #include "match.h"
 #include "motd.h"
+#include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
 #include "opercmds.h"
@@ -66,6 +69,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <tre/regex.h>
 #include <unistd.h>
 
 #ifndef INADDR_NONE
@@ -84,16 +88,46 @@ struct eline*    GlobalEList = 0;
 unsigned int     GlobalBLCount = 0;
 char*            GlobalForwards[256];
 
+struct fline*    GlobalFList;
+
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
 static struct ServerConf* serverConfList;
 static struct DenyConf*   denyConfList;
+
+/** Current line number in scanner input. */
+extern int yylineno;
 
 static int eline_flags[] = {
   EFLAG_KLINE,    'k',
   EFLAG_GLINE,    'g',
   EFLAG_ZLINE,    'z',
   EFLAG_SHUN,     's'
+};
+
+static int fline_rflags[] = {
+  RFFLAG_AUTH,      'a',
+  RFFLAG_CALERT,    'C',
+  RFFLAG_SALERT,    'S',
+  RFFLAG_KILL,      'k',
+  RFFLAG_GLINE,     'g',
+  RFFLAG_SHUN,      's',
+  RFFLAG_BLOCK,     'b',
+  RFFLAG_NOTIFY,    'n',
+  RFFLAG_ZLINE,     'z'
+};
+
+static int fline_wflags[] = {
+  WFFLAG_NOTICE,    'n',
+  WFFLAG_CHANNOTICE,'N',
+  WFFLAG_PRIVMSG,   'p',
+  WFFLAG_CHANMSG,   'C',
+  WFFLAG_AWAY,      'a',
+  WFFLAG_TOPIC,     't',
+  WFFLAG_CONNECT,   'u',
+  WFFLAG_PART,      'P',
+  WFFLAG_QUIT,      'q',
+  WFFLAG_DCC,       'd'
 };
 
 static int dnsbl_flags[] = {
@@ -106,15 +140,15 @@ static int dnsbl_flags[] = {
 
 
 static int oper_access[] = {
-	OFLAG_GLOBAL,	'O',
-	OFLAG_ADMIN,	'A',
-	OFLAG_RSA,	'R',
-        OFLAG_REMOTE,   'r',
-        OFLAG_WHOIS,    'W',
-        OFLAG_IDLE,     'I',
-        OFLAG_XTRAOP,   'X',
-        OFLAG_HIDECHANS, 'n',
-	0, 0
+  OFLAG_GLOBAL,	  'O',
+  OFLAG_ADMIN,	  'A',
+  OFLAG_RSA,  	  'R',
+  OFLAG_REMOTE,   'r',
+  OFLAG_WHOIS,    'W',
+  OFLAG_IDLE,     'I',
+  OFLAG_XTRAOP,   'X',
+  OFLAG_HIDECHANS, 'n',
+  0, 0
 };
 
 char eflagstr(const char* eflags)
@@ -130,6 +164,58 @@ char eflagstr(const char* eflags)
 
   for (; *flagstr; flagstr++) {
     for (flag_p = (unsigned int*)eline_flags; flag_p[0]; flag_p += 2) {
+      if (flag_p[1] == *flagstr)
+        break;
+    }
+
+    if (!flag_p[0])
+      continue;
+
+    x_flag |= flag_p[0];
+  }
+
+  return x_flag;
+}
+
+int watchfflagstr(const char* fflags)
+{
+  unsigned int *flag_p;
+  unsigned int x_flag = 0;
+  const char *flagstr;
+
+  flagstr = fflags;
+
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)fline_wflags; flag_p[0]; flag_p += 2) {
+      if (flag_p[1] == *flagstr)
+        break;
+    }
+
+    if (!flag_p[0])
+      continue;
+
+    x_flag |= flag_p[0];
+  }
+
+  return x_flag;
+}
+
+int reactfflagstr(const char* fflags)
+{
+  unsigned int *flag_p;
+  unsigned int x_flag = 0;
+  const char *flagstr;
+
+  flagstr = fflags;
+
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)fline_rflags; flag_p[0]; flag_p += 2) {
       if (flag_p[1] == *flagstr)
         break;
     }
@@ -1064,6 +1150,20 @@ void clear_webirc_list(void)
   GlobalWList = 0;
 }
 
+void clear_fline_list(void)
+{
+  struct fline *fline;
+  while ((fline = GlobalFList)) {
+    GlobalFList = fline->next;
+    regfree(&fline->filter);
+    MyFree(fline->rawfilter);
+    MyFree(fline->wflags);
+    MyFree(fline->rflags);
+    MyFree(fline->reason);
+  }
+  GlobalFList = 0;
+}
+
 void conf_add_except_line(const char* const* fields, int count)
 {
   struct eline *eline;
@@ -1359,6 +1459,77 @@ int find_blline(struct Client* sptr, const char* replyip, char *checkhost)
     }
   }
   return ret;
+}
+
+/** When non-zero, indicates that a configuration error has been seen in this pass. */
+static int conf_error;
+/** When non-zero, indicates that the configuration file was loaded at least once. */
+static int conf_already_read;
+extern void yyparse(void);
+extern int init_lexer(const char *configfile2);
+extern void deinit_lexer(void);
+
+/** Read configuration file.
+ * @return Zero on failure, non-zero on success. */
+int read_configuration_file2(void)
+{
+  conf_error = 0;
+  if (!init_lexer(configfile2))
+    return 0;
+  yyparse();
+  deinit_lexer();
+  conf_already_read = 1;
+  return 1;
+}
+
+/** Report an error message about the configuration file.
+ * @param msg The error to report.
+ */
+void
+yyerror(const char *msg)
+{
+ sendto_opmask_butone(0, SNO_ALL, "Config file parse error line %d: %s",
+               yylineno, msg);
+ log_write(LS_CONFIG, L_ERROR, 0, "Config file parse error line %d: %s",
+           yylineno, msg);
+ if (!conf_already_read)
+   fprintf(stderr, "Config file parse error line %d: %s\n", yylineno, msg);
+ conf_error = 1;
+}
+
+/** Report an error message about the configuration file.
+ * @param fmt The error to report.
+ */
+void
+yyserror(const char *fmt, ...)
+{
+  static char error_buffer[1024];
+  va_list vl;
+
+  va_start(vl, fmt);
+  ircd_vsnprintf(NULL, error_buffer, sizeof(error_buffer), fmt, vl);
+  va_end(vl);
+  yyerror(error_buffer);
+}
+
+/** Report a recoverable warning about the configuration file.
+ * @param fmt The error to report.
+ */
+void
+yywarning(const char *fmt, ...)
+{
+  static char warn_buffer[1024];
+  va_list vl;
+
+  va_start(vl, fmt);
+  ircd_vsnprintf(NULL, warn_buffer, sizeof(warn_buffer), fmt, vl);
+  va_end(vl);
+  sendto_opmask_butone(0, SNO_ALL, "Config warning on line %d: %s",
+                yylineno, warn_buffer);
+  log_write(LS_CONFIG, L_WARNING, 0, "Config warning on line %d: %s",
+            yylineno, warn_buffer);
+  if (!conf_already_read)
+    fprintf(stderr, "Config warning on line %d: %s\n", yylineno, warn_buffer);
 }
 
 void conf_add_local(const char* const* fields, int count)
@@ -1658,7 +1829,7 @@ read_actual_config(const char *cfile)
     field_vector[0] = line;
     field_count = 1;
     quoted = 0;
-
+    
     for (src = line, dest = line; *src; ) {
       switch (*src) {
 	case '\\':
@@ -1690,8 +1861,8 @@ read_actual_config(const char *cfile)
 	      break;
 	    case '\\':
 	      *dest++ = '\\';
-	      ++src;
-	      break;
+              ++src;
+              break;
 	    case '\0':
 	      break;
 	    default:
@@ -2080,6 +2251,7 @@ int rehash(struct Client *cptr, int sig)
   clear_dnsbl_list();
   clear_webirc_list();
   clear_eline_list();
+  clear_fline_list();
   clear_svclines();
   clear_lblines();
 
@@ -2092,6 +2264,7 @@ int rehash(struct Client *cptr, int sig)
   mark_listeners_closing();
 
   read_configuration_file();
+  read_configuration_file2();
 
   log_reopen(); /* reopen log files */
 
@@ -2156,6 +2329,8 @@ int rehash(struct Client *cptr, int sig)
 
 int init_conf(void)
 {
+  int sc = 1, fc = 1;
+
   if (read_configuration_file()) {
     /*
      * make sure we're sane to start if the config
@@ -2173,9 +2348,169 @@ int init_conf(void)
     if (0 == localConf.contact)
       DupString(localConf.contact, "");
     
-    return 1;
+    fc = 1;
   }
-  return 0;
+
+  /* uses same code as above */
+  if (read_configuration_file2()) {
+     sc = 1;
+  }
+
+  if (fc && sc)
+    return 1;
+  else
+    return 0;
+}
+
+char* iitoa (int n){
+  int i=0,j;
+  char* s;
+  char* u;
+
+  s= (char*) malloc(17);
+  u= (char*) malloc(17);
+
+  do{
+    s[i++]=(char)( n%10+48 );
+    n-=n%10;
+  }
+  while((n/=10)>0);
+  for (j=0;j<i;j++)
+  u[i-1-j]=s[j];
+
+  u[j]='\0';
+  return u;
+}
+
+char* get_type(unsigned int flag)
+{
+  if (WFFLAG_NOTICE & flag)
+    return "NOTICE";
+  else if (WFFLAG_PRIVMSG & flag)
+    return "PRIVMSG";
+  else if (WFFLAG_AWAY & flag)
+    return "AWAY";
+  else if (WFFLAG_TOPIC & flag)
+    return "TOPIC";
+  else if (WFFLAG_CONNECT & flag)
+   return "CONNECT";
+  else if (WFFLAG_PART & flag)
+    return "PART";
+  else if (WFFLAG_QUIT & flag)
+    return "QUIT";
+  else if (WFFLAG_DCC & flag)
+    return "DCC";
+  else
+    return "(unknown)";
+}
+
+/*
+ * find_fline
+ * input:
+ *  client pointer
+ *  combination of FFLAG_*'s
+*/
+int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned int flags, char *target)
+{
+  int rf_flag = 0;
+  int wf_flag = 0;
+  struct fline *fline;
+  struct Channel *chptr;
+  int ret = 0;
+  char temp1[BUFSIZE]; 
+  char temp2[BUFSIZE]; 
+  char temphost[HOSTLEN +3]; 
+  char reason[BUFSIZE];
+  char* gline[5];
+  char* zline[5];
+  char* shun[5];
+
+
+  for (fline = GlobalFList; fline; fline = fline->next) {
+    rf_flag = reactfflagstr(fline->rflags);
+    wf_flag = watchfflagstr(fline->wflags);
+
+    if (rf_flag & RFFLAG_AUTH && IsAccount(sptr)) {
+      Debug((DEBUG_DEBUG, "regexec IsAccount and FFLAG_AUTH yes, breaking"));
+      break;
+    }
+
+    if (wf_flag & flags) {
+      if(0 == regexec(&fline->filter, string, 0, 0, 0)) {
+        Debug((DEBUG_DEBUG, "regexec match"));
+        if (rf_flag & RFFLAG_CALERT) {
+          if ((chptr = FindChannel(feature_str(FEAT_FILTER_ALERT_CHANNAME)))) {
+            ircd_snprintf(0, temp1, sizeof(temp1), "%s has triggered a filter the following %s%s%s%s", cli_name(sptr), get_type(flags),
+                          !EmptyString(target) ? " (Targets: " : "", !EmptyString(target) ? target : "", !EmptyString(target) ? ")" : "");
+            ircd_snprintf(0, temp2, sizeof(temp2), "%s", string);
+            if (feature_bool(FEAT_FILTER_ALERT_USEMSG)) {
+              sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp1);
+              sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp2);
+            } else {
+              sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp1);
+              sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp2);
+            }
+          }
+        }
+        if (rf_flag & RFFLAG_SALERT) {
+          sendto_allops(&me, SNO_OLDSNO, "%s has triggered a filter line for the following %s%s%s%s", cli_name(sptr),
+          get_type(flags), !EmptyString(target) ? " (Targets: " : "", !EmptyString(target) ? target : "",
+          !EmptyString(target) ? ")" : "");
+          sendto_allops(&me, SNO_OLDSNO, "%s", string);
+        }
+        if (rf_flag & RFFLAG_NOTIFY) {
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Your last %s was blocked as it matched a spam filter.", sptr, get_type(flags));
+        }
+        if (rf_flag & RFFLAG_GLINE) {
+          gline[0] = strdup(NumServ(&me));
+          gline[1] = strdup(NumServ(&me));
+          ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+          gline[2] = strdup(temphost);
+          gline[3] = iitoa(feature_int(FEAT_FILTER_GLINE_LENGTH));
+          gline[4] = iitoa(CurrentTime);
+          ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
+          gline[5] = strdup(reason);
+          ms_gline(&me, &me, 6, gline);
+          ret = 2;
+        } else {
+          if (rf_flag & RFFLAG_ZLINE) {
+            zline[0] = strdup(NumServ(&me));
+            zline[1] = strdup(NumServ(&me));
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+            zline[2] = strdup(temphost);
+            zline[3] = iitoa(feature_int(FEAT_FILTER_ZLINE_LENGTH));
+            zline[4] = iitoa(CurrentTime);
+            ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
+            zline[5] = strdup(reason);
+            ms_zline(&me, &me, 6, zline);
+            ret = 2;
+          } else {
+            if (rf_flag & RFFLAG_KILL) {
+               SetFlag(cptr, FLAG_KILLED);
+               exit_client_msg(cptr, sptr, &me, "Filter Match (%s)", fline->reason);
+               ret = 2;
+            }
+            if (rf_flag & RFFLAG_SHUN) {
+              shun[0] = strdup(NumServ(&me));
+              shun[1] = strdup(NumServ(&me));
+              ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+              shun[2] = strdup(temphost);
+              shun[3] = iitoa(feature_int(FEAT_FILTER_SHUN_LENGTH));
+              shun[4] = iitoa(CurrentTime);
+              ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
+              shun[5] = strdup(reason);
+              ms_shun(&me, &me, 6, shun);
+            }
+          }
+        }
+        if ((rf_flag & RFFLAG_BLOCK) && (ret != 2)) {
+           ret = 1;
+        }
+      }
+    }
+  }
+
+  return ret;
 }
 
 /*

@@ -91,6 +91,8 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "send.h"
+#include "s_conf.h"
+#include "s_misc.h"
 
 #include <assert.h>
 #include <string.h>
@@ -109,12 +111,21 @@ int m_part(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   struct JoinBuf parts;
   char *p = 0;
   char *name;
+  int ret = 0;
 
   ClrFlag(sptr, FLAG_TS8);
 
   /* check number of arguments */
   if (parc < 2 || parv[1][0] == '\0')
     return need_more_params(sptr, "PART");
+
+  ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PART, parv[1]);
+  if (ret != 0) {
+    if (ret == 2)
+      return CPTR_KILLED;
+    else
+      parv[parc - 1] = "";
+  }
 
   /* init join/part buffer */
   joinbuf_init(&parts, sptr, cptr, JOINBUF_TYPE_PART,

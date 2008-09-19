@@ -171,6 +171,38 @@ AC_PATH_PROGS(RMPROG, rm, /bin/rm)
 AC_PATH_PROGS(SHPROG, sh, /bin/sh)
 AC_PATH_PROGS(BASH, bash, /bin/bash, [/bin/bash:/usr/bin/bash:/usr/local/bin/bash:$PATH])
 
+dnl (F)LEX - needed for the new conf file parser
+AC_PROG_LEX
+dnl The autoconf docs say $LEX defaults to 'lex'.  They lie.
+if test "$LEX" = ":" ; then
+  AC_MSG_ERROR([Cannot find flex.])
+elif echo "" | $LEX -V -v --version > /dev/null 2>&1 ; then
+  :
+else
+  AC_MSG_ERROR([Cannot use $LEX as flex.])
+fi
+
+if test -z "$LEXLIB" ; then
+  AC_MSG_FAILURE([Cannot find a library with yywrap() in, but flex was found.
+  It's possible the compiler you're using ($CC) is incompatible with the
+  installed library.])
+fi
+
+LIBS="$LEXLIB $LIBS"
+
+dnl YACC - ditto
+AC_PROG_YACC
+dnl The autoconf docs say $YACC defaults to 'yacc'.  This seems to be true,
+dnl but judging from AC_PROG_LEX, it may not stay true.
+if test "$YACC" = ":" ; then
+  AC_MSG_ERROR([Cannot find yacc.])
+elif echo "" | $YACC -V -v --version > /dev/null 2>&1 ; then
+  :
+else
+dnl byacc does not seem to have any way to test for workingness, so only warn.
+  AC_MSG_WARN([$YACC may not work as yacc.])
+fi
+
 unet_NONBLOCKING
 unet_SIGNALS
 
@@ -378,6 +410,26 @@ else
         AC_DEFINE(PATH_DEVNULL, "devnull.log", [Path to /dev/null])
         AC_MSG_RESULT(no - using devnull.log)
 fi
+
+
+dnl libTRE (regex library) checking
+tre_version="0.7.5"
+withval=''
+AC_ARG_WITH(tre,
+[  --with-tre=PATH         Base path to where libtre is installed, such that 
+                          PATH/lib/libtre.so and PATH/include/tre/regex.h exist.], )
+if test "x$withval" != "x"; then
+    AC_MSG_RESULT(Using include dir $withval to find libtre)
+    CPPFLAGS="$CPPFLAGS -I$withval/include -L$withval/lib"
+    LIBS="$LIBS -L$withval/lib"
+else
+    AC_MSG_RESULT([Looking for tre in system and home dirs (${HOME})...])
+    CPPFLAGS="$CPPFLAGS -I${HOME}/include -L${HOME}/lib"
+    LIBS="$LIBS -L${HOME}/lib"
+fi
+AC_CHECK_HEADER(tre/regex.h, , [AC_MSG_ERROR([tre/regex.h, the TRE regex headers, were not found. Install tre or use --with-tre=PATH to tell me how to find it, where PATH/include/tre/regex.h exists.  For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory.])],)
+AC_CHECK_LIB(tre, regexec, , [AC_MSG_ERROR([TRE regex library not found. Install tre, or use --with-tre=PATH to tell me how to find it, where PATH/lib/libtre.so exists. For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory.])])
+
 
 dnl **
 dnl **  SSL Library checks (OpenSSL)
@@ -835,6 +887,37 @@ else
 fi
 
 AC_DEFINE_UNQUOTED(CPATH, "$unet_cpath", [Configuration file name])
+
+dnl --with-capth2 allows us to specify the configuration file
+AC_MSG_CHECKING([where the default configuration file resides])
+AC_ARG_WITH([cpath2],
+[  --with-cpath2=file       Set server configuration file],
+[unet_cv_with_cpath2=$with_cpath2],
+[AC_CACHE_VAL(unet_cv_with_cpath2,
+[unet_cv_with_cpath2="ircd2.conf"])])
+
+if test x"$unet_cv_with_cpath2" = xyes -o x"$unet_cv_with_cpath2" = xno; then
+    unet_cv_with_cpath2="ircd2.conf"
+fi
+
+AC_MSG_RESULT([$unet_cv_with_cpath2])
+
+if echo "$unet_cv_with_cpath2" | grep '^/' > /dev/null 2>&1; then
+    # Absolute path; check against chroot stuff
+    if test x"$unet_cv_with_chroot" != xno; then
+	if echo "$unet_cv_with_cpath2" | grep "^$unet_cv_with_chroot" > /dev/null 2>&1; then
+	    unet_cpath2=`echo "$unet_cv_with_cpath2" | sed "s%^$unet_cv_with_chroot%%"`
+	else
+	    AC_MSG_ERROR([Configuration file $unet_cv_with_cpath2 not relative to root directory $unet_cv_with_chroot])
+	fi
+    else
+	unet_cpath2=$unet_cv_with_cpath2
+    fi
+else
+    unet_cpath2=$unet_cv_with_cpath2
+fi
+
+AC_DEFINE_UNQUOTED(CPATH2, "$unet_cpath2", [Configuration file name])
 
 dnl --with-lpath allows us to specify the default debugging log file
 AC_MSG_CHECKING([where to put the debugging log if debugging enabled])

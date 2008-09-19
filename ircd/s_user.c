@@ -385,6 +385,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
   char             chan[CHANNELLEN-1];
   int              killreason;
   char             ip_base64[8];
+  char             userhostgecos[NICKLEN+USERLEN+HOSTLEN+REALLEN+4];
+  int              ret = 0;
 
   user->last = CurrentTime;
   parv[0] = cli_name(sptr);
@@ -626,6 +628,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
     return 0;
 
   }
+
+  ircd_snprintf(0, userhostgecos, sizeof(userhostgecos), "%s!%s@%s:%s", cli_name(sptr), user->username, cli_user(sptr)->realhost, cli_info(sptr));
+  ret = find_fline(cptr, sptr, userhostgecos, WFFLAG_CONNECT, NULL);
+  if (ret == 2)
+    return CPTR_KILLED;
 
   if (MyConnect(sptr) && feature_bool(FEAT_DNSBL_CHECKS)) {
     struct SLink*  dp;

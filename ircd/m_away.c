@@ -89,6 +89,8 @@
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
+#include "s_conf.h"
+#include "s_misc.h"
 #include "s_user.h"
 #include "send.h"
 
@@ -155,9 +157,20 @@ int m_away(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   char* away_message = parv[1];
   int was_away = cli_user(sptr)->away != 0;
+  int ret = 0;
 
   assert(0 != cptr);
   assert(cptr == sptr);
+
+  if (!EmptyString(away_message)) {
+    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_AWAY, NULL);
+    if (ret != 0) {
+      if (ret == 2)
+        return CPTR_KILLED;
+      else
+        return 0;
+    }
+  }
 
   if (user_set_away(cli_user(sptr), away_message)) {
     if (!was_away)

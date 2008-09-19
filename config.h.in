@@ -6,6 +6,9 @@
 /* Configuration file name */
 #undef CPATH
 
+/* Configuration file name */
+#undef CPATH2
+
 /* Enable debugging code */
 #undef DEBUGMODE
 
@@ -74,6 +77,9 @@
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have the `tre' library (-ltre). */
+#undef HAVE_LIBTRE
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
@@ -327,6 +333,10 @@
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
 #undef WORDS_BIGENDIAN
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const

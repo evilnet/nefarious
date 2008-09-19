@@ -18,6 +18,8 @@
 #define INCLUDED_netinet_in_h
 #endif
 
+#include <tre/regex.h>
+
 struct Client;
 struct SLink;
 struct TRecord;
@@ -221,6 +223,15 @@ struct eline {
   char *flags;
 };
 
+struct fline {
+  struct fline *next;
+  regex_t filter;
+  char *rawfilter;
+  char *rflags;
+  char *wflags;
+  char *reason;
+};
+
 /*
  * GLOBALS
  */
@@ -237,6 +248,7 @@ extern struct svcline*	GlobalServicesList;
 extern struct blline*	GlobalBLList;
 extern struct wline*    GlobalWList;
 extern struct eline*    GlobalEList;
+extern struct fline*    GlobalFList;
 extern unsigned int	GlobalBLCount;
 extern char*		GlobalForwards[256];
 
@@ -269,6 +281,7 @@ extern int  conf_check_server(struct Client *cptr);
 extern struct ConfItem* find_conf_name(const char* name, int statmask);
 extern int rehash(struct Client *cptr, int sig);
 extern void read_tlines(void);
+extern int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned int flags, char *target);
 extern int find_eline(struct Client *cptr, unsigned int flags);
 extern int find_kill(struct Client *cptr);
 extern int find_restrict(struct Client *cptr);
@@ -292,5 +305,11 @@ extern char dflagstr(const char* dflags);
 extern int find_dnsbl(struct Client* sptr, const char* dnsbl);
 extern int add_dnsbl(struct Client* sptr, const char* dnsbl);
 extern int del_dnsbl(struct Client* sptr, char* dnsbl);
+extern int watchfflagstr(const char* fflags);
+extern int reactfflagstr(const char* fflags);
+
+extern void yyerror(const char *msg);
+extern void yyserror(const char *fmt, ...);
+extern void yywarning(const char *fmt, ...);
 
 #endif /* INCLUDED_s_conf_h */

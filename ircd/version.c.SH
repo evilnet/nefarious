@@ -109,10 +109,11 @@ const char *othertext[] = {
 cvs_version=`cat ../ChangeLog.nefarious | grep '#define CVS_VERSION "$Id:' | \
 awk '{ print $5 " " $6 }'`
 
-
-for file in ${srcdir}/ircd/*.c ; do
- echo "    \"[" `./md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c
-done;
+( for file in ${srcdir}/ircd/*.[cly] ${srcdir}/ircd/version.c.SH ; do
+  case `basename $file` in
+    version.c | y.tab.c | lex.yy.c | chattr.tab.c ) ;;
+    * ) echo "    \"[" `${srcdir}/ircd/md5sum $file | awk 'split($2, a, "/"){ print a[3] ": " $1 }'` "]\"," >> version.c ;;
+esac done )
 
 echo "    \"\"," >> version.c
 echo "    \"Headers:\"," >> version.c

@@ -979,6 +979,27 @@ struct Client {
 /** Exception for /SHUNS */
 #define EFLAG_SHUN      0x008
 
+#define RFFLAG_AUTH     0x001
+#define RFFLAG_KILL     0x002
+#define RFFLAG_GLINE    0x004
+#define RFFLAG_SHUN     0x008
+#define RFFLAG_BLOCK    0x010
+#define RFFLAG_CALERT   0x020
+#define RFFLAG_SALERT   0x040
+#define RFFLAG_NOTIFY   0x080
+#define RFFLAG_ZLINE    0x100
+
+#define WFFLAG_NOTICE     0x001
+#define WFFLAG_CHANNOTICE 0x002
+#define WFFLAG_PRIVMSG    0x004
+#define WFFLAG_CHANMSG    0x008
+#define WFFLAG_AWAY       0x010
+#define WFFLAG_TOPIC      0x020
+#define WFFLAG_CONNECT    0x040
+#define WFFLAG_PART       0x080
+#define WFFLAG_QUIT       0x100
+#define WFFLAG_DCC        0x200
+
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/**< socket needs to be freed */
 #define FREEFLAG_TIMER	0x0002	/**< timer needs to be freed */

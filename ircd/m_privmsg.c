@@ -92,6 +92,9 @@
 #include "msg.h"
 #include "numeric.h"
 #include "send.h"
+#include "s_conf.h"
+#include "s_debug.h"
+#include "s_misc.h"
 
 #include <assert.h>
 #include <string.h>
@@ -105,6 +108,10 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char*           server;
   int             i;
   int             count;
+  int             ret = 0;
+  int             isprivmsg = 0;
+  int             ischanmsg = 0;
+  int             isdcc = 0;
   char*           vector[MAXTARGETS];
 
   assert(0 != cptr);
@@ -124,6 +131,46 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   count = unique_name_vector(parv[1], ',', vector, MAXTARGETS);
 
+  if (strcmp(parv[2], "DCC")) {
+    isdcc = 1;
+    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, parv[1]);
+    if (ret != 0) {
+      if (ret == 2)
+        return CPTR_KILLED;
+      else
+        return 0;
+    }
+  }
+
+  for (i = 0; i < count; ++i) {
+    name = vector[i];
+    if (IsChannelPrefix(*name))
+      ischanmsg = 1;
+    else
+      isprivmsg = 1;
+  }
+  i = 0;
+
+  if (ischanmsg && !isdcc) {
+    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, parv[1]);
+    if (ret != 0) {
+      if (ret == 2)
+        return CPTR_KILLED;
+      else
+        return 0;
+    }
+  }
+
+  if (isprivmsg && !isdcc) {
+    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, parv[1]);
+    if (ret != 0) {
+      if (ret == 2)
+        return CPTR_KILLED;
+      else
+        return 0;
+    }
+  }
+
   for (i = 0; i < count; ++i) {
     name = vector[i];
     /*
@@ -135,12 +182,13 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /*
      * we have to check for the '@' at least once no matter what we do
      * handle it first so we don't have to do it twice
-     */
+    */
     else if ((server = strchr(name, '@')))
       relay_directed_message(sptr, name, server, parv[parc - 1]);
     else 
       relay_private_message(sptr, name, parv[parc - 1]);
   }
+
   return 0;
 }
 

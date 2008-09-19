@@ -86,6 +86,7 @@
 #include "ircd.h"
 #include "ircd_string.h"
 #include "ircd_struct.h"
+#include "s_conf.h"
 #include "s_misc.h"
 #include "ircd_reply.h"
 
@@ -101,10 +102,19 @@
 int m_quit(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   char *quitnocolour = 0;
+  int ret = 0;
 
   assert(0 != cptr);
   assert(0 != sptr);
   assert(cptr == sptr);
+
+  ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_QUIT, parv[1]);
+  if (ret != 0) {
+    if (ret == 2)
+      return CPTR_KILLED;
+    else
+      parv[parc - 1] = "";
+  }
 
   if (cli_user(sptr)) {
     struct Membership* chan;

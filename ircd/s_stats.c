@@ -194,6 +194,16 @@ stats_elines(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
+stats_flines(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct fline *fline;
+
+  for (fline = GlobalFList; fline; fline = fline->next)
+    send_reply(to, RPL_STATSFILTERLINE, fline->rawfilter, fline->wflags ? fline->wflags : "",
+               fline->rflags ? fline->rflags : "", fline->reason);
+}
+
+static void
 stats_webirc(struct Client* to, struct StatDesc* sd, int stat, char* param)
 {
   struct wline *wline;
@@ -489,9 +499,12 @@ struct StatDesc statsinfo[] = {
   { 'e', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_e,
     stats_engine, 0,
     "Report server event loop engine." },
-  { 'f', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_f,
+  { 'F', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_F,
     feature_report, 0,
     "Feature settings." },
+  { 'f', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_f,
+    stats_flines, 0,
+    "Filter lines." },
   { 'g', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_g,
     gline_stats, 0,
     "Global bans (G-lines)." },
