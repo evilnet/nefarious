@@ -3,6 +3,18 @@
 
 2008-09-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Removed B,b,E,R,S,Q,W,X line sections
+
+	* doc/example2.conf: Added blocks for B,b,E,R,S,Q,W,X lines.
+
+	* ircd/ircd_lexer.l: Moved over B,b,E,R,S,Q,W,X lines to new config parser.
+
+	* ircd/ircd_parser.y: Moved over B,b,E,R,S,Q,W,X lines to new config parser.
+
+	* ircd/s_conf.c: Removed B,b,E,R,S,Q,W,X lines from the old config parser.
+
+2008-09-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* config.h.in: Ran autoheader.
 
 	* configure: Regenerated.

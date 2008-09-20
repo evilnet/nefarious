@@ -78,17 +78,18 @@
 
 struct ConfItem* GlobalConfList  = 0;
 int              GlobalConfCount = 0;
-struct qline*    GlobalQuarantineList = 0;
-struct sline*    GlobalSList = 0;
-struct csline*   GlobalConnStopList = 0;
-struct svcline*  GlobalServicesList = 0;
-struct blline*   GlobalBLList = 0;
-struct wline*    GlobalWList = 0;
-struct eline*    GlobalEList = 0;
-unsigned int     GlobalBLCount = 0;
 char*            GlobalForwards[256];
 
+unsigned int     GlobalBLCount;
+
+struct eline*    GlobalEList;
+struct svcline*  GlobalServicesList;
+struct sline*    GlobalSList;
+struct csline*   GlobalConnStopList;
+struct wline*    GlobalWList;
 struct fline*    GlobalFList;
+struct blline*   GlobalBLList;
+struct qline*    GlobalQuarantineList;
 
 static struct LocalConf   localConf;
 static struct CRuleConf*  cruleConfList;
@@ -1023,34 +1024,11 @@ void conf_add_listener(const char* const* fields, int count)
 #endif /* USE_SSL */
 }
 
-void conf_add_lbline(const char* const* fields, int count)
-{
-    unsigned char ch = fields[1][0];
-    MyFree(GlobalForwards[ch]);
-    DupString(GlobalForwards[ch], fields[2]);
-}
-
-
 void clear_lblines(void)
 {
   unsigned int ii;
   for (ii = 0; ii < 256; ++ii)
     MyFree(GlobalForwards[ii]);
-}
-
-void conf_add_quarantine(const char* const* fields, int count)
-{
-  struct qline *qline;
-
-  if (count < 3 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-      (fields[1][0] != '#' && fields[1][0] != '&'))
-    return;
- 
-  qline = (struct qline *) MyMalloc(sizeof(struct qline));
-  DupString(qline->chname, fields[1]);
-  DupString(qline->reason, fields[2]);
-  qline->next = GlobalQuarantineList;
-  GlobalQuarantineList = qline;
 }
 
 char* find_quarantine(const char* chname)
@@ -1088,20 +1066,6 @@ int find_csline(struct Client* sptr, const char* mask)
   return 0;
 }
 
-void conf_add_csline(const char* const* fields, int count)
-{
-  struct csline *csline;
-  if (count < 3 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-      EmptyString(fields[2]))
-    return;
-  csline = (struct csline *) MyMalloc(sizeof(struct csline));
-  DupString(csline->mask, fields[1]);
-  DupString(csline->server, fields[2]);
-  DupString(csline->port, fields[3]);
-  csline->next = GlobalConnStopList;
-  GlobalConnStopList = csline;
-}
-
 void clear_cslines(void)
 {
   struct csline *csline;
@@ -1113,27 +1077,6 @@ void clear_cslines(void)
     MyFree(csline);
   }
   GlobalConnStopList = 0;
-}
-
-void conf_add_webirc_line(const char* const* fields, int count)
-{
-  struct wline *wline;
-
-  if (count < 5 || EmptyString(fields[1]) || EmptyString(fields[2]) || EmptyString(fields[5]))
-  {
-    log_write(LS_CONFIG, L_CRIT, 0, "Your W: line must have 4 fields!");
-    return;
-  }
-
-  wline = (struct wline *) MyMalloc(sizeof(struct wline));
-  memset(wline, 0, sizeof(struct wline));
-  DupString(wline->mask, fields[1]);
-  DupString(wline->passwd, fields[2]);
-  DupString(wline->flags, fields[3]);
-  DupString(wline->ident, fields[4]);
-  DupString(wline->desc, fields[5]);
-  wline->next = GlobalWList;
-  GlobalWList = wline;
 }
 
 void clear_webirc_list(void)
@@ -1164,24 +1107,6 @@ void clear_fline_list(void)
   GlobalFList = 0;
 }
 
-void conf_add_except_line(const char* const* fields, int count)
-{
-  struct eline *eline;
-
-  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]))
-  {
-    log_write(LS_CONFIG, L_CRIT, 0, "Your E: line must have 2 fields!");
-    return;
-  }
-
-  eline = (struct eline *) MyMalloc(sizeof(struct eline));
-  memset(eline, 0, sizeof(struct eline));
-  DupString(eline->mask, fields[1]);
-  DupString(eline->flags, fields[2]);
-  eline->next = GlobalEList;
-  GlobalEList = eline;
-}
-
 void clear_eline_list(void)
 {
   struct eline *eline;
@@ -1191,32 +1116,6 @@ void clear_eline_list(void)
     MyFree(eline->flags);
   }
   GlobalEList = 0;
-}
-
-void conf_add_dnsbl_line(const char* const* fields, int count)
-{
-  struct blline *blline;
-
-  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]) ||
-     EmptyString(fields[3]) || EmptyString(fields[4]) ||
-     EmptyString(fields[5]) || EmptyString(fields[6]))
-  {
-    log_write(LS_CONFIG, L_CRIT, 0, "Your X: line must have 6 fields!");
-    return;
-  }
-
-  ++GlobalBLCount;
-
-  blline = (struct blline *) MyMalloc(sizeof(struct blline));
-  memset(blline, 0, sizeof(struct blline));
-  DupString(blline->server, fields[1]);
-  DupString(blline->name, fields[2]);
-  DupString(blline->flags, fields[3]);
-  DupString(blline->replies, fields[4]);
-  DupString(blline->reply, fields[5]);
-  DupString(blline->rank, fields[6]);
-  blline->next = GlobalBLList;
-  GlobalBLList = blline;
 }
 
 void clear_dnsbl_list(void)
@@ -1921,14 +1820,6 @@ read_actual_config(const char *cfile)
       conf_add_admin(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'B':                /* 'services' lines (aka 'bot lines'). */
-      conf_add_svcline(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
-    case 'b':                /* service forward lines */
-       conf_add_lbline(field_vector, field_count);
-       aconf->status = CONF_ILLEGAL;
-       break;
     case 'C':                /* Server where I should try to connect */
     case 'c':                /* in case of lp failures             */
       ++ccount;
@@ -1944,11 +1835,6 @@ read_actual_config(const char *cfile)
       conf_add_crule(field_vector, field_count, CRULE_AUTO);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'E':                /* Exception lines */
-    case 'e':
-      conf_add_except_line(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'F':                /* Feature line */
     case 'f':
       feature_set(0, &field_vector[1], field_count - 1);
@@ -1961,11 +1847,6 @@ read_actual_config(const char *cfile)
     case 'I':                /* Just plain normal irc client trying  */
     case 'i':                /* to connect me */
       aconf->status = CONF_CLIENT;
-      break;
-    case 'W':                /* WEBIRC Auth lines */
-    case 'w':
-      conf_add_webirc_line(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
       break;
     case 'K':                /* Kill user line on irc.conf           */
       conf_add_deny(field_vector, field_count, 0);
@@ -2000,16 +1881,6 @@ read_actual_config(const char *cfile)
       conf_add_listener(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'Q':        /* CONF_QUARANTINE */
-    case 'q':
-      conf_add_quarantine(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
-    case 'R':        /* CONF_CONNSTOP */
-    case 'r':
-      conf_add_csline(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'T':                /* print out different motd's */
     case 't':                /* based on hostmask - CONF_TLINES */
       motd_add(field_vector[1], field_vector[2]);
@@ -2019,19 +1890,9 @@ read_actual_config(const char *cfile)
     case 'u':      /* *Every* server on the net must define the same !!! */
       aconf->status = CONF_UWORLD;
       break;
-    case 'X':
-    case 'x':
-      conf_add_dnsbl_line(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'Y':
     case 'y':      /* CONF_CLASS */
       conf_add_class(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
-    case 'S':      /* Super Spoof line */
-    case 's':
-      conf_add_sline(field_vector, field_count);
       aconf->status = CONF_ILLEGAL;
       break;
     default:
@@ -2794,27 +2655,6 @@ int conf_check_server(struct Client *cptr)
   Debug((DEBUG_DNS, "sv_cl: access ok: %s[%s]", cli_name(cptr), cli_sockhost(cptr)));
   return 0;
 }
-
-void conf_add_svcline(const char* const* fields, int count)
-{
-  struct svcline *new_svc;
-
-  /* b:X2:X2@X2.AfterNET.Services:* */
-  /* b:AUTH:AuthServ@OperServ.AfterNET.Services:AUTH */
-
-  if (count < 2 || EmptyString(fields[1]) || EmptyString(fields[2]))
-    return;
-
-  new_svc = (struct svcline *)MyMalloc(sizeof(struct svcline));
-  
-  DupString(new_svc->cmd, fields[1]);
-  DupString(new_svc->target, fields[2]);
-  if (!EmptyString(fields[3]))
-    DupString(new_svc->prepend, fields[3]);
-
-  new_svc->next = GlobalServicesList;
-  GlobalServicesList = new_svc;
-}
  
 void clear_svclines(void)
 {
@@ -2840,62 +2680,6 @@ struct svcline *find_svc(const char *cmd)
       return confbot;
   }
   return NULL;
-}
-
-void conf_add_sline(const char* const* fields, int count)
-{
-  struct prefix *p;
-  struct sline *sline;
-
-  if (count < 2 || EmptyString(fields[1]))
-    return;
-
-  if (!EmptyString(fields[3]))
-    if (EmptyString(fields[4])) {
-      log_write(LS_CONFIG, L_CRIT, 0, "S-line: (%s) If third field is present, 4:th field must not be empty.", fields[1]);
-      return;
-    }
-
-  if (!EmptyString(fields[4]))
-    if (EmptyString(fields[3])) {
-      log_write(LS_CONFIG, L_CRIT, 0, "S-line: (%s) If fourth field is present, 3:rd field must not be empty.", fields[1]);
-      return;
-    }
- 
-  p = (struct prefix *) MyMalloc(sizeof(struct prefix));
-  sline = (struct sline *) MyMalloc(sizeof(struct sline));
-  DupString(sline->spoofhost, fields[1]);
-  if (!EmptyString(fields[2]))
-    DupString(sline->passwd, fields[2]);
-  else
-    sline->passwd = NULL;
-  if (!EmptyString(fields[3])) {
-    DupString(sline->realhost, fields[3]);
-    if (check_if_ipmask(sline->realhost)) {
-      if (str2prefix(sline->realhost, p) != 0) {
-        sline->address = p->address;
-        sline->bits = p->bits; 
-        Debug((DEBUG_DEBUG, "S-Line: %s = %08x/%i (%08x)", sline->realhost,
-             sline->address, sline->bits, NETMASK(sline->bits)));
-        sline->flags = SLINE_FLAGS_IP; 
-      } else {
-        Debug((DEBUG_FATAL, "S-Line: \"%s\" appears not to be a valid IP address, might be wildcarded.", sline->realhost));
-        sline->flags = SLINE_FLAGS_HOSTNAME;
-      }
-    } else
-      sline->flags = SLINE_FLAGS_HOSTNAME;
-  } else {
-    sline->realhost = NULL;
-    sline->flags = 0;
-  }
-  if (!EmptyString(fields[4]))
-    DupString(sline->username, fields[4]);
-  else
-    sline->username = NULL;
-
-  sline->next = GlobalSList;
-  GlobalSList = sline;
-  MyFree(p);
 }
 
 void clear_slines(void)

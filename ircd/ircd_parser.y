@@ -37,6 +37,7 @@
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "ircd_struct.h"
 #include "list.h"
 #include "listener.h"
 #include "match.h"
@@ -52,7 +53,7 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
-#include "ircd_struct.h"
+#include "support.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -65,19 +66,37 @@
   void lexer_include(const char *filename);
 
   /* Now all the globals we need :/... */
+  char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, invert, stringno, flags;
   static char *name, *pass, *host, *ip, *username, *origin, *hub_limit;
-  static char *rtype, *action, *reason;
+  static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
+  static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask;
+  static char *prefix, *command, *service;
   struct SLink *hosts;
   static char *stringlist[MAX_STRINGS];
   struct fline*    GlobalFList = 0;
+  struct blline*   GlobalBLList = 0;
+  struct wline*    GlobalWList = 0;
+  struct csline*   GlobalConnStopList = 0;
+  struct sline*    GlobalSList = 0;
+  struct svcline*  GlobalServicesList = 0;
+  struct eline*    GlobalEList = 0;
+  unsigned int     GlobalBLCount = 0;
 
 #define parse_error yyserror
 
 enum ConfigBlock
 {
+  BLOCK_COMMAND,
+  BLOCK_DNSBL,
+  BLOCK_EXCEPT,
   BLOCK_FILTER,
+  BLOCK_FORWARD,
   BLOCK_INCLUDE,
+  BLOCK_QUARANTINE,
+  BLOCK_REDIRECT,
+  BLOCK_SPOOFHOST,
+  BLOCK_WEBIRC,
   BLOCK_LAST_BLOCK
 };
 
@@ -94,7 +113,8 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Filter", "Include",
+    "Command", "DNSBL", "Except", "Filter", "Forward", "Include",
+    "Quarantine", "Redirect", "Spoofhost", "WebIRC",
   };
 
   if (!includes)
@@ -132,18 +152,38 @@ static void free_slist(struct SLink **link) {
 %token LOCATION
 %token RTYPE
 %token ACTION
+%token CHNAME
 %token REASON
+%token FLAGS
+%token REPLIES
+%token REPLY
+%token RANK
 %token CONTACT
 %token CONNECT
 %token CLASS
 %token PINGFREQ
 %token CONNECTFREQ
+%token WEBIRC
+%token SPOOFHOST
+%token SPOOF
+%token COMMAND
+%token FORWARD
+%token PREFIX
+%token CMD
+%token SERVICE
+%token EXCEPT
+%token MASK
+%token IDENT
+%token DESC
 %token FILTER
+%token DNSBL
+%token REDIRECT
 %token MAXLINKS
 %token MAXHOPS
 %token SENDQ
 %token NAME
 %token HOST
+%token HOSTMASK
 %token IP
 %token USERNAME
 %token PASS
@@ -163,7 +203,6 @@ static void free_slist(struct SLink **link) {
 %token TBYTES
 %token SERVER
 %token PORT
-%token MASK
 %token HUB
 %token LEAF
 %token UWORLD
@@ -224,7 +263,8 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: filterblock | includeblock | error ';';
+block: commandblock | dnsblblock      | exceptblock   | filterblock    | forwardblock |
+       includeblock | quarantineblock | redirectblock | spoofhostblock | webircblock  | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -296,6 +336,380 @@ expr: NUMBER
 		}
 		;
 
+
+dnsblblock: DNSBL '{' dnsblitems '}' ';'
+{
+  struct blline *blline;
+
+  if (permitted(BLOCK_DNSBL, 1)) {
+    if (!server)
+      parse_error("Your DNSBL block must contain a server.");
+    else if (!name)
+      parse_error("Your DNSBL block must contain a name.");
+    else if (!dflags)
+      parse_error("Your DNSBL block must contain flags.");
+    else if (!replies)
+      parse_error("Your DNSBL block must contain replies.");
+    else if (!reply)
+      parse_error("Your DNSBL block must contain a reply.");
+    else if (!rank)
+      parse_error("Your DNSBL block must contain a rank.");
+    else {
+      ++GlobalBLCount;
+
+      blline = (struct blline *) MyMalloc(sizeof(struct blline));
+      memset(blline, 0, sizeof(struct blline));
+      DupString(blline->server, server);
+      DupString(blline->name, name);
+      DupString(blline->flags, dflags);
+      DupString(blline->replies, replies);
+      DupString(blline->reply, reply);
+      DupString(blline->rank, rank);
+      blline->next = GlobalBLList;
+      GlobalBLList = blline;
+
+      server = NULL;
+      name = NULL;
+      dflags = NULL;
+      replies = NULL;
+      reply = NULL;
+      rank = NULL;
+    }
+  }
+};
+dnsblitems: dnsblitem | dnsblitems dnsblitem;
+dnsblitem: dnsblserver | dnsblname | dnsblflags | dnsblreplies | dnsblreply | dnsblrank;
+dnsblserver: NAME '=' QSTRING ';'
+{
+  MyFree(name);
+  name = $3;
+};
+dnsblname: SERVER '=' QSTRING ';'
+{
+  MyFree(server);
+  server = $3;
+};
+dnsblflags: FLAGS '=' QSTRING ';'
+{
+  MyFree(dflags);
+  dflags = $3;
+};
+dnsblreplies: REPLIES '=' QSTRING ';'
+{
+  MyFree(replies);
+  replies = $3;
+};
+dnsblreply: REPLY '=' QSTRING ';'
+{
+  MyFree(reply);
+  reply = $3;
+};
+dnsblrank: RANK '=' QSTRING ';'
+{
+  MyFree(rank);
+  rank = $3;
+};
+
+commandblock: COMMAND '{' commanditems '}' ';'
+{
+  struct svcline *new_svc;
+
+  if (permitted(BLOCK_COMMAND, 1)) {
+    if (!command)
+      parse_error("Your Command block must contain a command.");
+    else if (!service)
+      parse_error("Your Command block must contain a service.");
+    else {
+      new_svc = (struct svcline *)MyMalloc(sizeof(struct svcline));
+
+      DupString(new_svc->cmd, command);
+      DupString(new_svc->target, service);
+ 
+      if (prefix)
+        DupString(new_svc->prepend, prefix);
+
+      new_svc->next = GlobalServicesList;
+      GlobalServicesList = new_svc;
+
+      command = NULL;
+      service = NULL;
+      prefix = NULL;
+    }
+  }
+};
+commanditems: commanditem | commanditems commanditem;
+commanditem: commandcmd | commandservice | commandprefix;
+commandcmd: CMD '=' QSTRING ';'
+{
+  MyFree(command);
+  command = $3;
+};
+commandservice: SERVICE '=' QSTRING ';'
+{
+  MyFree(service);
+  service = $3;
+};
+commandprefix: PREFIX '=' QSTRING ';'
+{
+  MyFree(prefix);
+  prefix = $3;
+};
+
+forwardblock: FORWARD '{' {
+  (void)permitted(BLOCK_FORWARD, 1);
+} forwarditems '}' ';';
+forwarditems: forwarditems forwarditem | forwarditem;
+forwarditem: QSTRING '=' QSTRING ';'
+{
+  if (!permitted(BLOCK_FORWARD, 0))
+  {
+    MyFree($1);
+    MyFree($3);
+  }
+  else
+  {
+    char *fields;
+    unsigned char ch = 0;
+
+    DupString(fields, $1);
+    ch = *fields;
+
+    MyFree(GlobalForwards[ch]);
+    DupString(GlobalForwards[ch], $3);
+  }
+};
+
+exceptblock: EXCEPT '{' exceptitems '}' ';'
+{
+  struct eline *eline;
+
+  if (permitted(BLOCK_EXCEPT, 1)) {
+    if (!mask)
+      parse_error("Your Except block must contain a mask.");
+    else if (!dflags)
+      parse_error("Your Except block must contain flags.");
+    else {
+      eline = (struct eline *) MyMalloc(sizeof(struct eline));
+      memset(eline, 0, sizeof(struct eline));
+      DupString(eline->mask, mask);
+      DupString(eline->flags, dflags);
+      eline->next = GlobalEList;
+      GlobalEList = eline;   
+    }
+  }
+};
+exceptitems: exceptitem | exceptitems exceptitem;
+exceptitem: exceptmask | exceptflags;
+exceptmask: MASK '=' QSTRING ';'
+{
+  MyFree(mask);
+  mask = $3;
+};
+exceptflags: FLAGS '=' QSTRING ';'
+{
+  MyFree(dflags);
+  dflags = $3;
+};
+
+spoofhostblock: SPOOFHOST '{' spoofhostitems '}' ';'
+{
+  struct prefix *p;
+  struct sline *sline;
+
+  if (permitted(BLOCK_SPOOFHOST, 1)) {
+    if (!hostmask && ident)
+      parse_error("Spoofhost block error, if using a hostname then the username must not be empty.");
+    else if (!ident && hostmask)
+      parse_error("Spoofhost block error, if using a usernamen then the hostname must not be empty.");
+    else {
+      p = (struct prefix *) MyMalloc(sizeof(struct prefix));
+      sline = (struct sline *) MyMalloc(sizeof(struct sline));
+      DupString(sline->spoofhost, spoofhost);
+      if (pass)
+        DupString(sline->passwd, pass);
+      else
+        sline->passwd = NULL;
+      if (hostmask) {
+        DupString(sline->realhost, hostmask);
+        if (check_if_ipmask(sline->realhost)) {
+          if (str2prefix(sline->realhost, p) != 0) {
+            sline->address = p->address;
+            sline->bits = p->bits;
+            sline->flags = SLINE_FLAGS_IP;
+          } else {
+            sline->flags = SLINE_FLAGS_HOSTNAME;
+          }
+        } else
+          sline->flags = SLINE_FLAGS_HOSTNAME;
+      } else {
+        sline->realhost = NULL;
+        sline->flags = 0;
+      }
+      if (username)
+        DupString(sline->username, ident);
+      else
+         sline->username = NULL;
+
+      sline->next = GlobalSList;
+      GlobalSList = sline;
+      MyFree(p);
+
+      spoofhost = NULL;
+      pass = NULL;
+      hostmask = NULL;
+      ident = NULL;
+    }
+  }
+};
+spoofhostitems: spoofhostitem | spoofhostitems spoofhostitem;
+spoofhostitem: spoofhostspoof | spoofhostpass | spoofhostmask | spoofhostident;
+spoofhostspoof: SPOOF '=' QSTRING ';'
+{
+  MyFree(spoofhost);
+  spoofhost = $3;
+};
+spoofhostpass: PASS '=' QSTRING ';'
+{
+  MyFree(pass);
+  pass = $3;
+};
+spoofhostmask: HOSTMASK '=' QSTRING ';'
+{
+  MyFree(host);
+  hostmask = $3;
+};
+spoofhostident: IDENT '=' QSTRING ';'
+{
+  MyFree(ident);
+  ident = $3;
+};
+
+redirectblock: REDIRECT '{' redirectitems '}' ';'
+{
+  struct csline *csline;
+  if (permitted(BLOCK_REDIRECT, 1)) {
+    if (!mask)
+      parse_error("Your Redirect block must contain a mask.");
+    else if (!server)
+      parse_error("Your Redirect block must contain a server.");
+    else if (!sport)
+      parse_error("Your Redirect block must contain a port.");
+    else {
+      csline = (struct csline *) MyMalloc(sizeof(struct csline));
+      DupString(csline->mask, mask);
+      DupString(csline->server, server);
+      DupString(csline->port, sport);
+      csline->next = GlobalConnStopList;
+      GlobalConnStopList = csline;
+
+      mask = NULL;
+      server = NULL;
+      sport = NULL;
+    }
+  }
+};
+redirectitems: redirectitem | redirectitems redirectitem;
+redirectitem: redirectmask | redirectserver | redirectport;
+redirectmask: MASK '=' QSTRING ';'
+{
+  MyFree(mask);
+  mask = $3;
+};
+redirectserver: SERVER '=' QSTRING ';'
+{
+  MyFree(server);
+  server = $3;
+};
+redirectport: PORT '=' QSTRING ';'
+{
+  MyFree(sport);
+  sport = $3;
+};
+
+quarantineblock: QUARANTINE '{' {
+  (void)permitted(BLOCK_QUARANTINE, 1);
+} quarantineitems '}' ';';
+quarantineitems: quarantineitems quarantineitem | quarantineitem;
+quarantineitem: QSTRING '=' QSTRING ';'
+{
+  if (!permitted(BLOCK_QUARANTINE, 0))
+  {
+    MyFree($1);
+    MyFree($3);
+  }
+  else
+  {
+    struct qline *qconf = MyCalloc(1, sizeof(*qconf));
+    qconf->chname = $1;
+    qconf->reason = $3;
+    qconf->next = GlobalQuarantineList;
+    GlobalQuarantineList = qconf;
+  }
+};
+
+webircblock: WEBIRC '{' webircitems '}' ';'
+{
+  struct wline *wline;
+
+  if (permitted(BLOCK_WEBIRC, 1)) {
+    if (!mask)
+      parse_error("Your WebIRC block must contain a mask.");
+    else if (!pass)
+      parse_error("Your WebIRC block must contain a passwd.");
+    else if (!dflags)
+      parse_error("Your WebIRC block must contain flags.");
+    else if (!ident)
+      parse_error("Your WebIRC block must contain a ident.");
+    else if (!desc)
+      parse_error("Your WebIRC block must contain a description.");
+    else {
+      wline = (struct wline *) MyMalloc(sizeof(struct wline));
+      memset(wline, 0, sizeof(struct wline));
+      DupString(wline->mask, mask);
+      DupString(wline->passwd, pass);
+      DupString(wline->flags, dflags);
+      DupString(wline->ident, ident);
+      DupString(wline->desc, desc);
+      wline->next = GlobalWList;
+      GlobalWList = wline;
+
+      mask = NULL;
+      pass = NULL;
+      dflags = NULL;
+      ident = NULL;
+      desc = NULL;
+    }
+  }
+};
+webircitems: webircitem | webircitems webircitem;
+webircitem: webircmask | webircpasswd | webircflags | webircident | webircdesc;
+webircmask: MASK '=' QSTRING ';'
+{
+  MyFree(mask);
+  mask = $3;
+};
+webircpasswd: PASS '=' QSTRING ';'
+{
+  MyFree(pass);
+  pass = $3;
+};
+webircflags: FLAGS '=' QSTRING ';'
+{
+  MyFree(dflags);
+  dflags = $3;
+};
+webircident: IDENT '=' QSTRING ';'
+{
+  MyFree(ident);
+  ident = $3;
+};
+webircdesc: DESC '=' QSTRING ';'
+{
+  MyFree(desc);
+  desc = $3;
+};
+
+
 filterblock: FILTER '{' filteritems '}' ';'
 {
   struct fline *fline;
@@ -325,6 +739,10 @@ filterblock: FILTER '{' filteritems '}' ';'
         GlobalFList = fline;
 
         regfree(&tempre);
+        name = NULL;
+        rtype = NULL;
+        action = NULL;
+        reason = NULL;
       } else {
         parse_error("Invalid regex format in Filter block");
       }
