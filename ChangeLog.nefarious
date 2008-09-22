@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-09-22  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fixed fakehosts not being applied properly
+	after a netsplit
+
 2008-09-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Removed B,b,E,R,S,Q,W,X line sections

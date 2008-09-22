@@ -1157,6 +1157,10 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       }
     }
 
+    if (HasFakeHost(new_client)) {
+      ircd_strncpy(cli_user(new_client)->host, cli_user(new_client)->fakehost , HOSTLEN);
+    }
+
     if (HasSetHost(new_client)) {
       if ((host = strrchr(sethost, '@')) != NULL) {
         *host++ = '\0';
