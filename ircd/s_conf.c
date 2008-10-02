@@ -91,7 +91,8 @@ struct fline*    GlobalFList;
 struct blline*   GlobalBLList;
 struct qline*    GlobalQuarantineList;
 
-static struct LocalConf   localConf;
+struct LocalConf   localConf;
+
 static struct CRuleConf*  cruleConfList;
 static struct ServerConf* serverConfList;
 static struct DenyConf*   denyConfList;
@@ -1431,60 +1432,6 @@ yywarning(const char *fmt, ...)
     fprintf(stderr, "Config warning on line %d: %s\n", yylineno, warn_buffer);
 }
 
-void conf_add_local(const char* const* fields, int count)
-{
-  if (count < 6 || EmptyString(fields[1]) || EmptyString(fields[5])) {
-    log_write(LS_CONFIG, L_CRIT, 0, "Your M: line must have 6 fields!");
-    return;
-  }
-  /*
-   * these two can only be set the first time
-   */
-  if (0 == localConf.name) {
-    if (string_is_hostname(fields[1]))
-      DupString(localConf.name, fields[1]);
-  }
-  if (0 == localConf.numeric) {
-    localConf.numeric = atoi(fields[5]);
-    if (0 == localConf.numeric)
-      log_write(LS_CONFIG, L_WARNING, 0,
-		"Your M: line must have a Numeric value greater than 0");
-  }
-  /*
-   * these two can be changed while the server is running
-   */
-  if (string_is_address(fields[2])) {
-    if (INADDR_NONE == (localConf.vhost_address.s_addr = inet_addr(fields[2])))
-      localConf.vhost_address.s_addr = INADDR_ANY;
-  }
-  MyFree(localConf.description);
-  DupString(localConf.description, fields[3]);
-  /*
-   * XXX - shouldn't be setting these directly here
-   */
-  ircd_strncpy(cli_info(&me), fields[3], REALLEN);
-  set_virtual_host(localConf.vhost_address);
-}
-
-void conf_add_admin(const char* const* fields, int count)
-{
-  /*
-   * if you have one, it MUST have 3 lines
-   */
-  if (count < 4) {
-    log_write(LS_CONFIG, L_CRIT, 0, "Your A: line must have 4 fields!");
-    return;
-  }
-  MyFree(localConf.location1);
-  DupString(localConf.location1, fields[1]);
-
-  MyFree(localConf.location2);
-  DupString(localConf.location2, fields[2]);
-
-  MyFree(localConf.contact);
-  DupString(localConf.contact, fields[3]);
-}
-
 /*
  * conf_add_crule - Create expression tree from connect rule and add it
  * to the crule list
@@ -1815,11 +1762,6 @@ read_actual_config(const char *cfile)
     aconf = make_conf();
 
     switch (*field_vector[0]) {
-    case 'A':                /* Name, e-mail address of administrator */
-    case 'a':                /* of this server. CONF_ADMIN */
-      conf_add_admin(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'C':                /* Server where I should try to connect */
     case 'c':                /* in case of lp failures             */
       ++ccount;
@@ -1864,11 +1806,6 @@ read_actual_config(const char *cfile)
       break;
       /* Me. Host field is name used for this host */
       /* and port number is the number of the port */
-    case 'M':
-    case 'm':        /* CONF_ME */
-      conf_add_local(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'O':
       aconf->status = CONF_OPERATOR;
       break;
@@ -2192,29 +2129,12 @@ int init_conf(void)
 {
   int sc = 1, fc = 1;
 
-  if (read_configuration_file()) {
-    /*
-     * make sure we're sane to start if the config
-     * file read didn't get everything we need.
-     * XXX - should any of these abort the server?
-     * TODO: add warning messages
-     */
-    if (0 == localConf.name || 0 == localConf.numeric)
-      return 0;
-
-    if (0 == localConf.location1)
-      DupString(localConf.location1, "");
-    if (0 == localConf.location2)
-      DupString(localConf.location2, "");
-    if (0 == localConf.contact)
-      DupString(localConf.contact, "");
-    
-    fc = 1;
-  }
-
-  /* uses same code as above */
   if (read_configuration_file2()) {
      sc = 1;
+  }
+
+  if (read_configuration_file()) {
+    fc = 1;
   }
 
   if (fc && sc)

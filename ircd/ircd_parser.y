@@ -83,15 +83,19 @@
   struct eline*    GlobalEList = 0;
   unsigned int     GlobalBLCount = 0;
 
+  extern struct LocalConf   localConf;
+
 #define parse_error yyserror
 
 enum ConfigBlock
 {
+  BLOCK_ADMIN,
   BLOCK_COMMAND,
   BLOCK_DNSBL,
   BLOCK_EXCEPT,
   BLOCK_FILTER,
   BLOCK_FORWARD,
+  BLOCK_GENERAL,
   BLOCK_INCLUDE,
   BLOCK_QUARANTINE,
   BLOCK_REDIRECT,
@@ -113,8 +117,8 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Command", "DNSBL", "Except", "Filter", "Forward", "Include",
-    "Quarantine", "Redirect", "Spoofhost", "WebIRC",
+    "Admin", "Command", "DNSBL", "Except", "Filter", "Forward",
+    "Include", "General", "Quarantine", "Redirect", "Spoofhost", "WebIRC",
   };
 
   if (!includes)
@@ -263,8 +267,8 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: commandblock | dnsblblock      | exceptblock   | filterblock    | forwardblock |
-       includeblock | quarantineblock | redirectblock | spoofhostblock | webircblock  | error ';';
+block: adminblock   | commandblock | dnsblblock      | exceptblock   | filterblock    | generalblock |
+       forwardblock | includeblock | quarantineblock | redirectblock | spoofhostblock | webircblock  | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -335,6 +339,118 @@ expr: NUMBER
 			$$ = $2;
 		}
 		;
+
+generalblock: GENERAL
+{
+  if (permitted(BLOCK_GENERAL, 1))
+  {
+  }
+} '{' generalitems '}' ';' {
+  if (localConf.name == NULL)
+    parse_error("Your General block must contain a name.");
+  if (localConf.numeric == 0)
+    parse_error("Your General block must contain a numeric (between 1 and 4095).");
+
+  set_virtual_host(localConf.vhost_address);
+};
+generalitems: generalitem generalitems | generalitem;
+generalitem: generalnumeric | generalname | generalvhost | generaldesc;
+
+generalnumeric: NUMERIC '=' NUMBER ';'
+{
+  if (!permitted(BLOCK_GENERAL, 0))
+    ;
+  else if (localConf.numeric == 0)
+    localConf.numeric = $3;
+  else if (localConf.numeric != (unsigned int)$3)
+    parse_error("Redefinition of server numeric %i (%i)", $3,
+    		localConf.numeric);
+};
+
+generalname: NAME '=' QSTRING ';'
+{
+  if (!permitted(BLOCK_GENERAL, 0))
+    MyFree($3);
+  else if (localConf.name == NULL)
+    localConf.name = $3;
+  else
+  {
+    if (strcmp(localConf.name, $3))
+      parse_error("Redefinition of server name %s (%s)", $3,
+                  localConf.name);
+    MyFree($3);
+  }
+};
+
+generaldesc: DESCRIPTION '=' QSTRING ';'
+{
+  if (!permitted(BLOCK_GENERAL, 0))
+    MyFree($3);
+  else
+  {
+    MyFree(localConf.description);
+    localConf.description = $3;
+    ircd_strncpy(cli_info(&me), $3, REALLEN);
+  }
+};
+
+generalvhost: VHOST '=' QSTRING ';'
+{
+  char *vhost = $3;
+
+  if (!permitted(BLOCK_GENERAL, 0))
+    ;
+  if (string_is_address(vhost)) {
+    if (INADDR_NONE == (localConf.vhost_address.s_addr = inet_addr(vhost)))
+      localConf.vhost_address.s_addr = INADDR_ANY;
+  }
+
+  MyFree(vhost);
+};
+
+
+adminblock: ADMIN
+{
+  if (permitted(BLOCK_ADMIN, 1))
+  {
+    MyFree(localConf.location1);
+    MyFree(localConf.location2);
+    MyFree(localConf.contact);
+    localConf.location1 = localConf.location2 = localConf.contact = NULL;
+  }
+}
+'{' adminitems '}' ';'
+{
+  if (localConf.location1 == NULL)
+    DupString(localConf.location1, "");
+  if (localConf.location2 == NULL)
+    DupString(localConf.location2, "");
+  if (localConf.contact == NULL)
+    DupString(localConf.contact, "");
+};
+adminitems: adminitems adminitem | adminitem;
+adminitem: adminlocation | admincontact;
+adminlocation: LOCATION '=' QSTRING ';'
+{
+  if (!permitted(BLOCK_ADMIN, 0))
+    MyFree($3);
+  else if (localConf.location1 == NULL)
+    localConf.location1 = $3;
+  else if (localConf.location2 == NULL)
+    localConf.location2 = $3;
+  else /* Otherwise just drop it. -A1kmm */
+    MyFree($3);
+};
+admincontact: CONTACT '=' QSTRING ';'
+{
+  if (!permitted(BLOCK_ADMIN, 0))
+    MyFree($3);
+  else
+  {
+    MyFree(localConf.contact);
+    localConf.contact = $3;
+  }
+};
 
 
 dnsblblock: DNSBL '{' dnsblitems '}' ';'

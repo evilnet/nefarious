@@ -94,6 +94,7 @@
 #include "s_user.h"
 #include "send.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 /*

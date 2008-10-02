@@ -1,6 +1,18 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example2.conf: Added sections for General and Admin blocks.
+
+	* ircd/ircd_parser.c: Converted M and A lines over to blocks.
+
+	* ircd/m_die.c: Warning fix.
+
+	* ircd/m_restart.c: Warning fix.
+
+	* ircd/s_conf.c: Converted M and A lines over to blocks.
+
 2008-09-22  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fixed fakehosts not being applied properly
