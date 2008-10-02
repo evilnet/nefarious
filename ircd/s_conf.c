@@ -972,59 +972,6 @@ void conf_add_class(const char* const* fields, int count)
             atoi(fields[4]), atoi(fields[5]));
 }
 
-void conf_add_listener(const char* const* fields, int count)
-{
-  int is_server = 0;
-  int is_exempt = 0;
-  int is_hidden = 0;
-#ifdef USE_SSL
-  int is_ssl = 0;
-#endif /* USE_SSL */
-
-  /*
-   * need a port
-   */
-  if (count < 5 || EmptyString(fields[4]))
-    return;
-
-  if (!EmptyString(fields[3])) {
-    const char* x = fields[3];
-
-    if ('S' == ToUpper(*x))
-      is_server = 1;
-    if ('H' == ToUpper(*x))
-      is_hidden = 1;
-#ifdef USE_SSL
-    if ('E' == ToUpper(*x))
-      is_ssl = 1;
-#endif /* USE_SSL */
-    if ('X' == ToUpper(*x))
-      is_exempt = 1;
-
-    while (++x != NULL) {
-      if ('S' == ToUpper(*x))
-        is_server = 1;
-      if ('H' == ToUpper(*x))
-        is_hidden = 1;
-#ifdef USE_SSL
-      if ('E' == ToUpper(*x))
-        is_ssl = 1;
-#endif /* USE_SSL */
-      if ('X' == ToUpper(*x))
-        is_exempt = 1;
-      if (*x == '\0')
-        break;
-    }
-  }
-
-  /*           port             vhost      mask  */
-#ifdef USE_SSL
-  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_ssl, is_exempt);
-#else
-  add_listener(atoi(fields[4]), fields[2], fields[1], is_server, is_hidden, is_exempt);
-#endif /* USE_SSL */
-}
-
 void clear_lblines(void)
 {
   unsigned int ii;
@@ -1812,11 +1759,6 @@ read_actual_config(const char *cfile)
       /* Local Operator, (limited privs --SRB) */
     case 'o':
       aconf->status = CONF_LOCOP;
-      break;
-    case 'P':                /* listen port line */
-    case 'p':        /* CONF_LISTEN_PORT */
-      conf_add_listener(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
       break;
     case 'T':                /* print out different motd's */
     case 't':                /* based on hostmask - CONF_TLINES */

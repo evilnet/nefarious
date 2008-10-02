@@ -68,7 +68,8 @@
   /* Now all the globals we need :/... */
   char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, invert, stringno, flags;
-  static char *name, *pass, *host, *ip, *username, *origin, *hub_limit;
+  static int is_ssl, is_server, is_hidden, is_exempt;
+  static char *name, *pass, *host, *vhost, *ip, *username, *origin, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask;
   static char *prefix, *command, *service;
@@ -97,6 +98,7 @@ enum ConfigBlock
   BLOCK_FORWARD,
   BLOCK_GENERAL,
   BLOCK_INCLUDE,
+  BLOCK_PORT,
   BLOCK_QUARANTINE,
   BLOCK_REDIRECT,
   BLOCK_SPOOFHOST,
@@ -118,7 +120,8 @@ permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
     "Admin", "Command", "DNSBL", "Except", "Filter", "Forward",
-    "Include", "General", "Quarantine", "Redirect", "Spoofhost", "WebIRC",
+    "Include", "General", "Port", "Quarantine", "Redirect", "Spoofhost",
+    "WebIRC",
   };
 
   if (!includes)
@@ -227,6 +230,7 @@ static void free_slist(struct SLink **link) {
 %token REAL
 %token TFILE
 %token RULE
+%token SSL
 %token ALL
 %token FEATURES
 %token QUARANTINE
@@ -268,7 +272,8 @@ static void free_slist(struct SLink **link) {
 /* Blocks in the config file... */
 blocks: blocks block | block;
 block: adminblock   | commandblock | dnsblblock      | exceptblock   | filterblock    | generalblock |
-       forwardblock | includeblock | quarantineblock | redirectblock | spoofhostblock | webircblock  | error ';';
+       forwardblock | includeblock | quarantineblock | redirectblock | spoofhostblock | webircblock  |
+       portblock    | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -339,6 +344,78 @@ expr: NUMBER
 			$$ = $2;
 		}
 		;
+
+
+/* The port block... */
+portblock: PORT '{' portitems '}' ';'
+{
+  if (!permitted(BLOCK_PORT, 1))
+    ;
+  else {
+#ifdef USE_SSL
+    add_listener(port, vhost, pass, is_server, is_hidden, is_ssl, is_exempt);
+#else
+    add_listener(port, vhost, pass, is_server, is_hidden, is_exempt);
+#endif
+  }
+  MyFree(pass);
+  pass = NULL;
+  port = 0;
+};
+portitems: portitem portitems | portitem;
+portitem: portnumber | portvhost | portmask | portserver | porthidden | portexempt | portssl;
+portnumber: PORT '=' NUMBER ';'
+{
+  if ($3 < 1 || $3 > 65535) {
+    parse_error("Port %d is out of range", port);
+  } else {
+    port = $3;
+  }
+};
+
+portvhost: VHOST '=' QSTRING ';'
+{
+  MyFree(vhost);
+  vhost = $3;
+};
+
+portmask: MASK '=' QSTRING ';'
+{
+  MyFree(pass);
+  pass = $3;
+};
+
+portserver: SERVER '=' YES ';'
+{
+  is_server = 1;
+} | SERVER '=' NO ';'
+{
+  is_server = 0;
+};
+
+porthidden: HIDDEN '=' YES ';'
+{
+  is_hidden = 1;
+} | HIDDEN '=' NO ';'
+{
+  is_hidden = 0;
+};
+
+portexempt: EXEMPT '=' YES ';'
+{
+  is_exempt = 1;
+} | EXEMPT '=' NO ';'
+{
+  is_exempt = 0;
+};
+
+portssl: SSL '=' YES ';'
+{
+  is_ssl = 1;
+} | SSL '=' NO ';'
+{
+  is_ssl = 0;
+};
 
 generalblock: GENERAL
 {

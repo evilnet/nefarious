@@ -3,6 +3,16 @@
 
 2008-10-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example2.conf: Added Port block documentation.
+
+	* ircd/ircd_lexer.l: Added SSL token.
+
+	* ircd/ircd_parser.y: Converted P:lines over to Port blocks.
+
+	* ircd/s_conf.c: Removed old P:line code.
+
+2008-10-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example2.conf: Added sections for General and Admin blocks.
 
 	* ircd/ircd_parser.c: Converted M and A lines over to blocks.

@@ -191,6 +191,7 @@ SERVER		return SERVER;
 SERVICE		return SERVICE;
 SPOOF		return SPOOF;
 SPOOFHOST	return SPOOFHOST;
+SSL		return SSL;
 TB		return TBYTES;
 TBYTES		return TBYTES;
 TERABYTES	return TBYTES;
