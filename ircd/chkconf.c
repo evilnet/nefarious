@@ -315,10 +315,6 @@ static struct ConfItem *chk_initconf(void)
       case 't':
         aconf->status = CONF_TLINES;
         break;
-      case 'U':
-      case 'u':
-        aconf->status = CONF_UWORLD;
-        break;
       case 'Y':
       case 'y':
         aconf->status = CONF_CLASS;

@@ -655,6 +655,20 @@ void clearNickJupes(void)
     jupeTable[i][0] = '\000';
 }
 
+/*
+ * @param[in] to Client requesting statistics.
+ * @param[in] sd Stats descriptor for request (ignored).
+ * @param[in] param Extra parameter from user (ignored).
+ */
+void
+stats_nickjupes(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  int i;
+  for (i = 0; i < JUPEHASHSIZE; i++)
+    if (jupeTable[i][0])
+      send_reply(to, RPL_STATSJLINE, jupeTable[i]);
+}
+
 /** Send more channels to a client in mid-LIST.
  * @param[in] cptr Client to send the list to.
  */

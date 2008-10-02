@@ -52,6 +52,7 @@
 #include "s_bsd.h"
 #include "s_debug.h"
 #include "s_misc.h"
+#include "s_stats.h"
 #include "send.h"
 #ifdef USE_SSL
 #include "ssl.h"
@@ -1379,6 +1380,81 @@ yywarning(const char *fmt, ...)
     fprintf(stderr, "Config warning on line %d: %s\n", yylineno, warn_buffer);
 }
 
+/** List of server names with UWorld privileges. */
+static struct SLink *uworlds;
+
+/** Update the UWorld status flag for a server and every server behind it.
+ * @param[in] cptr The server to check against UWorld.
+ */
+void
+update_uworld_flags(struct Client *cptr)
+{
+  struct DLink *lp;
+  struct SLink *sp;
+
+  assert(cli_serv(cptr) != NULL);
+
+  for (sp = uworlds; sp; sp = sp->next)
+    if (0 == ircd_strcmp(cli_name(cptr), sp->value.cp))
+      break;
+
+  if (sp)
+    cli_serv(cptr)->flags |= SFLAG_UWORLD;
+  else
+    cli_serv(cptr)->flags &= ~SFLAG_UWORLD;
+
+  for (lp = cli_serv(cptr)->down; lp; lp = lp->next)
+    update_uworld_flags(lp->value.cptr);
+}
+
+/** Empty the list of known UWorld servers. */
+static void
+conf_erase_uworld_list(void)
+{
+  struct SLink *sp;
+
+  while (uworlds)
+  {
+    sp = uworlds;
+    uworlds = sp->next;
+    MyFree(sp->value.cp);
+    free_link(sp);
+  }
+
+  update_uworld_flags(&me);
+}
+
+/** Record the name of a server having UWorld privileges.
+ * @param[in] name Privileged server's name.
+ */
+void conf_make_uworld(char *name)
+{
+  struct SLink *sp;
+
+  sp = make_link();
+  sp->value.cp = name;
+  sp->next = uworlds;
+  uworlds = sp;
+}
+
+/** Send a list of UWorld servers.
+ * @param[in] to Client requesting statistics.
+ * @param[in] sd Stats descriptor for request (ignored).
+ * @param[in] param Extra parameter from user (ignored).
+ */
+void
+stats_uworld(struct Client* to, struct StatDesc* sd, int stat, char* param)
+{
+  struct SLink *sp;
+  char *tmp = NULL;
+
+  for (sp = uworlds; sp; sp = sp->next) {
+    tmp = strdup(sp->value.cp);
+    Debug((DEBUG_DEBUG, "test: %s", tmp));
+    send_reply(to, RPL_STATSULINE, tmp);
+  }
+}
+
 /*
  * conf_add_crule - Create expression tree from connect rule and add it
  * to the crule list
@@ -1765,10 +1841,6 @@ read_actual_config(const char *cfile)
       motd_add(field_vector[1], field_vector[2]);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'U':      /* Underworld server, allowed to hack modes */
-    case 'u':      /* *Every* server on the net must define the same !!! */
-      aconf->status = CONF_UWORLD;
-      break;
     case 'Y':
     case 'y':      /* CONF_CLASS */
       conf_add_class(field_vector, field_count);
@@ -1873,15 +1945,6 @@ read_actual_config(const char *cfile)
       lookup_confhost(aconf);
     }
 
-    /*
-     * Juped nicks are listed in the 'password' field of U:lines,
-     * the list is comma separated and might be empty and/or contain
-     * empty elements... the only limit is that it MUST be shorter
-     * than 512 chars, or they will be cutted out :)
-     */
-    if ((aconf->status == CONF_UWORLD) && (aconf->passwd) && (*aconf->passwd))
-      addNickJupes(aconf->passwd);
-
     collapse(aconf->host);
     collapse(aconf->name);
        
@@ -1976,6 +2039,7 @@ int rehash(struct Client *cptr, int sig)
       free_conf(tmp2);
     }
   }
+  conf_erase_uworld_list();
   conf_erase_crule_list();
   conf_erase_deny_list();
   motd_clear();
@@ -2034,9 +2098,9 @@ int rehash(struct Client *cptr, int sig)
       assert(!IsMe(acptr));
       if (IsServer(acptr)) {
         det_confs_butmask(acptr,
-            ~(CONF_HUB | CONF_LEAF | CONF_UWORLD | CONF_ILLEGAL));
+            ~(CONF_HUB | CONF_LEAF | CONF_ILLEGAL));
         attach_confs_byname(acptr, cli_name(acptr),
-                            CONF_HUB | CONF_LEAF | CONF_UWORLD);
+                            CONF_HUB | CONF_LEAF);
       }
       /* Because admin's are getting so uppity about people managing to
        * get past K/G's etc, we'll "fix" the bug by actually explaining
@@ -2054,6 +2118,8 @@ int rehash(struct Client *cptr, int sig)
       }
     }
   }
+
+  update_uworld_flags(&me);
 
   return ret;
 }
@@ -2509,7 +2575,7 @@ int conf_check_server(struct Client *cptr)
    * attach the C line to the client structure for later use.
    */
   attach_conf(cptr, c_conf);
-  attach_confs_byname(cptr, cli_name(cptr), CONF_HUB | CONF_LEAF | CONF_UWORLD);
+  attach_confs_byname(cptr, cli_name(cptr), CONF_HUB | CONF_LEAF);
 
   if (INADDR_NONE == c_conf->ipnum.s_addr)
     c_conf->ipnum.s_addr = cli_ip(cptr).s_addr;

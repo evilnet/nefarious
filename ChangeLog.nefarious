@@ -1,6 +1,46 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example2.conf: Added UWorld and Jupe blocks.
+
+	* include/client.h: Added cli_uworld.
+
+	* include/ircd_features.h: Added F:line for Jupe blocks.
+
+	* include/ircd_struct.h: Add new "flags" field.
+
+	* include/numeric.h: Added RPL_STATSJLINE.
+
+	* include/s_conf.h: Removed CONF_UWORLD and declared a few new
+	functions
+
+	* ircd/chkconf.c: Removed CONF_UWORLD.
+
+	* ircd/ircd_features.c: Added F:line for Jupe blocks.
+
+	* ircd/ircd_parser.y: Converted U:lines to UWorld and Jupe blocks.
+
+	* ircd/m_gline.c: Use cli_uworld() to check UWorld status.
+
+	* ircd/m_mode.c: Use cli_uworld() to check UWorld status.
+
+	* ircd/m_server.c: Use update_uworld_flags() to update a server's
+	 UWorld status.
+
+	* ircd/m_shun.c: Use cli_uworld() to check UWorld status.
+
+	* ircd/m_zline.c: Use cli_uworld() to check UWorld status.
+
+	* ircd/s_conf.c: Added new uworld functions and removed CONF_UWORLD.
+
+	* ircd/s_serv.c (server_estab): Remove CONF_UWORLD reference.
+
+	* ircd/s_stats.c (statsinfo): Point /stats U to stats_uworld().
+	(stats_configured_links): Remove CONF_UWORLD handling. Also added
+	handler for /stats J
+
 2008-10-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example2.conf: Added Port block documentation.

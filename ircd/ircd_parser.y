@@ -98,10 +98,12 @@ enum ConfigBlock
   BLOCK_FORWARD,
   BLOCK_GENERAL,
   BLOCK_INCLUDE,
+  BLOCK_JUPE,
   BLOCK_PORT,
   BLOCK_QUARANTINE,
   BLOCK_REDIRECT,
   BLOCK_SPOOFHOST,
+  BLOCK_UWORLD,
   BLOCK_WEBIRC,
   BLOCK_LAST_BLOCK
 };
@@ -120,8 +122,8 @@ permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
     "Admin", "Command", "DNSBL", "Except", "Filter", "Forward",
-    "Include", "General", "Port", "Quarantine", "Redirect", "Spoofhost",
-    "WebIRC",
+    "Include", "Jupe", "General", "Port", "Quarantine", "Redirect",
+    "Spoofhost", "UWorld", "WebIRC",
   };
 
   if (!includes)
@@ -271,9 +273,9 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: adminblock   | commandblock | dnsblblock      | exceptblock   | filterblock    | generalblock |
-       forwardblock | includeblock | quarantineblock | redirectblock | spoofhostblock | webircblock  |
-       portblock    | error ';';
+block: adminblock   | commandblock | dnsblblock | exceptblock     | filterblock   | generalblock |
+       forwardblock | includeblock | jupeblock  | quarantineblock | redirectblock | spoofhostblock | 
+       uworldblock  | webircblock  | portblock  | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -344,6 +346,39 @@ expr: NUMBER
 			$$ = $2;
 		}
 		;
+
+
+uworldblock: UWORLD '{' {
+  (void)permitted(BLOCK_UWORLD, 1);
+}  uworlditems '}' ';';
+uworlditems: uworlditem uworlditems | uworlditem;
+uworlditem: uworldname;
+uworldname: NAME '=' QSTRING ';'
+{
+  if (permitted(BLOCK_UWORLD, 0))
+    conf_make_uworld($3);
+};
+
+uworldblock: UWORLD QSTRING ';'
+{
+  if (permitted(BLOCK_UWORLD, 1))
+    conf_make_uworld($2);
+}
+
+
+jupeblock: JUPE '{' {
+  (void)permitted(BLOCK_JUPE, 1);
+} jupeitems '}' ';' ;
+jupeitems: jupeitem jupeitems | jupeitem;
+jupeitem: jupenick;
+jupenick: NICK '=' QSTRING ';'
+{
+  if (permitted(BLOCK_JUPE, 0))
+  {
+    addNickJupes($3);
+    MyFree($3);
+  }
+};
 
 
 /* The port block... */

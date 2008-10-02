@@ -135,7 +135,7 @@ ms_zline(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   }
 
   if ((parc == 3 && *mask == '-') || parc == 5) {
-    if (!find_conf_byhost(cli_confs(cptr), cli_name(sptr), CONF_UWORLD))
+    if (!cli_uworld(sptr))
       return need_more_params(sptr, "ZLINE");
 
     if (parc > 4)

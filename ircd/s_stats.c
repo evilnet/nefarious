@@ -82,7 +82,6 @@ static unsigned int report_array[17][3] = {
   {CONF_OPERATOR, RPL_STATSOLINE, 'O'},
   {CONF_HUB, RPL_STATSHLINE, 'H'},
   {CONF_LOCOP, RPL_STATSOLINE, 'o'},
-  {CONF_UWORLD, RPL_STATSULINE, 'U'},
   {0, 0}
 };
 
@@ -116,9 +115,7 @@ stats_configured_links(struct Client* sptr, struct StatDesc* sd, int stat,
        * displayed on STATS reply.    -Vesa
        */
       /* Special-case 'k' or 'K' lines as appropriate... -Kev */
-      if ((tmp->status & CONF_UWORLD))
-        send_reply(sptr, p[1], c, host, pass, name, 0, get_conf_class(tmp)); 
-      else if ((feature_bool(FEAT_STATS_C_IPS) || !IsOper(sptr))
+      if ((feature_bool(FEAT_STATS_C_IPS) || !IsOper(sptr))
 	       && (tmp->status & (CONF_SERVER)))
         send_reply(sptr, p[1], c, "*", name, 0, get_conf_class(tmp));
       else
@@ -514,7 +511,10 @@ struct StatDesc statsinfo[] = {
   { 'i', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_i,
     stats_access, CONF_CLIENT,
     "Connection authorization lines." },
-  { 'j', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_j,
+  { 'J', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_J,
+     stats_nickjupes, 0,
+     "Nickjupe information." },
+  { 'j', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_j,
     msgq_histogram, 0,
     "Message length histogram." },
   { 'k', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_k,
@@ -561,7 +561,7 @@ struct StatDesc statsinfo[] = {
     tstats, 0,
     "Local connection statistics (Total SND/RCV, etc)." },
   { 'U', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_U,
-    stats_configured_links, CONF_UWORLD,
+    stats_uworld, 0,
     "Service server & nick jupes information." },
   { 'u', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_u,
     stats_uptime, 0,

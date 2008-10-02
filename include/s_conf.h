@@ -20,6 +20,7 @@
 
 #include <tre/regex.h>
 
+struct StatDesc;
 struct Client;
 struct SLink;
 struct TRecord;
@@ -41,7 +42,6 @@ struct TRecord;
 #define CONF_OPERATOR           0x0020
 #define CONF_LEAF               0x1000
 #define CONF_HUB                0x4000
-#define CONF_UWORLD             0x8000
 
 #define CONF_OPS                (CONF_OPERATOR | CONF_LOCOP)
 #define CONF_CLIENT_MASK        (CONF_CLIENT | CONF_OPS | CONF_SERVER)
@@ -269,6 +269,10 @@ extern struct ConfItem* attach_confs_byhost(struct Client* cptr, const char* hos
 extern struct ConfItem* find_conf_byhost(struct SLink* lp, const char* host, int statmask);
 extern struct ConfItem* find_conf_byname(struct SLink* lp, const char *name, int statmask);
 extern struct ConfItem* conf_find_server(const char* name);
+
+extern void update_uworld_flags(struct Client *cptr);
+extern void conf_make_uworld(char *name);
+extern void stats_uworld(struct Client* to, struct StatDesc* sd, int stat, char* param);
 
 extern void det_confs_butmask(struct Client *cptr, int mask);
 extern enum AuthorizationCheckResult attach_conf(struct Client *cptr, struct ConfItem *aconf);

@@ -418,8 +418,7 @@ int mr_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      * Our new server might be a juped server,
      * or someone trying abuse a second Uworld:
      */
-    else if (IsServer(acptr) && (0 == ircd_strncmp(cli_info(acptr), "JUPE", 4) ||
-        find_conf_byhost(cli_confs(cptr), cli_name(acptr), CONF_UWORLD)))
+    else if (IsServer(acptr) && (0 == ircd_strncmp(cli_info(acptr), "JUPE", 4)))
     {
       if (!IsServer(sptr))
         return exit_client(cptr, sptr, &me, cli_info(acptr));
@@ -659,6 +658,7 @@ int mr_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /* Use cptr, because we do protocol 9 -> 10 translation
        for numeric nicks ! */
     SetServerYXX(cptr, acptr, parv[6]);
+    update_uworld_flags(cptr);
 
     Count_newremoteserver(UserStats);
     if (Protocol(acptr) < 10)
@@ -1065,8 +1065,7 @@ int ms_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
      * Our new server might be a juped server,
      * or someone trying abuse a second Uworld:
      */
-    else if (IsServer(acptr) && (0 == ircd_strncmp(cli_info(acptr), "JUPE", 4) ||
-        find_conf_byhost(cli_confs(cptr), cli_name(acptr), CONF_UWORLD)))
+    else if (IsServer(acptr) && (0 == ircd_strncmp(cli_info(acptr), "JUPE", 4)))
     {
       if (!IsServer(sptr))
         return exit_client(cptr, sptr, &me, cli_info(acptr));
@@ -1307,6 +1306,7 @@ int ms_server(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     /* Use cptr, because we do protocol 9 -> 10 translation
        for numeric nicks ! */
     SetServerYXX(cptr, acptr, parv[6]);
+    update_uworld_flags(cptr);
 
     Count_newremoteserver(UserStats);
     if (Protocol(acptr) < 10)
