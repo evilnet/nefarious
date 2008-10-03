@@ -54,6 +54,8 @@
 #include "s_misc.h"
 #include "send.h"
 #include "support.h"
+
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -68,10 +70,10 @@
   /* Now all the globals we need :/... */
   char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, invert, stringno, flags;
-  static int is_ssl, is_server, is_hidden, is_exempt;
+  static int is_ssl, is_server, is_hidden, is_exempt, i_class, is_local;
   static char *name, *pass, *host, *vhost, *ip, *username, *origin, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
-  static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask;
+  static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
   static char *prefix, *command, *service;
   struct SLink *hosts;
   static char *stringlist[MAX_STRINGS];
@@ -82,18 +84,34 @@
   struct sline*    GlobalSList = 0;
   struct svcline*  GlobalServicesList = 0;
   struct eline*    GlobalEList = 0;
+  struct ConfItem* GlobalConfList;
   unsigned int     GlobalBLCount = 0;
+
   static struct DenyConf *dconf;
+  static struct ConnectionClass *c_class;
 
   extern struct DenyConf*   denyConfList;
   extern struct CRuleConf*  cruleConfList;
   extern struct LocalConf   localConf;
+
+static int oper_access[] = {
+  OFLAG_GLOBAL,	  'O',
+  OFLAG_ADMIN,	  'A',
+  OFLAG_RSA,  	  'R',
+  OFLAG_REMOTE,   'r',
+  OFLAG_WHOIS,    'W',
+  OFLAG_IDLE,     'I',
+  OFLAG_XTRAOP,   'X',
+  OFLAG_HIDECHANS, 'n',
+  0, 0
+};
 
 #define parse_error yyserror
 
 enum ConfigBlock
 {
   BLOCK_ADMIN,
+  BLOCK_CLASS,
   BLOCK_CRULE,
   BLOCK_COMMAND,
   BLOCK_DNSBL,
@@ -104,7 +122,9 @@ enum ConfigBlock
   BLOCK_GENERAL,
   BLOCK_KILL,
   BLOCK_INCLUDE,
+  BLOCK_MOTD,
   BLOCK_JUPE,
+  BLOCK_OPER,
   BLOCK_PORT,
   BLOCK_QUARANTINE,
   BLOCK_REDIRECT,
@@ -127,9 +147,9 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Admin", "Command", "CRule", "DNSBL", "Except", "Features", "Filter", "Forward",
-    "Kill", "Include", "Jupe", "General", "Port", "Quarantine", "Redirect",
-    "Spoofhost", "UWorld", "WebIRC",
+    "Admin", "Command", "Class", "CRule", "DNSBL", "Except", "Features", "Filter", "Forward",
+    "Kill", "Include", "Jupe", "General", "Oper", "Port", "Quarantine", "Redirect",
+    "Spoofhost", "UWorld", "WebIRC", "Motd"
   };
 
   if (!includes)
@@ -281,9 +301,9 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: adminblock   | commandblock | cruleblock   | dnsblblock  | exceptblock | featuresblock   | filterblock   | generalblock   |
-       forwardblock | killblock    | includeblock | jupeblock   | quarantineblock | redirectblock | spoofhostblock | 
-       uworldblock  | webircblock  | portblock    | error ';';
+block: adminblock      | commandblock  | classblock     | cruleblock   | dnsblblock   | exceptblock  | featuresblock | filterblock |
+       generalblock    | forwardblock  | killblock      | includeblock | jupeblock    | motdblock     | operblock   |
+       quarantineblock | redirectblock | spoofhostblock | uworldblock  | webircblock  | portblock     | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -354,6 +374,211 @@ expr: NUMBER
 			$$ = $2;
 		}
 		;
+
+yesorno: YES { $$ = 1; } | NO { $$ = 0; };
+
+optall: { $$ = 0; };
+  | ALL { $$ = 1; };
+
+stringlist: stringlist extrastring | extrastring;
+extrastring: QSTRING
+{
+  if (stringno < MAX_STRINGS)
+    stringlist[stringno++] = $1;
+  else
+    MyFree($1);
+};
+
+
+classblock: CLASS {
+  tping = 90;
+} '{' classitems '}' ';'
+{
+  if (!permitted(BLOCK_CLASS, 1))
+    ;
+  else if (i_class)
+  {
+    add_class(i_class, tping, tconn, maxlinks, sendq);
+  }
+  else {
+   parse_error("Missing class number in class block");
+  }
+  name = NULL;
+  pass = NULL;
+  tconn = 0;
+  maxlinks = 0;
+  sendq = 0;
+  i_class = 0;
+};
+classitems: classitem classitems | classitem;
+classitem: classname | classpingfreq | classconnfreq | classmaxlinks |
+           classsendq;
+classname: NAME '=' NUMBER ';'
+{
+  i_class = $3;
+};
+classpingfreq: PINGFREQ '=' timespec ';'
+{
+  tping = $3;
+};
+classconnfreq: CONNECTFREQ '=' timespec ';'
+{
+  tconn = $3;
+};
+classmaxlinks: MAXLINKS '=' expr ';'
+{
+  maxlinks = $3;
+};
+classsendq: SENDQ '=' sizespec ';'
+{
+  sendq = $3;
+};
+
+
+operblock: OPER '{' operitems '}' ';'
+{
+  struct ConfItem *aconf = NULL;
+  struct SLink *link;
+  int* i;
+  int iflag;
+  char *m;
+
+  if (!permitted(BLOCK_OPER, 1))
+    ;
+  else if (name == NULL)
+    parse_error("Missing name in operator block");
+  else if (pass == NULL)
+    parse_error("Missing password in operator block");
+  else if (hosts == NULL)
+    parse_error("Missing host(s) in operator block");
+  else if (c_class == NULL)
+    parse_error("Invalid or missing class in operator block");
+  else for (link = hosts; link != NULL; link = link->next) {
+    aconf = make_conf();
+    if (is_local) {
+      m = "o";
+      aconf->status = CONF_LOCOP;
+    } else {
+      m = "O";
+      aconf->status = CONF_OPERATOR;
+    }
+    DupString(aconf->name, name);
+    DupString(aconf->passwd, pass);
+    DupString(aconf->host, link->value.cp);
+
+    if (!strchr(aconf->host, '@')) {
+      char* newhost;
+      int len = 3;                /* *@\0 = 3 */
+
+      len += strlen(aconf->host);
+      newhost = (char*) MyMalloc(len);
+      assert(0 != newhost);
+      ircd_snprintf(0, newhost, len, "*@%s", aconf->host);
+      MyFree(aconf->host);
+      aconf->host = newhost;
+    }
+
+    aconf->conn_class = c_class;
+
+    if (*oflags)
+      DupString(m, oflags);
+    for (; *m; m++) {
+      for (i = oper_access; (iflag = *i); i += 2) {
+        if (*m == (char)(*(i + 1))) {
+          aconf->port |= iflag;
+          break;
+        }
+      }
+    }
+
+    aconf->next = GlobalConfList;
+    GlobalConfList = aconf;
+    aconf = NULL;
+ }
+  MyFree(oflags);
+  MyFree(name);
+  MyFree(pass);
+  free_slist(&hosts);
+  name = pass = NULL;
+  c_class = NULL;
+};
+operitems: operitem | operitems operitem;
+operitem: opername | operpass | operhost | operflags | operclass | operlocal;
+opername: NAME '=' QSTRING ';'
+{
+  MyFree(name);
+  name = $3;
+};
+operpass: PASS '=' QSTRING ';'
+{
+  MyFree(pass);
+  pass = $3;
+};
+operhost: HOST '=' QSTRING ';'
+{
+ struct SLink *link;
+ link = make_link();
+ if (!strchr($3, '@'))
+ {
+   int uh_len;
+   link->value.cp = (char*) MyMalloc((uh_len = strlen($3)+3));
+   ircd_snprintf(0, link->value.cp, uh_len, "*@%s", $3);
+ }
+ else
+   DupString(link->value.cp, $3);
+ MyFree($3);
+ link->next = hosts;
+ hosts = link;
+};
+operflags: FLAGS '=' QSTRING ';'
+{
+  MyFree(oflags);
+  oflags = $3;
+};
+operclass: CLASS '=' NUMBER ';'
+{
+ c_class = find_class($3);
+ if (!c_class)
+  parse_error("No such connection class '%d' for Operator block", $3);
+};
+operlocal: LOCAL '=' YES ';'
+{
+  is_local = 1;
+} | LOCAL '=' NO ';'
+{
+  is_local = 0;
+};
+
+
+motdblock: MOTD '{' motditems '}' ';'
+{
+  struct SLink *link;
+  if (permitted(BLOCK_MOTD, 1) && pass != NULL) {
+    for (link = hosts; link != NULL; link = link->next)
+      motd_add(link->value.cp, pass);
+  }
+  free_slist(&hosts);
+  MyFree(pass);
+  pass = NULL;
+};
+
+motditems: motditem motditems | motditem;
+motditem: motdhost | motdfile;
+motdhost: HOST '=' QSTRING ';'
+{
+  struct SLink *link;
+  link = make_link();
+  link->value.cp = $3;
+  link->next = hosts;
+  hosts = link;
+};
+
+motdfile: TFILE '=' QSTRING ';'
+{
+  MyFree(pass);
+  pass = $3;
+};
+
 
 killblock: KILL
 {
@@ -518,16 +743,6 @@ featureitem: QSTRING
   for (ii = 0; ii < stringno; ++ii)
     MyFree(stringlist[ii]);
 };
-
-stringlist: stringlist extrastring | extrastring;
-extrastring: QSTRING
-{
-  if (stringno < MAX_STRINGS)
-    stringlist[stringno++] = $1;
-  else
-    MyFree($1);
-};
-
 
 uworldblock: UWORLD '{' {
   (void)permitted(BLOCK_UWORLD, 1);
@@ -1181,20 +1396,6 @@ filterreason: REASON '=' QSTRING ';'
   reason = $3;
 };
 
-yesorno: YES { $$ = 1; } | NO { $$ = 0; };
-
-optall: { $$ = 0; };
-  | ALL { $$ = 1; };
-
-stringlist: stringlist extrastring | extrastring;
-extrastring: QSTRING
-{
-  if (stringno < MAX_STRINGS)
-    stringlist[stringno++] = $1;
-  else
-    MyFree($1);
-};
-
 includeblock: INCLUDE blocklimit QSTRING ';' {
   struct ConfigBlocks *child;
 
@@ -1225,6 +1426,7 @@ blocktypes: blocktype;
 blocktype: ALL { $$ = ~0; }
   | ADMIN { $$ = 1 << BLOCK_ADMIN; }
   | COMMAND { $$ = 1 << BLOCK_COMMAND; }
+  | CRULE { $$ = 1 << BLOCK_CRULE; }
   | DNSBL { $$ = 1 << BLOCK_DNSBL; }
   | EXCEPT { $$ = 1 << BLOCK_EXCEPT; }
   | FEATURES { $$ = 1 << BLOCK_FEATURES; }
@@ -1234,6 +1436,9 @@ blocktype: ALL { $$ = ~0; }
   | FILTER { $$ = 1 << BLOCK_FILTER; }
   | INCLUDE { $$ = 1 << BLOCK_INCLUDE; }
   | JUPE { $$ = 1 << BLOCK_JUPE; }
+  | KILL { $$ = 1 << BLOCK_KILL; }
+  | MOTD { $$ = 1 << BLOCK_MOTD; }
+  | OPER { $$ = 1 << BLOCK_OPER; }
   | PORT { $$ = 1 << BLOCK_PORT; }
   | QUARANTINE { $$ = 1 << BLOCK_QUARANTINE; }
   | REDIRECT { $$ = 1 << BLOCK_REDIRECT; }

@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added documentation for below blocks.
+
+	* ircd/ircd_parser.y: Converted T/Y/O lines over to Motd,Class and Operator blocks.
+
+	* ircd/s_conf.c: Converted T/Y/O lines over to Motd,Class and Operator blocks.
+
 2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example2.conf: Added CRule and Kill block examples.

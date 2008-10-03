@@ -77,7 +77,7 @@
 #define INADDR_NONE 0xffffffff
 #endif
 
-struct ConfItem* GlobalConfList  = 0;
+struct ConfItem* GlobalConfList;
 int              GlobalConfCount = 0;
 char*            GlobalForwards[256];
 
@@ -960,19 +960,6 @@ static struct ConfItem *find_conf_entry(struct ConfItem *aconf,
   return bconf;
 }
 
-
-/*
- * If conf line is a class definition, create a class entry
- * for it and make the conf_line illegal and delete it.
- */
-void conf_add_class(const char* const* fields, int count)
-{
-  if (count < 6)
-    return;
-  add_class(atoi(fields[1]), atoi(fields[2]), atoi(fields[3]),
-            atoi(fields[4]), atoi(fields[5]));
-}
-
 void clear_lblines(void)
 {
   unsigned int ii;
@@ -1786,27 +1773,7 @@ read_actual_config(const char *cfile)
       break;
       /* Me. Host field is name used for this host */
       /* and port number is the number of the port */
-    case 'O':
-      aconf->status = CONF_OPERATOR;
-      break;
-      /* Local Operator, (limited privs --SRB) */
-    case 'o':
-      aconf->status = CONF_LOCOP;
-      break;
-    case 'T':                /* print out different motd's */
-    case 't':                /* based on hostmask - CONF_TLINES */
-      motd_add(field_vector[1], field_vector[2]);
-      aconf->status = CONF_ILLEGAL;
-      break;
-    case 'Y':
-    case 'y':      /* CONF_CLASS */
-      conf_add_class(field_vector, field_count);
-      aconf->status = CONF_ILLEGAL;
-      break;
     default:
-      Debug((DEBUG_ERROR, "Error in config file: %s", line));
-      sendto_opmask_butone(0, SNO_OLDSNO, "Unknown prefix in config file: %c",
-                           *field_vector[0]);
       aconf->status = CONF_ILLEGAL;
       break;
     }
