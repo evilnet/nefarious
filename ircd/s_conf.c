@@ -2360,11 +2360,11 @@ int find_kill(struct Client *cptr)
       break;
 
     if (deny->flags & DENY_FLAGS_VERSION && feature_bool(FEAT_CTCP_VERSIONING) && feature_bool(FEAT_CTCP_VERSIONING_KILL)) { /* K: by version - added by Vadtec 02/25/2006 */
-      if (0 == match(deny->hostmask + 2, version))
+      if (0 == match(deny->hostmask, version))
 	break;
     }
     else if (deny->flags & DENY_FLAGS_REALNAME) { /* K: by real name */
-      if (0 == match(deny->hostmask + 2, realname))
+      if (0 == match(deny->hostmask, realname))
 	break;
     } else if (deny->flags & DENY_FLAGS_IP) { /* k: by IP */
       Debug((DEBUG_DEBUG, "ip: %08x network: %08x/%i mask: %08x",

@@ -3,6 +3,16 @@
 
 2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example2.conf: Added CRule and Kill block examples.
+
+	* ircd/ircd_lexer.l: Woops forgot version check support.
+
+	* ircd/ircd_parser.y: Woops forgot version check support.
+
+	* ircd/s_conf.c: Couple of tweaks to find_kill.
+
+2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/crule.h: Updated crule code from Undernet IRCu.
 
 	* ircd/crule.c: Updated crule code from Undernet IRCu.

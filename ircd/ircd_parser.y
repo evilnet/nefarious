@@ -5,7 +5,7 @@
  * Andrew Miller, the ircd-hybrid team and the ircu team.
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  the Free Software Foundation; either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -189,6 +189,7 @@ static void free_slist(struct SLink **link) {
 %token EXCEPT
 %token MASK
 %token IDENT
+%token VERSION
 %token DESC
 %token FILTER
 %token DNSBL
@@ -367,9 +368,10 @@ killblock: KILL
     MyFree(dconf->message);
     MyFree(dconf);
   }
-  else if (dconf->usermask || dconf->hostmask || (dconf->flags & DENY_FLAGS_REALNAME))
+  else if (dconf->usermask || dconf->hostmask || (dconf->flags & DENY_FLAGS_REALNAME) ||
+          (dconf->flags & DENY_FLAGS_VERSION))
   {
-    if (dconf->flags & DENY_FLAGS_REALNAME)
+    if ((dconf->flags & DENY_FLAGS_REALNAME) || (dconf->flags & DENY_FLAGS_VERSION))
       DupString(dconf->usermask, "*");
 
     dconf->next = denyConfList;
@@ -386,7 +388,7 @@ killblock: KILL
   dconf = NULL;
 };
 killitems: killitem killitems | killitem;
-killitem: killuhost | killreal | killusername | killreasonfile | killreason;
+killitem: killuhost | killversion | killreal | killusername | killreasonfile | killreason;
 killuhost: HOST '=' QSTRING ';'
 {
   char *h;
@@ -443,6 +445,12 @@ killusername: USERNAME '=' QSTRING ';'
 {
   MyFree(dconf->usermask);
   dconf->usermask = $3;
+};
+killversion: VERSION '=' QSTRING ';'
+{
+  MyFree(dconf->hostmask);
+  dconf->hostmask = $3;
+  dconf->flags |= DENY_FLAGS_VERSION;
 };
 killreal: REAL '=' QSTRING ';'
 {
