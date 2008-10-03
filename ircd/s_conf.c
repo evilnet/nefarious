@@ -1322,11 +1322,20 @@ extern void deinit_lexer(void);
 int read_configuration_file2(void)
 {
   conf_error = 0;
+  feature_unmark(); /* unmark all features for resetting later */
   if (!init_lexer(configfile2))
     return 0;
   yyparse();
   deinit_lexer();
+  feature_mark(); /* reset unmarked features */
   conf_already_read = 1;
+
+  /* Set our local FLAG_HUB if necessary. */
+  if (feature_bool(FEAT_HUB))
+    SetFlag(&me, FLAG_HUB);
+  else
+    ClrFlag(&me, FLAG_HUB);
+
   return 1;
 }
 
@@ -1800,11 +1809,6 @@ read_actual_config(const char *cfile)
       conf_add_crule(field_vector, field_count, CRULE_AUTO);
       aconf->status = CONF_ILLEGAL;
       break;
-    case 'F':                /* Feature line */
-    case 'f':
-      feature_set(0, &field_vector[1], field_count - 1);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'H':                /* Hub server line */
     case 'h':
       aconf->status = CONF_HUB;
@@ -1977,23 +1981,9 @@ read_actual_config(const char *cfile)
 int
 read_configuration_file(void)
 {
-  /* unmark all features for resetting later */
-  feature_unmark();
-
   /* try reading the actual ircd.conf */
   if (!read_actual_config(configfile))
     return 0;
-
-  /* reset unmarked features */
-  feature_mark();
-
-  /*
-   * Set our local FLAG_HUB if necessary.
-   */
-  if (feature_bool(FEAT_HUB))
-    SetFlag(&me, FLAG_HUB);
-  else
-    ClrFlag(&me, FLAG_HUB);
 
   return 1;
 }

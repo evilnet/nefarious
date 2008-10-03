@@ -3,6 +3,14 @@
 
 2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example2.conf: Move F:lines over to a Features block.
+
+	* ircd/ircd_parser.y: Move F:lines over to a Features block.
+
+	* ircd/s_conf.c: Move F:lines over to a Features block.
+
+2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example2.conf: Added UWorld and Jupe blocks.
 
 	* include/client.h: Added cli_uworld.

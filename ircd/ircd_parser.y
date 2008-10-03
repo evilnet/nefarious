@@ -94,6 +94,7 @@ enum ConfigBlock
   BLOCK_COMMAND,
   BLOCK_DNSBL,
   BLOCK_EXCEPT,
+  BLOCK_FEATURES,
   BLOCK_FILTER,
   BLOCK_FORWARD,
   BLOCK_GENERAL,
@@ -121,7 +122,7 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Admin", "Command", "DNSBL", "Except", "Filter", "Forward",
+    "Admin", "Command", "DNSBL", "Except", "Features", "Filter", "Forward",
     "Include", "Jupe", "General", "Port", "Quarantine", "Redirect",
     "Spoofhost", "UWorld", "WebIRC",
   };
@@ -273,7 +274,7 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: adminblock   | commandblock | dnsblblock | exceptblock     | filterblock   | generalblock |
+block: adminblock   | commandblock | dnsblblock | exceptblock     | featuresblock  | filterblock   | generalblock |
        forwardblock | includeblock | jupeblock  | quarantineblock | redirectblock | spoofhostblock | 
        uworldblock  | webircblock  | portblock  | error ';';
 
@@ -346,6 +347,33 @@ expr: NUMBER
 			$$ = $2;
 		}
 		;
+
+featuresblock: FEATURES '{' {
+  (void)permitted(BLOCK_FEATURES, 1);
+} featureitems '}' ';';
+featureitems: featureitems featureitem | featureitem;
+
+featureitem: QSTRING
+{
+  stringlist[0] = $1;
+  stringno = 1;
+} '=' stringlist ';' {
+  int ii;
+  if (permitted(BLOCK_FEATURES, 0))
+    feature_set(NULL, (const char * const *)stringlist, stringno);
+  Debug((DEBUG_DEBUG, "Feature: %s - %s", stringlist[0], stringlist[1]));
+  for (ii = 0; ii < stringno; ++ii)
+    MyFree(stringlist[ii]);
+};
+
+stringlist: stringlist extrastring | extrastring;
+extrastring: QSTRING
+{
+  if (stringno < MAX_STRINGS)
+    stringlist[stringno++] = $1;
+  else
+    MyFree($1);
+};
 
 
 uworldblock: UWORLD '{' {
@@ -1042,6 +1070,21 @@ blocklimit: blocktypes FROM;
 blocktypes: blocktypes ',' blocktype { $$ = $1 | $3; };
 blocktypes: blocktype;
 blocktype: ALL { $$ = ~0; }
+  | ADMIN { $$ = 1 << BLOCK_ADMIN; }
+  | COMMAND { $$ = 1 << BLOCK_COMMAND; }
+  | DNSBL { $$ = 1 << BLOCK_DNSBL; }
+  | EXCEPT { $$ = 1 << BLOCK_EXCEPT; }
+  | FEATURES { $$ = 1 << BLOCK_FEATURES; }
+  | FILTER { $$ = 1 << BLOCK_FILTER; }
+  | FORWARD { $$ = 1 << BLOCK_FORWARD; }
+  | GENERAL { $$ = 1 << BLOCK_GENERAL; }
   | FILTER { $$ = 1 << BLOCK_FILTER; }
   | INCLUDE { $$ = 1 << BLOCK_INCLUDE; }
+  | JUPE { $$ = 1 << BLOCK_JUPE; }
+  | PORT { $$ = 1 << BLOCK_PORT; }
+  | QUARANTINE { $$ = 1 << BLOCK_QUARANTINE; }
+  | REDIRECT { $$ = 1 << BLOCK_REDIRECT; }
+  | SPOOFHOST { $$ = 1 << BLOCK_SPOOFHOST; }
+  | UWORLD { $$ = 1 << BLOCK_UWORLD; }
+  | WEBIRC { $$ = 1 << BLOCK_WEBIRC; }
   ;
