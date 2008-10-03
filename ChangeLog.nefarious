@@ -3,6 +3,21 @@
 
 2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/crule.h: Updated crule code from Undernet IRCu.
+
+	* ircd/crule.c: Updated crule code from Undernet IRCu.
+
+	* ircd/chkconf.c: Removed as its useless and will soon be replaced once
+	the new conf parser is done.
+
+	* ircd/ircd_parser.y: Converted K/k/d/D lines over to Kill/CRule blocks.
+
+	* ircd/Makefile.in: Removed chkconf and ran make depend.
+
+	* ircd/s_conf.c: Converted K/k/d/D lines over to Kill/CRule blocks.
+
+2008-10-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example2.conf: Move F:lines over to a Features block.
 
 	* ircd/ircd_parser.y: Move F:lines over to a Features block.

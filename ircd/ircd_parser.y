@@ -83,7 +83,10 @@
   struct svcline*  GlobalServicesList = 0;
   struct eline*    GlobalEList = 0;
   unsigned int     GlobalBLCount = 0;
+  static struct DenyConf *dconf;
 
+  extern struct DenyConf*   denyConfList;
+  extern struct CRuleConf*  cruleConfList;
   extern struct LocalConf   localConf;
 
 #define parse_error yyserror
@@ -91,6 +94,7 @@
 enum ConfigBlock
 {
   BLOCK_ADMIN,
+  BLOCK_CRULE,
   BLOCK_COMMAND,
   BLOCK_DNSBL,
   BLOCK_EXCEPT,
@@ -98,6 +102,7 @@ enum ConfigBlock
   BLOCK_FILTER,
   BLOCK_FORWARD,
   BLOCK_GENERAL,
+  BLOCK_KILL,
   BLOCK_INCLUDE,
   BLOCK_JUPE,
   BLOCK_PORT,
@@ -122,8 +127,8 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Admin", "Command", "DNSBL", "Except", "Features", "Filter", "Forward",
-    "Include", "Jupe", "General", "Port", "Quarantine", "Redirect",
+    "Admin", "Command", "CRule", "DNSBL", "Except", "Features", "Filter", "Forward",
+    "Kill", "Include", "Jupe", "General", "Port", "Quarantine", "Redirect",
     "Spoofhost", "UWorld", "WebIRC",
   };
 
@@ -258,6 +263,7 @@ static void free_slist(struct SLink **link) {
 %type <num> expr yesorno
 %type <num> blocklimit blocktypes blocktype
 %type <num> optall
+%type <crule> crule_expr
 %left LOGICAL_OR
 %left LOGICAL_AND
 %left '+' '-'
@@ -274,9 +280,9 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: adminblock   | commandblock | dnsblblock | exceptblock     | featuresblock  | filterblock   | generalblock |
-       forwardblock | includeblock | jupeblock  | quarantineblock | redirectblock | spoofhostblock | 
-       uworldblock  | webircblock  | portblock  | error ';';
+block: adminblock   | commandblock | cruleblock   | dnsblblock  | exceptblock | featuresblock   | filterblock   | generalblock   |
+       forwardblock | killblock    | includeblock | jupeblock   | quarantineblock | redirectblock | spoofhostblock | 
+       uworldblock  | webircblock  | portblock    | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -348,6 +354,146 @@ expr: NUMBER
 		}
 		;
 
+killblock: KILL
+{
+  dconf = (struct DenyConf*) MyMalloc(sizeof(struct DenyConf));
+  memset(dconf, 0, sizeof(struct DenyConf));
+} '{' killitems '}' ';'
+{
+  if (!permitted(BLOCK_KILL, 1))
+  {
+    MyFree(dconf->usermask);
+    MyFree(dconf->hostmask);
+    MyFree(dconf->message);
+    MyFree(dconf);
+  }
+  else if (dconf->usermask || dconf->hostmask || (dconf->flags & DENY_FLAGS_REALNAME))
+  {
+    if (dconf->flags & DENY_FLAGS_REALNAME)
+      DupString(dconf->usermask, "*");
+
+    dconf->next = denyConfList;
+    denyConfList = dconf;
+  }
+  else
+  {
+    MyFree(dconf->usermask);
+    MyFree(dconf->hostmask);
+    MyFree(dconf->message);
+    MyFree(dconf);
+    parse_error("Kill block must match on at least one of username, host or realname");
+  }
+  dconf = NULL;
+};
+killitems: killitem killitems | killitem;
+killitem: killuhost | killreal | killusername | killreasonfile | killreason;
+killuhost: HOST '=' QSTRING ';'
+{
+  char *h;
+  char *bhost;
+
+  MyFree(dconf->hostmask);
+  MyFree(dconf->usermask);
+
+  bhost = strdup($3);
+
+  if ((h = strchr($3, '@')) == NULL)
+  {
+    DupString(dconf->usermask, "*");
+    dconf->hostmask = bhost;
+  }
+  else
+  {
+    *h++ = '\0';
+    DupString(dconf->hostmask, h);
+    dconf->usermask = $3;
+  }
+
+  if (check_if_ipmask(dconf->hostmask)) {
+    int  c_class;
+    char ipname[16];
+    int  ad[4] = { 0 };
+    int  bits2 = 0;
+
+    if (!IsDigit(dconf->hostmask[0]))
+    {
+     sendto_opmask_butone(0, SNO_OLDSNO, 
+        "Mangled IP in IP Kill block: k:%s:%s", dconf->hostmask, dconf->usermask);
+    } else {
+      c_class = sscanf(dconf->hostmask, "%d.%d.%d.%d/%d",
+                       &ad[0], &ad[1], &ad[2], &ad[3], &bits2);
+      if (c_class != 5) {
+        dconf->bits = c_class * 8;
+      }
+      else {
+        dconf->bits = bits2;
+      }
+      ircd_snprintf(0, ipname, sizeof(ipname), "%d.%d.%d.%d", ad[0], ad[1],
+  		  ad[2], ad[3]);
+    
+      dconf->address = inet_addr(ipname);
+      Debug((DEBUG_DEBUG, "IPkill: %s = %08x/%i (%08x)", ipname,
+             dconf->address, dconf->bits, NETMASK(dconf->bits)));
+      dconf->flags |= DENY_FLAGS_IP;
+    }
+  }
+};
+
+killusername: USERNAME '=' QSTRING ';'
+{
+  MyFree(dconf->usermask);
+  dconf->usermask = $3;
+};
+killreal: REAL '=' QSTRING ';'
+{
+  MyFree(dconf->hostmask);
+  dconf->hostmask = $3;
+  dconf->flags |= DENY_FLAGS_REALNAME;
+};
+killreason: REASON '=' QSTRING ';'
+{
+ dconf->flags &= ~DENY_FLAGS_FILE;
+ MyFree(dconf->message);
+ dconf->message = $3;
+};
+
+killreasonfile: TFILE '=' QSTRING ';'
+{
+ dconf->flags |= DENY_FLAGS_FILE;
+ MyFree(dconf->message);
+ dconf->message = $3;
+};
+
+
+cruleblock: CRULE optall QSTRING optall crule_expr ';'
+{
+  if (permitted(BLOCK_CRULE, 1) && $5)
+  {
+    struct CRuleConf *p = (struct CRuleConf*) MyMalloc(sizeof(*p));
+    p->hostmask = collapse($3);
+    p->rule = crule_text($5);
+    p->type = ($2 || $4) ? CRULE_ALL : CRULE_AUTO;
+    p->node = $5;
+    p->next = cruleConfList;
+    cruleConfList = p;
+  }
+};
+
+optall: { $$ = 0; };
+  | ALL { $$ = 1; };
+
+crule_expr:
+    '(' crule_expr ')' { $$ = $2; }
+  | crule_expr LOGICAL_AND crule_expr { $$ = crule_make_and($1, $3); }
+  | crule_expr LOGICAL_OR crule_expr { $$ = crule_make_or($1, $3); }
+  | '!' crule_expr { $$ = crule_make_not($2); }
+  | CONNECTED '(' QSTRING ')' { $$ = crule_make_connected($3); }
+  | DIRECTCON '(' QSTRING ')' { $$ = crule_make_directcon($3); }
+  | VIA '(' QSTRING ',' QSTRING ')' { $$ = crule_make_via($3, $5); }
+  | DIRECTOP '(' ')' { $$ = crule_make_directop(); }
+  ;
+
+
 featuresblock: FEATURES '{' {
   (void)permitted(BLOCK_FEATURES, 1);
 } featureitems '}' ';';
@@ -361,7 +507,6 @@ featureitem: QSTRING
   int ii;
   if (permitted(BLOCK_FEATURES, 0))
     feature_set(NULL, (const char * const *)stringlist, stringno);
-  Debug((DEBUG_DEBUG, "Feature: %s - %s", stringlist[0], stringlist[1]));
   for (ii = 0; ii < stringno; ++ii)
     MyFree(stringlist[ii]);
 };

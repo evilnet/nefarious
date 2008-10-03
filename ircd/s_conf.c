@@ -93,10 +93,10 @@ struct blline*   GlobalBLList;
 struct qline*    GlobalQuarantineList;
 
 struct LocalConf   localConf;
+struct DenyConf*   denyConfList;
+struct CRuleConf*  cruleConfList;
 
-static struct CRuleConf*  cruleConfList;
 static struct ServerConf* serverConfList;
-static struct DenyConf*   denyConfList;
 
 /** Current line number in scanner input. */
 extern int yylineno;
@@ -1464,34 +1464,6 @@ stats_uworld(struct Client* to, struct StatDesc* sd, int stat, char* param)
   }
 }
 
-/*
- * conf_add_crule - Create expression tree from connect rule and add it
- * to the crule list
- */
-void conf_add_crule(const char* const* fields, int count, int type)
-{
-  struct CRuleNode* node;
-  assert(0 != fields);
-  
-  if (count < 4 || EmptyString(fields[1]) || EmptyString(fields[3]))
-    return;
-  
-  if ((node = crule_parse(fields[3]))) {
-    struct CRuleConf* p = (struct CRuleConf*) MyMalloc(sizeof(struct CRuleConf));
-    assert(0 != p);
-
-    DupString(p->hostmask, fields[1]);
-    collapse(p->hostmask);
-
-    DupString(p->rule, fields[3]);
-
-    p->type = type;
-    p->node = node;
-    p->next = cruleConfList;
-    cruleConfList = p;
-  } 
-}
-
 void conf_erase_crule_list(void)
 {
   struct CRuleConf* next;
@@ -1499,7 +1471,7 @@ void conf_erase_crule_list(void)
 
   for ( ; p; p = next) {
     next = p->next;
-    crule_free(&p->node);
+    crule_free(p->node);
     MyFree(p->hostmask);
     MyFree(p->rule);
     MyFree(p);
@@ -1800,15 +1772,6 @@ read_actual_config(const char *cfile)
       aconf->status = CONF_SERVER;
       break;
       /* Connect rule */
-    case 'D':  /* CONF_CRULEALL */
-      conf_add_crule(field_vector, field_count, CRULE_ALL);
-      aconf->status = CONF_ILLEGAL;
-      break;
-      /* Connect rule - autos only */
-    case 'd':  /* CONF_CRULEAUTO */
-      conf_add_crule(field_vector, field_count, CRULE_AUTO);
-      aconf->status = CONF_ILLEGAL;
-      break;
     case 'H':                /* Hub server line */
     case 'h':
       aconf->status = CONF_HUB;
@@ -1817,16 +1780,6 @@ read_actual_config(const char *cfile)
     case 'i':                /* to connect me */
       aconf->status = CONF_CLIENT;
       break;
-    case 'K':                /* Kill user line on irc.conf           */
-      conf_add_deny(field_vector, field_count, 0);
-      aconf->status = CONF_ILLEGAL;
-      break;
-    case 'k':                /* Kill user line based on IP in ircd.conf */
-      conf_add_deny(field_vector, field_count, 1);
-      aconf->status = CONF_ILLEGAL;
-      break;
-      /* Operator. Line should contain at least */
-      /* password and host where connection is  */
     case 'L':                /* guaranteed leaf server */
     case 'l':
       aconf->status = CONF_LEAF;
