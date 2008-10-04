@@ -89,7 +89,8 @@ extern void init_isupport(void);
  *--------------------------------------------------------------------------*/
 enum {
   BOOT_DEBUG = 1,
-  BOOT_TTY   = 2
+  BOOT_TTY   = 2,
+  BOOT_CHKCONF = 3
 };
 
 
@@ -167,7 +168,7 @@ static void pending_exit(struct PendingExit *pe)
   flush_connections(0);
   log_close();
   close_connections(!pe->restart ||
-		    !(thisServer.bootopt & (BOOT_TTY | BOOT_DEBUG)));
+		    !(thisServer.bootopt & (BOOT_TTY | BOOT_DEBUG | BOOT_CHKCONF)));
 
   if (!pe->restart) { /* just set running = 0 */
     running = 0;
@@ -716,7 +717,7 @@ static void check_pings(struct Event* ev) {
  * debugmode
  *--------------------------------------------------------------------------*/
 static void parse_command_line(int argc, char** argv) {
-  const char *options = "d:s:f:l:h:ntvx:";
+  const char *options = "d:s:f:l:h:nktvx:";
   int opt;
 
   if (thisServer.euid != thisServer.uid)
@@ -727,6 +728,7 @@ static void parse_command_line(int argc, char** argv) {
    */
   while ((opt = getopt(argc, argv, options)) != EOF)
     switch (opt) {
+    case 'k':  thisServer.bootopt |= BOOT_CHKCONF | BOOT_TTY; break;
     case 'n':
     case 't':  thisServer.bootopt |= BOOT_TTY;         break;
     case 'd':  dpath      = optarg;                    break;
@@ -764,7 +766,10 @@ static void parse_command_line(int argc, char** argv) {
       
     default:
       printf("Usage: ircd [-f config] [-d configpath] [-s serverpath] [-h servername] [-l logpath] [-x loglevel] [-ntv]\n");
-      printf("\n -n -t\t Don't detach\n -v\t display version\n\n");
+      printf("\n -x loglevel\t set debug logging verbosity");
+      printf("\n -n -t\t\t Don't detach");
+      printf("\n -k\t\t check configuration file");
+      printf("\n -v\t\t display version\n\n");
       printf("Server not started.\n");
       exit(1);
     }
@@ -778,7 +783,7 @@ static void daemon_init(int no_fork) {
   if (!init_connection_limits())
     exit(9);
 
-  close_connections(!(thisServer.bootopt & (BOOT_DEBUG | BOOT_TTY)));
+  close_connections(!(thisServer.bootopt & (BOOT_DEBUG | BOOT_TTY | BOOT_CHKCONF)));
 
   if (no_fork)
     return;
@@ -920,6 +925,11 @@ int main(int argc, char **argv) {
     log_write(LS_SYSTEM, L_CRIT, 0, "Failed to read configuration file %s",
 	      configfile);
     return 7;
+  }
+
+  if (thisServer.bootopt & BOOT_CHKCONF) {
+    fprintf(stderr, "Configuration file %s checked okay.\n", configfile);
+    return 0;
   }
 
   if (check_pid()) {
