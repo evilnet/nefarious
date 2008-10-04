@@ -3,11 +3,27 @@
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example2.conf: Added documentation for the Client block.
+
+	* include/s_conf.h: Added maximum field to the Conf struct.
+
+	* ircd/ircd_parser.y: Converted I:lines over to Client blocks.
+
+	* ircd/s_user.c: Changed the way Client passwords work. The password
+	field no longer holds the maximum connections.
+
+	* ircd/s_conf.c: Changed the way Client passwords work. The password
+	field no longer holds the maximum connections. Although at this point
+	the maximum field doesnt do anything as we have the IPCheck code
+	disabled.
+
+2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/Makefile.in: Reverting make depend changes for now.
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
-	* doc/example.conf: Added documentation for below blocks.
+	* doc/example2.conf: Added documentation for below blocks.
 
 	* ircd/ircd_parser.y: Converted T/Y/O lines over to Motd,Class and Operator blocks.
 

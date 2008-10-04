@@ -112,6 +112,7 @@ enum ConfigBlock
 {
   BLOCK_ADMIN,
   BLOCK_CLASS,
+  BLOCK_CLIENT,
   BLOCK_CRULE,
   BLOCK_COMMAND,
   BLOCK_DNSBL,
@@ -147,7 +148,7 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Admin", "Command", "Class", "CRule", "DNSBL", "Except", "Features", "Filter", "Forward",
+    "Admin", "Command", "Class", "Client", "CRule", "DNSBL", "Except", "Features", "Filter", "Forward",
     "Kill", "Include", "Jupe", "General", "Oper", "Port", "Quarantine", "Redirect",
     "Spoofhost", "UWorld", "WebIRC", "Motd"
   };
@@ -301,7 +302,7 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: adminblock      | commandblock  | classblock     | cruleblock   | dnsblblock   | exceptblock  | featuresblock | filterblock |
+block: adminblock      | commandblock  | classblock     | clientblock  | cruleblock   | dnsblblock    | exceptblock | featuresblock | filterblock |
        generalblock    | forwardblock  | killblock      | includeblock | jupeblock    | motdblock     | operblock   |
        quarantineblock | redirectblock | spoofhostblock | uworldblock  | webircblock  | portblock     | error ';';
 
@@ -387,6 +388,85 @@ extrastring: QSTRING
     stringlist[stringno++] = $1;
   else
     MyFree($1);
+};
+
+
+clientblock: CLIENT
+{
+  maxlinks = 65535;
+  port = 0;
+}
+'{' clientitems '}' ';'
+{
+  struct ConfItem *aconf = 0;
+  unsigned char addrbits = 0;
+
+  if (!permitted(BLOCK_CLIENT, 1))
+    ;
+  else if (!c_class)
+    parse_error("Invalid or missing class in Client block");
+  else if (pass && strlen(pass) > PASSWDLEN)
+    parse_error("Password too long in connect block");
+  else {
+    aconf = make_conf();
+    aconf->status = CONF_CLIENT;
+    aconf->host = ip;
+    aconf->name = host;
+    aconf->conn_class = c_class;
+    aconf->maximum = maxlinks;
+    aconf->passwd = pass;
+  }
+  if (!aconf) {
+    MyFree(username);
+    MyFree(host);
+    MyFree(ip);
+    MyFree(pass);
+  } else {
+    aconf->next = GlobalConfList;
+    GlobalConfList = aconf;
+    aconf = NULL;
+  }
+  host = NULL;
+  username = NULL;
+  c_class = NULL;
+  pass = NULL;
+  port = 0;
+};
+clientitems: clientitem clientitems | clientitem;
+clientitem: clienthost | clientusername | clientclass | clientpass | clientmaxlinks | clientport;
+clienthost: HOST '=' QSTRING ';'
+{
+  MyFree(host);
+  host = $3;
+};
+clientip: IP '=' QSTRING ';'
+{
+  MyFree(ip);
+  ip = $3;
+};
+clientusername: USERNAME '=' QSTRING ';'
+{
+  MyFree(username);
+  username = $3;
+};
+clientclass: CLASS '=' NUMBER ';'
+{
+  c_class = find_class($3);
+  if (!c_class)
+    parse_error("No such connection class '%d' for Client block", $3);
+};
+clientpass: PASS '=' QSTRING ';'
+{
+  MyFree(pass);
+  pass = $3;
+};
+clientmaxlinks: MAXLINKS '=' expr ';'
+{
+  maxlinks = $3;
+};
+clientport: PORT '=' expr ';'
+{
+  port = $3;
 };
 
 
@@ -1426,6 +1506,8 @@ blocktypes: blocktype;
 blocktype: ALL { $$ = ~0; }
   | ADMIN { $$ = 1 << BLOCK_ADMIN; }
   | COMMAND { $$ = 1 << BLOCK_COMMAND; }
+  | CLASS { $$ = 1 << BLOCK_CLASS; }
+  | CLIENT { $$ = 1 << BLOCK_CLIENT; }
   | CRULE { $$ = 1 << BLOCK_CRULE; }
   | DNSBL { $$ = 1 << BLOCK_DNSBL; }
   | EXCEPT { $$ = 1 << BLOCK_EXCEPT; }

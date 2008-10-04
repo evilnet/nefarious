@@ -551,16 +551,7 @@ void det_confs_butmask(struct Client* cptr, int mask)
 static enum AuthorizationCheckResult
 check_limit_and_attach(struct Client* cptr, struct ConfItem* aconf)
 {
-  int number = 255;
-  
-  if (aconf->passwd) {
-    if (IsDigit(*aconf->passwd) && !aconf->passwd[1])
-      number = *aconf->passwd-'0';
-    else if (IsDigit(*aconf->passwd) && IsDigit(aconf->passwd[1]) && 
-             !aconf->passwd[2])
-      number = (*aconf->passwd-'0')*10+(aconf->passwd[1]-'0');
-  }
-/*  if (IPcheck_nr(cptr) > number)
+/*  if (IPcheck_nr(cptr) > aconf->maximum)
  *  return ACR_TOO_MANY_FROM_IP; */
   return attach_conf(cptr, aconf);
 }
@@ -1762,10 +1753,6 @@ read_actual_config(const char *cfile)
     case 'H':                /* Hub server line */
     case 'h':
       aconf->status = CONF_HUB;
-      break;
-    case 'I':                /* Just plain normal irc client trying  */
-    case 'i':                /* to connect me */
-      aconf->status = CONF_CLIENT;
       break;
     case 'L':                /* guaranteed leaf server */
     case 'l':
