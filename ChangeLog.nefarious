@@ -3,9 +3,17 @@
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/Makefile.in: Added convert-conf.
+
+	* ircd/convert-conf.c: Added configuration converter.
+
+2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* configure: Regenerated.
 
 	* configure.in: Removed cpath2.
+
+	* doc/ircd.conf.sample: Removed.
 
 	* doc/example.conf: Removed old conf format and merged in
 	contents from example2.conf.
