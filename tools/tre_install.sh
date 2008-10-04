@@ -21,5 +21,5 @@ $MAKE install || exit 1
 cd $OLD_DIR
 
 echo ""
-echo "LibTRE is now installed in $HOME/include and $HOME/lib. You may now configure X3."
+echo "LibTRE is now installed in $HOME/include and $HOME/lib. You may now configure Nefarious."
 
