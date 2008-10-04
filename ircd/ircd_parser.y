@@ -385,6 +385,18 @@ yesorno: YES { $$ = 1; } | NO { $$ = 0; };
 optall: { $$ = 0; };
   | ALL { $$ = 1; };
 
+crule_expr:
+    '(' crule_expr ')' { $$ = $2; }
+  | crule_expr LOGICAL_AND crule_expr { $$ = crule_make_and($1, $3); }
+  | crule_expr LOGICAL_OR crule_expr { $$ = crule_make_or($1, $3); }
+  | '!' crule_expr { $$ = crule_make_not($2); }
+  | CONNECTED '(' QSTRING ')' { $$ = crule_make_connected($3); }
+  | DIRECTCON '(' QSTRING ')' { $$ = crule_make_directcon($3); }
+  | VIA '(' QSTRING ',' QSTRING ')' { $$ = crule_make_via($3, $5); }
+  | DIRECTOP '(' ')' { $$ = crule_make_directop(); }
+  ;
+
+
 stringlist: stringlist extrastring | extrastring;
 extrastring: QSTRING
 {
@@ -925,21 +937,6 @@ cruleblock: CRULE optall QSTRING optall crule_expr ';'
     cruleConfList = p;
   }
 };
-
-optall: { $$ = 0; };
-  | ALL { $$ = 1; };
-
-crule_expr:
-    '(' crule_expr ')' { $$ = $2; }
-  | crule_expr LOGICAL_AND crule_expr { $$ = crule_make_and($1, $3); }
-  | crule_expr LOGICAL_OR crule_expr { $$ = crule_make_or($1, $3); }
-  | '!' crule_expr { $$ = crule_make_not($2); }
-  | CONNECTED '(' QSTRING ')' { $$ = crule_make_connected($3); }
-  | DIRECTCON '(' QSTRING ')' { $$ = crule_make_directcon($3); }
-  | VIA '(' QSTRING ',' QSTRING ')' { $$ = crule_make_via($3, $5); }
-  | DIRECTOP '(' ')' { $$ = crule_make_directop(); }
-  ;
-
 
 featuresblock: FEATURES '{' {
   (void)permitted(BLOCK_FEATURES, 1);
@@ -1632,6 +1629,7 @@ includeblock: INCLUDE blocklimit QSTRING ';' {
   MyFree(includes);
   includes = parent;
 };
+
 
 blocklimit: { $$ = ~0; } ;
 blocklimit: blocktypes FROM;
