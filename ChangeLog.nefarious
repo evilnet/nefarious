@@ -3,6 +3,13 @@
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* tools/linesync2/*: Moved files into linesync dir.
+
+	* tools/linesync/*: Updated linesync files with an updated version
+	with block support.
+
+2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/ircd.c: Added -k arg for checking ircd.conf.
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
