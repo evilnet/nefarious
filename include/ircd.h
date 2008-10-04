@@ -76,7 +76,6 @@ extern int            GlobalRehashFlag;      /* 1 if SIGHUP is received */
 extern int            GlobalRestartFlag;     /* 1 if SIGINT is received */
 extern time_t         nextping;
 extern char*          configfile;
-extern char*          configfile2;
 extern int            debuglevel;
 extern char*          debugmode;
 extern int	      running;

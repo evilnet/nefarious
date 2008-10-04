@@ -1323,7 +1323,6 @@ Optional Packages:
                           doc/readme.chroot for more information.
   --with-dpath=dir        Directory for all server data files
   --with-cpath=file       Set server configuration file
-  --with-cpath2=file       Set server configuration file
   --with-lpath=file       Set the debugging log file
   --with-maxcon=maxcon    Maximum number of connections server will accept
   --with-sense-of-humor   Specify this if you have a sense of humor
@@ -12692,52 +12691,6 @@ fi
 
 cat >>confdefs.h <<_ACEOF
 #define CPATH "$unet_cpath"
-_ACEOF
-
-
-{ echo "$as_me:$LINENO: checking where the default configuration file resides" >&5
-echo $ECHO_N "checking where the default configuration file resides... $ECHO_C" >&6; }
-
-# Check whether --with-cpath2 was given.
-if test "${with_cpath2+set}" = set; then
-  withval=$with_cpath2; unet_cv_with_cpath2=$with_cpath2
-else
-  if test "${unet_cv_with_cpath2+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  unet_cv_with_cpath2="ircd2.conf"
-fi
-
-fi
-
-
-if test x"$unet_cv_with_cpath2" = xyes -o x"$unet_cv_with_cpath2" = xno; then
-    unet_cv_with_cpath2="ircd2.conf"
-fi
-
-{ echo "$as_me:$LINENO: result: $unet_cv_with_cpath2" >&5
-echo "${ECHO_T}$unet_cv_with_cpath2" >&6; }
-
-if echo "$unet_cv_with_cpath2" | grep '^/' > /dev/null 2>&1; then
-    # Absolute path; check against chroot stuff
-    if test x"$unet_cv_with_chroot" != xno; then
-	if echo "$unet_cv_with_cpath2" | grep "^$unet_cv_with_chroot" > /dev/null 2>&1; then
-	    unet_cpath2=`echo "$unet_cv_with_cpath2" | sed "s%^$unet_cv_with_chroot%%"`
-	else
-	    { { echo "$as_me:$LINENO: error: Configuration file $unet_cv_with_cpath2 not relative to root directory $unet_cv_with_chroot" >&5
-echo "$as_me: error: Configuration file $unet_cv_with_cpath2 not relative to root directory $unet_cv_with_chroot" >&2;}
-   { (exit 1); exit 1; }; }
-	fi
-    else
-	unet_cpath2=$unet_cv_with_cpath2
-    fi
-else
-    unet_cpath2=$unet_cv_with_cpath2
-fi
-
-
-cat >>confdefs.h <<_ACEOF
-#define CPATH2 "$unet_cpath2"
 _ACEOF
 
 

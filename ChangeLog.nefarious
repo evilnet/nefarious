@@ -3,6 +3,31 @@
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* configure: Regenerated.
+
+	* configure.in: Removed cpath2.
+
+	* doc/example.conf: Removed old conf format and merged in
+	contents from example2.conf.
+
+	* doc/example2.conf: Removed as its now in example.conf.
+
+	* include/ircd.h: Removed configfile2.
+
+	* include/s_conf.h: Added CONF_AUTOCONNECT and flags.
+
+	* ircd/ircd.c: Removed configfile2 and added CONF_AUTOCONNECT.
+
+	* ircd/ircd_parser.y: Converted C/L/H lines into Connect blocks.
+
+	* ircd/ircd_lexer.l: Removed couple of unused tokens
+
+	* ircd/Makefile.in: Removed example2.conf file install.
+
+	* ircd/s_conf.c: Removed old configuration parser.
+
+2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example2.conf: Added documentation for the Client block.
 
 	* include/s_conf.h: Added maximum field to the Conf struct.

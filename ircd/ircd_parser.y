@@ -69,8 +69,9 @@
 
   /* Now all the globals we need :/... */
   char* GlobalForwards[256];
-  static int tping, tconn, maxlinks, sendq, port, invert, stringno, flags;
+  static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class, is_local;
+  static int is_leaf, is_hub;
   static char *name, *pass, *host, *vhost, *ip, *username, *origin, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
@@ -115,6 +116,7 @@ enum ConfigBlock
   BLOCK_CLIENT,
   BLOCK_CRULE,
   BLOCK_COMMAND,
+  BLOCK_CONNECT,
   BLOCK_DNSBL,
   BLOCK_EXCEPT,
   BLOCK_FEATURES,
@@ -148,9 +150,10 @@ static int
 permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
-    "Admin", "Command", "Class", "Client", "CRule", "DNSBL", "Except", "Features", "Filter", "Forward",
-    "Kill", "Include", "Jupe", "General", "Oper", "Port", "Quarantine", "Redirect",
-    "Spoofhost", "UWorld", "WebIRC", "Motd"
+    "Admin", "Command", "Class", "Client", "CRule", "Connect", "DNSBL",
+    "Except", "Features", "Filter", "Forward", "Kill", "Include", "Jupe",
+    "General", "Oper", "Port", "Quarantine", "Redirect", "Spoofhost",
+    "UWorld", "WebIRC", "Motd"
   };
 
   if (!includes)
@@ -271,7 +274,6 @@ static void free_slist(struct SLink **link) {
 %token FAST
 %token AUTOCONNECT
 %token PROGRAM
-%token TOK_IPV4 TOK_IPV6
 %token DNS
 %token INCLUDE
 %token LINESYNC
@@ -302,9 +304,11 @@ static void free_slist(struct SLink **link) {
 %%
 /* Blocks in the config file... */
 blocks: blocks block | block;
-block: adminblock      | commandblock  | classblock     | clientblock  | cruleblock   | dnsblblock    | exceptblock | featuresblock | filterblock |
-       generalblock    | forwardblock  | killblock      | includeblock | jupeblock    | motdblock     | operblock   |
-       quarantineblock | redirectblock | spoofhostblock | uworldblock  | webircblock  | portblock     | error ';';
+block: adminblock   | commandblock | classblock      | clientblock   | cruleblock   |
+       connectblock | dnsblblock   | exceptblock     | featuresblock | filterblock |
+       generalblock | forwardblock | killblock       | includeblock  | jupeblock    |
+       motdblock    | operblock    | quarantineblock | redirectblock | spoofhostblock |
+       uworldblock  | webircblock  | portblock       | error ';';
 
 /* The timespec, sizespec and expr was ripped straight from
  * ircd-hybrid-7. */
@@ -390,6 +394,142 @@ extrastring: QSTRING
     MyFree($1);
 };
 
+connectblock: CONNECT
+{
+ maxlinks = 65535;
+ flags = CONF_AUTOCONNECT;
+} '{' connectitems '}' ';'
+{
+ struct ConfItem *aconf = NULL;
+ struct ConfItem *lconf = NULL;
+ struct ConfItem *hconf = NULL;
+
+ if (!permitted(BLOCK_CONNECT, 1))
+   ;
+ else if (name == NULL)
+  parse_error("Missing name in connect block");
+ else if (pass == NULL)
+  parse_error("Missing password in connect block");
+ else if (strlen(pass) > PASSWDLEN)
+  parse_error("Password too long in connect block");
+ else if (host == NULL)
+  parse_error("Missing host in connect block");
+ else if (strchr(host, '*') || strchr(host, '?'))
+  parse_error("Invalid host '%s' in connect block", host);
+ else if (!c_class)
+  parse_error("Missing or non-existent class in connect block");
+ else {
+   aconf = make_conf();
+   aconf->status = CONF_SERVER;	
+
+   aconf->name = name;
+   aconf->passwd = pass;
+
+   aconf->conn_class = c_class;
+   aconf->port = port;
+   aconf->host = host;
+   aconf->flags = flags;
+
+   lookup_confhost(aconf);
+
+   if (is_hub) {
+     hconf = make_conf();
+     hconf->status = CONF_HUB;
+     hconf->host = hub_limit;
+     hconf->name = name;
+     hconf->port = maxlinks;
+   } else {
+     if (is_leaf) {
+       lconf = make_conf();
+       lconf->status = CONF_LEAF;
+       lconf->name = name;
+       lconf->port = maxlinks;
+     }
+  }
+ }
+ if (!aconf) {
+   MyFree(name);
+   MyFree(pass);
+   MyFree(origin);
+   MyFree(host);
+   MyFree(hub_limit);
+ } else {
+   aconf->next = GlobalConfList;
+   GlobalConfList = aconf;
+   aconf = NULL;
+ }
+
+ if (hconf) {
+   hconf->next = GlobalConfList;
+   GlobalConfList = hconf;
+   hconf = NULL;
+ }
+
+ if (lconf) {
+   lconf->next = GlobalConfList;
+   GlobalConfList = lconf;
+   lconf = NULL;
+ }
+
+ name = pass = host = origin = hub_limit = NULL;
+ is_hub = is_leaf = port = flags = 0;
+}
+connectitems: connectitem connectitems | connectitem;
+connectitem: connectname | connectpass | connectclass | connecthost
+              | connectvhost | connectport | connectleaf | connecthub
+              | connecthublimit | connectmaxhops | connectauto;
+connectname: NAME '=' QSTRING ';'
+{
+ MyFree(name);
+ name = $3;
+};
+connectpass: PASS '=' QSTRING ';'
+{
+ MyFree(pass);
+ pass = $3;
+};
+connectvhost: VHOST '=' QSTRING ';'
+{
+ MyFree(origin);
+ origin = $3;
+};
+connectclass: CLASS '=' NUMBER ';'
+{
+ c_class = find_class($3);
+ if (!c_class)
+  parse_error("No such connection class '%d' for Connect block", $3);
+};
+connecthost: HOST '=' QSTRING ';'
+{
+ MyFree(host);
+ host = $3;
+};
+connectport: PORT '=' NUMBER ';'
+{
+ port = $3;
+};
+connectleaf: LEAF ';'
+{
+ is_leaf = 1;
+ maxlinks = 0;
+};
+connecthub: HUB ';'
+{
+ is_hub = 1;
+ MyFree(hub_limit);
+ DupString(hub_limit, "*");
+};
+connecthublimit: HUB '=' QSTRING ';'
+{
+ MyFree(hub_limit);
+ hub_limit = $3;
+};
+connectmaxhops: MAXHOPS '=' expr ';'
+{
+  maxlinks = $3;
+};
+connectauto: AUTOCONNECT '=' YES ';' { flags |= CONF_AUTOCONNECT; }
+ | AUTOCONNECT '=' NO ';' { flags &= ~CONF_AUTOCONNECT; };
 
 clientblock: CLIENT
 {
@@ -399,7 +539,6 @@ clientblock: CLIENT
 '{' clientitems '}' ';'
 {
   struct ConfItem *aconf = 0;
-  unsigned char addrbits = 0;
 
   if (!permitted(BLOCK_CLIENT, 1))
     ;
@@ -433,7 +572,7 @@ clientblock: CLIENT
   port = 0;
 };
 clientitems: clientitem clientitems | clientitem;
-clientitem: clienthost | clientusername | clientclass | clientpass | clientmaxlinks | clientport;
+clientitem: clienthost | clientip | clientclass | clientpass | clientmaxlinks | clientport;
 clienthost: HOST '=' QSTRING ';'
 {
   MyFree(host);
@@ -443,11 +582,6 @@ clientip: IP '=' QSTRING ';'
 {
   MyFree(ip);
   ip = $3;
-};
-clientusername: USERNAME '=' QSTRING ';'
-{
-  MyFree(username);
-  username = $3;
 };
 clientclass: CLASS '=' NUMBER ';'
 {
@@ -1508,6 +1642,7 @@ blocktype: ALL { $$ = ~0; }
   | COMMAND { $$ = 1 << BLOCK_COMMAND; }
   | CLASS { $$ = 1 << BLOCK_CLASS; }
   | CLIENT { $$ = 1 << BLOCK_CLIENT; }
+  | CONNECT { $$ = 1 << BLOCK_CONNECT; }
   | CRULE { $$ = 1 << BLOCK_CRULE; }
   | DNSBL { $$ = 1 << BLOCK_DNSBL; }
   | EXCEPT { $$ = 1 << BLOCK_EXCEPT; }

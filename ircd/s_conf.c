@@ -435,7 +435,7 @@ static struct DNSReply* conf_dns_lookup(struct ConfItem* aconf)
  * Do (start) DNS lookups of all hostnames in the conf line and convert
  * an IP addresses in a.b.c.d number for to IP#s.
  */
-static void lookup_confhost(struct ConfItem *aconf)
+void lookup_confhost(struct ConfItem *aconf)
 {
   char *tmp, *tmp2;
   struct DNSReply* reply;
@@ -1292,16 +1292,16 @@ static int conf_error;
 /** When non-zero, indicates that the configuration file was loaded at least once. */
 static int conf_already_read;
 extern void yyparse(void);
-extern int init_lexer(const char *configfile2);
+extern int init_lexer(const char *configfile);
 extern void deinit_lexer(void);
 
 /** Read configuration file.
  * @return Zero on failure, non-zero on success. */
-int read_configuration_file2(void)
+int read_configuration_file(void)
 {
   conf_error = 0;
   feature_unmark(); /* unmark all features for resetting later */
-  if (!init_lexer(configfile2))
+  if (!init_lexer(configfile))
     return 0;
   yyparse();
   deinit_lexer();
@@ -1591,311 +1591,6 @@ const struct DenyConf* conf_get_deny_list(void)
 }
 
 /*
- * read_actual_config 
- *
- * cfile - name of configuration file
- *
-
- * returns 1 if read, 0 if unable to open
- */
-
-#define MAXCONFLINKS 150
-
-int
-read_actual_config(const char *cfile) 
-{
-  enum { MAX_FIELDS = 15 };
-  const char* field_vector[MAX_FIELDS + 1];
-  int quoted, ccount = 0, field_count = 0;
-  char *src, *asrc, *dest, line[512];
-
-  struct ConfItem *aconf = 0;
-  FBFILE *file;
-
-  GlobalBLCount = 0;
-
-  Debug((DEBUG_DEBUG, "read_actual_config: ircd.conf = %s", cfile));
-  sendto_opmask_butone(0, SNO_OLDSNO, "Reading configuration file: %s",
-		       cfile);
-
-  if (0 == (file = fbopen(cfile, "r"))) {
-    sendto_opmask_butone(0, SNO_OLDSNO,
-			 "Unable to open configuration file: %s",
-			 cfile);
-    return 0;
-  }
-  feature_unmark(); /* unmark all features for resetting later */
-
-  while (fbgets(line, sizeof(line) - 1, file)) {
-    int is_include = 0;
-    /* Skip comments and whitespaces */
-    if ('#' == *line || IsSpace(*line))
-      continue;
-
-    if ((src = strchr(line, '\n')))
-      *src = '\0';
-    
-    if ((asrc = strstr(line, "include")))
-      is_include = 1; 
-
-    if (':' != line[1] && !is_include) {
-      Debug((DEBUG_ERROR, "Bad config line: %s", line));
-      sendto_opmask_butone(0, SNO_OLDSNO, "Bad Config line: %s", line);
-      continue;
-    }
-
-    for (field_count = 0; field_count <= MAX_FIELDS; field_count++)
-      field_vector[field_count] = NULL;
-
-    for (field_count = 0; field_count <= MAX_FIELDS; field_count++)
-      field_vector[field_count] = NULL;
-
-    /*
-     * do escapes, quoting, comments, and field breakup in place
-     * in one pass with a poor mans state machine
-     */
-    field_vector[0] = line;
-    field_count = 1;
-    quoted = 0;
-    
-    for (src = line, dest = line; *src; ) {
-      switch (*src) {
-	case '\\':
-	  ++src;
-          switch (*src) {
-	    case 'b':
-	      *dest++ = '\b';
-	      ++src;
-	      break;
-	    case 'f':
-	      *dest++ = '\f';
-	      ++src;
-	      break;
-	    case 'n':
-	      *dest++ = '\n';
-	      ++src;
-	      break;
-	    case 'r':
-	      *dest++ = '\r';
-	      ++src;
-	      break;
-	    case 't':
-	      *dest++ = '\t';
-	      ++src;
-	      break;
-	    case 'v':
-	      *dest++ = '\v';
-	      ++src;
-	      break;
-	    case '\\':
-	      *dest++ = '\\';
-              ++src;
-              break;
-	    case '\0':
-	      break;
-	    default:
-	     *dest++ = *src++;
-	     break;
-	  }
-	  break;
-	case '"':
-	  if (quoted)
-	    quoted = 0;
-	  else
-	    quoted = 1;
-	  /*
-	   * strip quotes
-	   */
-	  ++src;
-	  break;
-	case ':':
-	  if (quoted)
-	    *dest++ = *src++;
-	  else {
-	    *dest++ = '\0';
-	    field_vector[field_count++] = dest;
-	    if (field_count > MAX_FIELDS)
-	      *src = '\0';
-	    else
-	       ++src;
-	  }
-	  break;
-	case '#':
-	  *src = '\0';
-	  break;
-	default:
-	  *dest++ = *src++;
-	   break;
-      }
-    }
-    *dest = '\0';
-
-    if (field_count < 2 || EmptyString(field_vector[0]))
-      continue;
-
-    if (0 == ircd_strcmp(field_vector[0], "include")) {
-      read_actual_config(field_vector[1]);
-      continue;
-    }
-    if (aconf)
-      free_conf(aconf);
-
-
-    aconf = make_conf();
-
-    switch (*field_vector[0]) {
-    case 'C':                /* Server where I should try to connect */
-    case 'c':                /* in case of lp failures             */
-      ++ccount;
-      aconf->status = CONF_SERVER;
-      break;
-      /* Connect rule */
-    case 'H':                /* Hub server line */
-    case 'h':
-      aconf->status = CONF_HUB;
-      break;
-    case 'L':                /* guaranteed leaf server */
-    case 'l':
-      aconf->status = CONF_LEAF;
-      break;
-      /* Me. Host field is name used for this host */
-      /* and port number is the number of the port */
-    default:
-      aconf->status = CONF_ILLEGAL;
-      break;
-    }
-
-    if (IsIllegal(aconf))
-      continue;
-
-    if (!EmptyString(field_vector[1]))
-      DupString(aconf->host, field_vector[1]);
-
-    if (!EmptyString(field_vector[2]))
-      DupString(aconf->passwd, field_vector[2]);
-
-    if (field_count > 3 && !EmptyString(field_vector[3]))
-      DupString(aconf->name, field_vector[3]);
-
-    if (field_count > 4 && !EmptyString(field_vector[4])) {
-      if (aconf->status & CONF_OPERATOR) {
-	int* i;
-	int flag;
-	char *m = "O";
-	if (*field_vector[4])
-	  DupString(m, field_vector[4]);
-	for (; *m; m++) {
-	  for (i = oper_access; (flag = *i); i += 2)
-	    if (*m == (char)(*(i + 1))) {
-	      aconf->port |= flag;
-	      break;
-	    }
-	}
-      } else
-        aconf->port = atoi(field_vector[4]);
-    }
-
-    if (field_count > 5 && !EmptyString(field_vector[5]))
-      aconf->conn_class = find_class(atoi(field_vector[5]));
-
-    /*
-     * Associate each conf line with a class by using a pointer
-     * to the correct class record. -avalon
-     */
-    if (aconf->status & CONF_CLIENT_MASK) {
-      if (aconf->conn_class == 0)
-        aconf->conn_class = find_class(0);
-    }
-    if (aconf->status & CONF_CLIENT) {
-      struct ConfItem *bconf;
-
-      if ((bconf = find_conf_entry(aconf, aconf->status))) {
-        delist_conf(bconf);
-        bconf->status &= ~CONF_ILLEGAL;
-        if (aconf->status == CONF_CLIENT) {
-          /*
-           * copy the password field in case it changed
-           */
-          MyFree(bconf->passwd);
-          bconf->passwd = aconf->passwd;
-          aconf->passwd = 0;
-
-          ConfLinks(bconf) -= bconf->clients;
-          bconf->conn_class = aconf->conn_class;
-          if (bconf->conn_class)
-            ConfLinks(bconf) += bconf->clients;
-        }
-        free_conf(aconf);
-        aconf = bconf;
-      }
-    }
-
-    if (aconf->status & CONF_SERVER) {
-      if (ccount > MAXCONFLINKS || !aconf->host || strchr(aconf->host, '*') ||
-          strchr(aconf->host, '?') || !aconf->name)
-        continue;
-    }
-
-    if (aconf->status & (CONF_LOCOP | CONF_OPERATOR)) {
-      if (!strchr(aconf->host, '@')) {
-        char* newhost;
-        int len = 3;                /* *@\0 = 3 */
-
-        len += strlen(aconf->host);
-        newhost = (char*) MyMalloc(len);
-        assert(0 != newhost);
-        ircd_snprintf(0, newhost, len, "*@%s", aconf->host);
-        MyFree(aconf->host);
-        aconf->host = newhost;
-      }
-    }
-
-    if (aconf->status & CONF_SERVER) {
-      if (EmptyString(aconf->passwd))
-        continue;
-      lookup_confhost(aconf);
-    }
-
-    collapse(aconf->host);
-    collapse(aconf->name);
-       
-    Debug((DEBUG_NOTICE, "Read Init: (%d) (%s) (%s) (%s) (%u) (%p)",
- 	  aconf->status, aconf->host, aconf->passwd,
-	  aconf->name, aconf->port, aconf->conn_class));
- 
-    aconf->next = GlobalConfList;
-    GlobalConfList = aconf;
-    aconf = NULL;
-  }
-
-  if (aconf)
-    free_conf(aconf);
-
-  fbclose(file);
-
-  return 1;
-}
-
-
-/*
- * read_configuration_file
- *
- * Read configuration file.
- *
- * returns 0, if file cannot be opened
- *         1, if file read
- */
-int
-read_configuration_file(void)
-{
-  /* try reading the actual ircd.conf */
-  if (!read_actual_config(configfile))
-    return 0;
-
-  return 1;
-}
-
-/*
  * rehash
  *
  * Actual REHASH service routine. Called with sig == 0 if it has been called
@@ -1965,7 +1660,6 @@ int rehash(struct Client *cptr, int sig)
   mark_listeners_closing();
 
   read_configuration_file();
-  read_configuration_file2();
 
   log_reopen(); /* reopen log files */
 
@@ -2032,17 +1726,7 @@ int rehash(struct Client *cptr, int sig)
 
 int init_conf(void)
 {
-  int sc = 1, fc = 1;
-
-  if (read_configuration_file2()) {
-     sc = 1;
-  }
-
-  if (read_configuration_file()) {
-    fc = 1;
-  }
-
-  if (fc && sc)
+  if (read_configuration_file())
     return 1;
   else
     return 0;

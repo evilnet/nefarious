@@ -42,6 +42,7 @@ struct TRecord;
 #define CONF_OPERATOR           0x0020
 #define CONF_LEAF               0x1000
 #define CONF_HUB                0x4000
+#define CONF_AUTOCONNECT        0x8000
 
 #define CONF_OPS                (CONF_OPERATOR | CONF_LOCOP)
 #define CONF_CLIENT_MASK        (CONF_CLIENT | CONF_OPS | CONF_SERVER)
@@ -67,6 +68,7 @@ struct ConfItem {
   int                      dns_pending; /* a dns request is pending */
   unsigned short           port;
   char 		           bits;        /* Number of bits for ipkills */
+  int                      flags;
 };
 
 struct ServerConf {
@@ -282,6 +284,7 @@ extern struct ConfItem* find_conf_exact(const char* name, const char* user,
 extern struct ConfItem* find_conf_cidr(const char* name, const char* user,
                                        struct in_addr cli_addr, int statmask);
 extern enum AuthorizationCheckResult conf_check_client(struct Client *cptr);
+extern void lookup_confhost(struct ConfItem *aconf);
 extern int  conf_check_server(struct Client *cptr);
 extern struct ConfItem* find_conf_name(const char* name, int statmask);
 extern int rehash(struct Client *cptr, int sig);

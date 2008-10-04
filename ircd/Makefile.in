@@ -327,7 +327,6 @@ install-with-symlink: build mkbindir
 	  ${LN_S} ircd.`cat /tmp/ircd.tag` ${SYMLINK}; )
 	@${RM} /tmp/ircd.tag
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example.conf ${DPATH}
-	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example2.conf ${DPATH}
 # You cant overwrite these, they might already exist!!!!
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.quotes ${DPATH}
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
@@ -353,7 +352,6 @@ install-no-symlink: build mkbindir
 	@echo "Installing new ircd as ${BINDIR}/ircd :"
 	${INSTALL} -m ${IRCDMODE} -o ${IRCDOWN} -g ${IRCDGRP} ircd ${BINDIR}/ircd
 	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example.conf ${DPATH}
-	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/example2.conf ${DPATH}
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.quotes ${DPATH}
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.rules ${DPATH}
 #	${INSTALL} -m 600 -o ${IRCDOWN} -g ${IRCDGRP} ${top_srcdir}/doc/ircd.opermotd ${DPATH}

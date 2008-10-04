@@ -888,37 +888,6 @@ fi
 
 AC_DEFINE_UNQUOTED(CPATH, "$unet_cpath", [Configuration file name])
 
-dnl --with-capth2 allows us to specify the configuration file
-AC_MSG_CHECKING([where the default configuration file resides])
-AC_ARG_WITH([cpath2],
-[  --with-cpath2=file       Set server configuration file],
-[unet_cv_with_cpath2=$with_cpath2],
-[AC_CACHE_VAL(unet_cv_with_cpath2,
-[unet_cv_with_cpath2="ircd2.conf"])])
-
-if test x"$unet_cv_with_cpath2" = xyes -o x"$unet_cv_with_cpath2" = xno; then
-    unet_cv_with_cpath2="ircd2.conf"
-fi
-
-AC_MSG_RESULT([$unet_cv_with_cpath2])
-
-if echo "$unet_cv_with_cpath2" | grep '^/' > /dev/null 2>&1; then
-    # Absolute path; check against chroot stuff
-    if test x"$unet_cv_with_chroot" != xno; then
-	if echo "$unet_cv_with_cpath2" | grep "^$unet_cv_with_chroot" > /dev/null 2>&1; then
-	    unet_cpath2=`echo "$unet_cv_with_cpath2" | sed "s%^$unet_cv_with_chroot%%"`
-	else
-	    AC_MSG_ERROR([Configuration file $unet_cv_with_cpath2 not relative to root directory $unet_cv_with_chroot])
-	fi
-    else
-	unet_cpath2=$unet_cv_with_cpath2
-    fi
-else
-    unet_cpath2=$unet_cv_with_cpath2
-fi
-
-AC_DEFINE_UNQUOTED(CPATH2, "$unet_cpath2", [Configuration file name])
-
 dnl --with-lpath allows us to specify the default debugging log file
 AC_MSG_CHECKING([where to put the debugging log if debugging enabled])
 AC_ARG_WITH([lpath],
