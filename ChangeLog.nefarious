@@ -3,6 +3,16 @@
 
 2008-10-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Updated CRule documentation.
+
+	* ircd/ircd.c: Fixed up chkconf on start plus added a warning for people
+	who use -x when debug mode isnt enabled.
+
+	* ircd/ircd_lexer.l: Added couple of tokens plus removed a section that
+	should of never have been left in.
+
+2008-10-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Removed Include block.
 
 	* include/crule.c: Revert back.

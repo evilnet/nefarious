@@ -105,6 +105,7 @@ static struct lexer_token {
   TOKEN(PROGRAM),
   TOKEN(DNS),
 
+  TOKEN(ACTION),
   TOKEN(CHNAME),
   TOKEN(CMD),
   TOKEN(COMMAND),
@@ -120,6 +121,7 @@ static struct lexer_token {
   TOKEN(REDIRECT),
   TOKEN(REPLIES),
   TOKEN(REPLY),
+  TOKEN(RTYPE),
   TOKEN(SERVICE),
   TOKEN(SFILTER),
   TOKEN(SPOOF),
@@ -232,121 +234,4 @@ QSTRING \"[^"\n]+[\"\n]
 
 [a-zA-Z_][a-zA-Z_0-9]* { int res = find_token(yytext); if (res) return res; else REJECT; }
 \n lineno++;
-. return yytext[0];
-
-
-
-\&\&            return LOGICAL_AND;
-\|\|            return LOGICAL_OR;
-ACTION		return ACTION;
-ADMIN		return ADMIN;
-ADMINISTRATOR	return ADMIN;
-ALL		return ALL;
-AUTO		return AUTOCONNECT;
-AUTOCONNECT	return AUTOCONNECT;
-B		return BYTES;
-BYTES		return BYTES;
-CHNAME		return CHNAME;
-CLASS		return CLASS;
-CLIENT		return CLIENT;
-CONNECT		return CONNECT;
-CONNECTED       return CONNECTED;
-CONNECTFREQ	return CONNECTFREQ;
-CONTACT		return CONTACT;
-CMD		return CMD;
-COMMAND		return COMMAND;
-CRULE		return CRULE;
-DAYS		return DAYS;
-DESC		return DESC;
-DECADES		return DECADES;
-DESCRIPTION	return DESCRIPTION;
-DIRECTCON       return DIRECTCON;
-DIRECTOP        return DIRECTOP;
-DNS             return DNS;
-DNSBL		return DNSBL;
-EXEMPT          return EXEMPT;
-EXCEPT		return EXCEPT;
-FAST		return FAST;
-FEATURES	return FEATURES;
-FILE		return TFILE;
-SFILTER		return SFILTER;
-FLAGS		return FLAGS;
-FROM		return FROM;
-FORWARD		return FORWARD;
-GB		return GBYTES;
-GBYTES		return GBYTES;
-GENERAL		return GENERAL;
-GIGABYTES	return GBYTES;
-HIDDEN		return HIDDEN;
-HOST		return HOST;
-HOSTMASK	return HOSTMASK;
-HOURS		return HOURS;
-HUB		return HUB;
-IAUTH		return IAUTH;
-IDENT		return IDENT;
-INCLUDE		return INCLUDE;
-IP		return IP;
-JUPE		return JUPE;
-KB		return KBYTES;
-KBYTES		return KBYTES;
-KILOBYTES	return KBYTES;
-KILL		return KILL;
-LEAF		return LEAF;
-LINESYNC	return LINESYNC;
-LOCAL		return LOCAL;
-LOCATION	return LOCATION;
-MASK		return MASK;
-MAXHOPS		return MAXHOPS;
-MAXLINKS	return MAXLINKS;
-MB		return MBYTES;
-MBYTES		return MBYTES;
-MEGABYTES	return MBYTES;
-MINUTES		return MINUTES;
-MONTHS		return MONTHS;
-MOTD		return MOTD;
-NAME		return NAME;
-NICK		return NICK;
-NO		return NO;
-NUMERIC		return NUMERIC;
-OPER		return OPER;
-OPERATOR	return OPER;
-PASS		return PASS;
-PASSWORD	return PASS;
-PINGFREQ	return PINGFREQ;
-PORT		return PORT;
-PREFIX		return PREFIX;
-PREPEND		return PREPEND;
-PROGRAM		return PROGRAM;
-PSEUDO		return PSEUDO;
-QUARANTINE	return QUARANTINE;
-RANK		return RANK;
-REAL		return REAL;
-REALNAME	return REAL;
-REASON		return REASON;
-REDIRECT	return REDIRECT;
-REPLIES		return REPLIES;
-REPLY		return REPLY;
-RTYPE		return RTYPE;
-RULE		return RULE;
-SECONDS		return SECONDS;
-SENDQ		return SENDQ;
-SERVER		return SERVER;
-SERVICE		return SERVICE;
-SPOOF		return SPOOF;
-SPOOFHOST	return SPOOFHOST;
-SSL		return SSL;
-TB		return TBYTES;
-TBYTES		return TBYTES;
-TERABYTES	return TBYTES;
-USERMODE	return USERMODE;
-USERNAME	return USERNAME;
-UWORLD		return UWORLD;
-VERSION		return VERSION;
-VHOST		return VHOST;
-VIA             return VIA;
-WEBIRC		return WEBIRC;
-WEEKS		return WEEKS;
-YEARS		return YEARS;
-YES		return YES;
-
 . return yytext[0];

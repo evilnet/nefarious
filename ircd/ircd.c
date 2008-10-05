@@ -90,7 +90,7 @@ extern void init_isupport(void);
 enum {
   BOOT_DEBUG = 1,
   BOOT_TTY   = 2,
-  BOOT_CHKCONF = 3
+  BOOT_CHKCONF = 4
 };
 
 
@@ -762,6 +762,9 @@ static void parse_command_line(int argc, char** argv) {
 	debuglevel = 0;
       debugmode = optarg;
       thisServer.bootopt |= BOOT_DEBUG;
+ #ifndef DEBUGMODE
+      printf("WARNING: DEBUGMODE disabled; -x has no effect.\n");
+#endif
       break;
       
     default:
