@@ -99,7 +99,7 @@ struct CRuleConf*  cruleConfList;
 static struct ServerConf* serverConfList;
 
 /** Current line number in scanner input. */
-extern int yylineno;
+int lineno;
 
 static int eline_flags[] = {
   EFLAG_KLINE,    'k',
@@ -1292,7 +1292,7 @@ static int conf_error;
 /** When non-zero, indicates that the configuration file was loaded at least once. */
 static int conf_already_read;
 extern void yyparse(void);
-extern int init_lexer(const char *configfile);
+extern int init_lexer(void);
 extern void deinit_lexer(void);
 
 /** Read configuration file.
@@ -1301,7 +1301,7 @@ int read_configuration_file(void)
 {
   conf_error = 0;
   feature_unmark(); /* unmark all features for resetting later */
-  if (!init_lexer(configfile))
+  if (!init_lexer())
     return 0;
   yyparse();
   deinit_lexer();
@@ -1324,47 +1324,12 @@ void
 yyerror(const char *msg)
 {
  sendto_opmask_butone(0, SNO_ALL, "Config file parse error line %d: %s",
-               yylineno, msg);
+                      lineno, msg);
  log_write(LS_CONFIG, L_ERROR, 0, "Config file parse error line %d: %s",
-           yylineno, msg);
+           lineno, msg);
  if (!conf_already_read)
-   fprintf(stderr, "Config file parse error line %d: %s\n", yylineno, msg);
+   fprintf(stderr, "Config file parse error line %d: %s\n", lineno, msg);
  conf_error = 1;
-}
-
-/** Report an error message about the configuration file.
- * @param fmt The error to report.
- */
-void
-yyserror(const char *fmt, ...)
-{
-  static char error_buffer[1024];
-  va_list vl;
-
-  va_start(vl, fmt);
-  ircd_vsnprintf(NULL, error_buffer, sizeof(error_buffer), fmt, vl);
-  va_end(vl);
-  yyerror(error_buffer);
-}
-
-/** Report a recoverable warning about the configuration file.
- * @param fmt The error to report.
- */
-void
-yywarning(const char *fmt, ...)
-{
-  static char warn_buffer[1024];
-  va_list vl;
-
-  va_start(vl, fmt);
-  ircd_vsnprintf(NULL, warn_buffer, sizeof(warn_buffer), fmt, vl);
-  va_end(vl);
-  sendto_opmask_butone(0, SNO_ALL, "Config warning on line %d: %s",
-                yylineno, warn_buffer);
-  log_write(LS_CONFIG, L_WARNING, 0, "Config warning on line %d: %s",
-            yylineno, warn_buffer);
-  if (!conf_already_read)
-    fprintf(stderr, "Config warning on line %d: %s\n", yylineno, warn_buffer);
 }
 
 /** List of server names with UWorld privileges. */
@@ -1449,7 +1414,7 @@ void conf_erase_crule_list(void)
 
   for ( ; p; p = next) {
     next = p->next;
-    crule_free(p->node);
+    crule_free(&p->node);
     MyFree(p->hostmask);
     MyFree(p->rule);
     MyFree(p);
