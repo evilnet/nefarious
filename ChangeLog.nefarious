@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-06  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ircd_parser.y: Fix for hub masks in Connect blocks not
+	working properly.
+
 2008-10-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenrated.

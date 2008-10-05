@@ -454,6 +454,7 @@ connecthub: HUB ';'
 };
 connecthublimit: HUB '=' QSTRING ';'
 {
+ is_hub = 1;
  MyFree(hub_limit);
  hub_limit = $3;
 };
