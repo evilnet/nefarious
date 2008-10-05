@@ -120,7 +120,7 @@ enum ConfigBlock
   BLOCK_DNSBL,
   BLOCK_EXCEPT,
   BLOCK_FEATURES,
-  BLOCK_FILTER,
+  BLOCK_SFILTER,
   BLOCK_FORWARD,
   BLOCK_GENERAL,
   BLOCK_KILL,
@@ -151,7 +151,7 @@ permitted(enum ConfigBlock type, int warn)
 {
   static const char *block_names[BLOCK_LAST_BLOCK] = {
     "Admin", "Command", "Class", "Client", "CRule", "Connect", "DNSBL",
-    "Except", "Features", "Filter", "Forward", "Kill", "Include", "Jupe",
+    "Except", "Features", "SFilter", "Forward", "Kill", "Include", "Jupe",
     "General", "Oper", "Port", "Quarantine", "Redirect", "Spoofhost",
     "UWorld", "WebIRC", "Motd"
   };
@@ -215,7 +215,7 @@ static void free_slist(struct SLink **link) {
 %token IDENT
 %token VERSION
 %token DESC
-%token FILTER
+%token SFILTER
 %token DNSBL
 %token REDIRECT
 %token MAXLINKS
@@ -284,7 +284,7 @@ static void free_slist(struct SLink **link) {
 /* and some types... */
 %type <num> sizespec
 %type <num> timespec timefactor factoredtimes factoredtime
-%type <num> expr yesorno
+%type <num> expr
 %type <num> blocklimit blocktypes blocktype
 %type <num> optall
 %type <crule> crule_expr
@@ -305,7 +305,7 @@ static void free_slist(struct SLink **link) {
 /* Blocks in the config file... */
 blocks: blocks block | block;
 block: adminblock   | commandblock | classblock      | clientblock   | cruleblock   |
-       connectblock | dnsblblock   | exceptblock     | featuresblock | filterblock |
+       connectblock | dnsblblock   | exceptblock     | featuresblock | sfilterblock |
        generalblock | forwardblock | killblock       | includeblock  | jupeblock    |
        motdblock    | operblock    | quarantineblock | redirectblock | spoofhostblock |
        uworldblock  | webircblock  | portblock       | error ';';
@@ -379,8 +379,6 @@ expr: NUMBER
 			$$ = $2;
 		}
 		;
-
-yesorno: YES { $$ = 1; } | NO { $$ = 0; };
 
 optall: { $$ = 0; };
   | ALL { $$ = 1; };
@@ -885,8 +883,6 @@ killuhost: HOST '=' QSTRING ';'
   		  ad[2], ad[3]);
     
       dconf->address = inet_addr(ipname);
-      Debug((DEBUG_DEBUG, "IPkill: %s = %08x/%i (%08x)", ipname,
-             dconf->address, dconf->bits, NETMASK(dconf->bits)));
       dconf->flags |= DENY_FLAGS_IP;
     }
   }
@@ -989,7 +985,12 @@ jupenick: NICK '=' QSTRING ';'
 
 
 /* The port block... */
-portblock: PORT '{' portitems '}' ';'
+portblock: PORT {
+  is_server = 0;
+  is_ssl = 0;
+  is_hidden = 0;
+  is_exempt = 0;
+} '{' portitems '}' ';'
 {
   if (!permitted(BLOCK_PORT, 1))
     ;
@@ -1545,12 +1546,12 @@ webircdesc: DESC '=' QSTRING ';'
 };
 
 
-filterblock: FILTER '{' filteritems '}' ';'
+sfilterblock: SFILTER '{' sfilteritems '}' ';'
 {
   struct fline *fline;
   regex_t tempre;
 
-  if (permitted(BLOCK_FILTER, 1)) {
+  if (permitted(BLOCK_SFILTER, 1)) {
     if (!name)
       parse_error("Your Filter block must contain a filter.");
     else if (!rtype)
@@ -1579,29 +1580,29 @@ filterblock: FILTER '{' filteritems '}' ';'
         action = NULL;
         reason = NULL;
       } else {
-        parse_error("Invalid regex format in Filter block");
+        parse_error("Invalid regex format in SFilter block");
       }
     }
   }
 };
-filteritems: filteritem | filteritems filteritem;
-filteritem: filtername | filterrtype | filteraction | filterreason;
-filtername: NAME '=' QSTRING ';'
+sfilteritems: sfilteritem | sfilteritems sfilteritem;
+sfilteritem: sfiltername | sfilterrtype | sfilteraction | sfilterreason;
+sfiltername: NAME '=' QSTRING ';'
 {
   MyFree(name);
   name = $3;
 };
-filterrtype: RTYPE '=' QSTRING ';'
+sfilterrtype: RTYPE '=' QSTRING ';'
 {
   MyFree(rtype);
   rtype = $3;
 };
-filteraction: ACTION '=' QSTRING ';'
+sfilteraction: ACTION '=' QSTRING ';'
 {
   MyFree(action);
   action = $3;
 };
-filterreason: REASON '=' QSTRING ';'
+sfilterreason: REASON '=' QSTRING ';'
 {
   MyFree(reason);
   reason = $3;
@@ -1645,10 +1646,9 @@ blocktype: ALL { $$ = ~0; }
   | DNSBL { $$ = 1 << BLOCK_DNSBL; }
   | EXCEPT { $$ = 1 << BLOCK_EXCEPT; }
   | FEATURES { $$ = 1 << BLOCK_FEATURES; }
-  | FILTER { $$ = 1 << BLOCK_FILTER; }
+  | SFILTER { $$ = 1 << BLOCK_SFILTER; }
   | FORWARD { $$ = 1 << BLOCK_FORWARD; }
   | GENERAL { $$ = 1 << BLOCK_GENERAL; }
-  | FILTER { $$ = 1 << BLOCK_FILTER; }
   | INCLUDE { $$ = 1 << BLOCK_INCLUDE; }
   | JUPE { $$ = 1 << BLOCK_JUPE; }
   | KILL { $$ = 1 << BLOCK_KILL; }

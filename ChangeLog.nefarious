@@ -3,6 +3,12 @@
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/ircd_parser.y: Few tweaks.
+
+	* ircd/ircd_lexer.l: Few tweaks.
+
+2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* tools/tre_install.sh: Woops typo.
 
 2008-10-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

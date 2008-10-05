@@ -124,7 +124,7 @@ EXCEPT		return EXCEPT;
 FAST		return FAST;
 FEATURES	return FEATURES;
 FILE		return TFILE;
-FILTER		return FILTER;
+SFILTER		return SFILTER;
 FLAGS		return FLAGS;
 FROM		return FROM;
 FORWARD		return FORWARD;
