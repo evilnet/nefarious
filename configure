@@ -10597,20 +10597,6 @@ echo "$as_me: error: Cannot use $LEX as flex." >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-if test -z "$LEXLIB" ; then
-  { { echo "$as_me:$LINENO: error: Cannot find a library with yywrap() in, but flex was found.
-  It's possible the compiler you're using ($CC) is incompatible with the
-  installed library.
-See \`config.log' for more details." >&5
-echo "$as_me: error: Cannot find a library with yywrap() in, but flex was found.
-  It's possible the compiler you're using ($CC) is incompatible with the
-  installed library.
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-LIBS="$LEXLIB $LIBS"
-
 for ac_prog in 'bison -y' byacc
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
