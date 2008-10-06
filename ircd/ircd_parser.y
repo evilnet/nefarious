@@ -74,7 +74,7 @@
   static char *name, *pass, *host, *vhost, *ip, *username, *origin, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
-  static char *prefix, *command, *service;
+  static char *prefix, *command, *service, *regex;
   struct SLink *hosts;
   static char *stringlist[MAX_STRINGS];
   struct fline*    GlobalFList = 0;
@@ -161,6 +161,7 @@ static void free_slist(struct SLink **link) {
 %token DESC
 %token SFILTER
 %token DNSBL
+%token REGEX
 %token REDIRECT
 %token MAXLINKS
 %token MAXHOPS
@@ -1442,12 +1443,12 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
   else if (!reason)
     parse_error("Your Filter block must contain a reason.");
   else {
-    if(regcomp(&tempre, name, REG_ICASE|REG_EXTENDED) == 0) {
+    if(regcomp(&tempre, regex, REG_ICASE|REG_EXTENDED) == 0) {
       fline = (struct fline *) MyMalloc(sizeof(struct fline));
       memset(fline, 0, sizeof(struct fline));
 
-      regcomp(&fline->filter, name, REG_ICASE|REG_EXTENDED);
-      DupString(fline->rawfilter, name);
+      regcomp(&fline->filter, regex, REG_ICASE|REG_EXTENDED);
+      DupString(fline->rawfilter, regex);
       DupString(fline->wflags, rtype);
       DupString(fline->rflags, action);
       DupString(fline->reason, reason);
@@ -1456,7 +1457,7 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
       GlobalFList = fline;
 
       regfree(&tempre);
-      name = NULL;
+      regex = NULL;
       rtype = NULL;
       action = NULL;
       reason = NULL;
@@ -1466,11 +1467,11 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
   }
 };
 sfilteritems: sfilteritem | sfilteritems sfilteritem;
-sfilteritem: sfiltername | sfilterrtype | sfilteraction | sfilterreason;
-sfiltername: NAME '=' QSTRING ';'
+sfilteritem: sfilterregex | sfilterrtype | sfilteraction | sfilterreason;
+sfilterregex: REGEX '=' QSTRING ';'
 {
-  MyFree(name);
-  name = $3;
+  MyFree(regex);
+  regex = $3;
 };
 sfilterrtype: RTYPE '=' QSTRING ';'
 {

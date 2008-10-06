@@ -119,6 +119,7 @@ static struct lexer_token {
   TOKEN(PREFIX),
   TOKEN(RANK),
   TOKEN(REDIRECT),
+  TOKEN(REGEX),
   TOKEN(REPLIES),
   TOKEN(REPLY),
   TOKEN(RTYPE),

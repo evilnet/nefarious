@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Couple of fixes plus renamed the name part of the
+	SFilter block to regex. Fixes should fix the bsd crash issue.
+
+	* ircd/ircd_lexer.l: Renamed the name part of the SFilter block to
+	 regex.
+
+	* ircd/ircd_parser.y: Renamed the name part of the SFilter block to
+	regex.
+
 2008-10-06  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ircd_parser.y: Fix for hub masks in Connect blocks not
