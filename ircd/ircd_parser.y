@@ -623,6 +623,9 @@ operblock: OPER '{' operitems '}' ';'
 
     aconf->conn_class = c_class;
 
+    if (!oflags)
+      DupString(oflags, "O");
+
     if (*oflags)
       DupString(m, oflags);
     for (; *m; m++) {
