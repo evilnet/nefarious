@@ -91,7 +91,7 @@ extern void add_connection(struct Listener* listener, int fd, void *ssl);
 extern void add_connection(struct Listener* listener, int fd);
 #endif /* USE_SSL */
 extern int  read_message(time_t delay);
-extern void init_server_identity(void);
+extern int  init_server_identity(void);
 extern void close_connections(int close_stderr);
 extern int  init_connection_limits(void);
 extern void set_virtual_host(struct in_addr addr);

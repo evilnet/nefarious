@@ -940,7 +940,10 @@ int main(int argc, char **argv) {
     exit(2);
   }
 
-  init_server_identity();
+  if (init_server_identity()) {
+    fprintf(stderr, "General and/or Admin blocks are missing or are incorrect.");
+    return 0;
+  }
 
   uping_init();
 

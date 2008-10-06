@@ -3,6 +3,16 @@
 
 2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/s_bsd.h: Turned conf_get_locals into a int.
+
+	* ircd/ircd.c: Exit if General or Admin block details are missing.
+
+	* ircd/s_bsd.c: Turned conf_get_locals into a int. If General 
+	or Admin block details are missing them the server will error
+	rather than seg faulting.
+
+2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Quick tweak to fix an issue.
 
 2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

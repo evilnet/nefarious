@@ -1064,13 +1064,20 @@ void set_virtual_host(struct in_addr addr)
  * matches the server's name) and its primary IP#.  Hostname is stored
  * in the client structure passed as a pointer.
  */
-void init_server_identity(void)
+int init_server_identity(void)
 {
   const struct LocalConf* conf = conf_get_local();
   assert(0 != conf);
 
+  if (!conf->name || !conf->numeric || !conf->location1 || !conf->location2 ||
+    !conf->contact)
+    return 1;
+
+
   ircd_strncpy(cli_name(&me), conf->name, HOSTLEN);
   SetYXXServerName(&me, conf->numeric);
+
+  return 0;
 }
 
 /*
