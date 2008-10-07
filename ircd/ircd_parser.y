@@ -1437,7 +1437,7 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
   struct fline *fline;
   regex_t tempre;
 
-  if (!name)
+  if (!regex)
     parse_error("Your Filter block must contain a filter.");
   else if (!rtype)
     parse_error("Your Filter block must contain a type");
