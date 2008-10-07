@@ -131,7 +131,7 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   count = unique_name_vector(parv[1], ',', vector, MAXTARGETS);
 
-  if (strcmp(parv[2], "DCC")) {
+  if ( ircd_strcmp(parv[2], "DCC") == 0 ) {
     isdcc = 1;
     ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, parv[1]);
     if (ret != 0) {
@@ -152,6 +152,7 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   i = 0;
 
   if (ischanmsg && !isdcc) {
+    Debug((DEBUG_DEBUG, "chanmsg %d", WFFLAG_CHANMSG));
     ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, parv[1]);
     if (ret != 0) {
       if (ret == 2)
@@ -162,6 +163,7 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   }
 
   if (isprivmsg && !isdcc) {
+    Debug((DEBUG_DEBUG, "privmsg %d", WFFLAG_PRIVMSG));
     ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, parv[1]);
     if (ret != 0) {
       if (ret == 2)

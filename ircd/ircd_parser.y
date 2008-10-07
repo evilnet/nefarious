@@ -55,12 +55,13 @@
 #include "send.h"
 #include "support.h"
 
+#include "pcreposix.h"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
-#include <tre/regex.h>
 
 #define MAX_STRINGS 80 /* Maximum number of feature params. */
 
@@ -1446,7 +1447,7 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
   else if (!reason)
     parse_error("Your Filter block must contain a reason.");
   else {
-    if(regcomp(&tempre, regex, REG_ICASE|REG_EXTENDED) == 0) {
+    if(regcomp(&tempre, regex, REG_ICASE|REG_EXTENDED|REG_NOSUB) == 0) {
       fline = (struct fline *) MyMalloc(sizeof(struct fline));
       memset(fline, 0, sizeof(struct fline));
 

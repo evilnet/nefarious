@@ -61,6 +61,8 @@
 #include "support.h"
 #include "sys.h"
 
+#include "pcreposix.h"
+
 #include <assert.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -70,7 +72,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <tre/regex.h>
 #include <unistd.h>
 
 #ifndef INADDR_NONE
@@ -1402,7 +1403,7 @@ stats_uworld(struct Client* to, struct StatDesc* sd, int stat, char* param)
 
   for (sp = uworlds; sp; sp = sp->next) {
     tmp = strdup(sp->value.cp);
-    Debug((DEBUG_DEBUG, "test: %s", tmp));
+
     send_reply(to, RPL_STATSULINE, tmp);
   }
 }

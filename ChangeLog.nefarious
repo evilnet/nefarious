@@ -3,6 +3,28 @@
 
 2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* configure: Regnerated.
+
+	* configure.in: Trialing pcre rather than tre.
+
+	* include/s_conf.h: Trialing pcre rather than tre.
+
+	* ircd/Makefile.in: Trialing pcre rather than tre.
+
+	* ircd/ircd_parser.y: Trialing pcre rather than tre.
+
+	* ircd/m_privmsg.c: Bug fixed for privmsg spam filters.
+
+	* ircd/s_conf.c: Trialing pcre rather than tre.
+
+	* tools/tre_install.sh: Removed.
+
+	* tools/pcre.tar.gz: Added for pcre.
+
+	* tools/tre.tar.gz: Removed.
+
+2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Woops SFilter not Filter.
 
 	* ircd/ircd_parser.y: Small parsing tweak.
