@@ -11392,7 +11392,7 @@ make || exit 1
 { echo "$as_me:$LINENO: result: installing PCRE regex library" >&5
 echo "${ECHO_T}installing PCRE regex library" >&6; }
 make install || exit 1
-TREINCDIR="$HOME"
+TREINCDIR="$HOME/include"
 
         TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
 

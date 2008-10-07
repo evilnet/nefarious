@@ -426,7 +426,7 @@ AC_MSG_RESULT(compiling PCRE regex library)
 make || exit 1
 AC_MSG_RESULT(installing PCRE regex library)
 make install || exit 1
-TREINCDIR="$HOME"
+TREINCDIR="$HOME/include"
 AC_SUBST(TREINCDIR)
         TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
 AC_SUBST(TRELIBS)

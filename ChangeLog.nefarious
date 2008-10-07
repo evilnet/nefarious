@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* configure: Regnerated.
+
+	* configure.in: Pcre include path tweak.
+
 2008-10-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regnerated.
