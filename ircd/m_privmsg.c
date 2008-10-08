@@ -131,7 +131,7 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   count = unique_name_vector(parv[1], ',', vector, MAXTARGETS);
 
-  if ( ircd_strcmp(parv[2], "DCC") == 0 ) {
+  if ( strcasecmp(parv[2], "DCC") == 0 ) {
     isdcc = 1;
     ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, parv[1]);
     if (ret != 0) {
