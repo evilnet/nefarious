@@ -3,6 +3,16 @@
 
 2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/s_conf.h: Declared find_conf_entry
+
+	* ircd/ircd_parser.y: Fix for the rehash crash issue. I am aware
+	that some of the lines are commented still.
+
+	* ircd/s_conf.c: Changed find_conf_entry so we can use it from other
+	files.
+
+2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_privmsg.c: Doh always manage to leave a few Debug's in.
 
 2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

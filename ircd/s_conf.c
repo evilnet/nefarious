@@ -917,7 +917,7 @@ struct ConfItem* find_conf_byip(struct SLink* lp, const char* ip,
  *
  * - looks for a match on all given fields.
  */
-static struct ConfItem *find_conf_entry(struct ConfItem *aconf,
+struct ConfItem* find_conf_entry(struct ConfItem *aconf,
                                         unsigned int mask)
 {
   struct ConfItem *bconf;

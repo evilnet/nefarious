@@ -272,6 +272,7 @@ extern struct ConfItem* attach_confs_byhost(struct Client* cptr, const char* hos
 extern struct ConfItem* find_conf_byhost(struct SLink* lp, const char* host, int statmask);
 extern struct ConfItem* find_conf_byname(struct SLink* lp, const char *name, int statmask);
 extern struct ConfItem* conf_find_server(const char* name);
+extern struct ConfItem* find_conf_entry(struct ConfItem *aconf, unsigned int mask);
 
 extern void update_uworld_flags(struct Client *cptr);
 extern void conf_make_uworld(char *name);

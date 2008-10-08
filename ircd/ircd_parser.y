@@ -367,44 +367,39 @@ connectblock: CONNECT
 
    lookup_confhost(aconf);
 
+   aconf->next = GlobalConfList;
+   GlobalConfList = aconf;
+   aconf = NULL;
+
    if (is_hub) {
      hconf = make_conf();
      hconf->status = CONF_HUB;
      hconf->host = hub_limit;
      hconf->name = name;
      hconf->port = maxlinks;
+
+     hconf->next = GlobalConfList;
+     GlobalConfList = hconf;
+     hconf = NULL;
    } else {
      if (is_leaf) {
        lconf = make_conf();
        lconf->status = CONF_LEAF;
+       lconf->host = "";
        lconf->name = name;
        lconf->port = maxlinks;
+
+       lconf->next = GlobalConfList;
+       GlobalConfList = lconf;
+       lconf = NULL;
      }
-  }
+   }
  }
- if (!aconf) {
-   MyFree(name);
-   MyFree(pass);
-   MyFree(origin);
-   MyFree(host);
-   MyFree(hub_limit);
- } else {
-   aconf->next = GlobalConfList;
-   GlobalConfList = aconf;
-   aconf = NULL;
- }
-
- if (hconf) {
-   hconf->next = GlobalConfList;
-   GlobalConfList = hconf;
-   hconf = NULL;
- }
-
- if (lconf) {
-   lconf->next = GlobalConfList;
-   GlobalConfList = lconf;
-   lconf = NULL;
- }
+//   MyFree(name);
+//   MyFree(pass);
+//   MyFree(origin);
+//   MyFree(host);
+//   MyFree(hub_limit);
 
  name = pass = host = origin = hub_limit = NULL;
  is_hub = is_leaf = port = flags = 0;
@@ -415,17 +410,17 @@ connectitem: connectname | connectpass | connectclass | connecthost
               | connecthublimit | connectmaxhops | connectauto;
 connectname: NAME '=' QSTRING ';'
 {
- MyFree(name);
+// MyFree(name);
  name = $3;
 };
 connectpass: PASS '=' QSTRING ';'
 {
- MyFree(pass);
+// MyFree(pass);
  pass = $3;
 };
 connectvhost: VHOST '=' QSTRING ';'
 {
- MyFree(origin);
+// MyFree(origin);
  origin = $3;
 };
 connectclass: CLASS '=' NUMBER ';'
@@ -436,7 +431,7 @@ connectclass: CLASS '=' NUMBER ';'
 };
 connecthost: HOST '=' QSTRING ';'
 {
- MyFree(host);
+// MyFree(host);
  host = $3;
 };
 connectport: PORT '=' NUMBER ';'
@@ -451,13 +446,13 @@ connectleaf: LEAF ';'
 connecthub: HUB ';'
 {
  is_hub = 1;
- MyFree(hub_limit);
+// MyFree(hub_limit);
  DupString(hub_limit, "*");
 };
 connecthublimit: HUB '=' QSTRING ';'
 {
  is_hub = 1;
- MyFree(hub_limit);
+// MyFree(hub_limit);
  hub_limit = $3;
 };
 connectmaxhops: MAXHOPS '=' expr ';'
@@ -467,6 +462,7 @@ connectmaxhops: MAXHOPS '=' expr ';'
 connectauto: AUTOCONNECT '=' YES ';' { flags |= CONF_AUTOCONNECT; }
  | AUTOCONNECT '=' NO ';' { flags &= ~CONF_AUTOCONNECT; };
 
+
 clientblock: CLIENT
 {
   maxlinks = 65535;
@@ -475,6 +471,7 @@ clientblock: CLIENT
 '{' clientitems '}' ';'
 {
   struct ConfItem *aconf = 0;
+  struct ConfItem *bconf;
 
   if (!c_class)
     parse_error("Invalid or missing class in Client block");
@@ -483,22 +480,42 @@ clientblock: CLIENT
   else {
     aconf = make_conf();
     aconf->status = CONF_CLIENT;
+
     aconf->host = ip;
     aconf->name = host;
-    aconf->conn_class = c_class;
     aconf->maximum = maxlinks;
     aconf->passwd = pass;
+    aconf->conn_class = c_class;
+    if (aconf->conn_class == 0)
+      aconf->conn_class = find_class(0);
+
+    if ((bconf = find_conf_entry(aconf, aconf->status))) {
+      delist_conf(bconf);
+      bconf->status &= ~CONF_ILLEGAL;
+      if (aconf->status == CONF_CLIENT) {
+        MyFree(bconf->passwd);
+        bconf->passwd = aconf->passwd;
+        aconf->passwd = 0;
+        ConfLinks(bconf) -= bconf->clients;
+        bconf->conn_class = aconf->conn_class;
+        if (bconf->conn_class)
+          ConfLinks(bconf) += bconf->clients;
+      }
+      free_conf(aconf);
+      aconf = bconf;
+    }
   }
   if (!aconf) {
     MyFree(username);
     MyFree(host);
-    MyFree(ip);
+//    MyFree(ip);
     MyFree(pass);
-  } else {
-    aconf->next = GlobalConfList;
-    GlobalConfList = aconf;
-    aconf = NULL;
-  }
+ } else {
+   aconf->next = GlobalConfList;
+   GlobalConfList = aconf;
+   aconf = NULL;
+ }
+
   host = NULL;
   username = NULL;
   c_class = NULL;
@@ -514,12 +531,13 @@ clienthost: HOST '=' QSTRING ';'
 };
 clientip: IP '=' QSTRING ';'
 {
-  MyFree(ip);
+//  MyFree(ip);
   ip = $3;
 };
 clientclass: CLASS '=' NUMBER ';'
 {
   c_class = find_class($3);
+  Debug((DEBUG_DEBUG, "bob: %d", $3));
   if (!c_class)
     parse_error("No such connection class '%d' for Client block", $3);
 };
