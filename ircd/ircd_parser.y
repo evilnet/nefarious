@@ -55,13 +55,12 @@
 #include "send.h"
 #include "support.h"
 
-#include "pcreposix.h"
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <tre/regex.h>
 
 #define MAX_STRINGS 80 /* Maximum number of feature params. */
 
@@ -537,7 +536,6 @@ clientip: IP '=' QSTRING ';'
 clientclass: CLASS '=' NUMBER ';'
 {
   c_class = find_class($3);
-  Debug((DEBUG_DEBUG, "bob: %d", $3));
   if (!c_class)
     parse_error("No such connection class '%d' for Client block", $3);
 };

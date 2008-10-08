@@ -688,8 +688,6 @@ YACC
 YFLAGS
 OSDEP_C
 ENGINE_C
-TREINCDIR
-TRELIBS
 SSL_C
 SVNDIR
 INSTALL_RULE
@@ -1305,6 +1303,8 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-optimization=-O2 Explicitly set the compiler optimization flags
                           (default: -O3)
+  --with-tre=PATH         Base path to where libtre is installed, such that
+                          PATH/lib/libtre.so and PATH/include/tre/regex.h exist.
   --with-openssl-includes=dir
                           Specify location of OpenSSL header files (default:
                           /usr/include)
@@ -11368,35 +11368,240 @@ echo "${ECHO_T}no - using devnull.log" >&6; }
 fi
 
 
-tre_version="7.2"
-{ echo "$as_me:$LINENO: result: extracting PCRE regex library" >&5
-echo "${ECHO_T}extracting PCRE regex library" >&6; }
-cur_dir=`pwd`
-cd tools
-rm -rf pcre-$tre_version
-if test "x$ac_cv_path_GUNZIP" = "x" ; then
-        tar xfz pcre.tar.gz
-else
-        cp pcre.tar.gz pcre.tar.gz.bak
-        gunzip -f pcre.tar.gz
-        cp pcre.tar.gz.bak pcre.tar.gz
-        tar xf pcre.tar
+tre_version="0.7.5"
+withval=''
+
+# Check whether --with-tre was given.
+if test "${with_tre+set}" = set; then
+  withval=$with_tre;
 fi
-{ echo "$as_me:$LINENO: result: configuring PCRE regex library" >&5
-echo "${ECHO_T}configuring PCRE regex library" >&6; }
-cd pcre-$tre_version
-./configure --disable-shared --disable-system-abi --disable-utf8 --prefix=$HOME || exit 1
-{ echo "$as_me:$LINENO: result: compiling PCRE regex library" >&5
-echo "${ECHO_T}compiling PCRE regex library" >&6; }
-make || exit 1
-{ echo "$as_me:$LINENO: result: installing PCRE regex library" >&5
-echo "${ECHO_T}installing PCRE regex library" >&6; }
-make install || exit 1
-TREINCDIR="$HOME/include"
 
-        TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
+if test "x$withval" != "x"; then
+    { echo "$as_me:$LINENO: result: Using include dir $withval to find libtre" >&5
+echo "${ECHO_T}Using include dir $withval to find libtre" >&6; }
+    CPPFLAGS="$CPPFLAGS -I$withval/include -L$withval/lib"
+    LIBS="$LIBS -L$withval/lib"
+else
+    { echo "$as_me:$LINENO: result: Looking for tre in system and home dirs (${HOME})..." >&5
+echo "${ECHO_T}Looking for tre in system and home dirs (${HOME})..." >&6; }
+    CPPFLAGS="$CPPFLAGS -I${HOME}/include -L${HOME}/lib"
+    LIBS="$LIBS -L${HOME}/lib"
+fi
+if test "${ac_cv_header_tre_regex_h+set}" = set; then
+  { echo "$as_me:$LINENO: checking for tre/regex.h" >&5
+echo $ECHO_N "checking for tre/regex.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_tre_regex_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_tre_regex_h" >&5
+echo "${ECHO_T}$ac_cv_header_tre_regex_h" >&6; }
+else
+  # Is the header compilable?
+{ echo "$as_me:$LINENO: checking tre/regex.h usability" >&5
+echo $ECHO_N "checking tre/regex.h usability... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <tre/regex.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (ac_try="$ac_compile"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_compile") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest.$ac_objext; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-cd $cur_dir
+	ac_header_compiler=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ echo "$as_me:$LINENO: checking tre/regex.h presence" >&5
+echo $ECHO_N "checking tre/regex.h presence... $ECHO_C" >&6; }
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <tre/regex.h>
+_ACEOF
+if { (ac_try="$ac_cpp conftest.$ac_ext"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_cpp conftest.$ac_ext") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null && {
+	 test -z "$ac_c_preproc_warn_flag$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       }; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+
+rm -f conftest.err conftest.$ac_ext
+{ echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: tre/regex.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: tre/regex.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: tre/regex.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: tre/regex.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: tre/regex.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: tre/regex.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: tre/regex.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: tre/regex.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: tre/regex.h: in the future, the compiler will take precedence" >&2;}
+    ( cat <<\_ASBOX
+## -------------------------------------------------- ##
+## Report this to evilnet-devel@lists.sourceforge.net ##
+## -------------------------------------------------- ##
+_ASBOX
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+{ echo "$as_me:$LINENO: checking for tre/regex.h" >&5
+echo $ECHO_N "checking for tre/regex.h... $ECHO_C" >&6; }
+if test "${ac_cv_header_tre_regex_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_tre_regex_h=$ac_header_preproc
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_header_tre_regex_h" >&5
+echo "${ECHO_T}$ac_cv_header_tre_regex_h" >&6; }
+
+fi
+if test $ac_cv_header_tre_regex_h = yes; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: tre/regex.h, the TRE regex headers, were not found. Install tre or use --with-tre=PATH to tell me how to find it, where PATH/include/tre/regex.h exists.  For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory." >&5
+echo "$as_me: error: tre/regex.h, the TRE regex headers, were not found. Install tre or use --with-tre=PATH to tell me how to find it, where PATH/include/tre/regex.h exists.  For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
+
+{ echo "$as_me:$LINENO: checking for regexec in -ltre" >&5
+echo $ECHO_N "checking for regexec in -ltre... $ECHO_C" >&6; }
+if test "${ac_cv_lib_tre_regexec+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ltre  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char regexec ();
+int
+main ()
+{
+return regexec ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_tre_regexec=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_tre_regexec=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_tre_regexec" >&5
+echo "${ECHO_T}$ac_cv_lib_tre_regexec" >&6; }
+if test $ac_cv_lib_tre_regexec = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBTRE 1
+_ACEOF
+
+  LIBS="-ltre $LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: TRE regex library not found. Install tre, or use --with-tre=PATH to tell me how to find it, where PATH/lib/libtre.so exists. For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory." >&5
+echo "$as_me: error: TRE regex library not found. Install tre, or use --with-tre=PATH to tell me how to find it, where PATH/lib/libtre.so exists. For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+
 
 { echo "$as_me:$LINENO: checking whether to enable OpenSSL support" >&5
 echo $ECHO_N "checking whether to enable OpenSSL support... $ECHO_C" >&6; }
@@ -13514,8 +13719,6 @@ YACC!$YACC$ac_delim
 YFLAGS!$YFLAGS$ac_delim
 OSDEP_C!$OSDEP_C$ac_delim
 ENGINE_C!$ENGINE_C$ac_delim
-TREINCDIR!$TREINCDIR$ac_delim
-TRELIBS!$TRELIBS$ac_delim
 SSL_C!$SSL_C$ac_delim
 SVNDIR!$SVNDIR$ac_delim
 INSTALL_RULE!$INSTALL_RULE$ac_delim
@@ -13527,7 +13730,7 @@ DPATH!$DPATH$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 83; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 81; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

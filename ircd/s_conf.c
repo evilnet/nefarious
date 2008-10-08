@@ -61,8 +61,6 @@
 #include "support.h"
 #include "sys.h"
 
-#include "pcreposix.h"
-
 #include <assert.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -72,6 +70,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <tre/regex.h>
 #include <unistd.h>
 
 #ifndef INADDR_NONE
@@ -1722,8 +1721,12 @@ char* get_type(unsigned int flag)
 {
   if (WFFLAG_NOTICE & flag)
     return "NOTICE";
+  else if (WFFLAG_CHANNOTICE & flag)
+    return "CHANNEL NOTICE";
   else if (WFFLAG_PRIVMSG & flag)
-    return "PRIVMSG";
+    return "PRIVATE MESSAGE";
+  else if (WFFLAG_CHANMSG & flag)
+    return "CHANNEL MESSAGE";
   else if (WFFLAG_AWAY & flag)
     return "AWAY";
   else if (WFFLAG_TOPIC & flag)

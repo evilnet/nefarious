@@ -404,33 +404,24 @@ else
 fi
 
 
-dnl REMEMBER TO CHANGE WITH A NEW PCRE RELEASE!
-tre_version="7.2"
-AC_MSG_RESULT(extracting PCRE regex library)
-cur_dir=`pwd`
-cd tools
-dnl remove old tre directory to force a recompile...
-rm -rf pcre-$tre_version
-if test "x$ac_cv_path_GUNZIP" = "x" ; then
-        tar xfz pcre.tar.gz
+dnl libTRE (regex library) checking
+tre_version="0.7.5"
+withval=''
+AC_ARG_WITH(tre,
+[  --with-tre=PATH         Base path to where libtre is installed, such that 
+                          PATH/lib/libtre.so and PATH/include/tre/regex.h exist.], )
+if test "x$withval" != "x"; then
+    AC_MSG_RESULT(Using include dir $withval to find libtre)
+    CPPFLAGS="$CPPFLAGS -I$withval/include -L$withval/lib"
+    LIBS="$LIBS -L$withval/lib"
 else
-        cp pcre.tar.gz pcre.tar.gz.bak
-        gunzip -f pcre.tar.gz
-        cp pcre.tar.gz.bak pcre.tar.gz
-        tar xf pcre.tar
+    AC_MSG_RESULT([Looking for tre in system and home dirs (${HOME})...])
+    CPPFLAGS="$CPPFLAGS -I${HOME}/include -L${HOME}/lib"
+    LIBS="$LIBS -L${HOME}/lib"
 fi
-AC_MSG_RESULT(configuring PCRE regex library)
-cd pcre-$tre_version
-./configure --disable-shared --disable-system-abi --disable-utf8 --prefix=$HOME || exit 1
-AC_MSG_RESULT(compiling PCRE regex library)
-make || exit 1
-AC_MSG_RESULT(installing PCRE regex library)
-make install || exit 1
-TREINCDIR="$HOME/include"
-AC_SUBST(TREINCDIR)
-        TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
-AC_SUBST(TRELIBS)
-cd $cur_dir
+AC_CHECK_HEADER(tre/regex.h, , [AC_MSG_ERROR([tre/regex.h, the TRE regex headers, were not found. Install tre or use --with-tre=PATH to tell me how to find it, where PATH/include/tre/regex.h exists.  For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory.])],)
+AC_CHECK_LIB(tre, regexec, , [AC_MSG_ERROR([TRE regex library not found. Install tre, or use --with-tre=PATH to tell me how to find it, where PATH/lib/libtre.so exists. For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory.])])
+
 
 dnl **
 dnl **  SSL Library checks (OpenSSL)

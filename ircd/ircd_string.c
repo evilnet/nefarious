@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include <regex.h>
+#include <tre/regex.h>
 /*
  * include the character attribute tables here
  */

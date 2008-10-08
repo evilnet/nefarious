@@ -18,7 +18,7 @@
 #define INCLUDED_netinet_in_h
 #endif
 
-#include "pcreposix.h"
+#include <tre/regex.h>
 
 struct StatDesc;
 struct Client;
