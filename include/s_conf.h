@@ -40,9 +40,7 @@ struct TRecord;
 #define CONF_SERVER             0x0004
 #define CONF_LOCOP              0x0010
 #define CONF_OPERATOR           0x0020
-#define CONF_LEAF               0x1000
-#define CONF_HUB                0x4000
-#define CONF_AUTOCONNECT        0x8000
+#define CONF_AUTOCONNECT        0x0040
 
 #define CONF_OPS                (CONF_OPERATOR | CONF_LOCOP)
 #define CONF_CLIENT_MASK        (CONF_CLIENT | CONF_OPS | CONF_SERVER)
@@ -64,6 +62,7 @@ struct ConfItem {
   char*                    host;
   char*                    passwd;
   char*                    name;
+  char*                    hub_limit;
   time_t                   hold;        /* Hold until this time (calendar time) */
   int                      dns_pending; /* a dns request is pending */
   unsigned short           port;

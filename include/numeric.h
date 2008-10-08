@@ -134,7 +134,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_STATSLLINE       241	
 #define RPL_STATSUPTIME      242
 #define RPL_STATSOLINE       243
-#define RPL_STATSHLINE       244
+/*      RPL_STATSHLINE       244        unused */
 #define RPL_STATSSLINE       245	/* Reserved / Dalnet / IRCnet / EFnet / Nefarious */
 /*	RPL_STATSSPING	     246	   Numerics List: IRCnet */
 #define RPL_STATSTLINE       246        /* Undernet extension */

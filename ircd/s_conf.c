@@ -1652,12 +1652,9 @@ int rehash(struct Client *cptr, int sig)
   for (i = 0; i <= HighestFd; i++) {
     if ((acptr = LocalClientArray[i])) {
       assert(!IsMe(acptr));
-      if (IsServer(acptr)) {
-        det_confs_butmask(acptr,
-            ~(CONF_HUB | CONF_LEAF | CONF_ILLEGAL));
-        attach_confs_byname(acptr, cli_name(acptr),
-                            CONF_HUB | CONF_LEAF);
-      }
+      if (IsServer(acptr))
+        det_confs_butmask(acptr, ~(CONF_ILLEGAL));
+
       /* Because admin's are getting so uppity about people managing to
        * get past K/G's etc, we'll "fix" the bug by actually explaining
        * whats going on.
@@ -1670,7 +1667,7 @@ int rehash(struct Client *cptr, int sig)
                              get_client_name(acptr, SHOW_IP));
         if (exit_client(cptr, acptr, &me, found_g == -2 ? "G-lined" :
             "K-lined") == CPTR_KILLED)
-          ret = CPTR_KILLED;
+            ret = CPTR_KILLED;
       }
     }
   }
@@ -2125,7 +2122,6 @@ int conf_check_server(struct Client *cptr)
    * attach the C line to the client structure for later use.
    */
   attach_conf(cptr, c_conf);
-  attach_confs_byname(cptr, cli_name(cptr), CONF_HUB | CONF_LEAF);
 
   if (INADDR_NONE == c_conf->ipnum.s_addr)
     c_conf->ipnum.s_addr = cli_ip(cptr).s_addr;

@@ -3,6 +3,24 @@
 
 2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/numeric.h: Removed stats h entry.
+
+	* include/s_conf.h: Removed CONF_LEAF and CONF_HUB.
+
+	* ircd/ircd_parser.y: Removed CONF_LEAF and CONF_HUB.
+
+	* ircd/m_server.c: Overall of m_server.c to get rid of CONF_HUB and
+	CONF_LEAF (from .12)
+
+	* ircd/s_conf.c: Removed CONF_LEAF and CONF_HUB.
+
+	* ircd/s_serv.c: Removed CONF_LEAF and CONF_HUB.
+
+	* ircd/s_stats.c: Removed CONF_LEAF and CONF_HUB. Also Removed the
+	entry for stats h.
+
+2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* configure: Regenerated.
 
 	* configure.in: Switched back to TRE.

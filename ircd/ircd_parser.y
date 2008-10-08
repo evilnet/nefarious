@@ -71,7 +71,7 @@
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class, is_local;
   static int is_leaf, is_hub;
-  static char *name, *pass, *host, *vhost, *ip, *username, *origin, *hub_limit;
+  static char *name, *pass, *host, *vhost, *ipaddr, *username, *origin, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
   static char *prefix, *command, *service, *regex;
@@ -337,8 +337,6 @@ connectblock: CONNECT
 } '{' connectitems '}' ';'
 {
  struct ConfItem *aconf = NULL;
- struct ConfItem *lconf = NULL;
- struct ConfItem *hconf = NULL;
 
  if (name == NULL)
   parse_error("Missing name in connect block");
@@ -364,42 +362,22 @@ connectblock: CONNECT
    aconf->host = host;
    aconf->flags = flags;
 
-   lookup_confhost(aconf);
+   aconf->maximum = maxlinks;
+   aconf->hub_limit = hub_limit;
 
+   lookup_confhost(aconf);
+ }
+ if (!aconf) {
+   MyFree(name);
+   MyFree(pass);
+   MyFree(origin);
+   MyFree(host);
+   MyFree(hub_limit);
+ } else {
    aconf->next = GlobalConfList;
    GlobalConfList = aconf;
    aconf = NULL;
-
-   if (is_hub) {
-     hconf = make_conf();
-     hconf->status = CONF_HUB;
-     hconf->host = hub_limit;
-     hconf->name = name;
-     hconf->port = maxlinks;
-
-     hconf->next = GlobalConfList;
-     GlobalConfList = hconf;
-     hconf = NULL;
-   } else {
-     if (is_leaf) {
-       lconf = make_conf();
-       lconf->status = CONF_LEAF;
-       lconf->host = "";
-       lconf->name = name;
-       lconf->port = maxlinks;
-
-       lconf->next = GlobalConfList;
-       GlobalConfList = lconf;
-       lconf = NULL;
-     }
-   }
  }
-//   MyFree(name);
-//   MyFree(pass);
-//   MyFree(origin);
-//   MyFree(host);
-//   MyFree(hub_limit);
-
  name = pass = host = origin = hub_limit = NULL;
  is_hub = is_leaf = port = flags = 0;
 }
@@ -409,17 +387,17 @@ connectitem: connectname | connectpass | connectclass | connecthost
               | connecthublimit | connectmaxhops | connectauto;
 connectname: NAME '=' QSTRING ';'
 {
-// MyFree(name);
+ MyFree(name);
  name = $3;
 };
 connectpass: PASS '=' QSTRING ';'
 {
-// MyFree(pass);
+ MyFree(pass);
  pass = $3;
 };
 connectvhost: VHOST '=' QSTRING ';'
 {
-// MyFree(origin);
+ MyFree(origin);
  origin = $3;
 };
 connectclass: CLASS '=' NUMBER ';'
@@ -430,7 +408,7 @@ connectclass: CLASS '=' NUMBER ';'
 };
 connecthost: HOST '=' QSTRING ';'
 {
-// MyFree(host);
+ MyFree(host);
  host = $3;
 };
 connectport: PORT '=' NUMBER ';'
@@ -445,13 +423,13 @@ connectleaf: LEAF ';'
 connecthub: HUB ';'
 {
  is_hub = 1;
-// MyFree(hub_limit);
+ MyFree(hub_limit);
  DupString(hub_limit, "*");
 };
 connecthublimit: HUB '=' QSTRING ';'
 {
  is_hub = 1;
-// MyFree(hub_limit);
+ MyFree(hub_limit);
  hub_limit = $3;
 };
 connectmaxhops: MAXHOPS '=' expr ';'
@@ -480,7 +458,7 @@ clientblock: CLIENT
     aconf = make_conf();
     aconf->status = CONF_CLIENT;
 
-    aconf->host = ip;
+    aconf->host = ipaddr;
     aconf->name = host;
     aconf->maximum = maxlinks;
     aconf->passwd = pass;
@@ -507,7 +485,7 @@ clientblock: CLIENT
   if (!aconf) {
     MyFree(username);
     MyFree(host);
-//    MyFree(ip);
+/*    MyFree(ipaddr); */
     MyFree(pass);
  } else {
    aconf->next = GlobalConfList;
@@ -530,8 +508,8 @@ clienthost: HOST '=' QSTRING ';'
 };
 clientip: IP '=' QSTRING ';'
 {
-//  MyFree(ip);
-  ip = $3;
+/*  MyFree(ipaddr); */
+  ipaddr = $3;
 };
 clientclass: CLASS '=' NUMBER ';'
 {

@@ -75,54 +75,36 @@
  *       it--not reversed as in ircd.conf!
  */
 
-static unsigned int report_array[17][3] = {
-  {CONF_SERVER, RPL_STATSCLINE, 'C'},
-  {CONF_CLIENT, RPL_STATSILINE, 'I'},
-  {CONF_LEAF, RPL_STATSLLINE, 'L'},
-  {CONF_OPERATOR, RPL_STATSOLINE, 'O'},
-  {CONF_HUB, RPL_STATSHLINE, 'H'},
-  {CONF_LOCOP, RPL_STATSOLINE, 'o'},
-  {0, 0}
-};
-
 static void
-stats_configured_links(struct Client* sptr, struct StatDesc* sd, int stat,
-			char* param)
+stats_configured_links(struct Client *sptr, struct StatDesc* sd, int stat,
+                       char* param)
 {
   static char null[] = "<NULL>";
   struct ConfItem *tmp;
-  int mask;
-  unsigned int *p;
   unsigned short int port;
-  char c, *host, *pass, *name;
+  int maximum;
+  char *host, *pass, *name, *hub_limit;
 
-  mask = sd->sd_funcdata;
-
-  for (tmp = GlobalConfList; tmp; tmp = tmp->next) {
-    if ((tmp->status & mask)) {
-      for (p = &report_array[0][0]; *p; p += 3)
-        if (*p == tmp->status)
-          break;
-      if (!*p)
-        continue;
-      c = (char)*(p + 2);
+  for (tmp = GlobalConfList; tmp; tmp = tmp->next)
+  {
+    if ((tmp->status & sd->sd_funcdata))
+    {
       host = BadPtr(tmp->host) ? null : tmp->host;
       pass = BadPtr(tmp->passwd) ? null : tmp->passwd;
       name = BadPtr(tmp->name) ? null : tmp->name;
+      hub_limit = BadPtr(tmp->hub_limit) ? null : tmp->hub_limit;
+      maximum = tmp->maximum;
       port = tmp->port;
-      /*
-       * On K line the passwd contents can be
-       * displayed on STATS reply.    -Vesa
-       */
-      /* Special-case 'k' or 'K' lines as appropriate... -Kev */
-      if ((feature_bool(FEAT_STATS_C_IPS) || !IsOper(sptr))
-	       && (tmp->status & (CONF_SERVER)))
-        send_reply(sptr, p[1], c, "*", name, 0, get_conf_class(tmp));
-      else
-        if ((tmp->status & (CONF_OPERATOR)) || (tmp->status & (CONF_LOCOP)))
-          send_reply(sptr, p[1], c, host, name, oflagstr(port), get_conf_class(tmp));
-	else
-	  send_reply(sptr, p[1], c, host, name, port, get_conf_class(tmp));
+
+      if (tmp->status & CONF_SERVER)
+        if (feature_bool(FEAT_STATS_C_IPS) || !IsOper(sptr))
+  	  send_reply(sptr, RPL_STATSCLINE, "*", name, port, maximum, hub_limit, get_conf_class(tmp));
+        else
+  	  send_reply(sptr, RPL_STATSCLINE, host, name, port, maximum, hub_limit, get_conf_class(tmp));
+      else if (tmp->status & CONF_CLIENT)
+        send_reply(sptr, RPL_STATSILINE, host, name, port, get_conf_class(tmp));
+      else if (tmp->status & CONF_OPERATOR)
+        send_reply(sptr, RPL_STATSOLINE, host, name, oflagstr(port), get_conf_class(tmp));
     }
   }
 }
@@ -505,9 +487,6 @@ struct StatDesc statsinfo[] = {
   { 'g', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_g,
     gline_stats, 0,
     "Global bans (G-lines)." },
-  { 'h', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_h,
-    stats_configured_links, (CONF_HUB | CONF_LEAF),
-    "Hubs information." },
   { 'i', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_i,
     stats_access, CONF_CLIENT,
     "Connection authorization lines." },
