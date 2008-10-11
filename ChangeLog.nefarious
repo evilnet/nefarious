@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Removed some unused items.
+
+	* ircd/ircd_parser.y: Removed vhost from Connect block as .11 works
+	differently.
+
+	* ircd/m_challenge.c: Untested feature. Jobe if you get a chance
+	can you try this out. It should fixed the remote challenge issues.
+
 2008-10-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/numeric.h: Removed stats h entry.

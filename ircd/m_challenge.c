@@ -329,6 +329,17 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
       m_opermotd(sptr, sptr, 1, parv);
   }
 
+  if (parc < 4) {
+    return send_reply(sptr, ERR_NOOPERHOST);
+  }
+  if (!(acptr = FindNServer(parv[1]))) {
+    return send_reply(sptr, ERR_NOOPERHOST);
+  } else if (!IsMe(acptr)) {
+    sendcmdto_one(sptr, CMD_CHALLENGE, acptr, "%C %s %s", acptr, parv[2],
+                  parv[3]);
+    return 0;
+  }
+
   if (*parv[2] == '+')
   {
     /* Ignore it if we aren't expecting this... -A1kmm */

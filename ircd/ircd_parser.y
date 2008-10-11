@@ -71,7 +71,7 @@
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class, is_local;
   static int is_leaf, is_hub;
-  static char *name, *pass, *host, *vhost, *ipaddr, *username, *origin, *hub_limit;
+  static char *name, *pass, *host, *vhost, *ipaddr, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
   static char *prefix, *command, *service, *regex;
@@ -370,7 +370,6 @@ connectblock: CONNECT
  if (!aconf) {
    MyFree(name);
    MyFree(pass);
-   MyFree(origin);
    MyFree(host);
    MyFree(hub_limit);
  } else {
@@ -378,12 +377,12 @@ connectblock: CONNECT
    GlobalConfList = aconf;
    aconf = NULL;
  }
- name = pass = host = origin = hub_limit = NULL;
+ name = pass = host = hub_limit = NULL;
  is_hub = is_leaf = port = flags = 0;
 }
 connectitems: connectitem connectitems | connectitem;
 connectitem: connectname | connectpass | connectclass | connecthost
-              | connectvhost | connectport | connectleaf | connecthub
+              | connectport | connectleaf | connecthub
               | connecthublimit | connectmaxhops | connectauto;
 connectname: NAME '=' QSTRING ';'
 {
@@ -394,11 +393,6 @@ connectpass: PASS '=' QSTRING ';'
 {
  MyFree(pass);
  pass = $3;
-};
-connectvhost: VHOST '=' QSTRING ';'
-{
- MyFree(origin);
- origin = $3;
 };
 connectclass: CLASS '=' NUMBER ';'
 {
