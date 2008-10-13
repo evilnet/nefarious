@@ -1,6 +1,20 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Updated hub and prefix documentation.
+
+	* include/numeric.h: Brought back STATSHLINE.
+
+	* ircd/convert-conf.c: Removed.
+
+	* ircd/Makefile.in: Removed convert-conf.c parts.
+
+	* ircd/s_err.c: Brought back STATSHLINE.
+
+	* ircd/s_stats.c: Show hub stats in /STATS C.
+
 2008-10-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Removed some unused items.

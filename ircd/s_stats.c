@@ -101,6 +101,8 @@ stats_configured_links(struct Client *sptr, struct StatDesc* sd, int stat,
   	  send_reply(sptr, RPL_STATSCLINE, "*", name, port, maximum, hub_limit, get_conf_class(tmp));
         else
   	  send_reply(sptr, RPL_STATSCLINE, host, name, port, maximum, hub_limit, get_conf_class(tmp));
+        if (hub_limit)
+          send_reply(sptr, RPL_STATSHLINE, hub_limit, name, maximum);
       else if (tmp->status & CONF_CLIENT)
         send_reply(sptr, RPL_STATSILINE, host, name, port, get_conf_class(tmp));
       else if (tmp->status & CONF_OPERATOR)
