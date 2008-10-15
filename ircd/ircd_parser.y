@@ -208,7 +208,7 @@ static void free_slist(struct SLink **link) {
 %token REAL
 %token TFILE
 %token RULE
-%token SSL
+%token CRYPT
 %token ALL
 %token FEATURES
 %token QUARANTINE
@@ -985,10 +985,10 @@ portexempt: EXEMPT '=' YES ';'
   is_exempt = 0;
 };
 
-portssl: SSL '=' YES ';'
+portssl: CRYPT '=' YES ';'
 {
   is_ssl = 1;
-} | SSL '=' NO ';'
+} | CRYPT '=' NO ';'
 {
   is_ssl = 0;
 };

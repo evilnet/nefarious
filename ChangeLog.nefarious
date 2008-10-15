@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Changed SSL to CRYPT.
+
+	* ircd/ircd_lexer.l: Changed SSL to CRYPT.
+
+	* ircd/ircd_parser.y: Changed SSL to CRYPT.
+
 2008-10-15  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_challenge.c: Added missing declaration in ms_challenge

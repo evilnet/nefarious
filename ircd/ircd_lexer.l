@@ -109,6 +109,7 @@ static struct lexer_token {
   TOKEN(CHNAME),
   TOKEN(CMD),
   TOKEN(COMMAND),
+  TOKEN(CRYPT),
   TOKEN(DESC),
   TOKEN(DNSBL),
   TOKEN(EXCEPT),
@@ -127,7 +128,6 @@ static struct lexer_token {
   TOKEN(SFILTER),
   TOKEN(SPOOF),
   TOKEN(SPOOFHOST),
-  TOKEN(SSL),
   TOKEN(VERSION),
   TOKEN(WEBIRC),
 #undef TOKEN
