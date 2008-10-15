@@ -332,6 +332,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   if (parc < 4) {
     return send_reply(sptr, ERR_NOOPERHOST);
   }
+  struct Client *acptr;
   if (!(acptr = FindNServer(parv[1]))) {
     return send_reply(sptr, ERR_NOOPERHOST);
   } else if (!IsMe(acptr)) {

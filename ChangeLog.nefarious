@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-15  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_challenge.c: Added missing declaration in ms_challenge
+
 2008-10-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Small doc tweak.
