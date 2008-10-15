@@ -3,6 +3,10 @@
 
 2008-10-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Small doc tweak.
+
+2008-10-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Updated hub and prefix documentation.
 
 	* include/numeric.h: Brought back STATSHLINE.
