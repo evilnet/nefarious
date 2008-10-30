@@ -1166,7 +1166,11 @@ commandblock: COMMAND '{' commanditems '}' ';'
     DupString(new_svc->target, service);
  
     if (prefix)
-      DupString(new_svc->prepend, prefix);
+        DupString(new_svc->prepend, prefix);
+    else {
+        DupString(new_svc->prepend, "");
+        MyFree(new_svc->prepend);
+    }
 
     new_svc->next = GlobalServicesList;
     GlobalServicesList = new_svc;

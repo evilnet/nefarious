@@ -3,6 +3,11 @@
 
 2008-10-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/ircd_parser.y: Ugly but meh. Fix for Command prefix and
+	rehashing.
+
+2008-10-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_challenge.c: Fixed up remote challenge.
 
 2008-10-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
