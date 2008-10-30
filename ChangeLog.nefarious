@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_challenge.c: Fixed up remote challenge.
+
 2008-10-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_stats.c: Added some missing brackets.

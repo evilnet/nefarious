@@ -317,6 +317,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   char             chan[CHANNELLEN-1];
   char*            join[2];
   int nl;
+  struct Client *acptr = NULL;
 
   if (!IsServer(cptr))
     return 0;
@@ -329,10 +330,10 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
       m_opermotd(sptr, sptr, 1, parv);
   }
 
-  if (parc < 4) {
+  if (parc < 3) {
     return send_reply(sptr, ERR_NOOPERHOST);
   }
-  struct Client *acptr;
+
   if (!(acptr = FindNServer(parv[1]))) {
     return send_reply(sptr, ERR_NOOPERHOST);
   } else if (!IsMe(acptr)) {
