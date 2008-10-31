@@ -170,6 +170,8 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
     FlagSet(&privs_local, PRIV_LOCAL_KILL);
     FlagSet(&privs_local, PRIV_REHASH);
     FlagSet(&privs_local, PRIV_LOCAL_GLINE);
+    FlagSet(&privs_local, PRIV_LOCAL_ZLINE);
+    FlagSet(&privs_local, PRIV_LOCAL_SHUN);
     FlagSet(&privs_local, PRIV_LOCAL_JUPE);
     FlagSet(&privs_local, PRIV_LOCAL_OPMODE);
     FlagSet(&privs_local, PRIV_WHOX);
@@ -217,6 +219,8 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
     /* if they don't propagate oper status, prevent desyncs */
     ClrPriv(client, PRIV_KILL);
     ClrPriv(client, PRIV_GLINE);
+    ClrPriv(client, PRIV_SHUN);
+    ClrPriv(client, PRIV_ZLINE);
     ClrPriv(client, PRIV_JUPE);
     ClrPriv(client, PRIV_OPMODE);
     ClrPriv(client, PRIV_BADCHAN);
