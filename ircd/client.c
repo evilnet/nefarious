@@ -20,30 +20,28 @@
  * @brief Implementation of functions for handling local clients.
  * @version $Id$
  */
-
 #include "config.h"
 
 #include "client.h"
 #include "class.h"
 #include "ircd.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "list.h"
-#include "msg.h"
 #include "msgq.h"
 #include "numeric.h"
 #include "s_conf.h"
 #include "s_debug.h"
 #include "send.h"
 #include "ircd_struct.h"
-#include "ircd_string.h"
 
 #include <assert.h>
 #include <string.h>
 
 #define BAD_PING                ((unsigned int)-2)
-
 char privbufp[512] = "";
+
 
 /** Find the shortest non-zero ping time attached to a client.
  * If all attached ping times are zero, return the value for
@@ -73,6 +71,25 @@ int client_get_ping(const struct Client* acptr)
   Debug((DEBUG_DEBUG, "Client %s Ping %d", cli_name(acptr), ping));
 
   return ping;
+}
+
+/*
+ * client_get_default_umode
+ * returns default usermode in attached client connection class
+ */
+const char* client_get_default_umode(const struct Client* sptr)
+{
+  struct ConfItem* aconf;
+  struct SLink* link;
+
+  assert(cli_verify(sptr));
+
+  for (link = cli_confs(sptr); link; link = link->next) {
+    aconf = link->value.aconf;
+    if ((aconf->status & CONF_CLIENT) && ConfUmode(aconf))
+      return ConfUmode(aconf);
+  }
+  return NULL;
 }
 
 /** Remove a connection from the list of connections with queued data.
@@ -106,93 +123,105 @@ void client_add_sendq(struct Connection* con, struct Connection** con_p)
   }
 }
 
-/** Array mapping privilege values to names and vice versa. */
-static struct {
+/** Default privilege set for global operators. */
+static struct Privs privs_global;
+/** Default privilege set for local operators. */
+static struct Privs privs_local;
+/** Non-zero if #privs_global and #privs_local have been initialized. */
+static int privs_defaults_set;
+
+/* client_set_privs(struct Client* client)
+ *
+ * Sets the privileges for opers.
+ */
+/** Set the privileges for a client.
+ * @param[in] client Client who has become an operator.
+ * @param[in] oper Configuration item describing oper's privileges.
+ */
+void
+client_set_privs(struct Client *client, struct ConfItem *oper)
+{
+  struct Privs *source, *defaults;
   enum Priv priv;
-  enum Feature feat;
-  enum {
-    FEATFLAG_DISABLES_PRIV,
-    FEATFLAG_ENABLES_PRIV,
-    FEATFLAG_ADMIN_OPERS,
-    FEATFLAG_GLOBAL_OPERS,
-    FEATFLAG_LOCAL_OPERS,
-    FEATFLAG_ALL_OPERS
-  } flag;
-} feattab[] = {
-  { PRIV_WHOX, FEAT_LAST_F, FEATFLAG_ALL_OPERS },
-  { PRIV_DISPLAY, FEAT_LAST_F, FEATFLAG_ALL_OPERS },
-  { PRIV_CHAN_LIMIT, FEAT_OPER_NO_CHAN_LIMIT, FEATFLAG_ALL_OPERS },
-  { PRIV_MODE_LCHAN, FEAT_OPER_MODE_LCHAN, FEATFLAG_ALL_OPERS },
-  { PRIV_LOCAL_OPMODE, FEAT_OPER_MODE_LCHAN, FEATFLAG_ALL_OPERS },
-  { PRIV_WALK_LCHAN, FEAT_OPER_WALK_THROUGH_LMODES, FEATFLAG_ALL_OPERS },
-  { PRIV_DEOP_LCHAN, FEAT_NO_OPER_DEOP_LCHAN, FEATFLAG_ALL_OPERS },
-  { PRIV_SHOW_INVIS, FEAT_SHOW_INVISIBLE_USERS, FEATFLAG_ALL_OPERS },
-  { PRIV_SHOW_ALL_INVIS, FEAT_SHOW_ALL_INVISIBLE_USERS, FEATFLAG_ALL_OPERS },
-  { PRIV_UNLIMIT_QUERY, FEAT_UNLIMIT_OPER_QUERY, FEATFLAG_ALL_OPERS },
 
-  { PRIV_KILL, FEAT_LOCAL_KILL_ONLY, FEATFLAG_DISABLES_PRIV },
-  { PRIV_GLINE, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
-  { PRIV_ZLINE, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
-  { PRIV_SHUN, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
-  { PRIV_JUPE, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
-  { PRIV_OPMODE, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
-  { PRIV_BADCHAN, FEAT_CONFIG_OPERCMDS, FEATFLAG_ENABLES_PRIV },
+  if (!MyConnect(client))
+    return;
 
-  /* 
-   * if OPERFLAGS is disabled then any priv below will be given to global
-   * opers (assuming the feature for the priv is enabled)
+  /* Clear out client's privileges. */
+  memset(cli_privs(client), 0, sizeof(struct Privs));
+
+  if (!IsAnOper(client) || !oper)
+      return;
+
+  if (!privs_defaults_set)
+  {
+    memset(&privs_global, -1, sizeof(privs_global));
+    memset(&privs_local, 0, sizeof(privs_local));
+    FlagClr(&privs_global, PRIV_WALK_LCHAN);
+    FlagClr(&privs_global, PRIV_UNLIMIT_QUERY);
+    FlagClr(&privs_global, PRIV_SET);
+    FlagClr(&privs_global, PRIV_BADCHAN);
+    FlagClr(&privs_global, PRIV_LOCAL_BADCHAN);
+
+    FlagSet(&privs_local, PRIV_CHAN_LIMIT);
+    FlagSet(&privs_local, PRIV_MODE_LCHAN);
+    FlagSet(&privs_local, PRIV_SHOW_INVIS);
+    FlagSet(&privs_local, PRIV_SHOW_ALL_INVIS);
+    FlagSet(&privs_local, PRIV_LOCAL_KILL);
+    FlagSet(&privs_local, PRIV_REHASH);
+    FlagSet(&privs_local, PRIV_LOCAL_GLINE);
+    FlagSet(&privs_local, PRIV_LOCAL_JUPE);
+    FlagSet(&privs_local, PRIV_LOCAL_OPMODE);
+    FlagSet(&privs_local, PRIV_WHOX);
+    FlagSet(&privs_local, PRIV_DISPLAY);
+    FlagSet(&privs_local, PRIV_FORCE_LOCAL_OPMODE);
+    privs_defaults_set = 1;
+  }
+
+  /* Decide whether to use global or local oper defaults. */
+  if (FlagHas(&oper->privs_dirty, PRIV_PROPAGATE))
+    defaults = FlagHas(&oper->privs, PRIV_PROPAGATE) ? &privs_global : &privs_local;
+  else if (FlagHas(&oper->conn_class->privs_dirty, PRIV_PROPAGATE))
+    defaults = FlagHas(&oper->conn_class->privs, PRIV_PROPAGATE) ? &privs_global : &privs_local;
+  else {
+    assert(0 && "Oper has no propagation and neither does connection class");
+    return;
+  }
+
+  /* For each feature, figure out whether it comes from the operator
+   * conf, the connection class conf, or the defaults, then apply it.
    */
-  { PRIV_RESTART, FEAT_OPER_RESTART, FEATFLAG_ADMIN_OPERS },
-  { PRIV_JUPE, FEAT_OPER_JUPE, FEATFLAG_ADMIN_OPERS },
-  { PRIV_DIE, FEAT_OPER_DIE, FEATFLAG_ADMIN_OPERS },
-  { PRIV_SET, FEAT_OPER_SET, FEATFLAG_ADMIN_OPERS },
-  { PRIV_REMOTEREHASH, FEAT_OPER_REHASH, FEATFLAG_ADMIN_OPERS },
-  { PRIV_CHECK, FEAT_CHECK, FEATFLAG_ADMIN_OPERS },
-  { PRIV_SEE_SECRET_CHAN, FEAT_OPER_WHOIS_SECRET, FEATFLAG_ADMIN_OPERS },
-  { PRIV_LIST_CHAN, FEAT_OPER_LIST_CHAN, FEATFLAG_ADMIN_OPERS },
+  for (priv = 0; priv < PRIV_LAST_PRIV; ++priv)
+  {
+    /* Figure out most applicable definition for the privilege. */
+    if (FlagHas(&oper->privs_dirty, priv))
+      source = &oper->privs;
+    else if (FlagHas(&oper->conn_class->privs_dirty, priv))
+      source = &oper->conn_class->privs;
+    else
+      source = defaults;
 
-  { PRIV_PROPAGATE, FEAT_LAST_F, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_SEE_OPERS, FEAT_LAST_F, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_KILL, FEAT_OPER_KILL, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_KILL, FEAT_OPER_KILL, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_REHASH, FEAT_OPER_REHASH, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_GLINE, FEAT_OPER_GLINE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_GLINE, FEAT_OPER_LGLINE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_ZLINE, FEAT_OPER_ZLINE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_ZLINE, FEAT_OPER_LZLINE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_SHUN, FEAT_OPER_SHUN, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_SHUN, FEAT_OPER_LSHUN, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_JUPE, FEAT_OPER_LJUPE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_OPMODE, FEAT_OPER_OPMODE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_OPMODE, FEAT_OPER_LOPMODE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_FORCE_OPMODE, FEAT_OPER_FORCE_OPMODE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_FORCE_LOCAL_OPMODE, FEAT_OPER_FORCE_LOPMODE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_BADCHAN, FEAT_OPER_BADCHAN, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_LOCAL_BADCHAN, FEAT_OPER_LBADCHAN, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_SEE_CHAN, FEAT_OPERS_SEE_IN_SECRET_CHANNELS, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_WIDE_GLINE, FEAT_OPER_WIDE_GLINE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_WIDE_ZLINE, FEAT_OPER_WIDE_ZLINE, FEATFLAG_GLOBAL_OPERS },
-  { PRIV_WIDE_SHUN, FEAT_OPER_WIDE_SHUN, FEATFLAG_GLOBAL_OPERS },
+    /* Set it if necessary (privileges were already cleared). */
+    if (FlagHas(source, priv))
+      SetPriv(client, priv);
+  }
 
-  { PRIV_LOCAL_KILL, FEAT_LOCOP_KILL, FEATFLAG_LOCAL_OPERS },
-  { PRIV_REHASH, FEAT_LOCOP_REHASH, FEATFLAG_LOCAL_OPERS },
-  { PRIV_RESTART, FEAT_LOCOP_RESTART, FEATFLAG_LOCAL_OPERS },
-  { PRIV_DIE, FEAT_LOCOP_DIE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_LOCAL_GLINE, FEAT_LOCOP_LGLINE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_LOCAL_ZLINE, FEAT_LOCOP_LZLINE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_LOCAL_SHUN, FEAT_LOCOP_LSHUN, FEATFLAG_LOCAL_OPERS },
-  { PRIV_LOCAL_JUPE, FEAT_LOCOP_LJUPE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_LOCAL_OPMODE, FEAT_LOCOP_LOPMODE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_FORCE_LOCAL_OPMODE, FEAT_LOCOP_FORCE_LOPMODE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_LOCAL_BADCHAN, FEAT_LOCOP_LBADCHAN, FEATFLAG_LOCAL_OPERS },
-  { PRIV_SET, FEAT_LOCOP_SET, FEATFLAG_LOCAL_OPERS },
-  { PRIV_SEE_CHAN, FEAT_LOCOP_SEE_IN_SECRET_CHANNELS, FEATFLAG_LOCAL_OPERS },
-  { PRIV_WIDE_GLINE, FEAT_LOCOP_WIDE_GLINE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_WIDE_ZLINE, FEAT_LOCOP_WIDE_ZLINE, FEATFLAG_LOCAL_OPERS },
-  { PRIV_WIDE_SHUN, FEAT_LOCOP_WIDE_SHUN, FEATFLAG_LOCAL_OPERS },
-
-  { PRIV_LAST_PRIV, FEAT_LAST_F, 0 }
-};
+  /* This should be handled in the config, but lets be sure... */
+  if (HasPriv(client, PRIV_PROPAGATE))
+  {
+    /* force propagating opers to display */
+    SetPriv(client, PRIV_DISPLAY);
+  }
+  else
+  {
+    /* if they don't propagate oper status, prevent desyncs */
+    ClrPriv(client, PRIV_KILL);
+    ClrPriv(client, PRIV_GLINE);
+    ClrPriv(client, PRIV_JUPE);
+    ClrPriv(client, PRIV_OPMODE);
+    ClrPriv(client, PRIV_BADCHAN);
+  }
+}
 
 /** Array mapping privilege values to names and vice versa. */
 static struct {
@@ -214,107 +243,6 @@ static struct {
 #undef P
   { 0, 0 }
 };
-
-
-/** Set privileges on \a client.
- * @param[in] client Client whos privileges are being set.
- * @return Zero.
- */
-void
-client_set_privs(struct Client* client)
-{
-  struct Privs privs;
-  struct Privs antiprivs;
-  char privbuf[512] = "";
-  int i;
-
-  memset(&privs, 0, sizeof(struct Privs));
-  memset(&antiprivs, 0, sizeof(struct Privs));
-
-  if (!IsAnOper(client) && !IsRemoteOper(client)) { /* clear privilege mask */
-    memset(&(cli_privs(client)), 0, sizeof(struct Privs));
-    return;
-  } else if (!MyConnect(client) && !IsRemoteOper(client)) {
-    memset(&(cli_privs(client)), 255, sizeof(struct Privs));
-    PrivClr(&(cli_privs(client)), PRIV_SET);
-    return;
-  }
-
-  /* This sequence is temporary until the .conf is carefully rewritten */
-
-  for (i = 0; feattab[i].priv != PRIV_LAST_PRIV; i++) {
-    if (feattab[i].flag == FEATFLAG_ENABLES_PRIV) {
-      if (!feature_bool(feattab[i].feat))
-	PrivSet(&antiprivs, feattab[i].priv);
-    } else if (feattab[i].feat == FEAT_LAST_F || feature_bool(feattab[i].feat)) {
-      if (feattab[i].flag == FEATFLAG_DISABLES_PRIV) {
-	PrivSet(&antiprivs, feattab[i].priv);
-      } else if (feattab[i].flag == FEATFLAG_ALL_OPERS) {
-	if (IsAnOper(client) || OIsGlobal(client) || OIsAdmin(client))
-	  PrivSet(&privs, feattab[i].priv);
-      } else if (feattab[i].flag == FEATFLAG_GLOBAL_OPERS) {
-	if (IsOper(client) || OIsGlobal(client))
-	  PrivSet(&privs, feattab[i].priv);
-      } else if (feattab[i].flag == FEATFLAG_ADMIN_OPERS) {
-        if (feature_bool(FEAT_OPERFLAGS)) {
-          if (IsAdmin(client) || OIsAdmin(client))
-            PrivSet(&privs, feattab[i].priv);
-        } else {
-          if (IsOper(client) || OIsGlobal(client))
-            PrivSet(&privs, feattab[i].priv);
-        }
-      } else if (feattab[i].flag == FEATFLAG_LOCAL_OPERS) {
-	if (IsLocOp(client))
-	  PrivSet(&privs, feattab[i].priv);
-      }
-    }
-  }
-       
-  /* This is the end of the gross section */
-
-  if (PrivHas(&privs, PRIV_PROPAGATE))
-    PrivSet(&privs, PRIV_DISPLAY); /* force propagating opers to display */
-  else { /* if they don't propagate oper status, prevent desyncs */
-    PrivSet(&antiprivs, PRIV_KILL);
-    PrivSet(&antiprivs, PRIV_GLINE);
-    PrivSet(&antiprivs, PRIV_SHUN);
-    PrivSet(&antiprivs, PRIV_JUPE);
-    PrivSet(&antiprivs, PRIV_OPMODE);
-    PrivSet(&antiprivs, PRIV_BADCHAN);
-  }
-
-  if (OIsWhois(client)) {
-    PrivSet(&privs, PRIV_WHOIS_NOTICE);
-  }
-  if (OIsIdle(client)) {
-    PrivSet(&privs, PRIV_HIDE_IDLE);
-  }
-  if (OIsXtraop(client)) {
-    PrivSet(&privs, PRIV_XTRAOP);
-  }
-  if (OIsHideChans(client)) {
-    PrivSet(&privs, PRIV_HIDE_CHANNELS);
-  }
-
-  for (i = 0; i <= _PRIV_IDX(PRIV_LAST_PRIV); i++)
-    privs.priv_mask[i] &= ~antiprivs.priv_mask[i];
-
-  cli_privs(client) = privs;
-
-  /* Send privileges */
-  for (i = 0; privtab[i].name; i++)
-  if (HasPriv(client, privtab[i].priv)) {
-	strcat(privbuf, privtab[i].name);
-	strcat(privbuf, ",");
-  }
-  privbuf[strlen(privbuf)] = 0;
-  if (IsRemoteOper(client)) {
-    ClearRemoteOper(client);
-    sendcmdto_one(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
-    sendcmdto_serv_butone(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
-  } else
-    sendcmdto_serv_butone(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
-}
 
 /** Report privileges of \a client to \a to.
  * @param[in] to Client requesting privilege list.
@@ -365,9 +293,9 @@ int client_modify_priv_by_name(struct Client *who, char *priv, int what) {
  for (i = 0; privtab[i].name; i++)
   if (0 == ircd_strcmp(privtab[i].name, priv)) {
    if (what == PRIV_ADD)
-    GrantPriv(who, privtab[i].priv);
+    SetPriv(who, privtab[i].priv);
    else if (what == PRIV_DEL) {
-    RevokePriv(who, privtab[i].priv);
+    ClrPriv(who, privtab[i].priv);
    }
   }
  return 0;

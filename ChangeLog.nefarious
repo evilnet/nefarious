@@ -1,6 +1,42 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-10-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Document privs and usermode usage.
+
+	* include/class.h: Support for privs in Class/Oper blocks and
+	support for usermodes in Class blocks.
+
+	* include/client.h: Support for privs in Class/Oper blocks.
+
+	* include/ircd_features.h: Removed PRIV related F:lines.
+
+	* include/flagset.h: Move flagset declarations from client.h to a
+	new header file. 
+
+	* include/s_conf.h: Update priv usage.
+
+	* ircd/client.c: Overhauled priv's.
+
+	* ircd/ircd_features.c: Removed PRIV related F:lines.
+
+	* ircd/ircd_lexer.l:  Add in support for setting privs in Class and
+	Oper blocks. Also added in usermode support for Class blocks.
+
+	* ircd/ircd_parser.y: Add in support for setting privs in Class and
+	Oper blocks. Also added in usermode support for Class blocks.
+
+	* ircd/m_challenge.c: Update priv usage.
+
+	* ircd/m_oper.c: Update priv usage.
+
+	* ircd/m_server.c: Update priv usage.
+
+	* ircd/s_debug.c: Removed PRIV related F:lines.
+
+	* ircd/s_user.c: Set Class usermodes on connect.
+
 2008-10-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_parser.y: Ugly but meh. Fix for Command prefix and

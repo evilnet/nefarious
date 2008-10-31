@@ -30,6 +30,9 @@
 #ifndef INCLUDED_dbuf_h
 #include "dbuf.h"
 #endif
+#ifndef INCLUDED_flagset_h
+#include "flagset.h"
+#endif
 #ifndef INCLUDED_msgq_h
 #include "msgq.h"
 #endif
@@ -118,18 +121,6 @@ enum Priv {
   PRIV_LAST_PRIV        /**< number of privileges */
 };
 
-/** Number of bits */
-#define _PRIV_NBITS		(8 * sizeof(unsigned long))
-/** Element number for priv */
-#define _PRIV_IDX(priv)		((priv) / _PRIV_NBITS)
-/** Element bit for priv */
-#define _PRIV_BIT(priv)		(1UL << ((priv) % _PRIV_NBITS))
-
-/** Operator privileges. */
-struct Privs {
-  unsigned long priv_mask[(PRIV_LAST_PRIV + _PRIV_NBITS - 1) / _PRIV_NBITS];
-};
-
 /** Client flags and modes.
  * Note that flags at least FLAG_LOCAL_UMODES but less than
  * FLAG_GLOBAL_UMODES are treated as local modes, and flags at least
@@ -196,15 +187,14 @@ enum Flag {
 
     FLAG_PRIVDEAF,                  /**< Client is deaf to all private messages */
 
-    _FLAG_COUNT,
+    FLAG_LAST_FLAG,
+
     FLAG_LOCAL_UMODES = FLAG_LOCOP, /**< First local mode flag */
     FLAG_GLOBAL_UMODES = FLAG_OPER  /**< First global mode flag */
 };
 
-/** Client flags and modes. */
-struct Flags {
-  unsigned long flag_bits[((_FLAG_COUNT + _PRIV_NBITS - 1) / _PRIV_NBITS)];
-};
+DECLARE_FLAGSET(Privs, PRIV_LAST_PRIV);
+DECLARE_FLAGSET(Flags, FLAG_LAST_FLAG);
 
 /** Represents a local connection.
  * This contains a lot of stuff irrelevant to server connections, but
@@ -257,6 +247,7 @@ struct Connection {
                                          caused this clients socket to be `dead' */
   struct Socket       con_socket;     /**< socket descriptor for client */
   struct Timer        con_proc;       /**< process latent messages from client */
+  struct Privs        con_privs;     /**< Oper privileges */
   struct AuthRequest* con_auth;       /**< auth request for client */
   struct LOCInfo*     con_loc;        /**< Login-on-connect information */
 };
@@ -293,7 +284,6 @@ struct Client {
   struct in_addr cli_ip;        /**< Real ip# NOT defined for remote servers! */
   short          cli_status;    /**< Client type */
   unsigned char  cli_local;     /**< local or remote client */
-  struct Privs   cli_privs;     /**< Oper privileges */
   char cli_name[HOSTLEN + 1];   /**< Unique name of the client, nick or host */
   char cli_username[USERLEN + 1];    /**< username here now for auth stuff */
   char cli_info[REALLEN + 1];        /**< Free form additional client information */
@@ -354,7 +344,7 @@ struct Client {
 /** Return non-zero if the client is local. */
 #define cli_local(cli)		((cli)->cli_local)
 /** Get oper privileges for client. */
-#define cli_privs(cli)		((cli)->cli_privs)
+#define cli_privs(cli)		con_privs(cli_connect(cli))
 /** Get client name. */
 #define cli_name(cli)		((cli)->cli_name)
 /** Get client username (ident). */
@@ -448,6 +438,8 @@ struct Client {
 #define cli_socket(cli)		((cli)->cli_connect->con_socket)
 /** Get Timer for processing waiting messages from the client. */
 #define cli_proc(cli)		((cli)->cli_connect->con_proc)
+/** Get the oper privilege set for the connection. */
+#define con_privs(con)          (&(con)->con_privs)
 /** Get auth request for client. */
 #define cli_auth(cli)		((cli)->cli_connect->con_auth)
 /** Get login on connect request for client. */
@@ -604,23 +596,14 @@ struct Client {
             (STAT_SERVER | STAT_CONNECTING | STAT_HANDSHAKE))
 
 /*
- * flags macros.
+ * flags macros
  */
 /** Set a flag in a client's flags. */
-#define FlagSet(fset, flag)     ((fset)->flag_bits[_PRIV_IDX(flag)] |= \
-                                 _PRIV_BIT(flag))
+#define SetFlag(cli, flag)  FlagSet(&cli_flags(cli), flag)
 /** Clear a flag from a client's flags. */
-#define FlagClr(fset, flag)     ((fset)->flag_bits[_PRIV_IDX(flag)] &= \
-                                 ~(_PRIV_BIT(flag)))
+#define ClrFlag(cli, flag)  FlagClr(&cli_flags(cli), flag)
 /** Return non-zero if a flag is set in a client's flags. */
-#define FlagHas(fset, flag)     ((fset)->flag_bits[_PRIV_IDX(flag)] & \
-                                 _PRIV_BIT(flag))
-/** Set a flag in a client's flags. */
-#define SetFlag(cli, flag)      FlagSet(&cli_flags(cli), flag)
-/** Clear a flag from a client's flags. */
-#define ClrFlag(cli, flag)      FlagClr(&cli_flags(cli), flag)
-/** Return non-zero if a flag is set in a client's flags. */
-#define HasFlag(cli, flag)      FlagHas(&cli_flags(cli), flag)
+#define HasFlag(cli, flag)  FlagHas(&cli_flags(cli), flag)
 
 
 /** Return non-zero if the client has access */
@@ -1051,27 +1034,17 @@ struct Client {
 /** Noisy server notice bits that cause other bits to be cleared during connect. */
 #define SNO_NOISY (SNO_SERVKILL|SNO_UNAUTH)
 
-/** Grant a privilege to a client. */
-#define PrivSet(pset, priv)	((pset)->priv_mask[_PRIV_IDX(priv)] |= \
-				 _PRIV_BIT(priv))
-/** Revoke a privilege from a client. */
-#define PrivClr(pset, priv)	((pset)->priv_mask[_PRIV_IDX(priv)] &= \
-				 ~(_PRIV_BIT(priv)))
 /** Test whether a privilege has been granted to a client. */
-#define PrivHas(pset, priv)	((pset)->priv_mask[_PRIV_IDX(priv)] & \
-				 _PRIV_BIT(priv))
+#define HasPriv(cli, priv)  FlagHas(cli_privs(cli), priv)
+/** Grant a privilege to a client. */
+#define SetPriv(cli, priv)  FlagSet(cli_privs(cli), priv)
+/** Revoke a privilege from a client. */
+#define ClrPriv(cli, priv)  FlagClr(cli_privs(cli), priv)
 
 /** Used in setting and unsetting privs. */
 #define PRIV_ADD 1
 /** Used in setting and unsetting privs. */
 #define PRIV_DEL 0
-
-/** Grant a privilege to a client. */
-#define GrantPriv(cli, priv)	(PrivSet(&(cli_privs(cli)), priv))
-/** Revoke a privilege from a client. */
-#define RevokePriv(cli, priv)	(PrivClr(&(cli_privs(cli)), priv))
-/** Test whether a privilege has been granted to a client. */
-#define HasPriv(cli, priv)	(PrivHas(&(cli_privs(cli)), priv))
 
 /** IP address viewing options in get_client_name(). */
 typedef enum ShowIPType {
@@ -1081,11 +1054,12 @@ typedef enum ShowIPType {
 } ShowIPType;
 
 extern const char* get_client_name(const struct Client* sptr, int showip);
+extern const char* client_get_default_umode(const struct Client* sptr);
 extern int client_get_ping(const struct Client* local_client);
 extern void client_drop_sendq(struct Connection* con);
 extern void client_add_sendq(struct Connection* con,
 			     struct Connection** con_p);
-extern void client_set_privs(struct Client* client);
+extern void client_set_privs(struct Client *client, struct ConfItem *oper);
 extern int client_report_privs(struct Client* to, struct Client* client);
 extern char *client_print_privs(struct Client* client);
 extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);

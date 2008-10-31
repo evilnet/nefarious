@@ -70,7 +70,7 @@
   char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class, is_local;
-  static int is_leaf, is_hub;
+  static int is_leaf, is_hub, invert, class;
   static char *name, *pass, *host, *vhost, *ipaddr, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
@@ -93,6 +93,9 @@
   extern struct DenyConf*   denyConfList;
   extern struct CRuleConf*  cruleConfList;
   extern struct LocalConf   localConf;
+
+  struct Privs privs;
+  struct Privs privs_dirty;
 
 static int oper_access[] = {
   OFLAG_GLOBAL,	  'O',
@@ -226,10 +229,54 @@ static void free_slist(struct SLink **link) {
 %token TEOF
 %token LOGICAL_AND LOGICAL_OR
 %token CONNECTED DIRECTCON VIA DIRECTOP
+/* and now a lot of priviledges... */
+%token TPRIV_CHAN_LIMIT
+%token TPRIV_MODE_LCHAN
+%token TPRIV_WALK_LCHAN
+%token TPRIV_DEOP_LCHAN
+%token TPRIV_SHOW_INVIS
+%token TPRIV_SHOW_ALL_INVIS
+%token TPRIV_UNLIMIT_QUERY
+%token TPRIV_KILL
+%token TPRIV_LOCAL_KILL
+%token TPRIV_REHASH
+%token TPRIV_RESTART
+%token TPRIV_DIE
+%token TPRIV_GLINE
+%token TPRIV_LOCAL_GLINE
+%token TPRIV_JUPE
+%token TPRIV_LOCAL_JUPE
+%token TPRIV_OPMODE
+%token TPRIV_LOCAL_OPMODE
+%token TPRIV_SET
+%token TPRIV_WHOX
+%token TPRIV_BADCHAN
+%token TPRIV_LOCAL_BADCHAN
+%token TPRIV_SEE_CHAN
+%token TPRIV_PROPAGATE
+%token TPRIV_DISPLAY
+%token TPRIV_SEE_OPERS
+%token TPRIV_WIDE_GLINE
+%token TPRIV_FORCE_OPMODE
+%token TPRIV_FORCE_LOCAL_OPMODE
+%token TPRIV_REMOTEREHASH
+%token TPRIV_CHECK
+%token TPRIV_SEE_SECRET_CHAN
+%token TPRIV_SHUN
+%token TPRIV_LOCAL_SHUN
+%token TPRIV_WIDE_SHUN
+%token TPRIV_ZLINE
+%token TPRIV_LOCAL_ZLINE
+%token TPRIV_WIDE_ZLINE
+%token TPRIV_LIST_CHAN
+%token TPRIV_WHOIS_NOTICE
+%token TPRIV_HIDE_IDLE
+%token TPRIV_XTRAOP
+%token TPRIV_HIDE_CHANNELS
 /* and some types... */
 %type <num> sizespec
 %type <num> timespec timefactor factoredtimes factoredtime
-%type <num> expr
+%type <num> expr yesorno privtype
 %left LOGICAL_OR
 %left LOGICAL_AND
 %left '+' '-'
@@ -532,7 +579,12 @@ classblock: CLASS {
 {
   if (i_class)
   {
+    struct ConnectionClass *c_class;
     add_class(i_class, tping, tconn, maxlinks, sendq);
+    c_class = find_class(i_class);
+    c_class->default_umode = pass;
+    memcpy(&c_class->privs, &privs, sizeof(c_class->privs));
+    memcpy(&c_class->privs_dirty, &privs_dirty, sizeof(c_class->privs_dirty));
   }
   else {
    parse_error("Missing class number in class block");
@@ -543,10 +595,12 @@ classblock: CLASS {
   maxlinks = 0;
   sendq = 0;
   i_class = 0;
+  memset(&privs, 0, sizeof(privs));
+  memset(&privs_dirty, 0, sizeof(privs_dirty));
 };
 classitems: classitem classitems | classitem;
-classitem: classname | classpingfreq | classconnfreq | classmaxlinks |
-           classsendq;
+classitem: classname | classpingfreq | classconnfreq | classmaxlinks | priv |
+           classsendq | classusermode;
 classname: NAME '=' NUMBER ';'
 {
   i_class = $3;
@@ -567,15 +621,19 @@ classsendq: SENDQ '=' sizespec ';'
 {
   sendq = $3;
 };
+classusermode: USERMODE '=' QSTRING ';'
+{
+  pass = $3;
+};
 
 
 operblock: OPER '{' operitems '}' ';'
 {
-  struct ConfItem *aconf = NULL;
   struct SLink *link;
   int* i;
   int iflag;
   char *m;
+  struct ConfItem *aconf = NULL;
 
   if (name == NULL)
     parse_error("Missing name in operator block");
@@ -585,14 +643,18 @@ operblock: OPER '{' operitems '}' ';'
     parse_error("Missing host(s) in operator block");
   else if (c_class == NULL)
     parse_error("Invalid or missing class in operator block");
+  else if (!FlagHas(&privs_dirty, PRIV_PROPAGATE)
+           && !FlagHas(&c_class->privs_dirty, PRIV_PROPAGATE))
+    parse_error("Operator block for %s and class %d have no LOCAL setting", name, c_class->cc_class);
   else for (link = hosts; link != NULL; link = link->next) {
     aconf = make_conf();
-    if (is_local) {
-      m = "o";
-      aconf->status = CONF_LOCOP;
-    } else {
+
+    if (FlagHas(&privs, PRIV_PROPAGATE)) {
       m = "O";
       aconf->status = CONF_OPERATOR;
+    } else {
+      m = "o";
+      aconf->status = CONF_LOCOP;
     }
     DupString(aconf->name, name);
     DupString(aconf->passwd, pass);
@@ -625,6 +687,8 @@ operblock: OPER '{' operitems '}' ';'
         }
       }
     }
+    memcpy(&aconf->privs, &privs, sizeof(aconf->privs));
+    memcpy(&aconf->privs_dirty, &privs_dirty, sizeof(aconf->privs_dirty));
 
     aconf->next = GlobalConfList;
     GlobalConfList = aconf;
@@ -636,9 +700,11 @@ operblock: OPER '{' operitems '}' ';'
   free_slist(&hosts);
   name = pass = NULL;
   c_class = NULL;
+  memset(&privs, 0, sizeof(privs));
+  memset(&privs_dirty, 0, sizeof(privs_dirty));
 };
 operitems: operitem | operitems operitem;
-operitem: opername | operpass | operhost | operflags | operclass | operlocal;
+operitem: opername | operpass | operhost | operflags | operclass | priv;
 opername: NAME '=' QSTRING ';'
 {
   MyFree(name);
@@ -676,14 +742,63 @@ operclass: CLASS '=' NUMBER ';'
  if (!c_class)
   parse_error("No such connection class '%d' for Operator block", $3);
 };
-operlocal: LOCAL '=' YES ';'
+
+priv: privtype '=' yesorno ';'
 {
-  is_local = 1;
-} | LOCAL '=' NO ';'
-{
-  is_local = 0;
+  FlagSet(&privs_dirty, $1);
+  if (($3 == 1) ^ invert)
+    FlagSet(&privs, $1);
+  else
+    FlagClr(&privs, $1);
+  invert = 0;
 };
 
+privtype:  TPRIV_CHAN_LIMIT { $$ = PRIV_CHAN_LIMIT; } |
+           TPRIV_MODE_LCHAN { $$ = PRIV_MODE_LCHAN; } |
+           TPRIV_WALK_LCHAN { $$ = PRIV_WALK_LCHAN; } |
+           TPRIV_DEOP_LCHAN { $$ = PRIV_DEOP_LCHAN; } |
+           TPRIV_SHOW_INVIS { $$ = PRIV_SHOW_INVIS; } |
+           TPRIV_SHOW_ALL_INVIS { $$ = PRIV_SHOW_ALL_INVIS; } |
+           TPRIV_UNLIMIT_QUERY { $$ = PRIV_UNLIMIT_QUERY; } |
+           KILL { $$ = PRIV_KILL; } |
+           TPRIV_LOCAL_KILL { $$ = PRIV_LOCAL_KILL; } |
+           TPRIV_REHASH { $$ = PRIV_REHASH; } |
+           TPRIV_RESTART { $$ = PRIV_RESTART; } |
+           TPRIV_DIE { $$ = PRIV_DIE; } |
+           TPRIV_GLINE { $$ = PRIV_GLINE; } |
+           TPRIV_LOCAL_GLINE { $$ = PRIV_LOCAL_GLINE; } |
+           JUPE { $$ = PRIV_JUPE; } |
+           TPRIV_LOCAL_JUPE { $$ = PRIV_LOCAL_JUPE; } |
+           TPRIV_OPMODE { $$ = PRIV_OPMODE; } |
+           TPRIV_LOCAL_OPMODE { $$ = PRIV_LOCAL_OPMODE; } |
+           TPRIV_SET { $$ = PRIV_SET; } |
+           TPRIV_WHOX { $$ = PRIV_WHOX; } |
+           TPRIV_BADCHAN { $$ = PRIV_BADCHAN; } |
+           TPRIV_LOCAL_BADCHAN { $$ = PRIV_LOCAL_BADCHAN; } |
+           TPRIV_SEE_CHAN { $$ = PRIV_SEE_CHAN; } |
+           TPRIV_PROPAGATE { $$ = PRIV_PROPAGATE; } |
+           TPRIV_DISPLAY { $$ = PRIV_DISPLAY; } |
+           TPRIV_SEE_OPERS { $$ = PRIV_SEE_OPERS; } |
+           TPRIV_WIDE_GLINE { $$ = PRIV_WIDE_GLINE; } |
+           TPRIV_FORCE_OPMODE { $$ = PRIV_FORCE_OPMODE; } |
+           TPRIV_FORCE_LOCAL_OPMODE { $$ = PRIV_FORCE_LOCAL_OPMODE; } |
+           TPRIV_REMOTEREHASH { $$ = PRIV_REMOTEREHASH; } |
+           TPRIV_CHECK { $$ = PRIV_CHECK; } |
+           TPRIV_SEE_SECRET_CHAN { $$ = PRIV_SEE_SECRET_CHAN; } |
+           TPRIV_SHUN { $$ = PRIV_SHUN; } |
+           TPRIV_LOCAL_SHUN { $$ = PRIV_LOCAL_SHUN; } |
+           TPRIV_WIDE_SHUN { $$ = PRIV_WIDE_GLINE; } |
+           TPRIV_ZLINE { $$ = PRIV_ZLINE; } |
+           TPRIV_LOCAL_ZLINE { $$ = PRIV_LOCAL_ZLINE; } |
+           TPRIV_WIDE_ZLINE { $$ = PRIV_WIDE_ZLINE; } |
+           TPRIV_LIST_CHAN { $$ = PRIV_LIST_CHAN; } |
+           TPRIV_WHOIS_NOTICE { $$ = PRIV_WHOIS_NOTICE; } |
+           TPRIV_HIDE_IDLE { $$ = PRIV_HIDE_IDLE; } |
+           TPRIV_XTRAOP { $$ = PRIV_XTRAOP; } |
+           TPRIV_HIDE_CHANNELS { $$ = PRIV_HIDE_CHANNELS; }; |
+           LOCAL { $$ = PRIV_PROPAGATE; invert = 1; }
+
+yesorno: YES { $$ = 1; } | NO { $$ = 0; };
 
 motdblock: MOTD '{' motditems '}' ';'
 {

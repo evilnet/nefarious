@@ -29,7 +29,8 @@
 #define INCLUDED_sys_types_h
 #endif
 
-struct Client;
+ #include "client.h"
+
 struct StatDesc;
 struct ConfItem;
 
@@ -40,6 +41,9 @@ struct ConfItem;
 struct ConnectionClass {
   struct ConnectionClass* next;           /**< Link to next connection class. */
   int                     cc_class;       /**< Number of connection class. */
+  struct Privs            privs;
+  struct Privs            privs_dirty;
+  char                    *default_umode;
   unsigned int            max_sendq;      /**< Maximum client SendQ in bytes. */
   short                   ping_freq;      /**< Ping frequency for clients. */
   short                   conn_freq;      /**< Auto-connect frequency. */
@@ -78,6 +82,8 @@ struct ConnectionClass {
 #define ConfSendq(x)    ((x)->conn_class->max_sendq)
 /** Get number of references to class in ConfItem \a x. */
 #define ConfLinks(x)    ((x)->conn_class->ref_count)
+#define ConfUmode(x)    ((x)->conn_class->default_umode)
+
 
 /*
  * Proto types

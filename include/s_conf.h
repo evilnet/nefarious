@@ -18,6 +18,7 @@
 #define INCLUDED_netinet_in_h
 #endif
 
+#include "client.h"
 #include <tre/regex.h>
 
 struct StatDesc;
@@ -68,6 +69,8 @@ struct ConfItem {
   unsigned short           port;
   char 		           bits;        /* Number of bits for ipkills */
   int                      flags;
+  struct Privs privs; /* Priviledges for opers. */
+  struct Privs privs_dirty;
 };
 
 struct ServerConf {
@@ -294,6 +297,9 @@ extern int find_eline(struct Client *cptr, unsigned int flags);
 extern int find_kill(struct Client *cptr);
 extern int find_restrict(struct Client *cptr);
 extern struct MotdItem* read_motd(const char* motdfile);
+
+extern void set_initial_oper_privs(struct ConfItem *oper, int flags);
+
 extern char* find_quarantine(const char* chname);
 extern void conf_add_sline(const char* const* fields, int count);
 extern int conf_check_slines(struct Client *cptr);

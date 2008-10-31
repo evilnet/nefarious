@@ -854,6 +854,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
 			  NumNick(cptr) /* Two %'s */
 			  );
 /*    IPcheck_connect_succeeded(sptr);*/
+    /*
+     * Set user's initial modes
+     */
+    parv[0] = (char*)nick;
+    parv[1] = (char*)nick;
+    parv[2] = (char*)client_get_default_umode(sptr);
+    parv[3] = NULL; /* needed in case of +s */
+    set_user_mode(sptr, sptr, 3, parv);
+    ClearHiddenHost(sptr); /* just in case somebody stuck +x in there */
   }
   else
     /* if (IsServer(cptr)) */
@@ -984,7 +993,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
     else
       FlagClr(&flags, FLAG_ACCOUNT);
 
-    if (cli_snomask(sptr) != SNO_DEFAULT && HasFlag(sptr, FLAG_SERVNOTICE))
+    /* Send server notice mask to client */
+    if (MyUser(sptr) && (cli_snomask(sptr) != SNO_DEFAULT) && HasFlag(sptr, FLAG_SERVNOTICE))
       send_reply(sptr, RPL_SNOMASK, cli_snomask(sptr), cli_snomask(sptr));
 
     if (feature_bool(FEAT_POLICY_NOTICE)) {
@@ -1089,9 +1099,6 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
           }
         }
       }
-    }
-    if (HasFlag(new_client, FLAG_OPER)) {
-      GrantPriv(new_client, PRIV_PROPAGATE);
     }
     /*
      * Set new nick name.
@@ -2308,7 +2315,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     prop = 1;
   if (FlagHas(&setflags, FLAG_OPER) && !IsOper(acptr)) { /* user no longer oper */
     --UserStats.opers;
-    client_set_privs(acptr); /* will clear propagate privilege */
+    client_set_privs(acptr, NULL); /* will clear propagate privilege */
   }
   if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(acptr))
     --UserStats.inv_clients;
