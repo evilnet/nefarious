@@ -3,6 +3,10 @@
 
 2008-10-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/Makefile.in: Warning fix.
+
+2008-10-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Document privs and usermode usage.
 
 	* include/class.h: Support for privs in Class/Oper blocks and
