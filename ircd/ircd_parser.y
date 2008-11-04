@@ -534,6 +534,7 @@ clientblock: CLIENT
    aconf = NULL;
  }
 
+  ipaddr = NULL;
   host = NULL;
   username = NULL;
   c_class = NULL;
