@@ -90,7 +90,6 @@ enum Feature {
   FEAT_AUTH_TIMEOUT,
 
   /* features that affect all operators */
-  FEAT_CRYPT_OPER_PASSWORD,
   FEAT_CONFIG_OPERCMDS,
 
   /* HEAD_IN_SAND Features */
@@ -104,6 +103,7 @@ enum Feature {
   FEAT_HIS_LINKS,
   FEAT_HIS_TRACE,
   FEAT_HIS_STATS_l,
+  FEAT_HIS_STATS_L,
   FEAT_HIS_STATS_c,
   FEAT_HIS_STATS_g,
   FEAT_HIS_STATS_h,

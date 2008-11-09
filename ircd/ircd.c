@@ -36,6 +36,7 @@
 #include "ircd_signal.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
+#include "ircd_crypt.h"
 #include "jupe.h"
 #include "list.h"
 #include "match.h"
@@ -923,6 +924,7 @@ int main(int argc, char **argv) {
   initstats();
 
   init_resolver();
+  ircd_crypt_init();
 
   if (!init_conf()) {
     log_write(LS_SYSTEM, L_CRIT, 0, "Failed to read configuration file %s",

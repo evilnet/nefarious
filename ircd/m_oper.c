@@ -90,7 +90,7 @@
 #include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
-#include "ircd_xopen.h"
+#include "ircd_crypt.h"
 #include "msg.h"
 #include "numeric.h"
 #include "numnicks.h"
@@ -117,10 +117,12 @@ int oper_password_match(const char* to_match, const char* passwd)
   if (!to_match || !passwd)
     return 0;
 
-  if (feature_bool(FEAT_CRYPT_OPER_PASSWORD))
-    to_match = ircd_crypt(to_match, passwd);
+  to_match = ircd_crypt(to_match, passwd);
 
-  return (0 == strcmp(to_match, passwd));
+  if (to_match == NULL)
+    return 0;
+  else
+    return (0 == strcmp(to_match, passwd));
 }
 
 int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **_aconf) {

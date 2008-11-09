@@ -432,7 +432,6 @@ static struct FeatureDesc {
   F_I(AUTH_TIMEOUT, 0, 9, 0),
 
   /* features that affect all operators */
-  F_B(CRYPT_OPER_PASSWORD, FEAT_MYOPER | FEAT_READ, 1, 0),
   F_B(CONFIG_OPERCMDS, 0, 1, 0),
 
   /* HEAD_IN_SAND Features */
@@ -446,6 +445,7 @@ static struct FeatureDesc {
   F_B(HIS_LINKS, 0, 1, 0),
   F_B(HIS_TRACE, 0, 1, 0),
   F_B(HIS_STATS_l, 0, 1, 0),
+  F_B(HIS_STATS_L, 0, 1, 0),
   F_B(HIS_STATS_c, 0, 1, 0),
   F_B(HIS_STATS_g, 0, 1, 0),
   F_B(HIS_STATS_h, 0, 1, 0),
