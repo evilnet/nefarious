@@ -36,7 +36,7 @@
 #include "send.h"
 #include "ircd_struct.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
 #define BAD_PING                ((unsigned int)-2)

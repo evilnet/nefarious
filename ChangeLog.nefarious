@@ -3,6 +3,18 @@
 
 2008-11-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Backport of .12's custom assertion code.
+
+	* include/ircd_log.h: custom implementation of assert() that calls log_write().
+
+	* ircd/*.c: use new assert() in ircd_log.h in preference to system assert().
+
+	* ircd/ircd_log.c: add sentinel (log_inassert) to prevent assert()
+	from looping should there be an assertion failure somewhere in the
+	logging subsystem.
+
+2008-11-09  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* Backport of .12's encryption code. Credits: hikari <shadow@undernet.org>
 
 	* doc/example.conf: Update password use in Operator blocks.

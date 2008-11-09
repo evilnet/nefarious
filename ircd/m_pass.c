@@ -84,6 +84,7 @@
 #include "client.h"
 #include "ircd_alloc.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
 #include "send.h"
@@ -91,7 +92,7 @@
 #include "s_user.h"
 #include "msg.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /* XXX */
 #include "s_debug.h"

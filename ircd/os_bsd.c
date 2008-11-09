@@ -23,10 +23,12 @@
 
 #define _XOPEN_SOURCE	/* make limits.h #define IOV_MAX */
 
+
+#include "ircd_log.h"
 #include "ircd_osdep.h"
 #include "msgq.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>

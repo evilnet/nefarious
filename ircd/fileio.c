@@ -22,8 +22,9 @@
 
 #include "fileio.h"
 #include "ircd_alloc.h"         /* MyMalloc, MyFree */
+#include "ircd_log.h"
 
-#include <assert.h>             /* assert */
+/* #include <assert.h> -- Now using assert in ircd_log.h */             /* assert */
 #include <fcntl.h>              /* O_RDONLY, O_WRONLY, ... */
 #include <stdio.h>              /* BUFSIZ, EOF */
 #include <sys/stat.h>           /* struct stat */

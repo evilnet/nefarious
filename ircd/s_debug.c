@@ -57,7 +57,7 @@
 #include "whowas.h"
 #include "zline.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>

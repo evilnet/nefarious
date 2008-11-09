@@ -34,7 +34,7 @@
 #include "support.h"
 #include "sys.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>

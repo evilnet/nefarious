@@ -18,7 +18,7 @@
  */
 #include "fda.h"
 #include <stdio.h>
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 #define ALLOC_SIZE 100000
 

@@ -97,7 +97,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * ms_svspart - server message handler

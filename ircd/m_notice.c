@@ -83,6 +83,7 @@
 
 #include "client.h"
 #include "ircd_chattr.h"
+#include "ircd_log.h"
 #include "ircd_relay.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
@@ -98,7 +99,7 @@
 #include "s_misc.h" /* CPTR_KILLED - added by Vadtec 02/26/2008 */
 #include "hash.h" /* FindChannel() - added by Vadtec 02/26/2008 */
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 #include <stdio.h> /* snprintf - added by Vadtec 02/25/2008 */
 #ifdef _GNU_SOURCE

@@ -92,7 +92,7 @@
 #include "s_bsd.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * ms_desynch - server message handler

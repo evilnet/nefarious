@@ -93,7 +93,7 @@
 #include "s_bsd.h"
 #include "s_user.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <stdlib.h>
 
 static int send_asll_reply(struct Client *from, struct Client *to, char *server,

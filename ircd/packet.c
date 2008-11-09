@@ -25,13 +25,14 @@
 #include "client.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
+#include "ircd_log.h"
 #include "parse.h"
 #include "s_bsd.h"
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 static void update_bytes_received(struct Client* cptr, unsigned int length)
 {

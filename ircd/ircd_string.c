@@ -27,7 +27,7 @@
 #include "msg.h"
 #include "s_bsd.h"
 #include <stdlib.h>
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 #include <tre/regex.h>
 /*

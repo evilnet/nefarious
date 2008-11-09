@@ -57,7 +57,7 @@
 #include "sys.h"               /* TRUE bleah */
 
 #include <arpa/inet.h>         /* inet_netof */
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
 #include <fcntl.h>
 #include <netdb.h>             /* struct hostent */

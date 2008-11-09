@@ -30,12 +30,13 @@
 #include "ircd_alloc.h"
 #include "ircd_events.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "s_debug.h"
 #include "s_user.h"
 #include "send.h"
 #include "ssl.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
 /** Stores free target information for a particular user. */

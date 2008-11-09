@@ -96,7 +96,7 @@
 #include "s_user.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <stdlib.h>
 #include <string.h>
 

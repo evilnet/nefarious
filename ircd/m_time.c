@@ -93,7 +93,7 @@
 #include "s_user.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * m_time - generic message handler

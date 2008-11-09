@@ -24,7 +24,8 @@
 #include "ircd_osdep.h"
 #include "msgq.h"
 
-#include <assert.h>
+#include "ircd_log.h"
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
 #include <limits.h>
 #include <netinet/in.h>

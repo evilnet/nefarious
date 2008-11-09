@@ -91,7 +91,7 @@
 #include "send.h"
 #include "msg.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * mo_privs - report operator privileges

@@ -96,7 +96,7 @@
 #include "send.h"
 #include "ircd_struct.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * m_links - generic message handler

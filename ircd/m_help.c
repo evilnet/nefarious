@@ -96,7 +96,7 @@
 #include "send.h"
 
 #include <sys/stat.h>
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 #define HPATH  DPATH "/help/opers"
 #define UHPATH DPATH "/help/users"

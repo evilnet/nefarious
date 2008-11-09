@@ -92,7 +92,7 @@
 #include "opercmds.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * ms_rpong - server message handler

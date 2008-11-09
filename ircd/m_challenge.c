@@ -53,7 +53,7 @@
 #include "ssl.h"
 #include "support.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <stdlib.h>
 #include <string.h>
 

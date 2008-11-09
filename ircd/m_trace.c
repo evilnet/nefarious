@@ -98,7 +98,7 @@
 #include "send.h"
 #include "version.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
 void do_trace(struct Client *cptr, struct Client *sptr, int parc, char *parv[])

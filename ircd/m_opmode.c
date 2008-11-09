@@ -95,7 +95,7 @@
 #include "send.h"
 #include "s_conf.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * ms_opmode - server message handler

@@ -95,7 +95,7 @@
 #include "s_misc.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <stdlib.h>
 
 static void do_settopic(struct Client *sptr, struct Client *cptr, 

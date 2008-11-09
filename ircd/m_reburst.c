@@ -105,7 +105,7 @@
 #include "shun.h"
 #include "zline.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>

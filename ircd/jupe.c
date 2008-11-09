@@ -42,7 +42,7 @@
 #include "support.h"
 #include "sys.h"    /* FALSE bleah */
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
 static struct Jupe *GlobalJupeList = 0;

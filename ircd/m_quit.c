@@ -84,13 +84,14 @@
 #include "channel.h"
 #include "client.h"
 #include "ircd.h"
+#include "ircd_log.h"
 #include "ircd_string.h"
 #include "ircd_struct.h"
 #include "s_conf.h"
 #include "s_misc.h"
 #include "ircd_reply.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
 /*

@@ -23,10 +23,11 @@
 
 #include "ircd.h"
 #include "ircd_events.h"
+#include "ircd_log.h"
 #include "ircd_signal.h"
 #include "s_conf.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <signal.h>
 
 static struct tag_SignalCounter {

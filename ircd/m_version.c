@@ -97,7 +97,7 @@
 #include "supported.h"
 #include "version.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * m_version - generic message handler

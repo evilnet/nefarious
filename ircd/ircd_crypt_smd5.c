@@ -44,7 +44,7 @@
 #include "s_debug.h"
 #include "ircd_alloc.h"
 
-#include <assert.h> 
+/* #include <assert.h> -- Now using assert in ircd_log.h */ 
 #include <string.h>
 #include <unistd.h>
 

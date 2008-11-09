@@ -28,6 +28,7 @@
 #include "ircd.h"
 #include "ircd_alloc.h"
 #include "ircd_features.h"
+#include "ircd_log.h"
 #include "ircd_reply.h"
 #include "list.h"
 #include "numeric.h"
@@ -35,7 +36,7 @@
 #include "s_debug.h"
 #include "send.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /** Class representing bad conf's. */
 #define BAD_CONF_CLASS          ((unsigned int)-1)

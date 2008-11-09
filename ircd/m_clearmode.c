@@ -100,7 +100,7 @@
 #include "support.h"
 #include "supported.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 
 /*
  * do_clearmode(struct Client *cptr, struct Client *sptr,

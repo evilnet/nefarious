@@ -32,10 +32,11 @@
 
 #include "client.h"
 #include "channel.h"
+#include "ircd_log.h"
 #include "ircd_snprintf.h"
 #include "ircd_struct.h"
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

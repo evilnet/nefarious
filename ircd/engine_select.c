@@ -33,7 +33,7 @@
 # endif
 #endif
 
-#include <assert.h>
+/* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
 #include <sys/socket.h>
 #include <sys/time.h>
