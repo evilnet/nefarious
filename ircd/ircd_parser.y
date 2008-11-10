@@ -1281,10 +1281,11 @@ commandblock: COMMAND '{' commanditems '}' ';'
     DupString(new_svc->cmd, command);
     DupString(new_svc->target, service);
  
-    if (prefix)
+    if (prefix && (strlen(prefix) > 0)) {
+        Debug((DEBUG_DEBUG, "Command Prefix: %s", prefix));
         DupString(new_svc->prepend, prefix);
-    else {
-        DupString(new_svc->prepend, "");
+    } else {
+        DupString(new_svc->prepend, "*");
         MyFree(new_svc->prepend);
     }
 
