@@ -25,6 +25,10 @@
 #include <stdarg.h>	    /* va_list */
 #define INCLUDED_stdarg_h
 #endif
+#ifndef INCLUDED_stdlib_h
+#include <stdlib.h> /* abort */
+#define INCLUDED_stdlib_h
+#endif
 
 struct Client;
 
