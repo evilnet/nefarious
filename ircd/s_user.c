@@ -2886,9 +2886,11 @@ lsc(struct Client *cptr, char *target, const char *prepend,
   
   kludge = parv[1];
 
-  if (strcmp(prepend, "*")) {
-    strncpy(msg, prepend, sizeof(msg) - 1);
-    strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
+  if (prepend) {
+    if (strcmp(prepend, "*")) {
+      strncpy(msg, prepend, sizeof(msg) - 1);
+      strncat(msg, " ", sizeof(msg) - 1 - strlen(msg));
+    }
   }
 
   for (x = 1; x != parc; x++) {
