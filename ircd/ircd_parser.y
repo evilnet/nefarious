@@ -1545,7 +1545,7 @@ webircdesc: DESC '=' QSTRING ';'
 sfilterblock: SFILTER '{' sfilteritems '}' ';'
 {
   struct fline *fline;
-  regex_t tempre;
+  char *errbuf;
 
   if (!regex)
     parse_error("Your Filter block must contain a filter.");
@@ -1556,7 +1556,9 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
   else if (!reason)
     parse_error("Your Filter block must contain a reason.");
   else {
-    if(regcomp(&tempre, regex, REG_ICASE|REG_EXTENDED|REG_NOSUB) == 0) {
+    if ((errbuf = checkregex(regex,0))) {
+      parse_error("SFilter block (%s) contains an invalid regex: %s", regex, errbuf);
+    } else {
       fline = (struct fline *) MyMalloc(sizeof(struct fline));
       memset(fline, 0, sizeof(struct fline));
 
@@ -1569,13 +1571,10 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
       fline->next = GlobalFList;
       GlobalFList = fline;
 
-      regfree(&tempre);
       regex = NULL;
       rtype = NULL;
       action = NULL;
       reason = NULL;
-    } else {
-      parse_error("Invalid regex format in SFilter block");
     }
   }
 };

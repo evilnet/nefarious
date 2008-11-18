@@ -643,3 +643,45 @@ void tstats(struct Client *cptr, struct StatDesc *sd, int stath, char *param)
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":time connected %Tu %Tu",
 	     sp->is_cti, sp->is_sti);
 }
+
+char *checkregex(char *s, int check_broadness)
+{
+int errorcode, errorbufsize, regex=0;
+char *errtmp, *tmp;
+static char errorbuf[512];
+regex_t expr;
+
+
+        for (tmp = s; *tmp; tmp++) {
+                if (!IsAlnum(*tmp) && !(*tmp >= 128)) {
+                        if ((s == tmp) && (*tmp == '*'))
+                                continue;
+                        if ((*(tmp + 1) == '\0') && (*tmp == '*'))
+                                continue;
+                        regex = 1;
+                        break;
+                }
+        }
+        if (regex)
+        {
+                errorcode = regcomp(&expr, s, REG_ICASE|REG_EXTENDED);
+                if (errorcode > 0)
+                {
+                        errorbufsize = regerror(errorcode, &expr, NULL, 0)+1;
+                        errtmp = MyMalloc(errorbufsize);
+                        regerror(errorcode, &expr, errtmp, errorbufsize);
+                        strncpy(errorbuf, errtmp, sizeof(errorbuf));
+                        free(errtmp);
+                        regfree(&expr);
+                        return errorbuf;
+                }
+                if (check_broadness && !regexec(&expr, "", 0, NULL, 0))
+                {
+                        strncpy(errorbuf, "Regular expression is too broad", sizeof(errorbuf));
+                        regfree(&expr);
+                        return errorbuf;
+                }
+                regfree(&expr);
+        }
+        return NULL;
+}

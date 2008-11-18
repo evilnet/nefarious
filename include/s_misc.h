@@ -80,6 +80,7 @@ extern void tstats(struct Client *cptr, struct StatDesc *sd, int stat,
 		   char *param);
 
 extern struct ServerStatistics* ServerStats;
+extern char *checkregex(char *s, int check_broadness);
 
 #endif /* INCLUDED_s_misc_h */
 
