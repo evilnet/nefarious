@@ -42,7 +42,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <tre/regex.h>
+#include <regex.h>
 
 #include <arpa/nameser.h>
 #include <resolv.h>

@@ -61,6 +61,12 @@
 #include "support.h"
 #include "sys.h"
 
+#ifdef PCRE_SYSTEM
+#include <pcreposix.h>
+#else
+#include "pcreposix.h"
+#endif
+
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <arpa/inet.h>
 #include <errno.h>
@@ -70,7 +76,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <tre/regex.h>
 #include <unistd.h>
 
 #ifndef INADDR_NONE

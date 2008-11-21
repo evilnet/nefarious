@@ -55,12 +55,17 @@
 #include "send.h"
 #include "support.h"
 
+#ifdef PCRE_SYSTEM
+#include <pcreposix.h>
+#else
+#include "pcreposix.h"
+#endif
+
 /* #include <assert.h> */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
-#include <tre/regex.h>
 
 #define MAX_STRINGS 80 /* Maximum number of feature params. */
 
@@ -69,12 +74,13 @@
   /* Now all the globals we need :/... */
   char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
-  static int is_ssl, is_server, is_hidden, is_exempt, i_class, is_local;
-  static int is_leaf, is_hub, invert, class;
+  static int is_ssl, is_server, is_hidden, is_exempt, i_class;
+  static int is_leaf, is_hub, invert;
   static char *name, *pass, *host, *vhost, *ipaddr, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
   static char *prefix, *command, *service, *regex;
+
   struct SLink *hosts;
   static char *stringlist[MAX_STRINGS];
   struct fline*    GlobalFList = 0;

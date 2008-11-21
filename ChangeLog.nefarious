@@ -1,6 +1,36 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* configure: Regnerated.
+
+	* configure.in: Switch back to PCRE.
+
+	* doc/readme.features.c: Fix for bug #2319111.
+
+	* include/s_conf.h: Switch back to PCRE.
+
+	* ircd/client.c: Warning fixes.
+
+	* ircd/ircd_parser.y: Switch back to PCRE. Plus warning fixes.
+
+	* ircd/ircd_string.c: Switch back to PCRE.
+
+	* ircd/Makefile.in: Switch back to PCRE.
+
+	* ircd/res.c: Switch back to PCRE
+
+	* ircd/s_conf.c: Switch back to PCRE.
+
+	* tools/pcre.tar.gz: Added for pcre.
+
+	* tools/pcre_install.sh: Switch back to PCRE
+
+	* tools/tre.tar.gz: Removed.
+
+	* tools/tre_install.sh: Removed.
+
 2008-11-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenerated.

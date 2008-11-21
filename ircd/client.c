@@ -28,13 +28,14 @@
 #include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
+#include "ircd_string.h"
+#include "ircd_struct.h"
 #include "list.h"
 #include "msgq.h"
 #include "numeric.h"
 #include "s_conf.h"
 #include "s_debug.h"
 #include "send.h"
-#include "ircd_struct.h"
 
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>

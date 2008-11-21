@@ -58,6 +58,7 @@ IRCDGRP = @IRCDGRP@
 DPATH = @DPATH@
 MPATH = ${DPATH}/ircd.motd
 RPATH = ${DPATH}/remote.motd
+TREINCDIR = @TREINCDIR@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
@@ -281,7 +282,7 @@ svnupdate:
 	@${BASH} ${srcdir}/svncheck.sh ${SVNDIR}
 
 ircd: ${OBJS} ../include/patchlevel.h version.o
-	${PURIFY} ${CC} ${CFLAGS} ${LDFLAGS} ${OBJS} version.o ${RINGLOG_O} ${LDFLAGS} ${LIBS} \
+	${PURIFY} ${CC} ${CFLAGS} ${LDFLAGS} ${OBJS} version.o ${RINGLOG_O} ${LDFLAGS} ${TRELIBS} ${LIBS} \
 		-o ircd
 	${CHMOD} ${IRCDMODE} ircd${EXT}
 

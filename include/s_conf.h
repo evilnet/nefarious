@@ -5,6 +5,9 @@
  */
 #ifndef INCLUDED_s_conf_h
 #define INCLUDED_s_conf_h
+#ifndef INCLUDED_config_h
+#include "config.h"
+#endif
 #ifndef INCLUDED_time_h
 #include <time.h>              /* struct tm */
 #define INCLUDED_time_h
@@ -19,7 +22,12 @@
 #endif
 
 #include "client.h"
-#include <tre/regex.h>
+
+#ifdef PCRE_SYSTEM
+#include <pcreposix.h>
+#else
+#include "pcreposix.h"
+#endif
 
 struct StatDesc;
 struct Client;

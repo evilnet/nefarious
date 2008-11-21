@@ -26,10 +26,11 @@
 #include "ircd_log.h"
 #include "msg.h"
 #include "s_bsd.h"
+#include <regex.h>
 #include <stdlib.h>
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
-#include <tre/regex.h>
+
 /*
  * include the character attribute tables here
  */

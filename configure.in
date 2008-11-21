@@ -417,25 +417,6 @@ else
 fi
 
 
-dnl libTRE (regex library) checking
-tre_version="0.7.5"
-withval=''
-AC_ARG_WITH(tre,
-[  --with-tre=PATH         Base path to where libtre is installed, such that 
-                          PATH/lib/libtre.so and PATH/include/tre/regex.h exist.], )
-if test "x$withval" != "x"; then
-    AC_MSG_RESULT(Using include dir $withval to find libtre)
-    CPPFLAGS="$CPPFLAGS -I$withval/include -L$withval/lib"
-    LIBS="$LIBS -L$withval/lib"
-else
-    AC_MSG_RESULT([Looking for tre in system and home dirs (${HOME})...])
-    CPPFLAGS="$CPPFLAGS -I${HOME}/include -L${HOME}/lib"
-    LIBS="$LIBS -L${HOME}/lib"
-fi
-AC_CHECK_HEADER(tre/regex.h, , [AC_MSG_ERROR([tre/regex.h, the TRE regex headers, were not found. Install tre or use --with-tre=PATH to tell me how to find it, where PATH/include/tre/regex.h exists.  For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory.])],)
-AC_CHECK_LIB(tre, regexec, , [AC_MSG_ERROR([TRE regex library not found. Install tre, or use --with-tre=PATH to tell me how to find it, where PATH/lib/libtre.so exists. For convenience, just type 'tools/tre_install.sh' now, to install tre in your home directory.])])
-
-
 dnl **
 dnl **  SSL Library checks (OpenSSL)
 dnl ** 
@@ -529,6 +510,25 @@ dnl     SSL_C=ssl.c
 dnl     AC_SUBST(SSL_C)
 dnl     LIBS="$LIBS $SSLLIBS"
 dnl fi
+
+
+AC_CHECK_HEADERS(pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
+if test "$ac_cv_header_pcreposix_h" == "yes"; then
+        TRELIBS="-lpcreposix -lpcre"
+	AC_SUBST(TRELIBS)
+ 	AC_DEFINE([PCRE_SYSTEM], , [Define if PCRE is installed in /usr])
+else
+	ac_cv_header_pcreposix_h=no
+	AC_CHECK_HEADERS($HOME/include/pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
+	if test "$ac_cv_header_pcreposix_h" == "yes"; then
+		CPPFLAGS="$CPPFLAGS -I$HOME/include"
+		TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
+		AC_SUBST(TRELIBS)
+	else	
+		AC_MSG_ERROR([PCRE regex library not found. To install PCRE just type 'tools/pcre_install.sh' now, to install PCRE in your home directory.])
+        fi
+fi
+
 
 AC_MSG_CHECKING([weather to enable subversion updating support])
 AC_ARG_ENABLE([subversion],

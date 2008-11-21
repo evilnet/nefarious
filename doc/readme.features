@@ -648,7 +648,7 @@ BADCHAN_REASON
 This is the kick reason for users being autokicked from a channel when
 it has been bad channel glined.
 
-OPERLEVELS
+OPERFLAGS
  * Type: boolean
  * Default: FALSE
 
