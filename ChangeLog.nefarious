@@ -3,6 +3,13 @@
 
 2008-11-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* Fix from Undernet by Michael Poole <mdpoole@troilus.org>
+
+	* ircd/m_kick.c (ms_kick): Properly handle crossing net rider and
+	normal KICKs (in the case where we get the normal kick first).
+
+2008-11-21  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* configure: Regnerated.
 
 	* configure.in: Switch back to PCRE.
