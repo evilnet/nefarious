@@ -276,7 +276,7 @@ DEP_SRC = ${IRCD_SRC} ${OSDEP_SRC} ${ENGINE_SRC} ${CRYPTO_SRC}
 .c.o:
 	${CC} ${CFLAGS} ${CPPFLAGS} -c $< -o $@
 
-build: svnupdate ircd
+build: @SVNUPDATE@ ircd
 
 svnupdate:
 	@${BASH} ${srcdir}/svncheck.sh ${SVNDIR}

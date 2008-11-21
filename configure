@@ -312,7 +312,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP LIBOBJS AWK SET_MAKE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S RMPROG SHPROG BASH LEX LEXLIB LEX_OUTPUT_ROOT YACC OSDEP_C ENGINE_C SSL_C TRELIBS SVNDIR INSTALL_RULE SYMLINK IRCDMODE IRCDOWN IRCDGRP DPATH LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP LIBOBJS AWK SET_MAKE INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA LN_S RMPROG SHPROG BASH LEX LEXLIB LEX_OUTPUT_ROOT YACC OSDEP_C ENGINE_C SSL_C TRELIBS SVNDIR SVNUPDATE INSTALL_RULE SYMLINK IRCDMODE IRCDOWN IRCDGRP DPATH LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -12034,6 +12034,9 @@ for dir in $enableval /usr/bin /usr/local/bin; do
     if test -f "$svndir/svn"; then
        found_svn=yes
        SVNDIR=$svndir
+       SVNUPDATE="svnupdate"
+
+
        break;
     fi
 done
@@ -12048,8 +12051,6 @@ if test "x$found_svn" = "xno" ; then
 	echo "run configure again."
 	echo ""
 fi
-
-
 
 
 echo "$as_me:$LINENO: checking whether to enable the /dev/poll event engine" >&5
@@ -13732,6 +13733,7 @@ s,@ENGINE_C@,$ENGINE_C,;t t
 s,@SSL_C@,$SSL_C,;t t
 s,@TRELIBS@,$TRELIBS,;t t
 s,@SVNDIR@,$SVNDIR,;t t
+s,@SVNUPDATE@,$SVNUPDATE,;t t
 s,@INSTALL_RULE@,$INSTALL_RULE,;t t
 s,@SYMLINK@,$SYMLINK,;t t
 s,@IRCDMODE@,$IRCDMODE,;t t

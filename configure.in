@@ -542,6 +542,9 @@ for dir in $enableval /usr/bin /usr/local/bin; do
     if test -f "$svndir/svn"; then
        found_svn=yes
        SVNDIR=$svndir
+       SVNUPDATE="svnupdate"
+       AC_SUBST(SVNDIR)
+       AC_SUBST(SVNUPDATE)
        break;
     fi
 done
@@ -555,8 +558,6 @@ if test "x$found_svn" = "xno" ; then
 	echo "run configure again."
 	echo ""
 fi
-
-AC_SUBST(SVNDIR)
 
 
 dnl --disable-devpoll check...
