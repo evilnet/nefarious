@@ -735,7 +735,7 @@ shun_list(struct Client *sptr, char *userhost)
 }
 
 void
-shun_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
+shun_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
 {
   struct Shun *shun;
   struct Shun *sshun;

@@ -883,7 +883,7 @@ gline_list(struct Client *sptr, char *userhost)
 }
 
 void
-gline_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
+gline_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
 {
   struct Gline *gline;
   struct Gline *sgline;

@@ -76,8 +76,14 @@
  *       it--not reversed as in ircd.conf!
  */
 
+/* The statsinfo array should only be used in this file, but just TRY
+ * telling the compiler that you want to forward declare a static array,
+ * and see how it responds.  So we forward declare it "extern".
+ */
+extern struct StatDesc statsinfo[];
+
 static void
-stats_configured_links(struct Client *sptr, struct StatDesc* sd, int stat,
+stats_configured_links(struct Client *sptr, const struct StatDesc* sd,
                        char* param)
 {
   static char null[] = "<NULL>";
@@ -117,22 +123,19 @@ stats_configured_links(struct Client *sptr, struct StatDesc* sd, int stat,
  * {CONF_CRULEAUTO, RPL_STATSDLINE, 'd'},
  */
 static void
-stats_crule_list(struct Client* to, struct StatDesc* sd, int stat,
+stats_crule_list(struct Client* to, const struct StatDesc *sd,
 		  char* param)
 {
   const struct CRuleConf* p = conf_get_crule_list();
-  int mask;
-
-  mask = (stat == 'D' ? CRULE_ALL : CRULE_MASK);
 
   for ( ; p; p = p->next) {
-    if (0 != (p->type & mask))
-      send_reply(to, RPL_STATSDLINE, stat, p->hostmask, p->rule);
+    if (p->type & sd->sd_funcdata)
+      send_reply(to, RPL_STATSDLINE, sd->sd_c, p->hostmask, p->rule);
   }
 }
 
 static void
-stats_engine(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_engine(struct Client *to, const struct StatDesc *sd, char *param)
 {
   send_reply(to, RPL_STATSENGINE, engine_name());
 }
@@ -140,46 +143,43 @@ stats_engine(struct Client* to, struct StatDesc* sd, int stat, char* param)
  
 /* hopefuly this will be where we'll spit out info about loaded modules */
 static void
-stats_modules(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_modules(struct Client* to, const struct StatDesc* sd, char* param)
 {
-crypt_mechs_t* mechs;
+  crypt_mechs_t* mechs;
 
-  send_reply(to, SND_EXPLICIT | RPL_STATSLLINE, 
-   "Module  Description      Entry Point");
+  send_reply(to, SND_EXPLICIT | RPL_STATSLLINE, "Module  Description      Entry Point");
 
- /* atm the only "modules" we have are the crypto mechanisms,
-    eventualy they'll be part of a global dl module list, for now
-    i'll just output data about them -- hikari */
+  /* atm the only "modules" we have are the crypto mechanisms,
+     eventualy they'll be part of a global dl module list, for now
+     i'll just output data about them -- hikari */
 
- if(crypt_mechs_root == NULL)
-  return;
+  if(crypt_mechs_root == NULL)
+    return;
 
- mechs = crypt_mechs_root->next;
+  mechs = crypt_mechs_root->next;
 
- for(;;)
- {
-  if(mechs == NULL)
-   return;
+  for(;;)
+  {
+   if(mechs == NULL)
+    return;
 
-  send_reply(to, SND_EXPLICIT | RPL_STATSLLINE, 
-   "%s  %s     0x%X", 
-   mechs->mech->shortname, mechs->mech->description, 
-   mechs->mech->crypt_function);
+    send_reply(to, SND_EXPLICIT | RPL_STATSLLINE, "%s  %s     0x%X", 
+    mechs->mech->shortname, mechs->mech->description, 
+    mechs->mech->crypt_function);
 
-  mechs = mechs->next;
- }
-
+    mechs = mechs->next;
+  }
 }
 
 static void
-stats_access(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_access(struct Client *to, const struct StatDesc *sd, char *param)
 {
   struct ConfItem *aconf;
   int wilds = 0;
   int count = 1000;
 
   if (!param) {
-    stats_configured_links(to, sd, stat, param);
+    stats_configured_links(to, sd, param);
     return;
   }
 
@@ -201,7 +201,7 @@ stats_access(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_elines(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_elines(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct eline *eline;
 
@@ -210,7 +210,7 @@ stats_elines(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_flines(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_flines(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct fline *fline;
 
@@ -220,7 +220,7 @@ stats_flines(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_webirc(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_webirc(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct wline *wline;
 
@@ -243,7 +243,7 @@ report_deny_list(struct Client* to)
 }
 
 static void
-stats_klines(struct Client* sptr, struct StatDesc* sd, int stat, char* mask)
+stats_klines(struct Client* sptr, const struct StatDesc *sd, char* mask)
 {
   int   wilds = 0;
   int   count = 3;
@@ -291,7 +291,7 @@ stats_klines(struct Client* sptr, struct StatDesc* sd, int stat, char* mask)
 }
 
 static void
-stats_links(struct Client* sptr, struct StatDesc* sd, int stat, char* name)
+stats_links(struct Client* sptr, const struct StatDesc *sd, char* name)
 {
   struct Client *acptr;
   int i;
@@ -334,7 +334,7 @@ stats_links(struct Client* sptr, struct StatDesc* sd, int stat, char* name)
 }
 
 static void
-stats_commands(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_commands(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct Message *mptr;
 
@@ -344,7 +344,7 @@ stats_commands(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_cslines(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_cslines(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct csline *csline;
 
@@ -353,7 +353,7 @@ stats_cslines(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_dnsbl(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_dnsbl(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct blline *blline;
 
@@ -362,7 +362,7 @@ stats_dnsbl(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_quarantine(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct qline *qline;
 
@@ -374,7 +374,7 @@ stats_quarantine(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_configured_svcs(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_configured_svcs(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct svcline *bline;
   for (bline = GlobalServicesList; bline; bline = bline->next) {
@@ -383,7 +383,7 @@ stats_configured_svcs(struct Client* to, struct StatDesc* sd, int stat, char* pa
 }
 
 static void
-stats_sline(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_sline(struct Client* to, const struct StatDesc *sd, char* param)
 {
   int y = 1, i = 1;
   struct sline *sline;
@@ -421,7 +421,7 @@ stats_sline(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_uptime(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_uptime(struct Client* to, const struct StatDesc *sd, char* param)
 {
   time_t nowr;
 
@@ -432,28 +432,30 @@ stats_uptime(struct Client* to, struct StatDesc* sd, int stat, char* param)
 }
 
 static void
-stats_servers_verbose(struct Client* sptr, struct StatDesc* sd, int stat,
-		      char* param)
+stats_servers_verbose(struct Client* sptr, const struct StatDesc *sd, char* param)
 {
   struct Client *acptr;
+  const char *fmt;
+
 
   /* lowercase 'v' is for human-readable,
    * uppercase 'V' is for machine-readable */
-  if (stat == 'v')
+  if (sd->sd_funcdata) {
     send_reply(sptr, SND_EXPLICIT | RPL_STATSVERBOSE,
 	       "%-32s %-32s Flags Hops Numeric   Lag  RTT   Up Down "
 	       "Clients/Max Proto %-10s :Info", "Servername", "Uplink",
 	       "LinkTS");
+    fmt = "%-20s %-20s %c%c%c%c  %4i %s %-4i %5i %4i %4i %4i %5i %5i P%-2i   %Tu :%s";
+  } else {
+    fmt = "%s %s %c%c%c%c %i %s %i %i %i %i %i %i %i P%i %Tu :%s";
+  }
 
   for (acptr = GlobalClientList; acptr; acptr = cli_next(acptr)) {
     if (!IsServer(acptr) && !IsMe(acptr))
       continue;
     if (param && match(param, cli_name(acptr))) /* narrow search */
       continue;
-    send_reply(sptr, SND_EXPLICIT | RPL_STATSVERBOSE, stat == 'v' ?
-	       "%-32s %-32s %c%c%c%c  %4i %s %-4i %5i %4i %4i %4i %5i %5i "
-	       "P%-2i   %Tu :%s" :
-	       "%s %s %c%c%c%c %i %s %i %i %i %i %i %i %i P%i %Tu :%s",
+    send_reply(sptr, SND_EXPLICIT | RPL_STATSVERBOSE, fmt,
 	       cli_name(acptr),
 	       cli_name(cli_serv(acptr)->up),
 	       IsBurst(acptr) ? 'B' : '-',
@@ -477,7 +479,7 @@ stats_servers_verbose(struct Client* sptr, struct StatDesc* sd, int stat,
 
 #ifdef DEBUGMODE
 static void
-stats_meminfo(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_meminfo(struct Client* to, const struct StatDesc *sd, char* param)
 {
   class_send_meminfo(to);
   send_listinfo(to, 0);
@@ -485,162 +487,187 @@ stats_meminfo(struct Client* to, struct StatDesc* sd, int stat, char* param)
 #endif
 
 static void
-stats_help(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_help(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct StatDesc *asd;
 
   if (MyUser(to)) /* only if it's my user */
-    for (asd = statsinfo; asd->sd_c; asd++)
-      if (asd->sd_c != sd->sd_c) /* don't send the help for us */
-	sendcmdto_one(&me, CMD_NOTICE, to, "%C :%c - %s", to, asd->sd_c,
-		      asd->sd_desc);
+    for (asd = statsinfo; asd->sd_name; asd++)
+      if (asd != sd) /* don't send the help for us */
+        sendcmdto_one(&me, CMD_NOTICE, to, "%C :%c (%s) - %s", to, asd->sd_c,
+                      asd->sd_name, asd->sd_desc);
 }
 
 /* This array of structures contains information about all single-character
  * stats.  Struct StatDesc is defined in s_stats.h.
  */
 struct StatDesc statsinfo[] = {
-  { 'B', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_B,
+  { 'B', "mappings", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MAPPINGS,
     stats_configured_svcs, 0,
     "Service mappings." },
-  { 'c', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_c,
+  { 'c', "connect", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_CONNECT,
     stats_configured_links, CONF_SERVER,
     "Remote server connection lines." },
-  { 'd', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_d,
+  { 'd', "rules", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_CRULES,
     stats_crule_list, 0,
     "Dynamic routing configuration." },
-  { 'E', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_E,
+  { 'E', "excepts", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_EXCEPTIONS,
     stats_elines, 0,
     "Exception lines." },
-  { 'e', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_e,
+  { 'e', "engine", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_ENGINE,
     stats_engine, 0,
     "Report server event loop engine." },
-  { 'F', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_F,
+  { 'F', "features", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FEATURES,
     feature_report, 0,
     "Feature settings." },
-  { 'f', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_f,
+  { 'f', "filters", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FILTERS,
     stats_flines, 0,
     "Filter lines." },
-  { 'g', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_g,
+  { 'g', "glines", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_GLINES,
     gline_stats, 0,
     "Global bans (G-lines)." },
-  { 'i', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_i,
+  { 'i', "access", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_ACCESS,
     stats_access, CONF_CLIENT,
     "Connection authorization lines." },
-  { 'J', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_J,
+  { 'J', "jupes", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_JUPES,
      stats_nickjupes, 0,
      "Nickjupe information." },
-  { 'j', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_j,
+  { 'j', "histogram", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_HISTOGRAM,
     msgq_histogram, 0,
     "Message length histogram." },
-  { 'k', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_k,
+  { 'k', "klines", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_KLINES,
     stats_klines, 0,
     "Local bans (K-Lines)." },
-  { 'l', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_l,
+  { 'l', "links", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_LINKS,
     stats_links, 0,
     "Current connections information." },
-  { 'L', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), 
-    FEAT_HIS_STATS_L,
+  { 'L', "modules", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), 
+    FEAT_HIS_STATS_MODULES,
     stats_modules, 0,
     "Dynamicly loaded modules." },
-#if 0
-  { 'M', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_M,
-    stats_memtotal, 0,
-    "Memory allocation & leak monitoring." },
-#endif
-  { 'm', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_m,
+  { 'm', "commands", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_COMMANDS,
     stats_commands, 0,
     "Message usage information." },
-  { 'o', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_o,
+  { 'o', "operators", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_OPERATORS,
     stats_configured_links, CONF_OPS,
     "Operator information." },
-  { 'p', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_p,
+  { 'p', "ports", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_PORTS,
     show_ports, 0,
     "Listening ports." },
-  { 'q', (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_q,
+  { 'q', "quarantines", (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_QUARANTINES,
     stats_quarantine, 0,
     "Quarantined channels list." },
-  { 'R', (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_R,
+  { 'R', "redirects", (STAT_FLAG_OPERONLY | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_REDIRECTIONS,
     stats_cslines, 0,
     "Connection Redirection information." },
 #ifdef DEBUGMODE
-  { 'r', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_r,
+  { 'r', "usage", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_USAGE,
     send_usage, 0,
     "System resource usage (Debug only)." },
 #endif
-  { 'S', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_S,
+  { 'S', "shuns", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_SHUNS,
     shun_stats, 0,
     "Global Shuns." },
-  { 's', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_s,
+  { 's', "spoofhosts", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_SPOOFHOSTS,
     stats_sline, 0,
     "Spoofed hosts information." },
-  { 'T', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_T,
+  { 'T', "motds", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MOTDS,
     motd_report, 0,
     "Configured Message Of The Day files." },
-  { 't', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_t,
+  { 't', "locals", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_LOCALS,
     tstats, 0,
     "Local connection statistics (Total SND/RCV, etc)." },
-  { 'U', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_U,
+  { 'U', "uworld", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_UWORLD,
     stats_uworld, 0,
     "Service server & nick jupes information." },
-  { 'u', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_u,
+  { 'u', "uptime", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_UPTIME,
     stats_uptime, 0,
     "Current uptime & highest connection count." },
-  { 'v', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_v,
+  { 'v', "vservers", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_VSERVERS,
     stats_servers_verbose, 0,
     "Verbose server information." },
-  { 'W', (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_W,
+  { 'W', "webircs", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_WEBIRCS,
     stats_webirc, 0,
     "WEBIRC authorization lines." },
-  { 'w', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_w,
+  { 'w', "userload", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_USERLOAD,
     calc_load, 0,
     "Userload statistics." },
 #ifdef DEBUGMODE
-  { 'x', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_x,
+  { 'x', "memusage", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MEMUSAGE,
     stats_meminfo, 0,
     "List usage information (Debug only)." },
 #endif
-  { 'X', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_X,
+  { 'X', "dnsbls", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_DNSBLS,
     stats_dnsbl, 0,
     "Configured DNSBL hosts." },
-  { 'y', STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_y,
+  { 'y', "classes", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_CLASSES,
     report_classes, 0,
     "Connection classes." },
-  { 'z', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_z,
+  { 'z', "memory", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MEMORY,
     count_memory, 0,
     "Memory/Structure allocation information." },
-  { 'Z', (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_Z,
+  { 'Z', "zlines", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_ZLINES,
     zline_stats, 0,
     "Global IP bans (Z-lines)." },
-  { '*', (STAT_FLAG_CASESENS | STAT_FLAG_VARPARAM), FEAT_LAST_F,
+  { '*', "help", STAT_FLAG_CASESENS, FEAT_LAST_F,
     stats_help, 0,
     "Send help for stats." },
   { '\0', 0, FEAT_LAST_F, 0, 0, 0 }
 };
 
 /* This array is for mapping from characters to statistics descriptors */
-struct StatDesc *statsmap[256];
+static struct StatDesc *statsmap[256];
+static int statscount;
+
+static int
+stats_cmp(const void *a_, const void *b_)
+{
+  const struct StatDesc *a = a_;
+  const struct StatDesc *b = b_;
+  return ircd_strcmp(a->sd_name, b->sd_name);
+}
+
+static int
+stats_search(const void *key, const void *sd_)
+{
+  const struct StatDesc *sd = sd_;
+  return ircd_strcmp(key, sd->sd_name);
+}
+
+/* Look up a stats handler.  If name_or_char is just one character
+ * long, use that as a character index; otherwise, look it up by
+ * name in statsinfo.
+ */
+const struct StatDesc *
+stats_find(const char *name_or_char)
+{
+  if (!name_or_char[1])
+    return statsmap[name_or_char[0] - CHAR_MIN];
+  else
+    return bsearch(name_or_char, statsinfo, statscount, sizeof(statsinfo[0]), stats_search);
+}
 
 /* Function to build the statsmap from the statsinfo array */
 void
 stats_init(void)
 {
   struct StatDesc *sd;
-  int i;
 
-  /* Make darn sure the statsmap array is initialized to all zeros */
-  for (i = 0; i < 256; i++)
-    statsmap[i] = 0;
+  /* Count number of stats entries and sort them. */
+  for (statscount = 0, sd = statsinfo; sd->sd_name; sd++, statscount++) {}
+  qsort(statsinfo, statscount, sizeof(statsinfo[0]), stats_cmp);
 
   /* Build the mapping */
-  for (sd = statsinfo; sd->sd_c; sd++) {
-    if (sd->sd_flags & STAT_FLAG_CASESENS)
+  for (sd = statsinfo; sd->sd_name; sd++) {
+    if (!sd->sd_c)
+      continue;
+    else if (sd->sd_flags & STAT_FLAG_CASESENS)
       /* case sensitive character... */
-      statsmap[(int)sd->sd_c] = sd;
+      statsmap[sd->sd_c - CHAR_MIN] = sd;
     else {
       /* case insensitive--make sure to put in two entries */
-      statsmap[(int)ToLower((int)sd->sd_c)] = sd;
-      statsmap[(int)ToUpper((int)sd->sd_c)] = sd;
+      statsmap[ToLower(sd->sd_c) - CHAR_MIN] = sd;
+      statsmap[ToUpper(sd->sd_c) - CHAR_MIN] = sd;
     }
   }
 }

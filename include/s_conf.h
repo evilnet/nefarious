@@ -286,7 +286,7 @@ extern struct ConfItem* find_conf_entry(struct ConfItem *aconf, unsigned int mas
 
 extern void update_uworld_flags(struct Client *cptr);
 extern void conf_make_uworld(char *name);
-extern void stats_uworld(struct Client* to, struct StatDesc* sd, int stat, char* param);
+extern void stats_uworld(struct Client* to, const struct StatDesc *sd, char* param);
 
 extern void det_confs_butmask(struct Client *cptr, int mask);
 extern enum AuthorizationCheckResult attach_conf(struct Client *cptr, struct ConfItem *aconf);

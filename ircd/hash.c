@@ -662,7 +662,7 @@ void clearNickJupes(void)
  * @param[in] param Extra parameter from user (ignored).
  */
 void
-stats_nickjupes(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_nickjupes(struct Client* to, const struct StatDesc *sd, char* param)
 {
   int i;
   for (i = 0; i < JUPEHASHSIZE; i++)

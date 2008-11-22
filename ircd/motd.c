@@ -388,7 +388,7 @@ motd_clear(void)
 
 /* This is called to report T-lines */
 void
-motd_report(struct Client *to, struct StatDesc *sd, int stath, char *param)
+motd_report(struct Client *to, const struct StatDesc *sd, char *param)
 {
   struct Motd *ptr;
 

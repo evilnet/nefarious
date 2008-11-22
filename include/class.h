@@ -105,7 +105,7 @@ extern unsigned int get_client_class(struct Client *acptr);
 extern void add_class(unsigned int conclass, unsigned int ping,
                       unsigned int confreq, unsigned int maxli, unsigned int sendq);
 extern void check_class(void);
-extern void report_classes(struct Client *sptr, struct StatDesc *sd, int stat,
+extern void report_classes(struct Client *sptr, const struct StatDesc *sd,
 			   char *param);
 extern unsigned int get_sendq(struct Client* cptr);
 

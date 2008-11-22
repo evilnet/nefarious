@@ -85,7 +85,7 @@ extern int isNickJuped(const char *nick);
 extern int addNickJupes(const char *nicks);
 extern void clearNickJupes(void);
 extern void list_next_channels(struct Client *cptr);
-extern void stats_nickjupes(struct Client* to, struct StatDesc* sd, int stat, char* param);
+extern void stats_nickjupes(struct Client* to, const struct StatDesc *sd, char* param);
 extern void list_set_default(void);
 
 #endif /* INCLUDED_hash_h */

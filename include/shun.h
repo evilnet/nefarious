@@ -94,7 +94,7 @@ extern void shun_free(struct Shun *shun);
 extern void shun_burst(struct Client *cptr);
 extern int shun_resend(struct Client *cptr, struct Shun *shun);
 extern int shun_list(struct Client *sptr, char *userhost);
-extern void shun_stats(struct Client *sptr, struct StatDesc *sd, int stat,
+extern void shun_stats(struct Client *sptr, const struct StatDesc *sd,
 		       char *param);
 extern int shun_memory_count(size_t *sh_size);
 extern int expire_shuns();

@@ -686,7 +686,7 @@ zline_list(struct Client *sptr, char *userhost)
 }
 
 void
-zline_stats(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
+zline_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
 {
   struct Zline *zline;
   struct Zline *szline;

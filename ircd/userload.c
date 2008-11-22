@@ -201,7 +201,7 @@ void update_load(void)
   last = CurrentTime;
 }
 
-void calc_load(struct Client *sptr, struct StatDesc *sd, int stat, char *param)
+void calc_load(struct Client *sptr, const struct StatDesc *sd, char *param)
 {
   /* *INDENT-OFF* */
   static const char *header =

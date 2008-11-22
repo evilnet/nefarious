@@ -263,7 +263,7 @@ struct ConnectionClass* find_class(unsigned int cclass)
  * @param[in] sd Stats descriptor for request (ignored).
  * @param[in] param Extra parameter from user (ignored).
  */
-void report_classes(struct Client *sptr, struct StatDesc *sd, int stat,
+void report_classes(struct Client *sptr, const struct StatDesc *sd,
 		    char *param)
 {
   struct ConnectionClass *cltmp;

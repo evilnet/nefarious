@@ -91,7 +91,7 @@ extern void zline_free(struct Zline *zline);
 extern void zline_burst(struct Client *cptr);
 extern int zline_resend(struct Client *cptr, struct Zline *zline);
 extern int zline_list(struct Client *sptr, char *userhost);
-extern void zline_stats(struct Client *sptr, struct StatDesc *sd, int stat,
+extern void zline_stats(struct Client *sptr, const struct StatDesc *sd,
 			char *param);
 extern int zline_memory_count(size_t *zl_size);
 

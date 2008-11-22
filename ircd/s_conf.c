@@ -1400,7 +1400,7 @@ void conf_make_uworld(char *name)
  * @param[in] param Extra parameter from user (ignored).
  */
 void
-stats_uworld(struct Client* to, struct StatDesc* sd, int stat, char* param)
+stats_uworld(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct SLink *sp;
   char *tmp = NULL;
