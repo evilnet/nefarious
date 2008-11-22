@@ -239,7 +239,8 @@ report_deny_list(struct Client* to)
   const struct DenyConf* p = conf_get_deny_list();
   for ( ; p; p = p->next)
     send_reply(to, RPL_STATSKLINE, (p->flags & DENY_FLAGS_IP) ? 'k' : 'K',
-               p->hostmask, p->message, p->usermask);
+               p->hostmask, p->message, p->usermask,
+               (p->flags & DENY_FLAGS_VERSION ? "v" : (p->flags & DENY_FLAGS_REALNAME ? "r" : "h")));
 }
 
 static void
@@ -283,7 +284,8 @@ stats_klines(struct Client* sptr, const struct StatDesc *sd, char* mask)
 	 (!user || !mmatch(user, conf->usermask)))) {
       send_reply(sptr, RPL_STATSKLINE,
 		 (conf->flags & DENY_FLAGS_IP) ? 'k' : 'K',
-                 conf->hostmask, conf->message, conf->usermask);
+                 conf->hostmask, conf->message, conf->usermask,
+                 (conf->flags & DENY_FLAGS_VERSION ? "v" : (conf->flags & DENY_FLAGS_REALNAME ? "r" : "h")));
       if (--count == 0)
 	return;
     }

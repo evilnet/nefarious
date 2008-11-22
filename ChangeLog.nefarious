@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_err.c: Added extra %s to STATS_KLINE.
+
+	* ircd/s_stats.c: In KLINE stats output now show what type the
+	line is. Eg v for version, r for realname and h for hostmask.
+
 2008-11-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Combination of two things from Undernet. Credits below.
