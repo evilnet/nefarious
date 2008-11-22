@@ -3,6 +3,12 @@
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Updated Jupe section.
+
+	* ircd/hash.c: Allow for wilcards in Nickname Jupes.
+
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/s_err.c: Added extra %s to STATS_KLINE.
 
 	* ircd/s_stats.c: In KLINE stats output now show what type the

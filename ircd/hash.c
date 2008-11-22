@@ -37,6 +37,7 @@
 #include "numeric.h"
 #include "send.h"
 #include "ircd_struct.h"
+#include "s_debug.h"
 #include "support.h"
 #include "sys.h"
 #include "watch.h"
@@ -595,9 +596,11 @@ int isNickJuped(const char *nick)
   int pos;
 
   if (nick && *nick) {
-    for (pos = strhash(nick); (pos &= JUPEHASHMASK), jupeTable[pos][0]; pos++) {
-      if (0 == ircd_strcmp(nick, jupeTable[pos]))
-        return 1;
+    for (pos = 0; pos < JUPEHASHSIZE; pos++) {
+      if (jupeTable[pos][0]) {
+        if (!match(jupeTable[pos], nick))
+          return 1;
+      }
     }
   }
   return 0;                     /* A bogus pointer is NOT a juped nick, right ? :) */
