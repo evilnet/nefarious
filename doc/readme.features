@@ -133,6 +133,7 @@ REMOTE_MOTD
  * Default: FALSE
 
 Controls the use of remote message of the day's.
+
 PROVIDER
  * Type: string
  * Default: NULL
@@ -270,6 +271,12 @@ HIDDEN_HOST
 
 This selects the suffix for the hidden hostmask (see HOST_HIDING).
 
+HOST_HIDING_PREFIX
+ * Type: string
+ * Default: AfterNET
+
+This selects the suffix for the hidden hostmask style 2.
+
 HIDDEN_OPERHOST
  * Type: string
  * Default: Staff.Nefarious
@@ -369,7 +376,6 @@ MAXEXCEPTS
  * Default: 30
 
 This is the maximum number of excepts a user may set on a given channel.
-
 
 CHANNELLEN
  * Type: integer
@@ -502,6 +508,14 @@ MPATH is the filename (relative to DPATH) or the full path of the
 "Message of the Day" file.  The contents of this file will be sent to
 every client that connects to the server, after registration.
 
+OMPATH
+ * Type: string
+ * Default: "operircd.motd"
+
+OMPATH is the filename (relative to DPATH) or the full path of the
+"Message of the Day" file.  The contents of this file will be sent to
+every operator upon opering.
+
 QPATH
  * Type: string
  * Default: "ircd.quotes"
@@ -517,11 +531,11 @@ EPATH is the filename (relative to DPATH) or the full path of the rules file.
 Users can see these using the rules command which will need to be enabled if you
 wish to use RULES. See the RULES feature.
 
-QMPATH
+QPATH
  * Type: string
  * Default: "ircd.opermotd"
 
-QMPATH is the filename (relative to DPATH) or the full path of the oper message of
+QPATH is the filename (relative to DPATH) or the full path of the oper message of
 the day file. Opers can see the motd via OPERMOTD. OPERMOTD will need to be enabled
 if you wish to use it. See the OPERMOTD feature.
 
@@ -588,6 +602,15 @@ from the kernel at once.  Since the number retrieved can impact
 performance, it can be tuned by modifying this value.  The engines
 enforce a lower limit of 20.
 
+NICKLEN
+ * Type: integer
+ * Default: 15
+
+This is the allowed length of the nickname length.  It may not be
+larger than the NICKLEN #define, and should usually be the same
+length.  The real purpose of this feature is to permit easy increases
+in nickname length for a network.
+
 IRCD_RES_RETRIES
  * Type: integer
  * Default: 2
@@ -612,34 +635,52 @@ This is the maximum number of seconds to wait for the ident lookup and
 the DNS query to succeed.  On older (pre 2.10.11.06) servers this was
 hard coded to 60 seconds.
 
+IPCHECK_CLONE_LIMIT
+ * Type: integer
+ * Default: 4
+
+The number of times you are allowed to connect within IPCHECK_CLONE_PERIOD
+seconds before you are considered abusing the server and throttled.
+
+IPCHECK_CLONE_PERIOD
+ * Type: integer
+ * Default: 40
+
+The number of seconds you are allowed to connect IPCHECK_CLONE_LIMIT times
+within before you are considered abusing the server and throttled.
+For instance if you set IPCHECK_CLONE_LIMIT to 1, and IPCHECK_CLONE_PERIOD
+to 10, then a user is only allowed to connect once in 10s, if they connect
+again within 10s, then they are considered to be connecting too fast and
+they are throttled.
+
+IPCHECK_CLONE_DELAY
+ * Type: integer
+ * Default: 600
+
+The number of seconds grace after restarting the server before the throttle
+code kicks in.  Even if a user connects repetitively during this period,
+they will never get throttled.  This is so after a restart users on a
+multiuser box can all connect to a server simultaniously without being
+considered an attack.
+
+SOCKSENDBUF
+ * Type: integer
+ * Default: 61440
+
+The send window size used for connections to other servers.
+
+SOCKRECVBUF
+ * Type: integer
+ * Default: 61440
+
+The receive window size used for connections to other servers.
+
 ANNOUNCE_INVITES
  * Type: boolean
  * Default: TRUE
 
 When a channel operator invites a user to their channel, all other opers
 will be notified of the invite.
-
-AUTOJOIN
- * Type: boolean
- * Default: FALSE
-
-Users can be auto joined into a channel on connect. The autojoin channel
-is located in ircd_defs.h in the include dir. You WILL HAVE TO recompile
-and restart if you change the channel.
-
-AUTOJOIN_NOTICE
- * Type: boolean
- * Default: TRUE
-
-This will display a "warning" message telling the user they are being
-autojoined.
-
-AUTOJOIN_NOTICE_VALUE
- * Type: string
- * Default: *** Notice -- You are now being autojoined into \#nefarious
-
-This is the notice that will be displayed to users if AUTOJOIN_NOTICE is
-enabled. ALWAYS use a \ before a #!
 
 BADCHAN_REASON
  * Type: string
@@ -698,20 +739,6 @@ OPER_LOCAL_CHANNELS
 
 Only opers can create local channels if LOCAL_CHANNELS is enabled.
 
-CRYPT_OPER_PASSWORD
- * Type: boolean
- * Default: TRUE
-
-In order to allow certain users to become IRC operators, they must
-authenticate themselves with a password.  This password is matched
-against an O-line in the "ircd.conf" configuration file; see
-doc/example.conf for more details.  If you specify "TRUE" here, you
-must use the crypted form of these passwords in your "ircd.conf" file.
-Since compromises of the "ircd.conf" file have happened in the past,
-you are highly encouraged to use this option.  You can find a program
-called "mkpasswd" in the tools directory that will allow you to
-generate crypted passwords.
-
 OPER_XTRAOP
  * Type: boolean
  * Default: FALSE
@@ -738,77 +765,6 @@ OPER_HIDEIDLE
 
 Controls the use of the oper mode for hiding their idle time in their
 WHOIS output.
-
-OPER_NO_CHAN_LIMIT
- * Type: boolean
- * Default: TRUE
-
-If this option is set to "TRUE," IRC operators may join as many
-channels as they need to.  This is primarily intended to permit
-administrators to run a channel service for local ("&") channels.
-
-OPER_MODE_LCHAN
- * Type: boolean
- * Default: TRUE
-
-If this option is set to "TRUE," IRC operators may change the channel
-modes on local ("&") channels.  This is primarily intended to permit
-administrators to run a channel service for local channels.
-
-OPER_WALK_THROUGH_LMODES
- * Type: boolean
- * Default: FALSE
-
-If this option is set to "TRUE," IRC operators may join local ("&")
-channels regardless of any restrictive modes, including bans.  This
-requires giving the special password "OVERRIDE."  This is primarily
-intended to permit administrators to run a channel service for local
-channels.
-
-NO_OPER_DEOP_LCHAN
- * Type: boolean
- * Default: FALSE
-
-If this option is set to "TRUE," IRC operators may not be deopped on
-local ("&") channels.  This is primarily intended to permit
-administrators to run a channel service for local channels.
-
-SHOW_INVISIBLE_USERS
- * Type: boolean
- * Default: TRUE
-
-If you specify "TRUE" here, then your (local) IRC Operators will be
-able to see all local invisible users (clients connected to your own
-server).  This should be used only for investigating instances of
-abuse; make sure your operators do not use this for spying on
-individuals.
-
-SHOW_ALL_INVISIBLE_USERS
- * Type: boolean
- * Default: TRUE
-
-If you specify "TRUE" here, then your global IRC Operators will be
-able to see ALL invisible users.  This should be used only for
-investigating instances of abuse; make sure your operators do not use
-this for spying on individuals.
-
-UNLIMIT_OPER_QUERY
- * Type: boolean
- * Default: FALSE
-
-A /WHO command can sometimes return several hundred lines of
-information.  To reduce the flood potential, the output is truncated.
-By setting this option to "TRUE," when an IRC Operator uses /WHO, the
-output will not be truncated, no matter how much data is returned.
-
-LOCAL_KILL_ONLY
- * Type: boolean
- * Default: FALSE
-
-If this option is set to "TRUE," operators of this server may only
-KILL clients directly connected to this server.  Operators will not be
-able to issue KILLs for clients on other servers.  Some networks may
-require that this be turned on for newly linking servers.
 
 CHECK
  * Type: boolean
@@ -982,220 +938,6 @@ CREATE_CHAN_OPER_ONLY
 
 Only IRC Operators will be able to create new channels.
 
-OPER_KILL
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue the /KILL command.
-
-OPER_REHASH
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue the /REHASH command.
-
-OPER_RESTART
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue the /RESTART command.
-
-OPER_DIE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue the /DIE command.
-
-OPER_GLINE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue global G-lines.
-
-OPER_LGLINE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue local G-lines.
-
-OPER_JUPE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue global jupes.
-
-OPER_LJUPE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to issue local jupes.
-
-OPER_OPMODE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to use /OPMODE and /CLEARMODE on ordinary ("#") channels.
-
-OPER_LOPMODE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to use /OPMODE and /CLEARMODE on local ("&") channels.
-
-OPER_FORCE_OPMODE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to override Q-lines set for /OPMODE and /CLEARMODE on ordinary ("#") channels
-
-OPER_FORCE_LOPMODE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to override Q-lines set for /OPMODE and /CLEARMODE on local ("&") channels
-
-OPER_BADCHAN
- * Type: boolean
- * Default: FALSE
-
-This selects whether global IRC operators on this server are permitted
-to issue global BADCHANs.  USE OF THIS ON THE UNDERNET IS STRICTLY
-REGULATED BY THE UNDERNET ADMINISTRATION.
-
-OPER_LBADCHAN
- * Type: boolean
- * Default: FALSE
-
-This selects whether global IRC operators on this server are permitted
-to issue local BADCHANs.  USE OF THIS ON THE UNDERNET IS STRICTLY
-REGULATED BY THE UNDERNET ADMINISTRATION.
-
-OPER_SET
- * Type: boolean
- * Default: FALSE
-
-This selects whether global IRC operators on this server are permitted
-to use the /SET command to set various feature values.
-
-OPERS_SEE_IN_SECRET_CHANNELS
- * Type: boolean
- * Default: TRUE
-
-If you specify "TRUE" here, then your global IRC Operators will be
-able to see who is on a specified secret channel, without joining
-themselves.  This can be used to make a reasonable judgment in the
-case of a "channel takeover" being reported, while the channel is set
-invite-only.  See doc/readme.who for more details.
-
-OPER_WIDE_GLINE
- * Type: boolean
- * Default: TRUE
-
-This selects whether global IRC operators on this server are permitted
-to use the /GLINE command with the ! flag to force slightly wide
-G-lines to be set.
-
-LOCOP_KILL
- * Type: boolean
- * Default: TRUE
-
-This selects whether local IRC operators are permitted to use the
-/KILL command on local clients.
-
-LOCOP_REHASH
- * Type: boolean
- * Default: TRUE
-
-This selects whether local IRC operators are permitted to use the
-/REHASH command.
-
-LOCOP_RESTART
- * Type: boolean
- * Default: FALSE
-
-This selects whether local IRC operators are permitted to use the
-/RESTART command.
-
-LOCOP_DIE
- * Type: boolean
- * Default: FALSE
-
-This selects whether local IRC operators are permitted to use the /DIE
-command.
-
-LOCOP_LGLINE
- * Type: boolean
- * Default: TRUE
-
-This selects whether local IRC operators are permitted to issue local
-G-lines.
-
-LOCOP_LJUPE
- * Type: boolean
- * Default: TRUE
-
-This selects whether local IRC operators are permitted to issue local
-jupes.
-
-LOCOP_LOPMODE
- * Type: boolean
- * Default: TRUE
-
-This selects whether local IRC operators are permitted to use /OPMODE
-and /CLEARMODE on local ("&") channels.
-
-LOCOP_FORCE_LOPMODE
- * Type: boolean
- * Default: TRUE
-
-This selects whether local IRC operators on this server are permitted
-to override Q-lines set for /OPMODE and /CLEARMODE on local ("&") channels
-
-LOCOP_LBADCHAN
- * Type: boolean
- * Default: FALSE
-
-This selects whether local IRC operators are permitted to issue local
-BADCHANs.  USE OF THIS ON THE UNDERNET IS STRICTLY REGULATED BY THE
-UNDERNET ADMINISTRATION.
-
-LOCOP_SET
- * Type: boolean
- * Default: FALSE
-
-This selects whether local IRC operators are permitted to use the /SET
-command to set various feature values.
-
-LOCOP_SEE_IN_SECRET_CHANNELS
- * Type: boolean
- * Default: FALSE
-
-If you specify "TRUE" here, then your local IRC Operators will be
-able to see who is on a specified secret channel, without joining
-themselves.  This can be used to make a reasonable judgment in the
-case of a "channel takeover" being reported, while the channel is set
-invite-only.  See doc/readme.who for more details.
-
-LOCOP_WIDE_GLINE
- * Type: boolean
- * Default: FALSE
-
-This selects whether local IRC operators are permitted to use the
-/GLINE command with the ! flag to force slightly wide G-lines to be
-set.
-
 RESTARTPASS
  * Type: string
  * Default: (empty)
@@ -1274,6 +1016,12 @@ HIS_SNOTICES_OPER_ONLY
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes server notices from users.
+
+HIS_SNOTICES_OPER_AND_BOT
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes server notices from users.
  
 HIS_DESYNCS
  * Type: boolean
@@ -1319,175 +1067,205 @@ HIS_SHUN_REASON
 This HIDES the shun reason from the target when a shun is set
 on them (when TRUE).
 
-HIS_STATS_l
+HIS_STATS_LINKS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS l from users.
 
-HIS_STATS_b
+HIS_STATS_MODULES
  * Type: boolean
  * Default: TRUE
 
-As per UnderNet CFV-165, this removes /STATS b from users.
+As per UnderNet CFV-165, this removes /STATS L from users.
 
-HIS_STATS_c
+HIS_STATS_MAPPINGS
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS B from users.
+
+HIS_STATS_CONNECT
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS c from users.
 
-HIS_STATS_g
+HIS_STATS_GLINES
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS g from users.
 
-HIS_STATS_h
+HIS_STATS_SHUNS
  * Type: boolean
  * Default: TRUE
 
-As per UnderNet CFV-165, this removes /STATS h from users.
+As per UnderNet CFV-165, this removes /STATS S from users.
 
-HIS_STATS_k
+HIS_STATS_ZLINES
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS Z from users.
+
+HIS_STATS_KLINES
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS k from users.
 
-HIS_STATS_f
+HIS_STATS_WEBIRCS
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS W from users.
+
+HIS_STATS_FILTERS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS f from users.
 
-HIS_STATS_i
+HIS_STATS_FEATURES
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS F from users.
+
+HIS_STATS_ACCESS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS i from users.
 
-HIS_STATS_j
+HIS_STATS_HISTOGRAM
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS j from users.
 
-HIS_STATS_M
+HIS_STATS_COMMANDS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS M from users.
 
-HIS_STATS_m
- * Type: boolean
- * Default: TRUE
-
-As per UnderNet CFV-165, this removes /STATS m from users.
-
-HIS_STATS_o
+HIS_STATS_OPERATORS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS o from users.
 
-HIS_STATS_p
+HIS_STATS_PORTS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS p from users.
 
-HIS_STATS_q
+HIS_STATS_QUARANTINES
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS q from users.
 
-HIS_STATS_R
+HIS_STATS_REDIRECTIONS
  * Type: boolean
  * Default: TRUE
  
 As per UnderNet CFV-165, this removes /STATS R from users.
 
-HIS_STATS_r
+HIS_STATS_USAGE
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS r from users.
 
-HIS_STATS_s
+HIS_STATS_SPOOFHOSTS
  * Type: boolean
  * Default: TRUE
 
 As per SETHOST patch, this removes /STATS s from users.
 
-HIS_STATS_d
+HIS_STATS_CRULES
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS d from users.
 
-HIS_STATS_e
+HIS_STATS_ENGINE
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS e from users.
 
-HIS_STATS_t
+HIS_STATS_EXCEPTIONS
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS E from users.
+
+HIS_STATS_LOCALS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS t from users.
 
-HIS_STATS_T
+HIS_STATS_JUPES
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS J from users.
+
+HIS_STATS_MOTDS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS T from users.
 
-HIS_STATS_u
+HIS_STATS_UPTIME
  * Type: boolean
  * Default: FALSE
 
 As per UnderNet CFV-165, this allows users to perform /STATS u.
 
-HIS_STATS_U
+HIS_STATS_UWORLD
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS U from users.
 
-HIS_STATS_v
+HIS_STATS_VSERVERS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS v from users.
 
-HIS_STATS_w
+HIS_STATS_USERLOAD
  * Type: boolean
  * Default: FALSE
 
 As per UnderNet CFV-165, this allows users to perform /STATS w.
 
-HIS_STATS_x
+HIS_STATS_MEMUSAGE
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS x from users.
 
-HIS_STATS_X
+HIS_STATS_DNSBLS
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS X from users.
 
-HIS_STATS_y
+HIS_STATS_CLASSES
  * Type: boolean
  * Default: TRUE
 
 As per UnderNet CFV-165, this removes /STATS y from users.
 
-HIS_STATS_z
+HIS_STATS_MEMORY
  * Type: boolean
  * Default: TRUE
 

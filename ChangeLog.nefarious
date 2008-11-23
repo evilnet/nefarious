@@ -3,6 +3,17 @@
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/readme.features: Start the cleanup and update process of
+	this document.
+
+	* include/ircd_features.h: Removed some unused features.
+
+	* ircd/ircd_features.c: Removed some unused features.
+
+	* ircd/m_nick.c: Added a #include for s_conf.h.
+
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_join.c: Fix for bug 2330283. Dont send auto channel modes
 	for local channels.
 
