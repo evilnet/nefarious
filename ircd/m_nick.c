@@ -150,6 +150,7 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char*          arg;
   char*          s;
   const char*    client_name;
+  int            ret = 0;
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -201,6 +202,16 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       && nick[1] == '\0') {
     send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
     return 0;
+  }
+
+  ret = find_fline(cptr, sptr, nick, WFFLAG_NICK, cli_name(sptr));
+  if (ret != 0) {
+    if (ret == 2)
+      return CPTR_KILLED;
+    else {
+      send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
+      return 0;
+    }
   }
 
   if (!(acptr = FindClient(nick))) {

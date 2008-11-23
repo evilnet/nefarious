@@ -3,6 +3,16 @@
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Add spam filter check for nick changes. (watch flag i).
+
+	* include/client.h: Add spam filter check for nick changes.
+
+	* ircd/m_nick.c: Add spam filter check for nick changes.
+
+	* ircd/s_conf.c: Add spam filter check for nick changes.
+
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Updated Jupe section.
 
 	* ircd/hash.c: Allow for wilcards in Nickname Jupes.

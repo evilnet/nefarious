@@ -135,7 +135,8 @@ static int fline_wflags[] = {
   WFFLAG_CONNECT,   'u',
   WFFLAG_PART,      'P',
   WFFLAG_QUIT,      'q',
-  WFFLAG_DCC,       'd'
+  WFFLAG_DCC,       'd',
+  WFFLAG_NICK,      'i'
 };
 
 static int dnsbl_flags[] = {

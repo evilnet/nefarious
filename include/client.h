@@ -984,6 +984,7 @@ struct Client {
 #define WFFLAG_PART       0x080
 #define WFFLAG_QUIT       0x100
 #define WFFLAG_DCC        0x200
+#define WFFLAG_NICK       0x400
 
 /* free flags */
 #define FREEFLAG_SOCKET	0x0001	/**< socket needs to be freed */
