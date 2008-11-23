@@ -3,6 +3,14 @@
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_join.c: Fix for bug 2330283. Dont send auto channel modes
+	for local channels.
+
+	* ircd/m_svsjoin.c: Fix for bug 2330283. Dont send auto channel modes
+	for local channels.
+
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_join.c: Fix for bug 2330233.
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

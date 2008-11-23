@@ -321,6 +321,7 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       joinbuf_join(&create, chptr, flags);
       if (feature_bool(FEAT_AUTOCHANMODES) &&
 	  feature_str(FEAT_AUTOCHANMODES_LIST) &&
+          !IsLocalChannel(chptr->chname) &&
 	  strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) {
 	SetAutoChanModes(chptr);
         automodes = 1;
