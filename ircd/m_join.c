@@ -218,11 +218,18 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       flags = CHFL_CHANOP;
 
     /* disallow creating local channels */
-    if (IsLocalChannel(name) && !chptr &&
-	!feature_bool(FEAT_LOCAL_CHANNELS) &&
-	(feature_bool(FEAT_OPER_LOCAL_CHANNELS) && !IsAnOper(sptr))) {
-	send_reply(sptr, ERR_NOSUCHCHANNEL, name);
-	continue;
+    if (IsLocalChannel(name) && !chptr) {
+      if (IsAnOper(sptr)) {
+        if (!feature_bool(FEAT_OPER_LOCAL_CHANNELS)) {
+          send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+          continue;
+        }
+      } else {
+        if (!feature_bool(FEAT_LOCAL_CHANNELS)) {
+          send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+          continue;
+        }
+      }
     }
 
     if (cli_user(sptr)->joined >= feature_int(FEAT_MAXCHANNELSPERUSER) &&

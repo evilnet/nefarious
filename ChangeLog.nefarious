@@ -3,6 +3,10 @@
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_join.c: Fix for bug 2330233.
+
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Add spam filter check for nick changes. (watch flag i).
 
 	* include/client.h: Add spam filter check for nick changes.
