@@ -1808,7 +1808,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           gline[1] = strdup(NumServ(&me));
           ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
           gline[2] = strdup(temphost);
-          gline[3] = iitoa(feature_int(FEAT_FILTER_GLINE_LENGTH));
+          gline[3] = iitoa(fline->length);
           gline[4] = iitoa(CurrentTime);
           ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
           gline[5] = strdup(reason);
@@ -1820,7 +1820,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
             zline[1] = strdup(NumServ(&me));
             ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
             zline[2] = strdup(temphost);
-            zline[3] = iitoa(feature_int(FEAT_FILTER_ZLINE_LENGTH));
+            zline[3] = iitoa(fline->length);
             zline[4] = iitoa(CurrentTime);
             ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
             zline[5] = strdup(reason);
@@ -1837,7 +1837,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
               shun[1] = strdup(NumServ(&me));
               ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
               shun[2] = strdup(temphost);
-              shun[3] = iitoa(feature_int(FEAT_FILTER_SHUN_LENGTH));
+              shun[3] = iitoa(fline->length);
               shun[4] = iitoa(CurrentTime);
               ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
               shun[5] = strdup(reason);

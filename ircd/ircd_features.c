@@ -674,9 +674,7 @@ static struct FeatureDesc {
 
   F_S(FILTER_ALERT_CHANNAME, 0, "#opers", 0),
   F_B(FILTER_ALERT_USEMSG, 0, 0, 0),
-  F_I(FILTER_GLINE_LENGTH, 0, 3600, 0),
-  F_I(FILTER_ZLINE_LENGTH, 0, 3600, 0),
-  F_I(FILTER_SHUN_LENGTH, 0, 3600, 0),
+  F_I(FILTER_DEFAULT_LENGTH, 0, 3600, 0),
 
   /* Allows configuring sending host in LOC */
   F_B(LOC_SENDHOST, 0, 0, 0),

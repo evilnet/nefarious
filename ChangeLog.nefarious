@@ -3,6 +3,29 @@
 
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Changed default filter length feature to
+	FILTER_DEFAULT_LENGTH. Also added length feature to Filter blocks.
+
+	* include/ircd_features.h: Changed default filter length feature to
+	FILTER_DEFAULT_LENGTH.
+
+	* include/s_conf.h: Added length setting to filter blocks.
+
+	* ircd/ircd_features.c: Changed default filter length feature to
+	FILTER_DEFAULT_LENGTH.
+
+	* ircd/ircd_lexer.l: Added length setting to filter blocks.
+
+	* ircd/ircd_parser.y: Added length setting to filter blocks.
+
+	* ircd/s_err.c: Show length in /stats f
+
+	* ircd/s_conf.c: Added length setting to filter blocks.
+
+	* ircd/s_stats.c: Show length in /stats f.
+
+2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/readme.features: Start the cleanup and update process of
 	this document.
 

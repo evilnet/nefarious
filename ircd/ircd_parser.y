@@ -75,7 +75,7 @@
   char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class;
-  static int is_leaf, is_hub, invert;
+  static int is_leaf, is_hub, invert, length;
   static char *name, *pass, *host, *vhost, *ipaddr, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
@@ -232,6 +232,7 @@ static void free_slist(struct SLink **link) {
 %token INCLUDE
 %token LINESYNC
 %token FROM
+%token LENGTH
 %token TEOF
 %token LOGICAL_AND LOGICAL_OR
 %token CONNECTED DIRECTCON VIA DIRECTOP
@@ -1548,7 +1549,9 @@ webircdesc: DESC '=' QSTRING ';'
 };
 
 
-sfilterblock: SFILTER '{' sfilteritems '}' ';'
+sfilterblock: SFILTER {
+  length = 0;
+} '{' sfilteritems '}' ';'
 {
   struct fline *fline;
   char *errbuf;
@@ -1568,11 +1571,15 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
       fline = (struct fline *) MyMalloc(sizeof(struct fline));
       memset(fline, 0, sizeof(struct fline));
 
+      if (length == 0)
+        length = feature_int(FEAT_FILTER_DEFAULT_LENGTH);
+
       regcomp(&fline->filter, regex, REG_ICASE|REG_EXTENDED);
       DupString(fline->rawfilter, regex);
       DupString(fline->wflags, rtype);
       DupString(fline->rflags, action);
       DupString(fline->reason, reason);
+      fline->length = length;
 
       fline->next = GlobalFList;
       GlobalFList = fline;
@@ -1581,11 +1588,12 @@ sfilterblock: SFILTER '{' sfilteritems '}' ';'
       rtype = NULL;
       action = NULL;
       reason = NULL;
+      length = 0;
     }
   }
 };
 sfilteritems: sfilteritem | sfilteritems sfilteritem;
-sfilteritem: sfilterregex | sfilterrtype | sfilteraction | sfilterreason;
+sfilteritem: sfilterregex | sfilterrtype | sfilteraction | sfilterreason | sfilterlength;
 sfilterregex: REGEX '=' QSTRING ';'
 {
   MyFree(regex);
@@ -1605,4 +1613,8 @@ sfilterreason: REASON '=' QSTRING ';'
 {
   MyFree(reason);
   reason = $3;
+};
+sfilterlength: LENGTH '=' NUMBER ';'
+{
+  length = $3;
 };
