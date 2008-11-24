@@ -3,6 +3,10 @@
 
 2008-11-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Small tweak.
+
+2008-11-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Updated SFilter flags.
 
 	* include/client.h: added client flag FLAG_SPAM.
