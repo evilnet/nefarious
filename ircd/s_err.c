@@ -681,7 +681,7 @@ static Numeric replyTable[] = {
 /* 325 */
   { RPL_WHOISWEBIRC, "%s :is connected via %s", "325" },
 /* 326 */
-  { 0 },
+  { RPL_SPAM, "%s :is a known spam source", "326" },
 /* 327 */
   { 0 },
 /* 328 */

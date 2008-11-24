@@ -23,6 +23,7 @@
 
 #include "config.h"
 #include "s_conf.h"
+#include "channel.h"
 #include "class.h"
 #include "client.h"
 #include "crule.h"
@@ -79,7 +80,7 @@
   static char *name, *pass, *host, *vhost, *ipaddr, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
-  static char *prefix, *command, *service, *regex;
+  static char *prefix, *command, *service, *regex, *channel;
 
   struct SLink *hosts;
   static char *stringlist[MAX_STRINGS];
@@ -233,6 +234,7 @@ static void free_slist(struct SLink **link) {
 %token LINESYNC
 %token FROM
 %token LENGTH
+%token CHANNEL
 %token TEOF
 %token LOGICAL_AND LOGICAL_OR
 %token CONNECTED DIRECTCON VIA DIRECTOP
@@ -1579,6 +1581,19 @@ sfilterblock: SFILTER {
       DupString(fline->wflags, rtype);
       DupString(fline->rflags, action);
       DupString(fline->reason, reason);
+
+      if (channel && *channel) {
+        if ((!IsChannelName(channel)) || (HasCntrl(channel)))
+          parse_error("Your Filter block channel name is invalid");
+        else
+          DupString(fline->nchan, channel);
+      } else {
+        if ((!IsChannelName(feature_str(FEAT_FILTER_DEFAULT_CHANNAME))))
+          parse_error("Your Filter default alert channel name is invalid");
+        else
+          DupString(fline->nchan, feature_str(FEAT_FILTER_DEFAULT_CHANNAME));
+      }
+
       fline->length = length;
 
       fline->next = GlobalFList;
@@ -1588,12 +1603,14 @@ sfilterblock: SFILTER {
       rtype = NULL;
       action = NULL;
       reason = NULL;
+      channel = NULL;
       length = 0;
     }
   }
 };
 sfilteritems: sfilteritem | sfilteritems sfilteritem;
-sfilteritem: sfilterregex | sfilterrtype | sfilteraction | sfilterreason | sfilterlength;
+sfilteritem: sfilterregex | sfilterrtype | sfilteraction | sfilterreason | sfilterlength | 
+             sfilterchannel;
 sfilterregex: REGEX '=' QSTRING ';'
 {
   MyFree(regex);
@@ -1617,4 +1634,9 @@ sfilterreason: REASON '=' QSTRING ';'
 sfilterlength: LENGTH '=' NUMBER ';'
 {
   length = $3;
+};
+sfilterchannel: CHANNEL '=' QSTRING ';'
+{
+  MyFree(channel);
+  channel = $3;
 };

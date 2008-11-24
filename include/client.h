@@ -177,6 +177,7 @@ enum Flag {
     FLAG_DNSBLMARKED,               /**< Client in DNSBL Marked */
     FLAG_DNSBLALLOWED,              /**< Client in DNSBL Allowed in */
     FLAG_DNSBLDENIED,               /**< Only set if a client is found on a d X:line */
+    FLAG_SPAM,                      /**< Only set if a client has triggered a spam filter */
 
     FLAG_WEBIRC,                    /**< User registered with WEBIRC command */
     FLAG_WEBIRC_UIDENT,             /**< Use USER method for getting IDENT */
@@ -697,6 +698,8 @@ struct Client {
 #define IsWhois(x)		HasFlag(x, FLAG_WHOIS)
 /** Return non-zero if the client has operator or server privileges. */
 #define IsPrivileged(x)         (IsAnOper(x) || IsServer(x))
+/** Return non-zero if the client has triggered a spam filter */
+#define IsSpam(x)               HasFlag(x, FLAG_SPAM)
 /** Return non-zero if the client is a WEBIRC user. */
 #define IsWebIRC(x)             HasFlag(x, FLAG_WEBIRC)
 /** Return non-zero if the client is WEBIRC line uses USER method */
@@ -782,6 +785,8 @@ struct Client {
 #define SetAdmin(x)		SetFlag(x, FLAG_ADMIN)
 /** Mark a client as being oper mode +W set (/whois alerts). */
 #define SetWhois(x)		SetFlag(x, FLAG_WHOIS)
+/** Mark a client as being a spam source */
+#define SetSpam(x)              SetFlag(x, FLAG_SPAM)
 /** Mark a client as being a WEBIRC user. */
 #define SetWebIRC(x)            SetFlag(x, FLAG_WEBIRC)
 /** Mark a WEBIRC client as using USER to send ident .*/
@@ -851,6 +856,8 @@ struct Client {
 #define ClearDNSBLMarked(x)	ClrFlag(x, FLAG_DNSBLMARKED)
 /** Client matching on dnsbl is no longer allowed in. Allow flag removed from client */
 #define ClearDNSBLAllowed(x)	ClrFlag(x, FLAG_DNSBLALLOWED)
+/** Client is no longer a spam source */
+#define ClearSpam(x)            ClrFlag(x, FLAG_SPAM)
 /** Client is no longer a WEBIRC user. */
 #define ClearWebIRC(x)          ClrFlag(x, FLAG_WEBIRC)
 /** Client no longer supports extended names. */
@@ -973,6 +980,8 @@ struct Client {
 #define RFFLAG_SALERT   0x040
 #define RFFLAG_NOTIFY   0x080
 #define RFFLAG_ZLINE    0x100
+#define RFFLAG_MARK     0x200
+#define RFFLAG_IP       0x400
 
 #define WFFLAG_NOTICE     0x001
 #define WFFLAG_CHANNOTICE 0x002

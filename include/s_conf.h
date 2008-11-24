@@ -243,6 +243,7 @@ struct fline {
   char *rflags;
   char *wflags;
   char *reason;
+  char *nchan;
   int length;
 };
 

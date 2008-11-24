@@ -249,6 +249,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_LISTEND          323
 #define RPL_CHANNELMODEIS    324
 #define RPL_WHOISWEBIRC      325
+#define RPL_SPAM             326
 /*      RPL_CHANNELPASSIS    325           IRCnet extension */
 /*      RPL_UNIQOPIS         325           IRCnet extension */
 /*      RPL_NOCHANPASS       326           IRCnet extension */

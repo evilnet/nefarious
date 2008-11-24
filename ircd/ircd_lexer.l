@@ -130,6 +130,7 @@ static struct lexer_token {
   TOKEN(SPOOFHOST),
   TOKEN(VERSION),
   TOKEN(WEBIRC),
+  TOKEN(CHANNEL),
 #undef TOKEN
   { "administrator", ADMIN },
   { "auto", AUTOCONNECT },

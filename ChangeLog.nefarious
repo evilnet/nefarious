@@ -1,6 +1,37 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Updated SFilter flags.
+
+	* include/client.h: added client flag FLAG_SPAM.
+
+	* include/ircd_features.h: Changed FILTER_ALERT_CHANNAME to FILTER_DEFAULT_CHANNAME.
+
+	* include/mark.h: Added MARK_SFILTER.
+
+	* include/numeric.h: Added RPL_SPAM (326).
+
+	* include/s_conf.h: Added nchan char to fline struct.
+
+	* ircd/ircd_features.c: Changed FILTER_ALERT_CHANNAME to FILTER_DEFAULT_CHANNAME.
+
+	* ircd/ircd_lexer.l: Added channel option for per channel
+	alerts (flag C).
+
+	* ircd/ircd_parser.y: Added channel option for per channel
+	alerts (flag C).
+
+	* ircd/m_mark.c: Added SFILTER mark option.
+
+	* ircd/m_whois.c: Added spam whois reply (oper only).
+
+	* ircd/s_conf.c: Added 2 new react flags, m for marking and i for using
+	the IP to gline/zline/shun.
+
+	* ircd/s_err.c: Added RPL_SPAM (326).
+
 2008-11-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Changed default filter length feature to

@@ -28,6 +28,7 @@
 #define MARK_EXEMPT_UPDATE	"EXEMPT"
 #define MARK_CVERSION		"CVERSION"
 #define MARK_WEBIRC		"WEBIRC"
+#define MARK_SFILTER            "SFILTER"
 
 #endif /* INCLUDED_mark_h */
 

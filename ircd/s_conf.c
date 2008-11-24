@@ -41,6 +41,7 @@
 #include "ircd_string.h"
 #include "list.h"
 #include "listener.h"
+#include "mark.h"
 #include "match.h"
 #include "motd.h"
 #include "msg.h"
@@ -122,7 +123,9 @@ static int fline_rflags[] = {
   RFFLAG_SHUN,      's',
   RFFLAG_BLOCK,     'b',
   RFFLAG_NOTIFY,    'n',
-  RFFLAG_ZLINE,     'z'
+  RFFLAG_ZLINE,     'z',
+  RFFLAG_MARK,      'm',
+  RFFLAG_IP,        'i'
 };
 
 static int fline_wflags[] = {
@@ -1032,6 +1035,8 @@ void clear_fline_list(void)
   while ((fline = GlobalFList)) {
     GlobalFList = fline->next;
     regfree(&fline->filter);
+    fline->length = 0;
+    MyFree(fline->nchan);
     MyFree(fline->rawfilter);
     MyFree(fline->wflags);
     MyFree(fline->rflags);
@@ -1781,7 +1786,9 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
       if(0 == regexec(&fline->filter, string, 0, 0, 0)) {
         Debug((DEBUG_DEBUG, "regexec match"));
         if (rf_flag & RFFLAG_CALERT) {
-          if ((chptr = FindChannel(feature_str(FEAT_FILTER_ALERT_CHANNAME)))) {
+          chptr = FindChannel(fline->nchan);
+
+          if (chptr) {
             ircd_snprintf(0, temp1, sizeof(temp1), "%s has triggered a filter the following %s%s%s%s", cli_name(sptr), get_type(flags),
                           !EmptyString(target) ? " (Targets: " : "", !EmptyString(target) ? target : "", !EmptyString(target) ? ")" : "");
             ircd_snprintf(0, temp2, sizeof(temp2), "%s", string);
@@ -1793,6 +1800,10 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
               sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp2);
             }
           }
+        }
+        if (rf_flag & RFFLAG_MARK) {
+          SetSpam(sptr);
+          sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s +", cli_name(sptr), MARK_SFILTER);
         }
         if (rf_flag & RFFLAG_SALERT) {
           sendto_allops(&me, SNO_OLDSNO, "%s has triggered a filter line for the following %s%s%s%s", cli_name(sptr),
@@ -1806,7 +1817,10 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
         if (rf_flag & RFFLAG_GLINE) {
           gline[0] = strdup(NumServ(&me));
           gline[1] = strdup(NumServ(&me));
-          ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+          if (rf_flag & RFFLAG_IP)
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+          else
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
           gline[2] = strdup(temphost);
           gline[3] = iitoa(fline->length);
           gline[4] = iitoa(CurrentTime);
@@ -1818,7 +1832,10 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           if (rf_flag & RFFLAG_ZLINE) {
             zline[0] = strdup(NumServ(&me));
             zline[1] = strdup(NumServ(&me));
-            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+            if (rf_flag & RFFLAG_IP)
+              ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+            else
+              ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
             zline[2] = strdup(temphost);
             zline[3] = iitoa(fline->length);
             zline[4] = iitoa(CurrentTime);
@@ -1835,7 +1852,10 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
             if (rf_flag & RFFLAG_SHUN) {
               shun[0] = strdup(NumServ(&me));
               shun[1] = strdup(NumServ(&me));
-              ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+              if (rf_flag & RFFLAG_IP)
+                ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+              else
+                ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
               shun[2] = strdup(temphost);
               shun[3] = iitoa(fline->length);
               shun[4] = iitoa(CurrentTime);
