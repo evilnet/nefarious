@@ -1,6 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added S Except flag and K SFilter react flag.
+
+	* include/client.h: Added S Except flag and K SFilter react flag.
+
+	* ircd/m_notice.c: Re order the filter checks.
+
+	* ircd/m_privmsg.c: Re order the filter checks.
+
+	* ircd/s_conf.c: Added Except flag S for exempting users from SFilters.
+	Also added a K SFilter react flag for kicking spammers out of channels.
+
 2008-11-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Small tweak.

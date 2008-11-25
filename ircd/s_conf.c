@@ -111,7 +111,8 @@ static int eline_flags[] = {
   EFLAG_KLINE,    'k',
   EFLAG_GLINE,    'g',
   EFLAG_ZLINE,    'z',
-  EFLAG_SHUN,     's'
+  EFLAG_SHUN,     's',
+  EFLAG_SFILTER,  'S'
 };
 
 static int fline_rflags[] = {
@@ -125,7 +126,8 @@ static int fline_rflags[] = {
   RFFLAG_NOTIFY,    'n',
   RFFLAG_ZLINE,     'z',
   RFFLAG_MARK,      'm',
-  RFFLAG_IP,        'i'
+  RFFLAG_IP,        'i',
+  RFFLAG_KICK,      'K'
 };
 
 static int fline_wflags[] = {
@@ -1747,6 +1749,8 @@ char* get_type(unsigned int flag)
     return "QUIT";
   else if (WFFLAG_DCC & flag)
     return "DCC";
+  else if (WFFLAG_NICK & flag)
+    return "NICK";
   else
     return "(unknown)";
 }
@@ -1763,6 +1767,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   int wf_flag = 0;
   struct fline *fline;
   struct Channel *chptr;
+  struct Membership *member,*nmember;
   int ret = 0;
   char temp1[BUFSIZE]; 
   char temp2[BUFSIZE]; 
@@ -1779,6 +1784,11 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
 
     if (rf_flag & RFFLAG_AUTH && IsAccount(sptr)) {
       Debug((DEBUG_DEBUG, "regexec IsAccount and FFLAG_AUTH yes, breaking"));
+      break;
+    }
+
+    if (find_eline(sptr, EFLAG_SFILTER)) {
+      Debug((DEBUG_DEBUG, "Exempt from spam filter, breaking"));
       break;
     }
 
@@ -1813,6 +1823,25 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
         }
         if (rf_flag & RFFLAG_NOTIFY) {
           sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Your last %s was blocked as it matched a spam filter.", sptr, get_type(flags));
+        }
+        if (rf_flag & RFFLAG_KICK) {
+          if ((WFFLAG_CHANNOTICE & flags) || (WFFLAG_CHANMSG & flags)) {
+            chptr = FindChannel(target);
+
+            if (chptr) {
+              for (member=chptr->members;member;member=nmember) {
+                nmember=member->next_member;
+                if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
+                  continue;
+
+                if (member->user == sptr) {
+                  sendcmdto_serv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_KICK, NULL, "%H %C :%s", chptr, member->user, fline->reason);
+                  sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, 0, "%H %C :%s", chptr, member->user, fline->reason);
+                  make_zombie(member, member->user, &me, &me, chptr);
+                }
+              }
+            }
+          }
         }
         if (rf_flag & RFFLAG_GLINE) {
           gline[0] = strdup(NumServ(&me));

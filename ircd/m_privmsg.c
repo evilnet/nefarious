@@ -110,8 +110,6 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int             i;
   int             count;
   int             ret = 0;
-  int             isprivmsg = 0;
-  int             ischanmsg = 0;
   int             isdcc = 0;
   char*           vector[MAXTARGETS];
 
@@ -132,45 +130,40 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   count = unique_name_vector(parv[1], ',', vector, MAXTARGETS);
 
-  if ( strcasecmp(parv[2], "DCC") == 0 ) {
-    isdcc = 1;
-    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, parv[1]);
-    if (ret != 0) {
-      if (ret == 2)
-        return CPTR_KILLED;
-      else
-        return 0;
-    }
-  }
-
   for (i = 0; i < count; ++i) {
     name = vector[i];
-    if (IsChannelPrefix(*name))
-      ischanmsg = 1;
-    else
-      isprivmsg = 1;
+    if (IsChannelPrefix(*name)) {
+      ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, name);
+      if (ret != 0) {
+        if (ret == 2)
+          return CPTR_KILLED;
+        else
+          return 0;
+      }
+    } else {
+      if ( strcasecmp(parv[2], "DCC") == 0 ) {
+        isdcc = 1;
+        ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, name);
+        if (ret != 0) {
+          if (ret == 2)
+            return CPTR_KILLED;
+          else
+            return 0;
+        }
+      }
+
+      if (!isdcc) {
+        ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, name);
+        if (ret != 0) {
+          if (ret == 2)
+            return CPTR_KILLED;
+          else
+            return 0;
+        }
+      }
+    }
   }
   i = 0;
-
-  if (ischanmsg && !isdcc) {
-    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, parv[1]);
-    if (ret != 0) {
-      if (ret == 2)
-        return CPTR_KILLED;
-      else
-        return 0;
-    }
-  }
-
-  if (isprivmsg && !isdcc) {
-    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, parv[1]);
-    if (ret != 0) {
-      if (ret == 2)
-        return CPTR_KILLED;
-      else
-        return 0;
-    }
-  }
 
   for (i = 0; i < count; ++i) {
     name = vector[i];

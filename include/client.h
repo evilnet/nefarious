@@ -970,6 +970,8 @@ struct Client {
 #define EFLAG_ZLINE     0x004
 /** Exception for /SHUNS */
 #define EFLAG_SHUN      0x008
+/** Exception for Spam Filters */
+#define EFLAG_SFILTER   0x010
 
 #define RFFLAG_AUTH     0x001
 #define RFFLAG_KILL     0x002
@@ -982,6 +984,7 @@ struct Client {
 #define RFFLAG_ZLINE    0x100
 #define RFFLAG_MARK     0x200
 #define RFFLAG_IP       0x400
+#define RFFLAG_KICK     0x800
 
 #define WFFLAG_NOTICE     0x001
 #define WFFLAG_CHANNOTICE 0x002

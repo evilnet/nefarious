@@ -130,8 +130,6 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int             sent = 0; /* added by Vadtec 03/13/2008 */
   struct Client*  acptr; /* added by Vadtec 02/26/2008 */
   struct Channel* chptr; /* added by Vadtec 02/27/2008 */
-  int             isprivmsg = 0;
-  int             ischanmsg = 0;
   int             isdcc = 0;
 
   assert(0 != cptr);
@@ -221,45 +219,40 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     }
   }
 
-  if (strcmp(parv[2], "DCC")) {
-    isdcc = 1;
-    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, parv[1]);
-    if (ret != 0) {
-      if (ret == 2)
-        return CPTR_KILLED;
-      else
-        return 0;
-    }
-  }
-
   for (i = 0; i < count; ++i) {
     name = vector[i];
-    if (IsChannelPrefix(*name))
-      ischanmsg = 1;
-    else
-      isprivmsg = 1;
+    if (IsChannelPrefix(*name)) {
+      ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, name);
+      if (ret != 0) {
+        if (ret == 2)
+          return CPTR_KILLED;
+        else
+          return 0;
+      }
+    } else {
+      if (strcmp(parv[2], "DCC")) {
+        isdcc = 1;
+        ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, name);
+        if (ret != 0) {
+          if (ret == 2)
+            return CPTR_KILLED;
+          else
+            return 0;
+        }
+      }
+
+      if (!isdcc) {
+        ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, name);
+        if (ret != 0) {
+          if (ret == 2)
+            return CPTR_KILLED;
+          else
+            return 0;
+        }
+      }
+    }
   }
   i = 0;
-
-  if (ischanmsg && !isdcc) {
-    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, parv[1]);
-    if (ret != 0) {
-      if (ret == 2)
-        return CPTR_KILLED;
-      else
-        return 0;
-    }
-  }
-
-  if (isprivmsg && !isdcc) {
-    ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, parv[1]);
-    if (ret != 0) {
-      if (ret == 2)
-        return CPTR_KILLED;
-      else
-        return 0;
-    }
-  }
 
   for (i = 0; i < count; ++i) {
     name = vector[i];
