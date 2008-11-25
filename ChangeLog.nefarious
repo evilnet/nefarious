@@ -3,6 +3,16 @@
 
 2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added v SFilter react flag.
+
+	* include/client.h: Added v SFilter react flag.
+
+	* ircd/s_conf.c: If the v react flag is specified then if person 
+	triggers a spam filter on a channel where they are voiced then they
+	will be exempt.
+
+2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added o SFilter react flag.
 
 	* include/client.h: Added o SFilter react flag.

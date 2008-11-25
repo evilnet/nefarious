@@ -986,6 +986,7 @@ struct Client {
 #define RFFLAG_IP       0x400
 #define RFFLAG_KICK     0x800
 #define RFFLAG_OPS      0x1000
+#define RFFLAG_VOICE    0x2000
 
 #define WFFLAG_NOTICE     0x001
 #define WFFLAG_CHANNOTICE 0x002

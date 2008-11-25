@@ -128,7 +128,8 @@ static int fline_rflags[] = {
   RFFLAG_MARK,      'm',
   RFFLAG_IP,        'i',
   RFFLAG_KICK,      'K',
-  RFFLAG_OPS,       'o'
+  RFFLAG_OPS,       'o',
+  RFFLAG_VOICE,     'v'
 };
 
 static int fline_wflags[] = {
@@ -1804,6 +1805,21 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
         for (member=chptr->members;member;member=nmember) {
           nmember=member->next_member;
           if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
+            brk = 1;
+        }
+      }
+      if (brk == 1)
+        break;
+    }
+    brk = 0;
+
+    if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_VOICE)) {
+      chptr = FindChannel(target);
+
+      if (chptr) {
+        for (member=chptr->members;member;member=nmember) {
+          nmember=member->next_member;
+          if ((member->user == sptr) && (IsVoicedOrOpped(member)))
             brk = 1;
         }
       }
