@@ -3,6 +3,17 @@
 
 2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added o SFilter react flag.
+
+	* include/client.h: Added o SFilter react flag.
+
+	* ircd/s_conf.c: If the o react flag is specified then if person 
+	triggers a spam filter on a channel where they are opped or half
+	opped then they will be exempt. Also improved the check for exempting
+	opers from spam checks.
+
+2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added S Except flag and K SFilter react flag.
 
 	* include/client.h: Added S Except flag and K SFilter react flag.

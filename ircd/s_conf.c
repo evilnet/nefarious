@@ -127,7 +127,8 @@ static int fline_rflags[] = {
   RFFLAG_ZLINE,     'z',
   RFFLAG_MARK,      'm',
   RFFLAG_IP,        'i',
-  RFFLAG_KICK,      'K'
+  RFFLAG_KICK,      'K',
+  RFFLAG_OPS,       'o'
 };
 
 static int fline_wflags[] = {
@@ -1769,6 +1770,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   struct Channel *chptr;
   struct Membership *member,*nmember;
   int ret = 0;
+  int brk = 0;
   char temp1[BUFSIZE]; 
   char temp2[BUFSIZE]; 
   char temphost[HOSTLEN +3]; 
@@ -1782,6 +1784,9 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
     rf_flag = reactfflagstr(fline->rflags);
     wf_flag = watchfflagstr(fline->wflags);
 
+    if (IsAnOper(sptr))
+      break;
+
     if (rf_flag & RFFLAG_AUTH && IsAccount(sptr)) {
       Debug((DEBUG_DEBUG, "regexec IsAccount and FFLAG_AUTH yes, breaking"));
       break;
@@ -1791,6 +1796,21 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
       Debug((DEBUG_DEBUG, "Exempt from spam filter, breaking"));
       break;
     }
+
+    if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_OPS)) {
+      chptr = FindChannel(target);
+
+      if (chptr) {
+        for (member=chptr->members;member;member=nmember) {
+          nmember=member->next_member;
+          if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
+            brk = 1;
+        }
+      }
+      if (brk == 1)
+        break;
+    }
+    brk = 0;
 
     if (wf_flag & flags) {
       if(0 == regexec(&fline->filter, string, 0, 0, 0)) {
@@ -1831,10 +1851,10 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
             if (chptr) {
               for (member=chptr->members;member;member=nmember) {
                 nmember=member->next_member;
-                if (!MyUser(member->user) || IsZombie(member) || IsAnOper(member->user))
-                  continue;
-
                 if (member->user == sptr) {
+                  if (!MyUser(member->user) || IsZombie(member))
+                    continue;
+
                   sendcmdto_serv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_KICK, NULL, "%H %C :%s", chptr, member->user, fline->reason);
                   sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, 0, "%H %C :%s", chptr, member->user, fline->reason);
                   make_zombie(member, member->user, &me, &me, chptr);
@@ -1861,10 +1881,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           if (rf_flag & RFFLAG_ZLINE) {
             zline[0] = strdup(NumServ(&me));
             zline[1] = strdup(NumServ(&me));
-            if (rf_flag & RFFLAG_IP)
-              ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
-            else
-              ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
             zline[2] = strdup(temphost);
             zline[3] = iitoa(fline->length);
             zline[4] = iitoa(CurrentTime);
