@@ -99,6 +99,10 @@
 
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
+#include <stdio.h>
+#ifdef _GNU_SOURCE
+#include <strings.h>
+#endif
 
 /*
  * m_privmsg - generic message handler
@@ -112,6 +116,7 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int             ret = 0;
   int             isdcc = 0;
   char*           vector[MAXTARGETS];
+  char*           temp;
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -141,7 +146,13 @@ int m_privmsg(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           return 0;
       }
     } else {
-      if ( strcasecmp(parv[2], "DCC") == 0 ) {
+      #ifdef _GNU_SOURCE
+      if ((temp = strcasestr(parv[2], "\001DCC"))) {
+        temp = strchrnul(parv[2], ' ');
+      #else
+      if ((temp = strstr(parv[2], "\001DCC")) || (temp = strstr(parv[2], "\001dcc"))) {
+        temp = strchr(parv[2], ' ');
+      #endif
         isdcc = 1;
         ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, name);
         if (ret != 0) {

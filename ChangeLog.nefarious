@@ -3,6 +3,15 @@
 
 2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_notice.c: Fixed up DCC filtering.
+
+	* ircd/m_privmsg.c: Fixed up DCC filtering.
+
+	* ircd/s_conf.c: Fixed a crash with filter matches that have no
+	target.
+
+2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added v SFilter react flag.
 
 	* include/client.h: Added v SFilter react flag.

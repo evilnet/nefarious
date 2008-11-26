@@ -1798,35 +1798,37 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
       break;
     }
 
-    if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_OPS)) {
-      chptr = FindChannel(target);
+    if (target && *target) {
+      if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_OPS)) {
+        chptr = FindChannel(target);
 
-      if (chptr) {
-        for (member=chptr->members;member;member=nmember) {
-          nmember=member->next_member;
-          if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
-            brk = 1;
+        if (chptr) {
+          for (member=chptr->members;member;member=nmember) {
+            nmember=member->next_member;
+            if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
+              brk = 1;
+          }
         }
+        if (brk == 1)
+          break;
       }
-      if (brk == 1)
-        break;
-    }
-    brk = 0;
+      brk = 0;
 
-    if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_VOICE)) {
-      chptr = FindChannel(target);
+      if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_VOICE)) {
+        chptr = FindChannel(target);
 
-      if (chptr) {
-        for (member=chptr->members;member;member=nmember) {
-          nmember=member->next_member;
-          if ((member->user == sptr) && (IsVoicedOrOpped(member)))
-            brk = 1;
+        if (chptr) {
+          for (member=chptr->members;member;member=nmember) {
+            nmember=member->next_member;
+            if ((member->user == sptr) && (IsVoicedOrOpped(member)))
+              brk = 1;
+          }
         }
+        if (brk == 1)
+          break;
       }
-      if (brk == 1)
-        break;
+      brk = 0;
     }
-    brk = 0;
 
     if (wf_flag & flags) {
       if(0 == regexec(&fline->filter, string, 0, 0, 0)) {
@@ -1861,7 +1863,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Your last %s was blocked as it matched a spam filter.", sptr, get_type(flags));
         }
         if (rf_flag & RFFLAG_KICK) {
-          if ((WFFLAG_CHANNOTICE & flags) || (WFFLAG_CHANMSG & flags)) {
+          if (((WFFLAG_CHANNOTICE & flags) || (WFFLAG_CHANMSG & flags)) && (target && *target)) {
             chptr = FindChannel(target);
 
             if (chptr) {

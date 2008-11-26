@@ -96,6 +96,7 @@
 #include "ircd.h" /* &me - added by Vadtec 02/26/2008 */
 #include "s_bsd.h" /* HighestFd, LocalClientArray[] - added by Vadtec 02/26/2008 */
 #include "s_conf.h"
+#include "s_debug.h"
 #include "s_misc.h" /* CPTR_KILLED - added by Vadtec 02/26/2008 */
 #include "hash.h" /* FindChannel() - added by Vadtec 02/26/2008 */
 
@@ -230,7 +231,13 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           return 0;
       }
     } else {
-      if (strcmp(parv[2], "DCC")) {
+      #ifdef _GNU_SOURCE
+      if ((temp = strcasestr(parv[2], "\001DCC"))) {
+        temp = strchrnul(parv[2], ' ');
+      #else
+      if ((temp = strstr(parv[2], "\001DCC")) || (temp = strstr(parv[2], "\001dcc"))) {
+        temp = strchr(parv[2], ' ');
+      #endif
         isdcc = 1;
         ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_DCC, name);
         if (ret != 0) {
