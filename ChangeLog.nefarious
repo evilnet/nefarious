@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added NOIDENT, disables ident checking.
+
+	* include/ircd_features.h: Added NOIDENT.
+
+	* ircd/ircd_features.c: Added NOIDENT.
+
+	* ircd/s_auth.c: Added NOIDENT, disables ident checking.
+
 2008-11-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_notice.c: Fixed up DCC filtering.

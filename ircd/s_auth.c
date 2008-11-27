@@ -774,19 +774,21 @@ void start_auth(struct Client* client)
 
   start_dnsblcheck(auth, client);
 
-  if (start_auth_query(auth)) {
-    Debug((DEBUG_LIST, "identd query for %p initiated successfully",
-	   auth->client));
-    link_auth_request(auth, &AuthPollList);
-  } else if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS))) {
-    Debug((DEBUG_LIST, "identd query for %p not initiated successfully; "
-	   "waiting on DNS", auth->client));
-    link_auth_request(auth, &AuthIncompleteList);
-  } else {
-    Debug((DEBUG_LIST, "identd query for %p not initiated successfully; "
-	   "no DNS pending; releasing immediately", auth->client));
-    free_auth_request(auth);
-    release_auth_client(client);
+  if (!feature_bool(FEAT_NOIDENT)) {
+    if (start_auth_query(auth)) {
+      Debug((DEBUG_LIST, "identd query for %p initiated successfully",
+  	     auth->client));
+      link_auth_request(auth, &AuthPollList);
+    } else if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS))) {
+      Debug((DEBUG_LIST, "identd query for %p not initiated successfully; "
+ 	     "waiting on DNS", auth->client));
+      link_auth_request(auth, &AuthIncompleteList);
+    } else {
+      Debug((DEBUG_LIST, "identd query for %p not initiated successfully; "
+	     "no DNS pending; releasing immediately", auth->client));
+      free_auth_request(auth);
+      release_auth_client(client);
+    }
   }
 }
 
