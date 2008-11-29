@@ -98,7 +98,7 @@
 #include "s_debug.h"
 #include "s_misc.h"
 #include "send.h"
-/* #include "IPcheck.h" */
+#include "IPcheck.h"
 
 #include <arpa/inet.h>
 /* #include <assert.h> -- Now using assert in ircd_log.h */
@@ -114,9 +114,9 @@ static int wline_flags[] = {
 
 char wflagstr(const char* wflags)
 {
-  unsigned int *flag_p;
-  unsigned int x_flag = 0;
-  const char *flagstr;
+  unsigned int  *flag_p;
+  unsigned int   x_flag = 0;
+  const    char *flagstr;
 
   flagstr = wflags;
 
@@ -150,13 +150,14 @@ char wflagstr(const char* wflags)
  */
 int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
-  char*        hostname = NULL;
-  char*        ipaddr = NULL;
-  char*        password = NULL;
-  char i_host[SOCKIPLEN + USERLEN + 2];
-  char s_host[HOSTLEN + USERLEN + 2];
-  int invalidauth = 1, invalidpass = 0, mark = 0;
-  unsigned int w_flag = 0;
+  char*         hostname = NULL;
+  char*         ipaddr = NULL;
+  char*         password = NULL;
+  char          i_host[SOCKIPLEN + USERLEN + 2];
+  char          s_host[HOSTLEN + USERLEN + 2];
+  int           invalidauth = 1, invalidpass = 0, mark = 0;
+  unsigned int  w_flag = 0;
+  time_t        next_target = 0;
 
   struct in_addr webirc_addr;
   struct wline *wline;
@@ -222,15 +223,20 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   inet_aton(ipaddr, &webirc_addr);
 
-/*   IPcheck_connect_fail(cli_ip(cptr)); */
-/*   IPcheck_disconnect(cptr); */
+  if (feature_bool(FEAT_IPCHECK))
+    IPcheck_disconnect(cptr);
 
   cli_ip(cptr).s_addr = webirc_addr.s_addr;
 
-/*   if (!IPcheck_local_connect(cli_ip(cptr), &next_target)) {
- *  IPcheck_connect_fail(cli_ip(cptr));
- *  return exit_client(cptr, sptr, &me, "Too many connections from your host");
- *} */
+  if (feature_bool(FEAT_IPCHECK)) {
+    if (!IPcheck_local_connect(cli_ip(cptr), &next_target)) {
+      IPcheck_connect_fail(cptr);
+      return exit_client(cptr, sptr, &me, "Too many connections from your host");
+    }
+
+    if (next_target)
+      cli_nexttarget(cptr) = next_target;
+  }
 
   ircd_strncpy(cli_sock_ip(cptr), ipaddr, SOCKIPLEN);
   ircd_strncpy(cli_sockhost(cptr), hostname, HOSTLEN);

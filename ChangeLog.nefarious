@@ -1,6 +1,39 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added Feature IPCHECK. Default is TRUE,
+	requires a restart of the ircd if changed.
+
+	* include/ircd_features.h: Added Feature IPCHECK. Default is TRUE,
+	requires a restart of the ircd if changed.
+
+	* include/IPcheck.h: Re enabled IPCHECK code and updated it.
+
+	* ircd/IPcheck.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/ircd.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/ircd_features.c: Added Feature IPCHECK. Default is TRUE,
+	requires a restart of the ircd if changed.
+
+	* ircd/m_nick.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/m_webirc.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/s_auth.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/s_bsd.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/s_conf.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/s_misc.c: Re enabled IPCHECK code and updated it.
+
+	* ircd/s_serv.c: Removed IPCHECK code.
+
+	* ircd/s_user.c: Re enabled IPCHECK code and updated it.
+
 2008-11-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added NOIDENT, disables ident checking.

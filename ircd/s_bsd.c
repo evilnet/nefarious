@@ -23,7 +23,7 @@
 
 #include "s_bsd.h"
 #include "client.h"
-/*#include "IPcheck.h"*/
+#include "IPcheck.h"
 #include "channel.h"
 #include "class.h"
 #include "hash.h"
@@ -643,10 +643,9 @@ void add_connection(struct Listener* listener, int fd) {
   time_t             next_target = 0;
   struct Zline*    azline = NULL;
   char zreason[256];
-/*
+
   const char* const throttle_message =
          "ERROR :Your host is trying to (re)connect too fast -- throttled\r\n";
-*/
        /* 12345678901234567890123456789012345679012345678901234567890123456 */
   const char* const register_message =
          "ERROR :Unable to complete your registration\r\n";
@@ -679,53 +678,58 @@ void add_connection(struct Listener* listener, int fd) {
    */
   os_disable_options(fd);
 
-  /*
-   * Add this local client to the IPcheck registry.
-   *
-   * If they're throttled, murder them, but tell them why first.
-   */
-/*  if (!IPcheck_local_connect(addr.sin_addr, &next_target) && !listener->server) {
- *  ++ServerStats->is_ref;
- * #ifdef USE_SSL
- *      ssl_murder(ssl, fd, throttle_message);
- * #else
- *      write(fd, throttle_message, strlen(throttle_message));
- *      close(fd);
- * #endif * USE_SSL *
- *      return;
- *   } */
+  if (listener->server)
+  {
+    new_client = make_client(0, STAT_UNKNOWN_SERVER);
+  }
+  else
+  {
+    /*
+     * Add this local client to the IPcheck registry.
+     *
+     * If they're throttled, murder them, but tell them why first.
+     */
+    if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK)) {
+      ServerStats->is_ref++;
+      if (!ssl) {
+        i = write(fd, throttle_message, strlen(throttle_message));
+        close(fd);
+      } else
+        ssl_murder(ssl, fd, throttle_message);
+      return;
+    }
 
-  new_client = make_client(0, ((listener->server) ? 
-                               STAT_UNKNOWN_SERVER : STAT_UNKNOWN_USER));
-
+    new_client = make_client(0, STAT_UNKNOWN_USER);
+    if (feature_bool(FEAT_IPCHECK))
+      SetIPChecked(new_client);
+  }
   /*
    * Copy ascii address to 'sockhost' just in case. Then we have something
    * valid to put into error messages...  
    */
-  SetIPChecked(new_client);
   SetAccess(new_client);
   ircd_ntoa_r(cli_sock_ip(new_client), (const char*) &addr.sin_addr);   
   strcpy(cli_sockhost(new_client), cli_sock_ip(new_client));
   (cli_ip(new_client)).s_addr = addr.sin_addr.s_addr;
   cli_port(new_client)        = ntohs(addr.sin_port);
 
+  if (next_target)
+    cli_nexttarget(new_client) = next_target;
+
 /* begin zline */
   if ((azline = zline_lookup_oc(new_client, 0))) {
-    ircd_snprintf(0, zreason, sizeof(zreason), "%s", azline->zl_reason);
-
-#ifdef USE_SSL
-    ssl_murder(ssl, fd, zreason);
-#else
-    write(fd, zreason, sizeof(zreason));
-    close(fd);
-#endif /* USE_SSL */
-
+    ip_registry_disconnect_ip(cli_ip(new_client));
+    ircd_snprintf(0, zreason, sizeof(zreason), "ERROR :Z:Lined (%s)", azline->zl_reason);
+    if (!ssl) {
+      write(fd, zreason, strlen(zreason));
+      close(fd);
+    } else
+      ssl_murder(ssl, fd, zreason);
+    cli_fd(new_client) = -1;
     return;
   }
 /* end zline */
 
-  if (next_target)
-    cli_nexttarget(new_client) = next_target;
 
   cli_fd(new_client) = fd;
   if (!socket_add(&(cli_socket(new_client)), client_sock_callback,

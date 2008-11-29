@@ -22,7 +22,7 @@
 #include "config.h"
 
 #include "s_conf.h"
-/*#include "IPcheck.h"*/
+#include "IPcheck.h"
 #include "channel.h"
 #include "class.h"
 #include "client.h"
@@ -564,8 +564,12 @@ void det_confs_butmask(struct Client* cptr, int mask)
 static enum AuthorizationCheckResult
 check_limit_and_attach(struct Client* cptr, struct ConfItem* aconf)
 {
-/*  if (IPcheck_nr(cptr) > aconf->maximum)
- *  return ACR_TOO_MANY_FROM_IP; */
+  if (feature_bool(FEAT_IPCHECK)) {
+    Debug((DEBUG_DEBUG, "IPcheck current connection count %d", IPcheck_nr(cptr)));
+    if (IPcheck_nr(cptr) > aconf->maximum)
+      return ACR_TOO_MANY_FROM_IP;
+  }
+
   return attach_conf(cptr, aconf);
 }
 

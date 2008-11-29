@@ -25,7 +25,7 @@
 #include "config.h"
 
 #include "s_serv.h"
-/*#include "IPcheck.h"*/
+#include "IPcheck.h"
 #include "channel.h"
 #include "client.h"
 #include "gline.h"
@@ -126,12 +126,6 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
 		  cli_serv(cptr)->timestamp, MAJOR_PROTOCOL, NumServCap(&me),
 		  feature_bool(FEAT_HUB) ? "h" : "",
 		  *(cli_info(&me)) ? cli_info(&me) : "IRCers United");
-    /*
-     * Don't charge this IP# for connecting
-     * XXX - if this comes from a server port, it will not have been added
-     * to the IP check registry, see add_connection in s_bsd.c
-     */
-/*    IPcheck_connect_fail(cli_ip(cptr)); */
   }
 
   det_confs_butmask(cptr, CONF_SERVER);

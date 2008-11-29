@@ -4,7 +4,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -25,23 +25,23 @@
 #include "IPcheck.h"
 #include "client.h"
 #include "ircd.h"
+#include "match.h"
 #include "msg.h"
-#include "numnicks.h"
 #include "ircd_alloc.h"
 #include "ircd_events.h"
 #include "ircd_features.h"
 #include "ircd_log.h"
-#include "s_debug.h"
-#include "s_user.h"
+#include "ircd_string.h"    /* ircd_ntoa */
+#include "s_debug.h"        /* Debug */
+#include "s_user.h"         /* TARGET_DELAY */
 #include "send.h"
-#include "ssl.h"
 
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
 /** Stores free target information for a particular user. */
 struct IPTargetEntry {
-  int           count; /**< Number of free targets targets. */
+  unsigned int  count; /**< Number of free targets targets. */
   unsigned char targets[MAXTARGETS]; /**< Array of recent targets. */
 };
 
@@ -57,7 +57,6 @@ struct IPRegistryEntry {
 
 /** Size of hash table (must be a power of two). */
 #define IP_REGISTRY_TABLE_SIZE 0x10000
-
 /** Report current time for tracking in IPRegistryEntry::last_connect. */
 #define NOW ((unsigned short)(CurrentTime & 0xffff))
 /** Time from \a x until now, in seconds. */
@@ -73,26 +72,30 @@ struct IPRegistryEntry {
 /** Hash table for storing IPRegistryEntry entries. */
 static struct IPRegistryEntry* hashTable[IP_REGISTRY_TABLE_SIZE];
 /** List of allocated but unused IPRegistryEntry structs. */
-static struct IPRegistryEntry* freeList = 0;
+static struct IPRegistryEntry* freeList;
 /** Periodic timer to look for too-old registry entries. */
 static struct Timer expireTimer;
 
 /** Calculate hash value for an IP address.
- * @param[in] ip Address to hash.
+ * @param[in] ip Address to hash; must be in canonical form.
  * @return Hash value for address.
  */
+
 static unsigned int ip_registry_hash(unsigned int ip)
 {
   return ((ip >> 16) ^ ip) & (IP_REGISTRY_TABLE_SIZE - 1);
 }
 
 /** Find an IP registry entry if one exists for the IP address.
+ * If \a ip looks like an IPv6 address, only consider the first 64 bits
+ * of the address. Otherwise, only consider the final 32 bits.
  * @param[in] ip IP address to search for.
  * @return Matching registry entry, or NULL if none exists.
  */
 static struct IPRegistryEntry* ip_registry_find(unsigned int ip)
 {
-  struct IPRegistryEntry* entry = hashTable[ip_registry_hash(ip)];
+  struct IPRegistryEntry* entry;
+  entry = hashTable[ip_registry_hash(ip)];
   for ( ; entry; entry = entry->next) {
     if (entry->addr == ip)
       break;
@@ -112,7 +115,7 @@ static void ip_registry_add(struct IPRegistryEntry* entry)
 
 /** Remove an IP registry entry from the hash table.
  * @param[in] entry Registry entry to add.
- */  
+ */
 static void ip_registry_remove(struct IPRegistryEntry* entry)
 {
   unsigned int bucket = ip_registry_hash(entry->addr);
@@ -132,8 +135,8 @@ static void ip_registry_remove(struct IPRegistryEntry* entry)
 /** Allocate a new IP registry entry.
  * For members that have a sensible default value, that is used.
  * @return Newly allocated registry entry.
- */ 
-static struct IPRegistryEntry* ip_registry_new_entry()
+ */
+static struct IPRegistryEntry* ip_registry_new_entry(void)
 {
   struct IPRegistryEntry* entry = freeList;
   if (entry)
@@ -188,10 +191,12 @@ static void ip_registry_expire_entry(struct IPRegistryEntry* entry)
    * Don't touch this number, it has statistical significance
    * XXX - blah blah blah
    */
+  Debug((DEBUG_DEBUG, "IPCheck ip_registry_expire_entry %s (%d)", ircd_ntoa((char*) &entry->addr), CONNECTED_SINCE(entry->last_connect)));
   if (CONNECTED_SINCE(entry->last_connect) > 600) {
     /*
      * expired
      */
+    Debug((DEBUG_DEBUG, "IPcheck expiring registry for %s (no clients connected).", ircd_ntoa((char*) &entry->addr)));
     ip_registry_remove(entry);
     ip_registry_delete_entry(entry);
   }
@@ -223,12 +228,17 @@ static void ip_registry_expire(struct Event* ev)
         ip_registry_expire_entry(entry);
     }
   }
+  Debug((DEBUG_DEBUG, "[%i] ip_registry_expire() again in 60s",
+       CurrentTime));
+
+  timer_add(&expireTimer, ip_registry_expire, 0, TT_ABSOLUTE, CurrentTime+60);
 }
 
 /** Initialize the IPcheck subsystem. */
 void IPcheck_init(void)
 {
-  timer_add(timer_init(&expireTimer), ip_registry_expire, 0, TT_PERIODIC, 60);
+  Debug((DEBUG_DEBUG, "IPcheck: Initializing timer"));
+  timer_add(timer_init(&expireTimer), ip_registry_expire, 0, TT_RELATIVE, 60);
 }
 
 /** Check whether a new connection from a local client should be allowed.
@@ -239,24 +249,27 @@ void IPcheck_init(void)
  * @param[out] next_target_out Receives time to grant another free target.
  * @return Non-zero if the connection is permitted, zero if denied.
  */
+static
 int ip_registry_check_local(unsigned int addr, time_t* next_target_out)
 {
   struct IPRegistryEntry* entry = ip_registry_find(addr);
   unsigned int free_targets = STARTTARGETS;
- 
+
   if (0 == entry) {
     entry       = ip_registry_new_entry();
     entry->addr = addr;    /* The IP number of registry entry */
     ip_registry_add(entry);
+    Debug((DEBUG_DEBUG, "IPcheck added new registry for local connection from %s.", ircd_ntoa((char*) &entry->addr)));
     return 1;
   }
-  /* Note that this also connects server connects.
+  /* Note that this also counts server connects.
    * It is hard and not interesting, to change that.
-   *
-   * Don't allow more then 255 connects from one IP number, ever
+   * Refuse connection if it would overflow the counter.
    */
-  if (0 == ++entry->connected) {
+  if (0 == ++entry->connected)
+  {
     entry->connected--;
+    Debug((DEBUG_DEBUG, "IPcheck refusing local connection from %s: counter overflow.",  ircd_ntoa((char*) &entry->addr)));
     return 0;
   }
 
@@ -269,22 +282,24 @@ int ip_registry_check_local(unsigned int addr, time_t* next_target_out)
   if (0 == ++entry->attempts)   /* Check for overflow */
     --entry->attempts;
 
+  Debug((DEBUG_DEBUG, "IPcheck CLONE check entry->attempts: %d IPCHECK_CLONE_LIMIT: %d CurrentTime: %d cli_since(&me): %d IPCHECK_CLONE_DELAY: %d",
+        entry->attempts, IPCHECK_CLONE_LIMIT, CurrentTime, cli_since(&me), IPCHECK_CLONE_DELAY));
   if (entry->attempts < IPCHECK_CLONE_LIMIT) {
     if (next_target_out)
       *next_target_out = CurrentTime - (TARGET_DELAY * free_targets - 1);
   }
   else if ((CurrentTime - cli_since(&me)) > IPCHECK_CLONE_DELAY) {
-    /* 
+    /*
      * Don't refuse connection when we just rebooted the server
      */
-    if (feature_bool(FEAT_NOTHROTTLE))
-      return 1;
-    else {
-      assert(entry->connected>0);
+    if (!feature_bool(FEAT_NOTHROTTLE)) {
+      assert(entry->connected > 0);
       --entry->connected;
+      Debug((DEBUG_DEBUG, "IPcheck refusing local connection from %s: too fast.",  ircd_ntoa((char*) &entry->addr)));
       return 0;
     }
   }
+  Debug((DEBUG_DEBUG, "IPcheck accepting local connection from %s.",  ircd_ntoa((char*) &entry->addr)));
   return 1;
 }
 
@@ -296,41 +311,42 @@ int ip_registry_check_local(unsigned int addr, time_t* next_target_out)
  * @param[in] is_burst Non-zero if client was introduced during a burst.
  * @return Non-zero if the client should be accepted, zero if they must be killed.
  */
+static
 int ip_registry_check_remote(struct Client* cptr, int is_burst)
 {
-  struct IPRegistryEntry* entry = ip_registry_find((cli_ip(cptr)).s_addr);
+  struct IPRegistryEntry* entry;
 
   /*
    * Mark that we did add/update an IPregistry entry
    */
   SetIPChecked(cptr);
+  entry = ip_registry_find((cli_ip(cptr)).s_addr);
   if (0 == entry) {
     entry = ip_registry_new_entry();
-    entry->addr = (cli_ip(cptr)).s_addr;
     if (is_burst)
       entry->attempts = 0;
     ip_registry_add(entry);
+    Debug((DEBUG_DEBUG, "IPcheck added new registry for remote connection from %s.",  ircd_ntoa((char*) &entry->addr)));
+    return 1;
   }
-  else {
-    if (0 == ++entry->connected) {
-      /* 
-       * Don't allow more then 255 connects from one IP number, ever
+  /* Avoid overflowing the connection counter. */
+  if (0 == ++entry->connected) {
+    Debug((DEBUG_DEBUG, "IPcheck refusing remote connection from %s: counter overflow.",  ircd_ntoa((char*) &entry->addr)));
+    return 0;
+  }
+  if (CONNECTED_SINCE(entry->last_connect) > IPCHECK_CLONE_PERIOD)
+    entry->attempts = 0;
+  if (!is_burst) {
+    if (0 == ++entry->attempts) {
+      /*
+       * Check for overflow
        */
-      return 0;
+      --entry->attempts;
     }
-    if (CONNECTED_SINCE(entry->last_connect) > IPCHECK_CLONE_PERIOD)
-      entry->attempts = 0;
-    if (!is_burst) {
-      if (0 == ++entry->attempts) {
-        /*
-         * Check for overflow
-         */
-        --entry->attempts;
-      }
-      ip_registry_update_free_targets(entry);
-      entry->last_connect = NOW;
-    }
+    ip_registry_update_free_targets(entry);
+    entry->last_connect = NOW;
   }
+  Debug((DEBUG_DEBUG, "IPcheck counting remote connection from %s.",  ircd_ntoa((char*) &entry->addr)));
   return 1;
 }
 
@@ -339,14 +355,16 @@ int ip_registry_check_remote(struct Client* cptr, int is_burst)
  * so the client's address is not penalized for the failure.
  * @param[in] addr Address of rejected client.
  */
+static
 void ip_registry_connect_fail(unsigned int addr)
 {
   struct IPRegistryEntry* entry = ip_registry_find(addr);
-  if (entry) {
-    if (0 == --entry->attempts)
-      ++entry->attempts; /* check for overflow */
+  if (entry && 0 == --entry->attempts) {
+    Debug((DEBUG_DEBUG, "IPcheck noting local connection failure for %s.",  ircd_ntoa((char*) &entry->addr)));
+    ++entry->attempts; /* check for overflow */
   }
 }
+
 
 /** Handle a client that has successfully connected.
  * This copies free target information to \a cptr from his address's
@@ -354,24 +372,33 @@ void ip_registry_connect_fail(unsigned int addr)
  * the entry.
  * @param[in,out] cptr Client that has successfully connected.
  */
+static
 void ip_registry_connect_succeeded(struct Client *cptr)
 {
   const char*             tr    = "";
   unsigned int free_targets     = STARTTARGETS;
   struct IPRegistryEntry* entry = ip_registry_find((cli_ip(cptr)).s_addr);
 
-  if (!entry) {
-    Debug((DEBUG_ERROR, "Missing registry entry for: %s", cli_sock_ip(cptr)));
-    return;
-  }
+  assert(entry);
   if (entry->target) {
     memcpy(cli_targets(cptr), entry->target->targets, MAXTARGETS);
     free_targets = entry->target->count;
     tr = " tr";
   }
+  Debug((DEBUG_DEBUG, "IPcheck noting local connection success for %s.",  ircd_ntoa((char*) &entry->addr)));
   sendcmdto_one(&me, CMD_NOTICE, cptr, "%C :on %u ca %u(%u) ft %u(%u)%s",
 		cptr, entry->connected, entry->attempts, IPCHECK_CLONE_LIMIT,
 		free_targets, STARTTARGETS, tr);
+}
+
+void ip_registry_disconnect_ip(struct in_addr a)
+{
+  struct IPRegistryEntry* entry = ip_registry_find(a.s_addr);
+
+  if (entry && (entry->connected > 0)) {
+    --entry->connected;
+    Debug((DEBUG_DEBUG, "IPcheck ip_registry_disconnect_ip removing connection"));
+  }
 }
 
 /** Handle a client that decided to disconnect (or was killed after
@@ -379,24 +406,20 @@ void ip_registry_connect_succeeded(struct Client *cptr)
  * information for his IP registry entry.
  * @param[in] cptr Client that has exited.
  */
+static
 void ip_registry_disconnect(struct Client *cptr)
 {
   struct IPRegistryEntry* entry = ip_registry_find((cli_ip(cptr)).s_addr);
-  if (0 == entry) {
-    /*
-     * trying to find an entry for a server causes this to happen,
-     * servers should never have FLAG_IPCHECK set
-     */
-    return;
-  }
+  assert(entry);
+  assert(entry->connected > 0);
+  Debug((DEBUG_DEBUG, "IPcheck noting disconnect from %s.",  ircd_ntoa((char*) &entry->addr)));
   /*
    * If this was the last one, set `last_connect' to disconnect time (used for expiration)
    */
-  /* assert(entry->connected>0); */
   if (0 == --entry->connected) {
     if (CONNECTED_SINCE(entry->last_connect) > IPCHECK_CLONE_LIMIT * IPCHECK_CLONE_PERIOD) {
       /*
-       * Otherwise we'd penetalize for this old value if the client reconnects within 20 seconds
+       * Otherwise we'd penalize for this old value if the client reconnects within 20 seconds
        */
       entry->attempts = 0;
     }
@@ -418,7 +441,7 @@ void ip_registry_disconnect(struct Client *cptr)
     /*
      * This calculation can be pretty unfair towards large multi-user hosts, but
      * there is "nothing" we can do without also allowing spam bots to send more
-     * messages or by drastically increasing the ammount of memory used in the IPregistry.
+     * messages or by drastically increasing the amount of memory used in the IPregistry.
      *
      * The problem is that when a client disconnects, leaving no free targets, then
      * the next client from that IP number has to pay for it (getting no free targets).
@@ -445,7 +468,7 @@ void ip_registry_disconnect(struct Client *cptr)
        */
       free_targets += (CurrentTime - cli_firsttime(cptr) - 600) / TARGET_DELAY;
     /*
-     * Finally, store smallest value for Judgement Day
+     * Finally, store smallest value for Judgment Day
      */
     if (free_targets < entry->target->count)
       entry->target->count = free_targets;
@@ -456,6 +479,7 @@ void ip_registry_disconnect(struct Client *cptr)
  * @param[in] addr Address to look up.
  * @return Number of clients known to be connected from that address.
  */
+static
 int ip_registry_count(unsigned int addr)
 {
   struct IPRegistryEntry* entry = ip_registry_find(addr);
@@ -481,17 +505,19 @@ int IPcheck_local_connect(struct in_addr a, time_t* next_target_out)
 int IPcheck_remote_connect(struct Client *cptr, int is_burst)
 {
   assert(0 != cptr);
+  assert(!IsIPChecked(cptr));
   return ip_registry_check_remote(cptr, is_burst);
 }
 
 /** Handle a client being rejected during connection through no fault
  * of their own.  This "undoes" the effect of ip_registry_check_local()
  * so the client's address is not penalized for the failure.
- * @param[in] a Address of rejected client.
+ * @param[in] cptr Client who has been rejected.
  */
-void IPcheck_connect_fail(struct in_addr a)
+void IPcheck_connect_fail(const struct Client *cptr)
 {
-  ip_registry_connect_fail(a.s_addr);
+  assert(IsIPChecked(cptr));
+  ip_registry_connect_fail(cli_ip(cptr).s_addr);
 }
 
 /** Handle a client that has successfully connected.
@@ -503,6 +529,7 @@ void IPcheck_connect_fail(struct in_addr a)
 void IPcheck_connect_succeeded(struct Client *cptr)
 {
   assert(0 != cptr);
+  assert(IsIPChecked(cptr));
   ip_registry_connect_succeeded(cptr);
 }
 
@@ -514,6 +541,7 @@ void IPcheck_connect_succeeded(struct Client *cptr)
 void IPcheck_disconnect(struct Client *cptr)
 {
   assert(0 != cptr);
+  assert(IsIPChecked(cptr));
   ip_registry_disconnect(cptr);
 }
 
