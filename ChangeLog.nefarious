@@ -1,6 +1,18 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-11-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Removed several unused features.
+
+	* doc/readme.features: Updated finally.
+
+	* include/ircd_features.h: Removed several unused features.
+
+	* ircd/ircd_features.c: Removed several unused features.
+
+	* ircd/s_bsd.c: Small bug fix.
+
 2008-11-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added Feature IPCHECK. Default is TRUE,

@@ -324,6 +324,32 @@ This allows a user who has successfully authed to a service using login
 on connect (above) to bypass a DNSBL rejection if they got a positive
 result from the earlier check.
 
+DNSBL_LOC_EXEMPT_N_ONE
+ * Type: string
+ * Default: If you have an account with Nefarious services then you can bypass the DNSBL ban by logging in like this (where Account is your account name and Password is your password):
+
+If DNSBL_LOC_EXEMPT is enabled and a user matches a dnsbl then they will be
+sent a notice containing the string for this feature.
+
+DNSBL_LOC_EXEMPT_N_TWO
+ * Type: string
+ * Default: Type \002/QUOTE PASS AuthServ Account :Password\002 to connect
+
+If DNSBL_LOC_EXEMPT is enabled and a user matches a dnsbl then they will be
+sent a notice containing the string for this feature.
+
+DNSBL_WALLOPS_ONLY
+ * Type: boolean
+ * Default: FALSE
+
+If enabled DNSBL filter matches will be alerted to opers via wallops.
+
+DNSBL_MARK_FAKEHOST
+ * Type: boolean
+ * Default: TRUE
+
+If enabled then users who match DNSBL's will be marked.
+
 LOC_DEFAULT_SERVICE
   * type: string
   * Default: authserv
@@ -1353,6 +1379,13 @@ HIS_REMOTE
 
 As per UnderNet CFV-165, this disallows remote queries. (*sob!*)
 
+HIS_USERIP
+ * Type: boolean
+ * Default: TRUE
+
+This will hide the IP of a user in the output of a USERIP command. The real IP
+will be shown for opers.
+
 HIS_SCRAMBLED_CACHE_TIME
  * Type: integer
  * Default: 604800
@@ -1424,4 +1457,396 @@ NETWORK_DIE
  * Default: FALSE
 
 Allow this server to act upon a network-issued /die.
+
+NOIDENT
+ * Type: boolean
+ * Default: FALSE
+
+NOIDENT disables RFC 1413 (ident protocol) lookups of clients'
+usernames.
+
+MAX_CHECK_OUTPUT
+ * Type: integer
+ * Default: 1000
+
+The maximum results in a /CHECK response.
+
+EXTENDED_ACCOUNTS
+ * Type: boolean
+ * Default: TRUE
+
+Allows the IRCd to use the extended account system which X3 uses. If
+you plan to use services other than X3 then this will need to be set
+to FALSE in most cases.
+
+AUTOINVISIBLE
+ * Type: boolean
+ * Default: FALSE
+
+When enabled all users upon connect will have +i automatically set on
+them.
+
+CHMODE_a
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode a (admin only) to be used.
+
+CHMODE_c
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode c (no colours)  to be used.
+
+CHMODE_z
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode z (persistant channels) to be used.
+
+CHMODE_C
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode C (no ctcps) to be used.
+
+CHMODE_L
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode L (hide modes in /list) to be used.
+
+CHMODE_M
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode M (account only) to be used.
+
+CHMODE_N
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode N (no notice) to be used.
+
+CHMODE_O
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode O (oper only) to be used.
+
+CHMODE_Q
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode Q (no quit/part messages) to be used.
+
+CHMODE_S
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode S (strip control codes) to be used.
+
+CHMODE_T
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode T (no AMSG's) to be used.
+
+CHMODE_Z
+ * Type: boolean
+ * Default: TRUE
+
+Allows channel mode Z (SSL only) to be used.
+
+CHMODE_e_CHMODEEXCEPTION
+ * Type: boolean
+ * Default: FALSE
+
+If enabled anyone on the +e exemption list will be able to bypass
+modes +i/+k/+l.
+
+SWHOIS
+ * Type: boolean
+ * Default: TRUE
+
+Allows the IRCd to accept SWHOIS commands from services.
+
+HOST_HIDING_KEY1
+ * Type: string
+ * Default: aoAr1HnR6gl3sJ7hVz4Zb7x4YwpW
+
+One of the 3 unique host hiding keys used to encrypt style 2 hidden
+hosts. These must all be different.
+
+HOST_HIDING_KEY2
+ * Type: string
+ * Default: sdfjkLJKHlkjdkfjsdklfjlkjKLJ
+
+One of the 3 unique host hiding keys used to encrypt style 2 hidden
+hosts. These must all be different.
+
+HOST_HIDING_KEY3
+ * Type: string
+ * Default: KJklJSDFLkjLKDFJSLKjlKJFlkjS
+
+One of the 3 unique host hiding keys used to encrypt style 2 hidden
+hosts. These must all be different.
+
+AUTOJOIN_USER
+ * Type: boolean
+ * Default: FALSE
+
+Forces users to be autojoined on connect into the channel set
+for AUTOJOIN_USER_CHANNEL.
+
+AUTOJOIN_USER_CHANNEL
+ * Type: string
+ * Default: #evilnet
+
+Channel users will be forced to join if AUTOJOIN_USER is enabled.
+
+AUTOJOIN_USER_NOTICE
+ * Type: boolean
+ * Default: TRUE
+
+If enabled the notice set for AUTOJOIN_USER_NOTICE_VALUE will be notice'd
+to users just before forced autojoin.
+
+AUTOJOIN_USER_NOTICE_VALUE
+ * Type: string
+ * Default: *** Notice -- You are now being autojoined into #evilnet
+
+Notice for AUTOJOIN_USER_NOTICE (see above).
+
+AUTOJOIN_OPER
+ * Type: boolean
+ * Default: FALSE
+
+Forces opers to be autojoined upon /oper into the channel set
+for AUTOJOIN_OPER_CHANNEL.
+
+AUTOJOIN_OPER_CHANNEL
+ * Type: string
+ * Default: #opers
+
+Channel users will be forced to join if AUTOJOIN_OPER is enabled.
+
+AUTOJOIN_OPER_NOTICE
+ * Type: boolean
+ * Default: TRUE
+
+If enabled the notice set for AUTOJOIN_OPER_NOTICE_VALUE will be notice'd
+to users just before forced autojoin.
+
+AUTOJOIN_OPER_NOTICE_VALUE
+ * Type: string
+ * Default: *** Notice -- You are now being autojoined into #opers
+
+Notice for AUTOJOIN_OPER_NOTICE (see above).
+
+AUTOJOIN_ADMIN
+ * Type: boolean
+ * Default: FALSE
+
+Forces admins to be autojoined upon /oper into the channel set
+for AUTOJOIN_ADMIN_CHANNEL.
+
+AUTOJOIN_ADMIN_CHANNEL
+ * Type: string
+ * Default: #admin
+
+Channel users will be forced to join if AUTOJOIN_ADMIN is enabled.
+
+AUTOJOIN_ADMIN_NOTICE
+ * Type: boolean
+ * Default: TRUE
+
+If enabled the notice set for AUTOJOIN_ADMIN_NOTICE_VALUE will be notice'd
+to users just before forced autojoin.
+
+AUTOJOIN_ADMIN_NOTICE_VALUE
+ * Type: string
+ * Default: *** Notice -- You are now being autojoined into #admin
+
+Notice for AUTOJOIN_ADMIN_NOTICE (see above).
+
+CTCP_VERSIONING
+ * Type: boolean
+ * Default: FALSE
+
+Enables CTCP versioning for clients on connect.
+
+CTCP_VERSIONING_KILL
+ * Type: boolean
+ * Default: FALSE
+
+Kills clients who match specified versions.
+
+CTCP_VERSIONING_CHAN
+ * Type: boolean
+ * Default: FALSE
+
+If enabled version replies will be sent to the channel set for 
+CTCP_VERSIONING_CHANNAME
+
+CTCP_VERSIONING_CHANNAME
+ * Type: string
+ * Default: #opers
+
+Channel where version replies are sent to if CTCP_VERSIONING_CHAN
+is enabled (See above).
+
+CTCP_VERSIONING_USEMSG
+ * Type: boolean
+ * Default: FALSE
+
+If enabled version replies sent to the channel set for CTCP_VERSIONING_CHANNAME
+will be sent using privmsgs instead of notices.
+
+CTCP_VERSIONING_NOTICE
+ * Type: string
+ * Default: *** Checking your client version
+
+Message sent to clients during the versioning process on connect.
+
+FILTER_DEFAULT_CHANNAME
+ * Type: string
+ * Default: #opers
+
+Default channel filter matches will be sent to if the channel alert flag is
+enabled.
+
+FILTER_ALERT_USEMSG
+ * Type: boolean
+ * Default: FALSE
+
+If enabled then filter matches which are sent to alert channels will be sent
+as privmsg's instead of notices.
+
+FILTER_DEFAULT_LENGTH
+ * Type: integer
+ * Default: 3600
+
+Default length of a k/g/z:line for filter matches if a length isnt specifed.
+
+DEF_ALIST_LIMIT
+ * Type: integer
+ * Default: 30
+
+Maximum responses allowed in a ALIST search output.
+
+ALIST_SEND_FREQ
+ * Type: integer
+ * Default: 300
+
+How often (in seconds) ALIST updates are checked across the server.
+
+ALIST_SEND_DIFF
+ * Type: integer
+ * Default: 600
+
+If the last message for the channel is over the current time minus to setting
+for ALIST_SEND_DIFF then an ALIST update will be sent out to other servers.
+
+EXEMPT_EXPIRE
+ * Type: integer
+ * Default: 172800
+
+If no one has triggered an exempt within this amount of time (in seconds) then
+the exempt will expire.
+
+STRICTUSERNAME
+ * Type: boolean
+ * Default: FALSE
+
+If enabled then strict ident/username rules will be applied.
+
+SET_ACTIVE_ON_CREATE
+ * Type: boolean
+ * Default: TRUE
+
+Sets a channel as active when a user creates one.
+
+ZLINEMAXUSERCOUNT
+ * Type: integer
+ * Default: 20
+
+Maximum amount of users a Z:line can affect when a Z:line is set via /ZLINE.
+Zlines set via services or servers will not be affected by this rule.
+
+NICK_DELAY
+ * Type: integer
+ * Default: 30
+
+How often a user can change ther nick (in seconds).
+
+HELP_PACE
+ * Type: integer
+ * Default: 5
+
+How often a user can request /HELP (in seconds).
+
+LOC_SENDHOST
+ * Type: boolean
+ * Default: FALSE
+
+If enabled hostnames will be sent in Login on connect messages to servers.
+
+IPCHECK
+ * Type: boolean
+ * Default: TRUE
+
+Controls the clone and throttle detection system in the IRCd. If you disable this
+then the maximum setting in Client blocks will not have any effect. You would
+need to use clone detection systems in the services you use.
+
+LUSERS_AUTHED
+ * Type: boolean
+ * Default: FALSE
+
+If enabled a count of logged in users will be shown in /LUSERS.
+
+SHUNMAXUSERCOUNT
+ * Type: integer
+ * Default: 20
+
+Maximum amount of users a Shun can affect when a shun is set via /SHUN.
+Zlines set via services or servers will not be affected by this rule.
+
+OPER_WHOIS_PARANOIA
+ * Type: boolean
+ * Default: FALSE
+
+Allows the use of the W opermode which will show /WHOIS attempts to opers when
+they are done on themselves.
+
+HIS_SHUN_REASON
+ * Type: boolean
+ * Default: TRUE
+
+Will prevent the reason from being shown to a user if enabled.
+
+HIS_USERSHUN
+ * Type: boolean
+ * Default: TRUE
+
+Will prevent normal users from getting shun lists via /SHUN if enabled.
+
+HIS_ZLINE
+ * Type: boolean
+ * Default: TRUE
+
+This will hide the user who done the zline in the zline message when enabled.
+
+HIS_USERZLINE
+ * Type: boolean
+ * Default: TRUE
+
+Will prevent normal users from getting zline lists via /ZLINE if enabled.
+
+HIS_ZLINE_REASON
+ * Type: boolean
+ * Default: TRUE
+
+Will prevent the reason from being shown to a user if enabled.
 

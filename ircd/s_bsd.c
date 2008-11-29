@@ -692,7 +692,7 @@ void add_connection(struct Listener* listener, int fd) {
     if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK)) {
       ServerStats->is_ref++;
       if (!ssl) {
-        i = write(fd, throttle_message, strlen(throttle_message));
+        write(fd, throttle_message, strlen(throttle_message));
         close(fd);
       } else
         ssl_murder(ssl, fd, throttle_message);
