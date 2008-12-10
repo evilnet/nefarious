@@ -379,7 +379,7 @@ uninstall:
 	@echo "Please remove the contents of ${DPATH} manually"
 
 clean:
-	${RM} -f *.o *.bak ircd umkpasswd version.c ircd_osdep.c chattr.tab.c table_gen y.tab.c y.tab.h
+	${RM} -f *.o *.bak ircd umkpasswd version.c ircd_osdep.c chattr.tab.c table_gen y.tab.c y.tab.h lex.yy.c
 
 distclean: clean
 	${RM} -f Makefile stamp-m

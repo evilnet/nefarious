@@ -223,7 +223,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   for (i = 0; i < count; ++i) {
     name = vector[i];
     if (IsChannelPrefix(*name)) {
-      ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANMSG, name);
+      ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_CHANNOTICE, name);
       if (ret != 0) {
         if (ret == 2)
           return CPTR_KILLED;
@@ -249,7 +249,7 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       }
 
       if (!isdcc) {
-        ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_PRIVMSG, name);
+        ret = find_fline(cptr, sptr, parv[parc-1], WFFLAG_NOTICE, name);
         if (ret != 0) {
           if (ret == 2)
             return CPTR_KILLED;
