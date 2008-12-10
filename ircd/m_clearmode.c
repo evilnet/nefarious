@@ -179,6 +179,9 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
   if (del_mode & MODE_KEY && *chptr->mode.key)
     modebuf_mode_string(&mbuf, MODE_DEL | MODE_KEY, chptr->mode.key, 0);
 
+  if (del_mode & MODE_REDIRECT && *chptr->mode.redirect)
+    modebuf_mode_string(&mbuf, MODE_DEL | MODE_REDIRECT, chptr->mode.redirect, 0);
+
   /* If we're removing the limit, note that and clear the limit */
   if (del_mode & MODE_LIMIT && chptr->mode.limit) {
     modebuf_mode_uint(&mbuf, MODE_DEL | MODE_LIMIT, chptr->mode.limit);
@@ -258,6 +261,9 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
   /* Finally, we can clear the key... */
   if (del_mode & MODE_KEY)
     chptr->mode.key[0] = '\0';
+
+  if (del_mode & MODE_REDIRECT)
+    chptr->mode.redirect[0] = '\0';
 
   /* Ok, build control string again */
   for (flag_p = flags; flag_p[0]; flag_p += 2)

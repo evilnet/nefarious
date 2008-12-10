@@ -1204,7 +1204,7 @@ void channel_modes(struct Client *cptr, char *mbuf, char *pbuf, int buflen,
     *mbuf++ = 'l';
     ircd_snprintf(0, pbuf, buflen, "%u", chptr->mode.limit);
   }
-  if (chptr->mode.redirect) {
+  if (*chptr->mode.redirect) {
     *mbuf++ = 'L';
     if (chptr->mode.limit)
       strcat(pbuf, " ");

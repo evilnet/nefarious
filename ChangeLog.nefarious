@@ -3,6 +3,14 @@
 
 2008-12-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/channel.c: Bug fix.
+
+	* ircd/m_clearmode.c: Allow +L to be cleared.
+
+	* ircd/m_oper.c: Moved a few of the autojoins around.
+
+2008-12-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added MAX_BOUNCE (default 5).
 
 	* doc/readme.features: Added MAX_BOUNCE.
