@@ -105,7 +105,7 @@ struct Client;
 #define MODE_NONOTICE		0x40000 /* no notice allowed towards chan */
 #define MODE_STRIP		0x80000 /* strip color from text */
 #define MODE_NOAMSG		0x100000 /* no multi target messages/notices */
-#define MODE_NOLISTMODES	0x200000 /* channel modes hidden in LIST output */
+#define MODE_REDIRECT		0x200000 /* channel redirect if +l is reached */
 #define MODE_EXCEPT		0x400000 /* ban exceptions */
 #define MODE_ADMINONLY		0x800000 /* only admins may join */
 #define MODE_PERSIST            0x1000000 /* channel is persistant */
@@ -116,7 +116,7 @@ struct Client;
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
-#define MODE_WPARAS     (MODE_CHANOP|MODE_HALFOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT|MODE_EXCEPT)
+#define MODE_WPARAS     (MODE_CHANOP|MODE_HALFOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT|MODE_EXCEPT|MODE_REDIRECT)
 
 #define HoldChannel(x)          (!(x))
 /* name invisible */
@@ -240,6 +240,7 @@ struct Mode {
   unsigned int mode;
   unsigned int limit;
   char key[KEYLEN + 1];
+  char redirect[CHANNELLEN + 1];
 };
 
 struct Channel {

@@ -1850,3 +1850,9 @@ HIS_ZLINE_REASON
 
 Will prevent the reason from being shown to a user if enabled.
 
+MAX_BOUNCE
+ * Type: integer
+ * Default: 5
+
+Maximum amount of links (+L) in a row a client will follow before error'ing.
+

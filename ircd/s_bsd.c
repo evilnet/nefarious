@@ -691,11 +691,12 @@ void add_connection(struct Listener* listener, int fd) {
      */
     if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK)) {
       ServerStats->is_ref++;
-      if (!ssl) {
-        write(fd, throttle_message, strlen(throttle_message));
-        close(fd);
-      } else
-        ssl_murder(ssl, fd, throttle_message);
+#ifdef USE_SSL
+      ssl_murder(ssl, fd, throttle_message);
+#else
+      write(fd, throttle_message, strlen(throttle_message));
+      close(fd);
+#endif /* USE_SSL */
       return;
     }
 
@@ -720,11 +721,12 @@ void add_connection(struct Listener* listener, int fd) {
   if ((azline = zline_lookup_oc(new_client, 0))) {
     ip_registry_disconnect_ip(cli_ip(new_client));
     ircd_snprintf(0, zreason, sizeof(zreason), "ERROR :Z:Lined (%s)", azline->zl_reason);
-    if (!ssl) {
-      write(fd, zreason, strlen(zreason));
-      close(fd);
-    } else
-      ssl_murder(ssl, fd, zreason);
+#ifdef USE_SSL
+    ssl_murder(ssl, fd, zreason);
+#else
+    write(fd, zreason, strlen(zreason));
+    close(fd);
+#endif /* USE_SSL */
     cli_fd(new_client) = -1;
     return;
   }

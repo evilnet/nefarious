@@ -708,17 +708,15 @@ void list_next_channels(struct Client *cptr)
               || ShowChannel(cptr, chptr)))
       {
         modebuf[0] = parabuf[0] = modestuff[0] = 0;
-        if (!(chptr->mode.mode & MODE_NOLISTMODES) || (IsOper(cptr))) {
-          channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
-          if (modebuf[1] != '\0') {
-            strcat(modestuff, "[");
-            strcat(modestuff, modebuf);
-            if (parabuf[0]) {
-              strcat(modestuff, " ");
-              strcat(modestuff, parabuf);
-            }
-            strcat(modestuff, "] ");
+        channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
+        if (modebuf[1] != '\0') {
+          strcat(modestuff, "[");
+          strcat(modestuff, modebuf);
+          if (parabuf[0]) {
+            strcat(modestuff, " ");
+            strcat(modestuff, parabuf);
           }
+          strcat(modestuff, "] ");
         }
         strcat(modestuff, chptr->topic);
         send_reply(cptr, RPL_LIST, chptr->chname, chptr->users, modestuff);

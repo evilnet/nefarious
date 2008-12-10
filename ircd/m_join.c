@@ -85,6 +85,7 @@
 #include "class.h"
 #include "client.h"
 #include "gline.h"
+#include "handlers.h"
 #include "hash.h"
 #include "ircd.h"
 #include "ircd_chattr.h"
@@ -103,6 +104,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int bouncedtimes = 0;
 /*
  * Helper function to find last 0 in a comma-separated list of
  * channel names.
@@ -166,17 +168,31 @@ join0(struct JoinBuf *join, struct Client *cptr, struct Client *sptr,
  */
 int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 {
+  int ret;
+
+  bouncedtimes = 0;
+  ret = do_join(cptr, sptr, parc, parv);
+  bouncedtimes = 0;
+
+  return ret;
+}
+
+int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
+{
   struct Channel *chptr = NULL;
   struct JoinBuf join;
   struct JoinBuf create;
   struct Gline *gline;
   unsigned int flags = 0;
   int i, flex = 0, automodes = 0;
+  char* bjoin[2];
   char *p = 0;
   char *chanlist;
   char *name;
   char *keys;
   char format_reply[BUFSIZE + 1];
+
+#define RET(x) { bouncedtimes--; return x; }
 
   if (parc < 2 || *parv[1] == '\0')
     return need_more_params(sptr, "JOIN");
@@ -194,6 +210,15 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
     if (join0(&join, cptr, sptr, name)) /* did client do a JOIN 0? */
       continue;
+
+    bouncedtimes++;
+    /* don't use 'return x;' but 'RET(x)' from here ;p */
+
+    if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
+    {
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, name);
+      RET(0)
+    }
 
     /* bad channel name */
     if ((!IsChannelName(name)) || (HasCntrl(name))) {
@@ -251,8 +276,8 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
           flex = 1;
 	else if (i > MAGIC_OPER_OVERRIDE) { /* oper overrode mode */
 	  switch (i - MAGIC_OPER_OVERRIDE) {
-	  case ERR_CHANNELISFULL: /* figure out which mode */
-	    i = 'l';
+	  case ERR_CHANNELISFULL:
+            i = 'l';
 	    break;
 
 	  case ERR_INVITEONLYCHAN:
@@ -297,14 +322,27 @@ int m_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	    sendto_opmask_butone(0, SNO_HACK4, "OPER JOIN: %C JOIN %H "
 				 "(overriding +%c)", sptr, chptr, i);
 	} else {
-          if (i == ERR_OPERONLYCHAN) {
-            ircd_snprintf(0, format_reply, sizeof(format_reply), "%s", format_message(cli_name(sptr),
+          switch (i) {
+            case ERR_OPERONLYCHAN:
+              ircd_snprintf(0, format_reply, sizeof(format_reply), "%s", format_message(cli_name(sptr),
                           cli_username(sptr), (char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
                           cli_user(sptr)->host, chptr->chname,(char*)feature_str(FEAT_ERR_OPERONLYCHAN)));
+              send_reply(sptr, i, chptr->chname, format_reply);
+              break;
 
-            send_reply(sptr, i, chptr->chname, format_reply);
-          } else
-           send_reply(sptr, i, chptr->chname);
+            case ERR_CHANNELISFULL:
+              if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
+                send_reply(sptr, ERR_LINKFULL, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+                bjoin[0] = cli_name(sptr);
+                bjoin[1] = chptr->mode.redirect;
+                do_join(cptr, sptr, 2, bjoin);
+              }
+              break;
+
+            default:
+              send_reply(sptr, i, chptr->chname);
+              break;
+          }
 	  continue;
 	}
 

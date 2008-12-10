@@ -1,6 +1,39 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-10  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added MAX_BOUNCE (default 5).
+
+	* doc/readme.features: Added MAX_BOUNCE.
+
+	* include/channel.h: Changed channel mode +L to a redirect mode.
+
+	* include/handlers.h: Added do_join.
+
+	* include/ircd_features.h: Added MAX_BOUNCE.
+
+	* include/numeric.h: Added in ERR_REDIRECTSET and ERR_LINKFULL.
+
+	* include/supported.h: Added L to the mode list that accepts params.
+
+	* ircd/channel.c: Changed channel mode +L to a redirect mode.
+
+	* ircd/hash.c: Removed old +L code.
+
+	* ircd/ircd_features.c: Added MAX_BOUNCE and changed L so it accepts a
+	param
+
+	* ircd/m_alist.c: Removed old +L code.
+
+	* ircd/m_clearmode.c: Updated +L channel mode.
+
+	* ircd/m_join.c: Make use of channel mode +L
+
+	* ircd/s_bsd.c: Bug fix.
+
+	* ircd/s_err.c: Added in ERR_REDIRECTSET and ERR_LINKFULL.
+
 2008-11-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Removed several unused features.

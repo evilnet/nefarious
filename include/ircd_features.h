@@ -317,6 +317,7 @@ enum Feature {
   FEAT_LASTMOD_TWEAK,
   FEAT_NOIDENT,	
   FEAT_IPCHECK,
+  FEAT_MAX_BOUNCE,
 
   FEAT_CTCP_VERSIONING, /* added by Vadtec 02/25/2008 */
   FEAT_CTCP_VERSIONING_KILL, /* added by Vadtec 02/27/2008 */

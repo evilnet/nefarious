@@ -399,6 +399,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_NOHIDING	     459	   unreal */
 /*	ERR_NOTFORHALFOPS    460	   unreal */
 
+#define ERR_REDIRECTSET      460
 #define ERR_NEEDMOREPARAMS   461
 #define ERR_ALREADYREGISTRED 462
 #define ERR_NOPERMFORHOST    463
@@ -446,6 +447,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      ERR_TSLESSCHAN       488           IRCnet extension (?) */
 #define ERR_EXCEPTLISTFULL   488	/* Nefarious extension */
 #define ERR_VOICENEEDED      489        /* Undernet extension */
+#define ERR_LINKFULL         490
 
 #define ERR_NOOPERHOST       491
 /*      ERR_NOSERVICEHOST    492 	   IRCnet extension */
@@ -460,6 +462,7 @@ extern const struct Numeric* get_error_numeric(int err);
 
 #define ERR_UMODEUNKNOWNFLAG 501
 #define ERR_USERSDONTMATCH   502
+#define ERR_NOLSET           503
 /*      ERR_GHOSTEDCLIENT    503           efnet */
 /*	ERR_VWORLDWARN	     503	   austnet */
 

@@ -150,17 +150,15 @@ int m_alist(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (chptr->last_message > btime) {
       if (ShowChannel(sptr, chptr)) { 
         modebuf[0] = parabuf[0] = modestuff[0] = 0;
-        if (!(chptr->mode.mode & MODE_NOLISTMODES) || (IsOper(sptr))) {
-          channel_modes(sptr, modebuf, parabuf, sizeof(modebuf), chptr);
-          if (modebuf[1] != '\0') {
-            strcat(modestuff, "[");
-            strcat(modestuff, modebuf);
-            if (parabuf[0]) {
-              strcat(modestuff, " ");
-              strcat(modestuff, parabuf);
-            }
-            strcat(modestuff, "] ");
+        channel_modes(sptr, modebuf, parabuf, sizeof(modebuf), chptr);
+        if (modebuf[1] != '\0') {
+          strcat(modestuff, "[");
+          strcat(modestuff, modebuf);
+          if (parabuf[0]) {
+            strcat(modestuff, " ");
+            strcat(modestuff, parabuf);
           }
+          strcat(modestuff, "] ");
         }
         strcat(modestuff, chptr->topic);
         send_reply(cptr, RPL_LIST, chptr->chname, chptr->users, modestuff);

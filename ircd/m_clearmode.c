@@ -137,7 +137,7 @@ do_clearmode(struct Client *cptr, struct Client *sptr, struct Channel *chptr,
     MODE_NOQUITPARTS,	'Q',
     MODE_SSLONLY,	'Z',
     MODE_NOAMSG,	'T',
-    MODE_NOLISTMODES,	'L',
+    MODE_REDIRECT,	'L',
     0x0, 0x0
   };
   int *flag_p;

@@ -84,6 +84,7 @@
 struct Client;
 
 
+extern int do_join(struct Client*, struct Client*, int, char*[]);
 extern int m_admin(struct Client*, struct Client*, int, char*[]);
 extern int m_alist(struct Client*, struct Client*, int, char*[]);
 extern int m_away(struct Client*, struct Client*, int, char*[]);

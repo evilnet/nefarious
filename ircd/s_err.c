@@ -949,7 +949,7 @@ static Numeric replyTable[] = {
 /* 459 */
   { 0 },
 /* 460 */
-  { 0 },
+  { ERR_REDIRECTSET, "%s :Channel redirect already set", "460"  },
 /* 461 */
   { ERR_NEEDMOREPARAMS, "%s :Not enough parameters", "461" },
 /* 462 */
@@ -1009,7 +1009,7 @@ static Numeric replyTable[] = {
 /* 489 */
   { ERR_VOICENEEDED, "%s :You're neither voiced nor channel operator", "489" },
 /* 490 */
-  { 0 },
+  { ERR_LINKFULL, "%s :[Link] %s has become full, so you are automatically being transferred to the linked channel %s", "490" },
 /* 491 */
   { ERR_NOOPERHOST, ":No O-lines for your host", "491" },
 /* 492 */
@@ -1035,7 +1035,7 @@ static Numeric replyTable[] = {
 /* 502 */
   { ERR_USERSDONTMATCH, ":Can't change mode for other users", "502" },
 /* 503 */
-  { 0 },
+  { ERR_NOLSET, "L :+l must be set", "503" },
 /* 504 */
   { 0 },
 /* 505 */
