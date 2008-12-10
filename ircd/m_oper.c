@@ -287,7 +287,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       /* Autojoin admins to admin channel and oper channel (if enabled) */
       if (feature_bool(FEAT_AUTOJOIN_ADMIN)) {
         if (feature_bool(FEAT_AUTOJOIN_ADMIN_NOTICE))
-              sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_ADMIN_NOTICE_VALUE));
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_ADMIN_NOTICE_VALUE));
 
         ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_ADMIN_CHANNEL), CHANNELLEN-1);
         join[0] = cli_name(sptr);
@@ -383,18 +383,14 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 	 /* This must be called before client_set_privs() */
 	 SetRemoteOper(sptr);
 
-         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_WHOIS)) {
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_WHOIS))
            OSetWhois(sptr);
-         }
-         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_IDLE)) {
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_IDLE))
            OSetIdle(sptr);
-         }
-         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_XTRAOP)) {
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_XTRAOP))
            OSetXtraop(sptr);
-         }
-         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_HIDECHANS)) {
+         if (!feature_bool(FEAT_OPERFLAGS) || (aconf->port & OFLAG_HIDECHANS))
            OSetHideChans(sptr);
-         }
 
 	 if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
 	   ClearAdmin(sptr);
@@ -411,13 +407,13 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 		       (OIsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");
 	 send_reply(sptr, RPL_YOUREOPER);
 
-         if (feature_bool(FEAT_AUTOJOIN_OPER) && OIsGlobal(sptr)) {
+         if (feature_bool(FEAT_AUTOJOIN_OPER)) {
            if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
              sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 
            ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_OPER_CHANNEL), CHANNELLEN-1);
-           join[0] = cli_name(sptr);
-           join[1] = chan;
+           join[1] = cli_name(sptr);
+           join[2] = chan;
            ms_svsjoin(&me, &me, 2, join);
          }
 
@@ -427,13 +423,13 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
                               parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost);
 
            /* Autojoin admins to admin channel and oper channel (if enabled) */
-           if (feature_bool(FEAT_AUTOJOIN_ADMIN) && OIsGlobal(sptr)) {
+           if (feature_bool(FEAT_AUTOJOIN_ADMIN)) {
              if (feature_bool(FEAT_AUTOJOIN_ADMIN_NOTICE))
                sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_ADMIN_NOTICE_VALUE));
 
              ircd_strncpy(chan, feature_str(FEAT_AUTOJOIN_ADMIN_CHANNEL), CHANNELLEN-1);
-             join[0] = cli_name(sptr);
-             join[1] = chan;
+             join[1] = cli_name(sptr);
+             join[2] = chan;
              ms_svsjoin(&me, &me, 2, join);
            }
          } else

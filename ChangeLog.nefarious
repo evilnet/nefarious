@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_oper.c: Some tweaks to autojoin with remote oper.
+
+	* ircd/m_svsjoin.c: Allow svsjoin to accept a nick as well as a
+	numeric.
+
 2008-12-10  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_notice.c: Changed WFFLAG_*'s to use the apropriate NOTICE

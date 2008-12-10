@@ -151,8 +151,11 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   /* this could be done with hunt_server_cmd but its a bucket of shit */
 
-  if(!(acptr = findNUser(parv[1])))
-    return 0;
+  if(!(acptr = findNUser(parv[1]))) {
+    if (!(acptr = FindUser(parv[1]))) {
+      return 0; /* Ignore SVSNICK for a user that has quit */
+    }
+  }
 
   if (0 == ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(&me))) {
 
@@ -198,7 +201,6 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
         return 0;
       }
-      return 0;
       joinbuf_join(&create, chptr, flags);
       if (feature_bool(FEAT_AUTOCHANMODES) &&
           feature_str(FEAT_AUTOCHANMODES_LIST) &&
