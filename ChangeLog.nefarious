@@ -3,6 +3,17 @@
 
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/numeric.h: Changed LINKFULL to LINKSET.
+
+	* ircd/channel.c: Removed +l requirement for +L.
+
+	* ircd/m_join.c: If +L is enabled then redirect, even if +l isnt
+	set.
+
+	* ircd/s_err.c: Changed LINKFULL to LINKSET.
+
+2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_oper.c: Small tweak.
 
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

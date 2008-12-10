@@ -447,7 +447,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*      ERR_TSLESSCHAN       488           IRCnet extension (?) */
 #define ERR_EXCEPTLISTFULL   488	/* Nefarious extension */
 #define ERR_VOICENEEDED      489        /* Undernet extension */
-#define ERR_LINKFULL         490
+#define ERR_LINKSET          490
 
 #define ERR_NOOPERHOST       491
 /*      ERR_NOSERVICEHOST    492 	   IRCnet extension */

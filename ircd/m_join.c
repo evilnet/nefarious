@@ -269,6 +269,14 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     }
 
     if (chptr) {
+      if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
+        send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+        bjoin[0] = cli_name(sptr);
+        bjoin[1] = chptr->mode.redirect;
+        do_join(cptr, sptr, 2, bjoin);
+      }
+      continue;
+
       if (check_target_limit(sptr, chptr, chptr->chname, 0))
 	continue; /* exceeded target limit */
       else if ((i = can_join(sptr, chptr, keys))) {
@@ -328,15 +336,6 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
                           cli_username(sptr), (char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
                           cli_user(sptr)->host, chptr->chname,(char*)feature_str(FEAT_ERR_OPERONLYCHAN)));
               send_reply(sptr, i, chptr->chname, format_reply);
-              break;
-
-            case ERR_CHANNELISFULL:
-              if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
-                send_reply(sptr, ERR_LINKFULL, sptr->cli_name, chptr->chname, chptr->mode.redirect);
-                bjoin[0] = cli_name(sptr);
-                bjoin[1] = chptr->mode.redirect;
-                do_join(cptr, sptr, 2, bjoin);
-              }
               break;
 
             default:
