@@ -3,6 +3,10 @@
 
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_oper.c: Small tweak.
+
+2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_oper.c: Some tweaks to autojoin with remote oper.
 
 	* ircd/m_svsjoin.c: Allow svsjoin to accept a nick as well as a

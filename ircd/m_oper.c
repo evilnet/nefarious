@@ -270,7 +270,7 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     send_umode_out(cptr, sptr, &old_mode, HasPriv(sptr, PRIV_PROPAGATE));
     send_reply(sptr, RPL_YOUREOPER);
 
-    if (feature_bool(FEAT_AUTOJOIN_OPER) && IsOper(sptr) || IsAdmin(sptr)) {
+    if (feature_bool(FEAT_AUTOJOIN_OPER) && (IsOper(sptr) || IsAdmin(sptr))) {
       if (feature_bool(FEAT_AUTOJOIN_OPER_NOTICE))
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_AUTOJOIN_OPER_NOTICE_VALUE));
 
