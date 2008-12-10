@@ -323,6 +323,7 @@ int ip_registry_check_remote(struct Client* cptr, int is_burst)
   entry = ip_registry_find((cli_ip(cptr)).s_addr);
   if (0 == entry) {
     entry = ip_registry_new_entry();
+    entry->addr = cli_ip(cptr).s_addr;    /* The IP number of registry entry */
     if (is_burst)
       entry->attempts = 0;
     ip_registry_add(entry);
@@ -334,6 +335,7 @@ int ip_registry_check_remote(struct Client* cptr, int is_burst)
     Debug((DEBUG_DEBUG, "IPcheck refusing remote connection from %s: counter overflow.",  ircd_ntoa((char*) &entry->addr)));
     return 0;
   }
+    Debug((DEBUG_DEBUG, "IPcheck test: %d", +entry->connected));
   if (CONNECTED_SINCE(entry->last_connect) > IPCHECK_CLONE_PERIOD)
     entry->attempts = 0;
   if (!is_burst) {

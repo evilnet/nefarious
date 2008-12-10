@@ -732,8 +732,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyConnect(sptr) && feature_bool(FEAT_AUTOINVISIBLE))
     SetInvisible(sptr);
 
-  SetUser(sptr);
-
   /* increment global count if needed */
   if (UserStats.globalclients < UserStats.clients && IsUser(sptr)) {
     if (UserStats.globalclients >= 0) {
@@ -774,6 +772,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
         sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :You are shunned: %s", sptr,
              ashun->sh_reason);
     }
+
+    SetUser(sptr);
 
   /*
    * even though a client isnt auto +x'ing we still do a virtual 
@@ -869,11 +869,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ClearHiddenHost(sptr); /* just in case somebody stuck +x in there */
   }
   else
-    /* if (IsServer(cptr)) */
   {
-    struct Client *acptr;
+    struct Client *acptr = user->server;
 
-    acptr = user->server;
     if (cli_from(acptr) != cli_from(sptr))
     {
       sendcmdto_one(&me, CMD_KILL, cptr, "%C :%s (%s != %s[%s])",
@@ -882,9 +880,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
       SetFlag(sptr, FLAG_KILLED);
       return exit_client(cptr, sptr, &me, "NICK server wrong direction");
     }
-    else
-      if (HasFlag(acptr, FLAG_TS8))
-          SetFlag(sptr, FLAG_TS8);
+    else if (HasFlag(acptr, FLAG_TS8))
+      SetFlag(sptr, FLAG_TS8);
 
     /*
      * Check to see if this user is being propogated
@@ -892,7 +889,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
      * FIXME: This can be speeded up - its stupid to check it for
      * every NICK message in a burst again  --Run.
      */
-    for (acptr = user->server; acptr != &me; acptr = cli_serv(acptr)->up) {
+    for (; acptr != &me; acptr = cli_serv(acptr)->up) {
       if (IsBurst(acptr) || Protocol(acptr) < 10)
         break;
     }
@@ -905,6 +902,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         return exit_client(cptr, sptr, &me, "Too many connections from your host -- throttled");
       }
     }
+    SetUser(sptr);
   }
 
   /*
