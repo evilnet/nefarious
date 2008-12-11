@@ -81,6 +81,8 @@ extern void tstats(struct Client *cptr, const struct StatDesc *sd,
 
 extern struct ServerStatistics* ServerStats;
 extern char *checkregex(char *s, int check_broadness);
+extern char *decodespace(char *s);
+extern char *encodespace(char *s);
 
 #endif /* INCLUDED_s_misc_h */
 

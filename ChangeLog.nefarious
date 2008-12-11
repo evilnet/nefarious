@@ -3,6 +3,16 @@
 
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/s_misc.h: Added decode/encodespace. Will be used later
+	with extended bans.
+
+	* ircd/channel.c: Woops warning fix.
+
+	* ircd/s_misc.c: Added decode/encodespace. Will be used later with
+	extended bans.
+
+2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/ircd_string.h: Added substr function.
 
 	* ircd/channel.c: More extended ban work.

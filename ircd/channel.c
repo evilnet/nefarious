@@ -3067,7 +3067,7 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 
       default:
         Debug((DEBUG_DEBUG, "extended ban error"));
-        return 0;
+        return;
         break; /* isnt needed but better keep it */
     }
   } else
