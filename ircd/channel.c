@@ -2994,8 +2994,9 @@ mode_parse_except(struct ParseState *state, int *flag_p)
 static void
 mode_parse_ban(struct ParseState *state, int *flag_p)
 {
-  char *t_str, *s;
+  char *t_str, *s, *b_str;
   struct SLink *ban, *newban = 0;
+  char *cp;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
     if (MyUser(state->sptr) && !(state->done & DONE_BANLIST)) {
@@ -3030,7 +3031,26 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     return;
   }
 
-  t_str = collapse(pretty_mask(t_str));
+  for (; (*t_str && (*t_str == ':')); t_str++);
+  if (!*t_str)
+    return;
+
+  if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3]) {
+    char *temp;
+    if (strlen(t_str) > 80)
+      t_str[80] = '\0';
+    Debug((DEBUG_DEBUG, "extended ban check: %c", t_str[1]));
+    switch (t_str[1]) {
+      case 'e':
+        Debug((DEBUG_DEBUG, "extended ban e"));
+        break;
+
+      default:
+        Debug((DEBUG_DEBUG, "extended ban error"));
+        break;
+    }
+  } else
+    t_str = collapse(pretty_mask(t_str));
 
   /* remember the ban for the moment... */
   if (state->dir == MODE_ADD) {
