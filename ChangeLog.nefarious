@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ircd_features.c: Small tweak for channel mode +L being in the
+	wrong channel modes group in numeric 005 replies
+
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/s_misc.h: Added decode/encodespace. Will be used later

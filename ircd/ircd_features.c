@@ -230,7 +230,7 @@ set_isupport_excepts(void)
       del_isupport("MAXEXCEPTS");
     }
 
-    add_isupport_s("CHANMODES", feature_bool(FEAT_EXCEPTS) ? "be,kL,l,acimnprstzCMNOQSTZ" : "b,k,l,L,acimnprstzCMNOQSTZ");
+    add_isupport_s("CHANMODES", feature_bool(FEAT_EXCEPTS) ? "be,k,lL,acimnprstzCMNOQSTZ" : "b,k,lL,acimnprstzCMNOQSTZ");
 
     strcat(imaxlist, "b:");
     strcat(imaxlist, itoa(feature_int(FEAT_MAXBANS)));
