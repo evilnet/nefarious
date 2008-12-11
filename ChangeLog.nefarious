@@ -3,6 +3,14 @@
 
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/ircd_string.h: Added substr function.
+
+	* ircd/channel.c: More extended ban work.
+
+	* ircd/ircd_string.c: Added substr function.
+
+2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/channel.c: A start on possible extended ban code. Nothing is
 	garunteed.
 

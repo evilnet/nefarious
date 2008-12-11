@@ -2987,16 +2987,16 @@ mode_parse_except(struct ParseState *state, int *flag_p)
   state->done |= DONE_EXCEPTCLEAN;
 }
 
-
 /*
  * Helper function to convert bans
  */
 static void
 mode_parse_ban(struct ParseState *state, int *flag_p)
 {
-  char *t_str, *s, *b_str;
+  char *t_str, *s, *banned;
   struct SLink *ban, *newban = 0;
   char *cp;
+  int typepos = 0, startarg = 0;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
     if (MyUser(state->sptr) && !(state->done & DONE_BANLIST)) {
@@ -3039,15 +3039,36 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     char *temp;
     if (strlen(t_str) > 80)
       t_str[80] = '\0';
-    Debug((DEBUG_DEBUG, "extended ban check: %c", t_str[1]));
-    switch (t_str[1]) {
-      case 'e':
-        Debug((DEBUG_DEBUG, "extended ban e"));
+    if (t_str[1] == '!')
+      typepos = 2;
+    else
+      typepos = 1;
+
+    startarg = typepos + 2;
+
+    banned = substr(t_str, startarg, strlen(t_str)-1);
+    Debug((DEBUG_DEBUG, "extended ban check: %c", t_str[typepos]));
+    switch (t_str[typepos]) {
+      case 'q':
+        Debug((DEBUG_DEBUG, "extended ban q (%s)", banned));
+        break;
+
+      case 'n':
+        Debug((DEBUG_DEBUG, "extended ban n (%s)", banned));
+        break;
+
+      case 'c':
+        Debug((DEBUG_DEBUG, "extended ban c (%s)", banned));
+        break;
+
+      case 'r':
+        Debug((DEBUG_DEBUG, "extended ban r (%s)", banned));
         break;
 
       default:
         Debug((DEBUG_DEBUG, "extended ban error"));
-        break;
+        return 0;
+        break; /* isnt needed but better keep it */
     }
   } else
     t_str = collapse(pretty_mask(t_str));

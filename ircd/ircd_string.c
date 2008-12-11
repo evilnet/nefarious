@@ -581,3 +581,12 @@ void doCleanBuffer(char *str)
         }
     *out = ch;                  /* == '\0' */
 }
+
+char *substr(const char *pstr, int start, int numchars)
+{
+  char *pnew = malloc(numchars+1);
+  strncpy(pnew, pstr + start, numchars);
+  pnew[numchars] = '\0';
+  return pnew;
+}
+
