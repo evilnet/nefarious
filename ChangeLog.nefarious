@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_join.c: Small fix for bugs in +L implimentation
+
+	* ircd/m_svsjoin.c: Redone SVSJOIN system to fix automodes on
+	join not working properly
+
 2008-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/IPcheck.c: IPCheck bug fix.

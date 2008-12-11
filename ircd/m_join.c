@@ -192,7 +192,7 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char *keys;
   char format_reply[BUFSIZE + 1];
 
-#define RET(x) { bouncedtimes--; return x; }
+#define RET { bouncedtimes--; continue; }
 
   if (parc < 2 || *parv[1] == '\0')
     return need_more_params(sptr, "JOIN");
@@ -212,12 +212,12 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       continue;
 
     bouncedtimes++;
-    /* don't use 'return x;' but 'RET(x)' from here ;p */
+    /* don't use 'return x;' but 'RET' from here ;p */
 
     if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
     {
       sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, name);
-      RET(0)
+      RET
     }
 
     /* bad channel name */
@@ -274,8 +274,8 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
         bjoin[0] = cli_name(sptr);
         bjoin[1] = chptr->mode.redirect;
         do_join(cptr, sptr, 2, bjoin);
+        continue;
       }
-      continue;
 
       if (check_target_limit(sptr, chptr, chptr->chname, 0))
 	continue; /* exceeded target limit */

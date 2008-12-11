@@ -83,6 +83,7 @@
 
 #include "channel.h"
 #include "client.h"
+#include "gline.h"
 #include "handlers.h"
 #include "hash.h"
 #include "ircd.h"
@@ -102,6 +103,34 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+static int bouncedtimes = 0;
+/*
+ * Helper function to find last 0 in a comma-separated list of
+ * channel names.
+ */
+static char *
+last0(char *chanlist)
+{
+  char *p;
+
+  for (p = chanlist; p[0]; p++) /* find last "JOIN 0" */
+    if (p[0] == '0' && (p[1] == ',' || p[1] == '\0' || !IsChannelChar(p[1]))) {
+      chanlist = p; /* we'll start parsing here */
+
+      if (!p[1]) /* hit the end */
+        break;
+
+      p++;
+    } else {
+      while (p[0] != ',' && p[0] != '\0') /* skip past channel name */
+        p++;
+
+      if (!p[0]) /* hit the end */
+        break;
+    }
+
+  return chanlist;
+}
 
 /*
  * Helper function to perform a JOIN 0 if needed; returns 0 if channel
@@ -133,6 +162,140 @@ join0(struct JoinBuf *join, struct Client *cptr, struct Client *sptr,
   return 1;
 }
 
+int do_svsjoin(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
+{
+  struct Channel *chptr = NULL;
+  struct JoinBuf join;
+  struct JoinBuf create;
+  struct Gline *gline;
+  unsigned int flags = 0;
+  int i, flex = 0, automodes = 0;
+  char* bjoin[2];
+  char *p = 0;
+  char *chanlist;
+  char *name;
+  char format_reply[BUFSIZE + 1];
+
+#define RET { bouncedtimes--; continue; }
+
+  if (parc < 2 || *parv[1] == '\0')
+    return need_more_params(sptr, "JOIN");
+
+  joinbuf_init(&join, sptr, cptr, JOINBUF_TYPE_JOIN, 0, 0);
+  joinbuf_init(&create, sptr, cptr, JOINBUF_TYPE_CREATE, 0, TStime());
+
+  chanlist = last0(parv[1]); /* find last "JOIN 0" */
+
+  for (name = ircd_strtok(&p, chanlist, ","); name;
+       name = ircd_strtok(&p, 0, ",")) {
+    clean_channelname(name);
+
+    if (join0(&join, cptr, sptr, name)) /* did client do a JOIN 0? */
+      continue;
+
+    bouncedtimes++;
+    /* don't use 'return x;' but 'RET' from here ;p */
+
+    if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
+    {
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, name);
+      RET
+    }
+
+    /* bad channel name */
+    if ((!IsChannelName(name)) || (HasCntrl(name))) {
+      send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+      continue;
+    }
+
+    /* BADCHANed channel */
+    if ((gline = gline_find(name, GLINE_BADCHAN)) &&
+        GlineIsActive(gline) && !IsAnOper(sptr)) {
+      send_reply(sptr, ERR_BADCHANNAME, name, gline->gl_reason);
+      continue;
+    }
+
+    if ((chptr = FindChannel(name))) {
+      if (find_member_link(chptr, sptr))
+        continue; /* already on channel */
+
+      flags = CHFL_DEOPPED;
+    }
+    else
+      flags = CHFL_CHANOP;
+
+    /* disallow creating local channels */
+    if (IsLocalChannel(name) && !chptr) {
+      if (IsAnOper(sptr)) {
+        if (!feature_bool(FEAT_OPER_LOCAL_CHANNELS)) {
+          send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+          continue;
+        }
+      } else {
+        if (!feature_bool(FEAT_LOCAL_CHANNELS)) {
+          send_reply(sptr, ERR_NOSUCHCHANNEL, name);
+          continue;
+        }
+      }
+    }
+
+    if (chptr) {
+      if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
+        send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+        bjoin[0] = cli_name(sptr);
+        bjoin[1] = chptr->mode.redirect;
+        do_join(cptr, sptr, 2, bjoin);
+        continue;
+      }
+
+      if (check_target_limit(sptr, chptr, chptr->chname, 0))
+        continue; /* exceeded target limit */
+
+      joinbuf_join(&join, chptr, flags);
+    } else if (!(chptr = get_channel(sptr, name, CGT_CREATE))) {
+      continue; /* couldn't get channel */
+    } else {
+      joinbuf_join(&create, chptr, flags);
+      if (feature_bool(FEAT_AUTOCHANMODES) &&
+          feature_str(FEAT_AUTOCHANMODES_LIST) &&
+          !IsLocalChannel(chptr->chname) &&
+          strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) {
+        SetAutoChanModes(chptr);
+        automodes = 1;
+      }
+    }
+
+    del_invite(sptr, chptr);
+
+    if (chptr->topic[0]) {
+      send_reply(sptr, RPL_TOPIC, chptr->chname, chptr->topic);
+      send_reply(sptr, RPL_TOPICWHOTIME, chptr->chname, chptr->topic_nick,
+                 chptr->topic_time);
+    }
+
+    do_names(sptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
+/*
+ *    if (((chptr->mode.mode & MODE_ACCONLY) && !IsAccount(sptr)) ||
+ *      ((chptr->mode.mode & MODE_MODERATED) &&
+ *      (flex == 1) && feature_bool(FEAT_FLEXABLEKEYS))) {
+ *      sendcmdto_one(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
+ *      sendcmdto_serv_butone(&me, CMD_MODE, sptr, "%H +v %C", chptr, sptr);
+ *      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chptr, cptr, 0,
+ *                                     "%H +v %C", chptr, sptr);
+ *    }
+ */
+  }
+
+  joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */
+  joinbuf_flush(&create);
+
+  if (automodes && chptr)
+    sendcmdto_serv_butone(&me, CMD_MODE, sptr,
+                          "%H +%s", chptr, feature_str(FEAT_AUTOCHANMODES_LIST));
+
+  return 0;
+}
+
 /*
  * ms_svsjoin - server message handler
  *
@@ -142,12 +305,6 @@ join0(struct JoinBuf *join, struct Client *cptr, struct Client *sptr,
  */
 int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[]) {
   struct Client *acptr = NULL;
-  struct Channel *chptr = NULL;
-  struct JoinBuf join;
-  struct JoinBuf create;
-  unsigned int flags = 0;
-  char *name;
-  int automodes = 0;
 
   /* this could be done with hunt_server_cmd but its a bucket of shit */
 
@@ -164,67 +321,12 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       return need_more_params(sptr, "SVSJOIN");
     }
 
-    if (IsChannelService(acptr))
-      return 0;
+    char* join[2];
 
-    if ((chptr = FindChannel(parv[2]))) {
-      flags = CHFL_DEOPPED;
-      if (find_member_link(chptr, acptr))
-        return 0;
-    } else
-      flags = CHFL_CHANOP;
+    join[0] = cli_name(acptr);
+    join[1] = parv[2];
 
-    joinbuf_init(&join, acptr, acptr, JOINBUF_TYPE_JOIN, 0, 0);  
-    joinbuf_init(&create, acptr, acptr, JOINBUF_TYPE_CREATE, 0, TStime());
-
-    if (join0(&join, acptr, acptr, parv[2])) { /* did client do a JOIN 0? */
-      joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */
-      joinbuf_flush(&create);
-      return 0;
-    }
-
-    chptr = get_channel(acptr, parv[2],
-		        (!FindChannel(parv[2])) ? CGT_CREATE :
-		        CGT_NO_CREATE);
-
-    name = chptr->chname;
-    clean_channelname(name);
-
-    /* bad channel name */
-    if ((!IsChannelName(name)) || (HasCntrl(name)))
-      return 0;
-
-    if (chptr)
-      joinbuf_join(&join, chptr, flags);
-    else {
-      if (!MyUser(acptr)) {
-        sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
-        return 0;
-      }
-      joinbuf_join(&create, chptr, flags);
-      if (feature_bool(FEAT_AUTOCHANMODES) &&
-          feature_str(FEAT_AUTOCHANMODES_LIST) &&
-          !IsLocalChannel(chptr->chname) &&
-          strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) {
-        SetAutoChanModes(chptr);
-        automodes = 1;
-      }
-    }
-
-    if (chptr->topic[0]) {
-      send_reply(acptr, RPL_TOPIC, chptr->chname, chptr->topic);
-      send_reply(acptr, RPL_TOPICWHOTIME, chptr->chname,
-  	         chptr->topic_nick, chptr->topic_time);
-    }
-
-    do_names(acptr, chptr, NAMES_ALL|NAMES_EON); /* send /names list */
-
-    joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */  
-    joinbuf_flush(&create);
-
-    if (automodes && chptr)
-      sendcmdto_serv_butone(&me, CMD_MODE, sptr,
-                            "%H +%s", chptr, feature_str(FEAT_AUTOCHANMODES_LIST));
+    do_svsjoin(acptr, acptr, 2, join);
   }
 
   sendcmdto_serv_butone(sptr, CMD_SVSJOIN, cptr, "%s%s %s", acptr->cli_user->server->cli_yxx, acptr->cli_yxx, parv[2]);
