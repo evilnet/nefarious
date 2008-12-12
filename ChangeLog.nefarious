@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-12  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_conf.c: Small fix for SFilter kill action not notifying
+	other servers of the user having been disconnected
+
 2008-12-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Remove some Debug's plus check ~c extended bans

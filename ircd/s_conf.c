@@ -1913,7 +1913,6 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
             ret = 2;
           } else {
             if (rf_flag & RFFLAG_KILL) {
-               SetFlag(cptr, FLAG_KILLED);
                exit_client_msg(cptr, sptr, &me, "Filter Match (%s)", fline->reason);
                ret = 2;
             }
