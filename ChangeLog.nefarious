@@ -3,6 +3,16 @@
 
 2008-12-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added Feature EXTBANS (default FALSE).
+
+	* include/ircd_features.h: Added Feature EXTBANS (default FALSE).
+
+	* ircd/channel.c: Added Feature EXTBANS (default FALSE).
+
+	* ircd/ircd_features.c: Added Feature EXTBANS (default FALSE).
+
+2008-12-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/channel.h: Added EXTBAN_ flags.
 
 	* include/list.h: Added extflag and extstr fields to the ban

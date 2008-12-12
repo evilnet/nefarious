@@ -3037,7 +3037,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   if (!*t_str)
     return;
 
-  if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3]) {
+  if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3] &&
+     (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
     char *temp;
     if (strlen(t_str) > 80)
       t_str[80] = '\0';

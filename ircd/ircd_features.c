@@ -243,6 +243,12 @@ set_isupport_excepts(void)
 }
 
 static void
+set_isupport_extbans(void)
+{
+    add_isupport_s("EXTBANS", "~,cqnr");
+}
+
+static void
 set_isupport_watchs(void)
 {
     add_isupport_i("WATCH", feature_int(FEAT_MAXWATCHS));
@@ -588,6 +594,7 @@ static struct FeatureDesc {
   F_B(TIME_IN_TIMEOUT, 0, 0, 0),
   F_B(HALFOPS, FEAT_READ, 0, set_isupport_halfops),
   F_B(EXCEPTS, FEAT_READ, 0, set_isupport_excepts),
+  F_B(EXTBANS, FEAT_READ, 0, set_isupport_extbans),
   F_B(BREAK_P10, FEAT_READ, 0, 0),
   F_I(AVEXCEPTLEN, 0, 40, 0),
   F_I(MAXEXCEPTS, 0, 45, 0),
