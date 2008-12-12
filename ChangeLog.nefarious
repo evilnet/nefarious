@@ -3,6 +3,13 @@
 
 2008-12-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/channel.c: Remove some Debug's plus check ~c extended bans
+	in is_banned.
+
+	* ircd/m_svsjoin.c: Warning fixes.
+
+2008-12-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added Feature EXTBANS (default FALSE).
 
 	* include/ircd_features.h: Added Feature EXTBANS (default FALSE).

@@ -169,12 +169,11 @@ int do_svsjoin(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct JoinBuf create;
   struct Gline *gline;
   unsigned int flags = 0;
-  int i, flex = 0, automodes = 0;
+  int automodes = 0;
   char* bjoin[2];
   char *p = 0;
   char *chanlist;
   char *name;
-  char format_reply[BUFSIZE + 1];
 
 #define RET { bouncedtimes--; continue; }
 
@@ -315,13 +314,12 @@ int ms_svsjoin(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   }
 
   if (0 == ircd_strcmp(cli_name(acptr->cli_user->server), cli_name(&me))) {
+    char* join[2];
 
     if (parc < 3) {
       protocol_violation(sptr, "Too few arguments for SVSJOIN");
       return need_more_params(sptr, "SVSJOIN");
     }
-
-    char* join[2];
 
     join[0] = cli_name(acptr);
     join[1] = parv[2];

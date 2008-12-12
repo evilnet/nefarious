@@ -885,6 +885,37 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
         break;
     }
 
+    if (tmp->value.ban.extflag & EXTBAN_CHAN) {
+      struct Membership *lp;
+      struct Channel *chptr;
+      int cmatch = 0;
+
+      for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
+        chptr = lp->channel;
+        cmatch = 0;
+
+        if (*tmp->value.ban.extstr == '#') {
+          if (0 == match(tmp->value.ban.extstr, chptr->chname))
+            break;
+        } else {
+          if (0 == match(tmp->value.ban.extstr+1, chptr->chname)) {
+            if ((*tmp->value.ban.extstr == '@') && IsChanOp(lp)) {
+              cmatch = 1;
+              break;
+            } else if ((*tmp->value.ban.extstr == '%') && IsHalfOp(lp)) {
+              cmatch = 1;
+              break;
+            } else if ((*tmp->value.ban.extstr == '+') && HasVoice(lp)) {
+              cmatch = 1;
+              break;
+            }
+          }
+        }
+      }
+      if (cmatch)
+        break;
+    }
+
     if (match(tmp->value.ban.banstr, s) == 0)
       break;
     else if (sb && match(tmp->value.ban.banstr, sb) == 0)
@@ -2995,9 +3026,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
 static void
 mode_parse_ban(struct ParseState *state, int *flag_p)
 {
-  char *t_str, *s, *banned;
+  char *t_str, *s, *banned = NULL, *p;
   struct SLink *ban, *newban = 0;
-  char *cp, *p;
   int typepos = 0, startarg = 0, extended = 0, flags = 0;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
@@ -3039,7 +3069,6 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 
   if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3] &&
      (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
-    char *temp;
     if (strlen(t_str) > 80)
       t_str[80] = '\0';
     if (t_str[1] == '!')
@@ -3051,20 +3080,17 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 
     extended = 1;
     banned = substr(t_str, startarg, strlen(t_str)-1);
-    Debug((DEBUG_DEBUG, "extended ban check: %c", t_str[typepos]));
     switch (t_str[typepos]) {
       case 'q':
         flags = EXTBAN_QUIET;
         banned = collapse(pretty_mask(banned));
         ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
-        Debug((DEBUG_DEBUG, "extended ban quiet (q) (%s - %s)", banned, t_str));
         break;
 
       case 'n':
         flags = EXTBAN_NICK;
         banned = collapse(pretty_mask(banned));
         ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
-        Debug((DEBUG_DEBUG, "extended ban n (%s)", banned, t_str));
         break;
 
       case 'c':
@@ -3076,16 +3102,13 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
           sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Please use a # in the channelname (eg: ~c:#*blah*)", state->sptr);
           return;
         }
-        Debug((DEBUG_DEBUG, "extended ban channel (c) (%s)", banned));
         break;
 
       case 'r':
         flags = EXTBAN_REAL;
-        Debug((DEBUG_DEBUG, "extended ban realname (r) (%s)", banned));
         break;
 
       default:
-        Debug((DEBUG_DEBUG, "extended ban error"));
         return;
         break; /* isnt needed but better keep it */
     }
