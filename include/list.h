@@ -30,6 +30,8 @@ struct SLink {
     char *cp;
     struct {
       char *banstr;
+      char *extstr;
+      int extflag;
       char *who;
       time_t when;
     } ban;

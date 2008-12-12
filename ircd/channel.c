@@ -219,6 +219,7 @@ int destroy_unregistered_channel(struct Channel* chptr)
     obtmp = tmp;
     tmp = tmp->next;
     MyFree(obtmp->value.ban.banstr);
+    MyFree(obtmp->value.ban.extstr);
     MyFree(obtmp->value.ban.who);
     free_link(obtmp);
   }
@@ -286,6 +287,7 @@ int sub1_from_channel(struct Channel* chptr)
     obtmp = tmp;
     tmp = tmp->next;
     MyFree(obtmp->value.ban.banstr);
+    MyFree(obtmp->value.ban.extstr);
     MyFree(obtmp->value.ban.who);
     free_link(obtmp);
   }
@@ -2995,8 +2997,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 {
   char *t_str, *s, *banned;
   struct SLink *ban, *newban = 0;
-  char *cp;
-  int typepos = 0, startarg = 0;
+  char *cp, *p;
+  int typepos = 0, startarg = 0, extended = 0, flags = 0;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
     if (MyUser(state->sptr) && !(state->done & DONE_BANLIST)) {
@@ -3046,23 +3048,39 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 
     startarg = typepos + 2;
 
+    extended = 1;
     banned = substr(t_str, startarg, strlen(t_str)-1);
     Debug((DEBUG_DEBUG, "extended ban check: %c", t_str[typepos]));
     switch (t_str[typepos]) {
       case 'q':
-        Debug((DEBUG_DEBUG, "extended ban q (%s)", banned));
+        flags = EXTBAN_QUIET;
+        banned = collapse(pretty_mask(banned));
+        ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
+        Debug((DEBUG_DEBUG, "extended ban quiet (q) (%s - %s)", banned, t_str));
         break;
 
       case 'n':
-        Debug((DEBUG_DEBUG, "extended ban n (%s)", banned));
+        flags = EXTBAN_NICK;
+        banned = collapse(pretty_mask(banned));
+        ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
+        Debug((DEBUG_DEBUG, "extended ban n (%s)", banned, t_str));
         break;
 
       case 'c':
-        Debug((DEBUG_DEBUG, "extended ban c (%s)", banned));
+        flags = EXTBAN_CHAN;
+        p = banned;
+        if ((*p == '+') || (*p == '%') || (*p == '@'))
+          p++;
+        if (*p != '#') {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Please use a # in the channelname (eg: ~c:#*blah*)", state->sptr);
+          return;
+        }
+        Debug((DEBUG_DEBUG, "extended ban channel (c) (%s)", banned));
         break;
 
       case 'r':
-        Debug((DEBUG_DEBUG, "extended ban r (%s)", banned));
+        flags = EXTBAN_REAL;
+        Debug((DEBUG_DEBUG, "extended ban realname (r) (%s)", banned));
         break;
 
       default:
@@ -3079,6 +3097,10 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     newban->next = 0;
 
     DupString(newban->value.ban.banstr, t_str);
+    if (extended) {
+      DupString(newban->value.ban.extstr, banned);
+      newban->value.ban.extflag = flags;
+    }
 
     if (!IsUser(state->sptr) ||
       (feature_bool(FEAT_HIS_BANWHO) && state->mbuf != NULL && (state->mbuf->mb_dest & MODEBUF_DEST_OPMODE))) {
@@ -3135,6 +3157,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
       if (!ircd_strcmp(ban->value.ban.banstr, t_str)) {
 	newban->flags &= ~MODE_ADD; /* don't add ban at all */
 	MyFree(newban->value.ban.banstr); /* stopper a leak */
+        if (extended)
+  	  MyFree(newban->value.ban.extstr); /* stopper a leak */
 	state->numbans--; /* deallocate last ban */
 	if (state->done & DONE_BANCLEAN) /* If we're cleaning, finish */
 	  break;
@@ -3285,6 +3309,8 @@ mode_process_bans(struct ParseState *state)
       len -= banlen;
 
       MyFree(ban->value.ban.banstr);
+      if (ban->value.ban.extstr)
+        MyFree(ban->value.ban.extstr);
 
       continue;
     } else if (ban->flags & MODE_DEL) { /* Deleted a ban? */
@@ -3321,6 +3347,8 @@ mode_process_bans(struct ParseState *state)
 	len -= banlen;
 
 	MyFree(ban->value.ban.banstr);
+        if (ban->value.ban.extstr)
+	  MyFree(ban->value.ban.extstr);
       } else {
 	if (state->flags & MODE_PARSE_SET && MyUser(state->sptr) &&
 	    (len > (feature_int(FEAT_AVBANLEN) * feature_int(FEAT_MAXBANS)) ||
@@ -3331,6 +3359,8 @@ mode_process_bans(struct ParseState *state)
 	  len -= banlen;
 
 	  MyFree(ban->value.ban.banstr);
+          if (ban->value.ban.extstr)
+            MyFree(ban->value.ban.extstr);
 	} else {
 	  /* add the ban to the buffer */
 	  modebuf_mode_string(state->mbuf, MODE_ADD | MODE_BAN,
@@ -3340,6 +3370,8 @@ mode_process_bans(struct ParseState *state)
 	  if (state->flags & MODE_PARSE_SET) { /* create a new ban */
 	    newban = make_link();
 	    newban->value.ban.banstr = ban->value.ban.banstr;
+            newban->value.ban.extstr = ban->value.ban.extstr;
+              newban->value.ban.extflag = ban->value.ban.extflag;
 	    DupString(newban->value.ban.who, ban->value.ban.who);
 	    newban->value.ban.when = ban->value.ban.when;
 	    newban->flags = ban->flags & (CHFL_BAN | CHFL_BAN_IPMASK);
@@ -3660,6 +3692,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
   for (i = 0; i < MAXPARA; i++) { /* initialize ops/voices arrays */
     state.banlist[i].next = 0;
     state.banlist[i].value.ban.banstr = 0;
+    state.banlist[i].value.ban.extstr = 0;
+    state.banlist[i].value.ban.extflag = 0;
     state.banlist[i].value.ban.who = 0;
     state.banlist[i].value.ban.when = 0;
     state.banlist[i].flags = 0;

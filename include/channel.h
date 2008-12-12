@@ -50,6 +50,11 @@ struct Client;
  * Macro's
  */
 
+#define EXTBAN_NICK   0x001
+#define EXTBAN_CHAN   0x002
+#define EXTBAN_REAL   0x004
+#define EXTBAN_QUIET  0x008
+
 #define ChannelExists(n)        (0 != FindChannel(n))
 
 #define CHFL_CHANOP             0x0001  /* Channel operator */
