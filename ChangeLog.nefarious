@@ -3,6 +3,10 @@
 
 2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/readme.features: Added EXTBANS.
+
+2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/channel.c: Few tweaks.
 
 	* ircd/m_burst.c: Process extended bans on link.

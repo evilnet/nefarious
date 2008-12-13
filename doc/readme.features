@@ -1856,3 +1856,10 @@ MAX_BOUNCE
 
 Maximum amount of links (+L) in a row a client will follow before error'ing.
 
+EXTBANS
+ * Type: boolean
+ * Default: FALSE
+
+If enabled extended bans will be allowed. Servers will still be able to set
+them. This only controls /mode +b <extended ban> by clients.
+
