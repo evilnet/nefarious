@@ -3,6 +3,12 @@
 
 2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/channel.c: Few tweaks.
+
+	* ircd/m_burst.c: Process extended bans on link.
+
+2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/channel.c: Make use of realname extended bans.
 
 2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

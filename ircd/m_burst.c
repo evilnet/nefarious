@@ -181,7 +181,9 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct SLink *lp, **lp_p;
   unsigned int parse_flags = (MODE_PARSE_FORCE | MODE_PARSE_BURST);
   int param, nickpos = 0, banpos = 0, exceptpos = 0, type = 0, ecount = 0;
+  int extended = 0, typepos, flags = 0, startarg = 0, extmask = 0;
   char modestr[BUFSIZE], nickstr[BUFSIZE], banstr[BUFSIZE], exceptstr[BUFSIZE];
+  char *banned = NULL;
 
   if (parc < 3)
     return protocol_violation(sptr,"Too few parameters for BURST");
@@ -298,7 +300,51 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
           if ((0 == ircd_strcmp("~", ban)) && (type == 0))
             type = 1;
           if (type == 0) {
-  	    ban = collapse(pretty_mask(ban));
+
+            typepos = 0;
+            flags = 0;
+            extmask = 0;
+            typepos = 0;
+            extended = 0;
+            banned = NULL;
+
+            if (ban) {
+              if (*ban == '~' && ban[1] && (ban[2] == ':') && ban[3]) {
+
+                if (ban[1] == '!')
+                  typepos = 2;
+                else
+                  typepos = 1;
+
+                startarg = typepos + 2;
+
+                extended = 1;
+                banned = substr(ban, startarg, strlen(ban)-1);
+                switch (ban[typepos]) {
+                  case 'q':
+                    flags = EXTBAN_QUIET;
+                    extmask = 1;
+                    break;
+
+                   case 'n':
+                    flags = EXTBAN_NICK;
+                    extmask = 1;
+                    break;
+
+                  case 'c':
+                    flags = EXTBAN_CHAN;
+                    break;
+
+                  case 'r':
+                    flags = EXTBAN_REAL;
+                    break;
+
+                  default:
+                    break; /* isnt needed but better keep it */
+                }
+              } else
+ 	        ban = collapse(pretty_mask(ban));
+            }
 
 	    /*
 	     * Yeah, we should probably do this elsewhere, and make it better
@@ -337,6 +383,18 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
 	      newban = make_link(); /* create new ban */
 
+              if (extended) {
+                if (banned && flags) {
+                  Debug((DEBUG_DEBUG, "Adding extended ban: %s - %s (%i)", banned, ban, flags));
+                  DupString(newban->value.ban.extstr, banned);
+                  newban->value.ban.extflag = flags;
+                }
+              } else {
+                Debug((DEBUG_DEBUG, "Adding normal ban %s", ban));
+                DupString(newban->value.ban.extstr, "");
+                newban->value.ban.extflag = 0;
+              }
+
 	      DupString(newban->value.ban.banstr, ban);
 
 	      DupString(newban->value.ban.who, 
@@ -347,6 +405,11 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	      newban->flags = CHFL_BAN | CHFL_BURST_BAN; /* set flags */
 	      if ((eptr = strrchr(ban, '@')) && check_if_ipmask(eptr + 1))
 	        newban->flags |= CHFL_BAN_IPMASK;
+
+              if (extmask) { /* check for ipmask if its a quiet or nick ext ban */
+                if ((eptr = strrchr(banned, '@')) && check_if_ipmask(eptr + 1))
+                  newban->flags |= CHFL_BAN_IPMASK;
+              }
 
 	      newban->next = 0;
 	      if (lp)

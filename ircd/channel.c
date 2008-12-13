@@ -817,73 +817,75 @@ int is_ext_banned(struct Client *cptr, struct Channel *chptr,
   }
 
   for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
-    if (tmp->value.ban.extflag & flags) {
-      if ((tmp->flags & CHFL_BAN_IPMASK)) {
-        char* ip_start;
-        char* cidr_start;
+    if (tmp->value.ban.extflag) {
+      if (tmp->value.ban.extflag & flags) {
+        if ((tmp->flags & CHFL_BAN_IPMASK)) {
+          char* ip_start;
+          char* cidr_start;
 
-        if (!ip_s) {
-          ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
-                                   (cli_user(cptr))->realusername, cli_ip(cptr));
-          if ((ip_start = strrchr(ip_s, '@')))
-            cli_addr = inet_addr(ip_start + 1);
-        }
-        if (match(tmp->value.ban.extstr, ip_s) == 0)
-          break;
-        if ((ip_start = strrchr(tmp->value.ban.extstr, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
-          int bits = atoi(cidr_start + 1);
-          char* p = strchr(ip_s, '@');
+          if (!ip_s) {
+            ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
+                                     (cli_user(cptr))->realusername, cli_ip(cptr));
+            if ((ip_start = strrchr(ip_s, '@')))
+              cli_addr = inet_addr(ip_start + 1);
+          }
+          if (match(tmp->value.ban.extstr, ip_s) == 0)
+            break;
+          if ((ip_start = strrchr(tmp->value.ban.extstr, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+            int bits = atoi(cidr_start + 1);
+            char* p = strchr(ip_s, '@');
 
-          if (p) {
-            *p = *ip_start = 0;
-            if (match(tmp->value.ban.extstr, ip_s) == 0) {
-              if ((bits > 0) && (bits < 33)) {
-                in_addr_t ban_addr;
-                *cidr_start = 0;
-                ban_addr = inet_addr(ip_start + 1);
-                *cidr_start = '/';
-                if ((NETMASK(bits) & cli_addr) == ban_addr) {
-                  *p = *ip_start = '@';
-                  break;
+            if (p) {
+              *p = *ip_start = 0;
+              if (match(tmp->value.ban.extstr, ip_s) == 0) {
+                if ((bits > 0) && (bits < 33)) {
+                  in_addr_t ban_addr;
+                  *cidr_start = 0;
+                  ban_addr = inet_addr(ip_start + 1);
+                  *cidr_start = '/';
+                  if ((NETMASK(bits) & cli_addr) == ban_addr) {
+                    *p = *ip_start = '@';
+                    break;
+                  }
                 }
               }
+              *p = *ip_start = '@';
             }
-            *p = *ip_start = '@';
           }
         }
-      }
 
-      if (IsDNSBLMarked(cptr)) {
-        struct SLink* lp;
-        char tmpdhostb[BUFSIZE + 1];
-        int dnsblb = 0;
+        if (IsDNSBLMarked(cptr)) {
+          struct SLink* lp;
+          char tmpdhostb[BUFSIZE + 1];
+          int dnsblb = 0;
 
-        for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
-          ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
-          sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
-                                    cli_user(cptr)->realusername,
-                                    tmpdhostb);
+          for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
+            ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
+            sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                                      cli_user(cptr)->realusername,
+                                      tmpdhostb);
 
-          if (sd && match(tmp->value.ban.extstr, sd) == 0) {
-            dnsblb = 1;
+            if (sd && match(tmp->value.ban.extstr, sd) == 0) {
+              dnsblb = 1;
+              break;
+            }
+          }
+
+          if (dnsblb == 1)
             break;
-          }
         }
-
-        if (dnsblb == 1)
+  
+        if (match(tmp->value.ban.extstr, s) == 0)
+          break;
+        else if (sb && match(tmp->value.ban.extstr, sb) == 0)
+          break;
+        else if (sh && match(tmp->value.ban.extstr, sh) == 0)
+          break;
+        else if (sf && match(tmp->value.ban.extstr, sf) == 0)
+          break;
+        else if (sa && match(tmp->value.ban.extstr, sa) == 0)
           break;
       }
-  
-      if (match(tmp->value.ban.extstr, s) == 0)
-        break;
-      else if (sb && match(tmp->value.ban.extstr, sb) == 0)
-      break;
-      else if (sh && match(tmp->value.ban.extstr, sh) == 0)
-        break;
-      else if (sf && match(tmp->value.ban.extstr, sf) == 0)
-        break;
-      else if (sa && match(tmp->value.ban.extstr, sa) == 0)
-        break;
     }
   }
 
