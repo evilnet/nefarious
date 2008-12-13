@@ -593,8 +593,8 @@ struct Membership* find_channel_member(struct Client* cptr, struct Channel* chpt
 /*
  * is_excepted - a non-zero value if except else 0.
  */
-static int is_excepted(struct Client *cptr, struct Channel *chptr,
-                     struct Membership* member)
+int is_excepted(struct Client *cptr, struct Channel *chptr,
+                struct Membership* member)
 {
   struct SLink* tmpe;
   char          tmphoste[HOSTLEN + 1];
@@ -1264,8 +1264,9 @@ int member_can_send_to_channel(struct Membership* member)
   if (IsVoicedOrOpped(member))
     return 1;
 
-  if (is_ext_banned(member->user, member->channel, member, EXTBAN_QUIET))
+  if ((is_ext_banned(member->user, member->channel, member, EXTBAN_QUIET)) && !is_excepted(member->user, member->channel, member))
     return 0;
+
 
   /*
    * If it's moderated, and you aren't a privileged user, you can't

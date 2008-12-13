@@ -430,5 +430,6 @@ extern int joinbuf_flush(struct JoinBuf *jbuf);
 
 extern int SetAutoChanModes(struct Channel *chptr);
 extern int is_ext_banned(struct Client *cptr, struct Channel *chptr, struct Membership* member, int flags);
+extern int is_excepted(struct Client *cptr, struct Channel *chptr, struct Membership* member);
 
 #endif /* INCLUDED_channel_h */

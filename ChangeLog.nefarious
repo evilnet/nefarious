@@ -1,7 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/channel.h: Declare is_excepted.
+
+	* ircd/channel.c: Better check if the client is excepted before
+	applying any extended bans.
+
+	* ircd/m_nick.c: Better check if the client is excepted before
+	applying any extended bans.
+
+2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/readme.features: Added EXTBANS.
 
