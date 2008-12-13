@@ -3,6 +3,10 @@
 
 2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/channel.c: Make use of realname extended bans.
+
+2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/channel.h: Added is_ext_banned.
 
 	* ircd/channel.c: Added is_ext_banned for checking nick and quiet
