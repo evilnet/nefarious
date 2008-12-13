@@ -3,6 +3,21 @@
 
 2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Revert some changes that should never have been
+	committed.
+
+	* include/list.h: Added extended excepts.
+
+	* include/channel.h: Added extended excepts.
+
+	* ircd/channel.c: Added extended excepts.
+
+	* ircd/m_burst.c: Added extended excepts.
+
+	* ircd/m_nick.c: Added extended excepts.
+
+2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/channel.h: Declare is_excepted.
 
 	* ircd/channel.c: Better check if the client is excepted before

@@ -224,7 +224,8 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       for (lp = sptr->cli_user->channel; lp; lp = lp->next_channel) {
         chptr = lp->channel;
         if ((member = find_member_link(chptr, sptr))) {
-          if (is_ext_banned(sptr, chptr, member, EXTBAN_NICK) && !is_excepted(sptr, chptr, member)) {
+          if (is_ext_banned(sptr, chptr, member, EXTBAN_NICK) && (!is_excepted(sptr, chptr, member) ||
+             is_ext_excepted(sptr, chptr, member, EXTBAN_NICK))) {
             send_reply(sptr, ERR_BANNICKCHANGE, chptr->chname);
             return 0;
           }

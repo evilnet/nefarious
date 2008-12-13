@@ -37,6 +37,8 @@ struct SLink {
     } ban;
     struct {
       char *exceptstr;
+      char *extstr;
+      int extflag;
       char *who;
       time_t when;
     } except;

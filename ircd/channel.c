@@ -229,6 +229,7 @@ int destroy_unregistered_channel(struct Channel* chptr)
     obtmp = tmp;
     tmp = tmp->next;
     MyFree(obtmp->value.except.exceptstr);
+    MyFree(obtmp->value.except.extstr);
     MyFree(obtmp->value.except.who);
     free_link(obtmp);
   }
@@ -297,6 +298,7 @@ int sub1_from_channel(struct Channel* chptr)
     obtmp = tmp;
     tmp = tmp->next;
     MyFree(obtmp->value.except.exceptstr);
+    MyFree(obtmp->value.except.extstr);
     MyFree(obtmp->value.except.who);
     free_link(obtmp);
   }
@@ -724,6 +726,44 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
         break;
     }
 
+    if (tmpe->value.except.extflag & EXTEXCEPT_CHAN) {
+      struct Membership *lp;
+      struct Channel *chptr;
+      int cmatch = 0;
+
+      for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
+        chptr = lp->channel;
+        cmatch = 0;
+
+        if (*tmpe->value.except.extstr == '#') {
+          if (!mmatch(tmpe->value.except.extstr, chptr->chname)) {
+            cmatch = 1;
+            break;
+          }
+        } else {
+          if (!mmatch(tmpe->value.except.extstr+1, chptr->chname)) {
+            if ((*tmpe->value.except.extstr == '@') && IsChanOp(lp)) {
+              cmatch = 1;
+              break;
+            } else if ((*tmpe->value.except.extstr == '%') && IsHalfOp(lp)) {
+              cmatch = 1;
+              break;
+            } else if ((*tmpe->value.except.extstr == '+') && HasVoice(lp)) {
+              cmatch = 1;
+              break;
+            }
+          }
+        }
+      }
+      if (cmatch)
+        break;
+    }
+
+    if (tmpe->value.except.extflag & EXTEXCEPT_REAL) {
+      if (!mmatch(decodespace(tmpe->value.except.extstr), cli_info(cptr)))
+        break;
+    }
+
     if (match(tmpe->value.except.exceptstr, se) == 0)
       break;
     else if (seb && match(tmpe->value.except.exceptstr, seb) == 0)
@@ -884,6 +924,150 @@ int is_ext_banned(struct Client *cptr, struct Channel *chptr,
         else if (sf && match(tmp->value.ban.extstr, sf) == 0)
           break;
         else if (sa && match(tmp->value.ban.extstr, sa) == 0)
+          break;
+      }
+    }
+  }
+
+  if (tmp)
+    return 1;
+  else
+    return 0;
+}
+
+int is_ext_excepted(struct Client *cptr, struct Channel *chptr,
+                    struct Membership* member, int flags) {
+  struct SLink* tmp;
+  char          tmphost[HOSTLEN + 1];
+  char          nu_host[NUH_BUFSIZE];
+  char          nu_accthost[NUH_BUFSIZE];
+  char          nu_dnsblhost[NUH_BUFSIZE];
+  char          nu_realhost[NUH_BUFSIZE];
+  char          nu_fakehost[NUH_BUFSIZE];
+  char          nu_ip[NUI_BUFSIZE];
+  char*         s;
+  char*         sb;
+  char*         sa = NULL;
+  char*         sh = NULL;
+  char*         sf = NULL;
+  char*         sd = NULL;
+  char*         ip_s = NULL;
+  in_addr_t     cli_addr = 0;
+
+  if (!IsUser(cptr))
+    return 0;
+
+  /* eeeek */
+  s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+			  (cli_user(cptr))->realhost);
+
+  sb = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+			  (cli_user(cptr))->host);
+
+  if (HasSetHost(cptr))
+    sh = make_nick_user_host(nu_realhost, cli_name(cptr),
+			     cli_user(cptr)->realusername,
+			     cli_user(cptr)->realhost);
+
+  if (HasFakeHost(cptr))
+    sf = make_nick_user_host(nu_fakehost, cli_name(cptr),
+			     cli_user(cptr)->realusername,
+			     cli_user(cptr)->fakehost);
+
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    if (IsAccount(cptr)) {
+       if (HasHiddenHost(cptr) && !HasSetHost(cptr))
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                  cli_user(cptr)->realusername,
+                                  cli_user(cptr)->realhost);
+       else {
+	  make_hidden_hostmask(tmphost, cptr);
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                   cli_user(cptr)->realusername,
+                                   tmphost);
+       }
+    }
+  } else {
+     if (IsHiddenHost(cptr) && !HasSetHost(cptr))
+       sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               cli_user(cptr)->realhost);
+     else {
+       ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
+       sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                cli_user(cptr)->realusername,
+                                tmphost);
+     }
+  }
+
+  for (tmp = chptr->exceptlist; tmp; tmp = tmp->next) {
+    if (tmp->value.except.extflag) {
+      if (tmp->value.except.extflag & flags) {
+        if ((tmp->flags & CHFL_EXCEPT_IPMASK)) {
+          char* ip_start;
+          char* cidr_start;
+
+          if (!ip_s) {
+            ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
+                                     (cli_user(cptr))->realusername, cli_ip(cptr));
+            if ((ip_start = strrchr(ip_s, '@')))
+              cli_addr = inet_addr(ip_start + 1);
+          }
+          if (match(tmp->value.except.extstr, ip_s) == 0)
+            break;
+          if ((ip_start = strrchr(tmp->value.except.extstr, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+            int bits = atoi(cidr_start + 1);
+            char* p = strchr(ip_s, '@');
+
+            if (p) {
+              *p = *ip_start = 0;
+              if (match(tmp->value.except.extstr, ip_s) == 0) {
+                if ((bits > 0) && (bits < 33)) {
+                  in_addr_t except_addr;
+                  *cidr_start = 0;
+                  except_addr = inet_addr(ip_start + 1);
+                  *cidr_start = '/';
+                  if ((NETMASK(bits) & cli_addr) == except_addr) {
+                    *p = *ip_start = '@';
+                    break;
+                  }
+                }
+              }
+              *p = *ip_start = '@';
+            }
+          }
+        }
+
+        if (IsDNSBLMarked(cptr)) {
+          struct SLink* lp;
+          char tmpdhostb[BUFSIZE + 1];
+          int dnsblb = 0;
+
+          for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
+            ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
+            sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                                      cli_user(cptr)->realusername,
+                                      tmpdhostb);
+
+            if (sd && match(tmp->value.except.extstr, sd) == 0) {
+              dnsblb = 1;
+              break;
+            }
+          }
+
+          if (dnsblb == 1)
+            break;
+        }
+  
+        if (match(tmp->value.except.extstr, s) == 0)
+          break;
+        else if (sb && match(tmp->value.except.extstr, sb) == 0)
+          break;
+        else if (sh && match(tmp->value.except.extstr, sh) == 0)
+          break;
+        else if (sf && match(tmp->value.except.extstr, sf) == 0)
+          break;
+        else if (sa && match(tmp->value.except.extstr, sa) == 0)
           break;
       }
     }
@@ -1264,7 +1448,8 @@ int member_can_send_to_channel(struct Membership* member)
   if (IsVoicedOrOpped(member))
     return 1;
 
-  if ((is_ext_banned(member->user, member->channel, member, EXTBAN_QUIET)) && !is_excepted(member->user, member->channel, member))
+  if ((is_ext_banned(member->user, member->channel, member, EXTBAN_QUIET)) &&
+     (!is_excepted(member->user, member->channel, member) || is_ext_excepted(member->user, member->channel, member, EXTBAN_QUIET)))
     return 0;
 
 
@@ -3066,7 +3251,9 @@ mode_parse_redirect(struct ParseState *state, int *flag_p)
 static void
 mode_parse_except(struct ParseState *state, int *flag_p)
 {
-  char *t_str, *s;
+  char *t_str, *s, *excepted = NULL, *p;
+  int typepos = 0, startarg = 0, extended = 0, flags = 0;
+  int extmask = 0;
   struct SLink *except, *newexcept = 0;
 
   if (state->parc <= 0) { /* Not enough args, send except list */
@@ -3101,21 +3288,89 @@ mode_parse_except(struct ParseState *state, int *flag_p)
     return;
   }
 
-  t_str = collapse(pretty_mask(t_str));
+  for (; (*t_str && (*t_str == ':')); t_str++);
+  if (!*t_str)
+    return;
+
+  if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3] &&
+     (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
+    if (strlen(t_str) > 80)
+      t_str[80] = '\0';
+    if (t_str[1] == '!')
+      typepos = 2;
+    else
+      typepos = 1;
+
+    startarg = typepos + 2;
+
+    extended = 1;
+    excepted = substr(t_str, startarg, strlen(t_str)-1);
+    switch (t_str[typepos]) {
+      case 'q':
+        flags = EXTEXCEPT_QUIET;
+        extmask = 1;
+        excepted = collapse(pretty_mask(excepted));
+        ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", excepted);
+        break;
+
+      case 'n':
+        flags = EXTEXCEPT_NICK;
+        extmask = 1;
+        excepted = collapse(pretty_mask(excepted));
+        ircd_snprintf(0, t_str, BUFSIZE, "~n:%s", excepted);
+        break;
+
+      case 'c':
+        flags = EXTEXCEPT_CHAN;
+        p = excepted;
+        if ((*p == '+') || (*p == '%') || (*p == '@'))
+          p++;
+        if (*p != '#') {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Please use a # in the channelname (eg: ~c:#*blah*)", state->sptr);
+          return;
+        }
+        break;
+
+      case 'r':
+        flags = EXTEXCEPT_REAL;
+        break;
+
+      default:
+        return;
+        break; /* isnt needed but better keep it */
+    }
+  } else
+    t_str = collapse(pretty_mask(t_str));
+
 
   /* remember the except for the moment... */
   if (state->dir == MODE_ADD) {
     newexcept = state->exceptlist + (state->numexcepts++);
     newexcept->next = 0;
+    if (extended) {
+      DupString(newexcept->value.except.extstr, excepted);
+      newexcept->value.except.extflag = flags;
+    }
 
     DupString(newexcept->value.except.exceptstr, t_str);
-    newexcept->value.except.who = cli_name(state->sptr);
+    if (!IsUser(state->sptr) ||
+      (feature_bool(FEAT_HIS_EXCEPTWHO) && state->mbuf != NULL && (state->mbuf->mb_dest & MODEBUF_DEST_OPMODE))) {
+      newexcept->value.except.who  = "*";
+    } else {
+      newexcept->value.except.who = cli_name(state->sptr);
+    }
     newexcept->value.except.when = TStime();
 
     newexcept->flags = CHFL_EXCEPT | MODE_ADD;
 
     if ((s = strrchr(t_str, '@')) && check_if_ipmask(s + 1))
       newexcept->flags |= CHFL_EXCEPT_IPMASK;
+
+
+    if (extmask) { /* check for ipmask if its a quiet or nick ext ban */
+      if ((s = strrchr(excepted, '@')) && check_if_ipmask(s + 1))
+        newexcept->flags |= CHFL_BAN_IPMASK;
+    }
   }
 
   if (!state->chptr->exceptlist) {
@@ -3158,6 +3413,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
       if (!ircd_strcmp(except->value.except.exceptstr, t_str)) {
 	newexcept->flags &= ~MODE_ADD; /* don't add except at all */
 	MyFree(newexcept->value.except.exceptstr); /* stopper a leak */
+        if (extended)
+          MyFree(newexcept->value.except.extstr); /* stopper a leak */
 	state->numexcepts--; /* deallocate last except */
 	if (state->done & DONE_EXCEPTCLEAN) /* If we're cleaning, finish */
 	  break;
@@ -3393,6 +3650,8 @@ mode_process_excepts(struct ParseState *state)
       len -= exceptlen;
 
       MyFree(except->value.except.exceptstr);
+      if (except->value.except.extstr)
+        MyFree(except->value.except.extstr);
 
       continue;
     } else if (except->flags & MODE_DEL) { /* Deleted a except? */
@@ -3428,7 +3687,9 @@ mode_process_excepts(struct ParseState *state)
 	count--;
 	len -= exceptlen;
 
-	MyFree(except->value.except.exceptstr);
+ 	MyFree(except->value.except.exceptstr);
+        if (except->value.except.extstr)
+          MyFree(except->value.except.extstr);
       } else {
 	if (state->flags & MODE_PARSE_SET && MyUser(state->sptr) &&
 	    (len > (feature_int(FEAT_AVEXCEPTLEN) * feature_int(FEAT_MAXEXCEPTS)) ||
@@ -3439,6 +3700,8 @@ mode_process_excepts(struct ParseState *state)
 	  len -= exceptlen;
 
 	  MyFree(except->value.except.exceptstr);
+          if (except->value.except.extstr)
+            MyFree(except->value.except.extstr);
 	} else {
 	  /* add the except to the buffer */
 	  modebuf_mode_string(state->mbuf, MODE_ADD | MODE_EXCEPT,
@@ -3448,6 +3711,8 @@ mode_process_excepts(struct ParseState *state)
 	  if (state->flags & MODE_PARSE_SET) { /* create a new except */
 	    newexcept = make_link();
 	    newexcept->value.except.exceptstr = except->value.except.exceptstr;
+            newexcept->value.except.extstr = except->value.except.extstr;
+            newexcept->value.except.extflag = except->value.except.extflag;
 	    DupString(newexcept->value.except.who, except->value.except.who);
 	    newexcept->value.except.when = except->value.except.when;
 	    newexcept->flags = except->flags & (CHFL_EXCEPT | CHFL_EXCEPT_IPMASK);
@@ -3887,6 +4152,8 @@ mode_parse(struct ModeBuf *mbuf, struct Client *cptr, struct Client *sptr,
     state.banlist[i].flags = 0;
     state.exceptlist[i].next = 0;
     state.exceptlist[i].value.except.exceptstr = 0;
+    state.exceptlist[i].value.except.extstr = 0;
+    state.exceptlist[i].value.except.extflag = 0;
     state.exceptlist[i].value.except.who = 0;
     state.exceptlist[i].value.except.when = 0;
     state.exceptlist[i].flags = 0;

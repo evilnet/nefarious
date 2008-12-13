@@ -183,7 +183,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   int param, nickpos = 0, banpos = 0, exceptpos = 0, type = 0, ecount = 0;
   int extended = 0, typepos, flags = 0, startarg = 0, extmask = 0;
   char modestr[BUFSIZE], nickstr[BUFSIZE], banstr[BUFSIZE], exceptstr[BUFSIZE];
-  char *banned = NULL;
+  char *banned = NULL, *excepted = NULL;
 
   if (parc < 3)
     return protocol_violation(sptr,"Too few parameters for BURST");
@@ -307,6 +307,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
             typepos = 0;
             extended = 0;
             banned = NULL;
+            excepted = NULL;
 
             if (ban) {
               if (*ban == '~' && ban[1] && (ban[2] == ':') && ban[3]) {
@@ -418,11 +419,55 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	        chptr->banlist = newban;
 	    }
           } else if (type == 1) {
-            char *except, *ptr;
+            char *except = NULL, *ptr;
             struct SLink *newexcept;
             ecount++;
-            if (ecount > 1) { /* miss the first one as its just the ~ seperator */
-              except = collapse(pretty_mask(ban));
+           if (ecount > 1) { /* miss the first one as its just the ~ seperator */
+             typepos = 0;
+             flags = 0;
+             extmask = 0;
+             typepos = 0;
+             extended = 0;
+             banned = NULL;
+             excepted = NULL;
+
+             if (ban) {
+               if (*ban == '~' && ban[1] && (ban[2] == ':') && ban[3]) {
+
+                 if (ban[1] == '!')
+                   typepos = 2;
+                 else
+                   typepos = 1;
+
+                 startarg = typepos + 2;
+
+                 extended = 1;
+                 excepted = substr(except, startarg, strlen(except)-1);
+                 switch (ban[typepos]) {
+                   case 'q':
+                     flags = EXTEXCEPT_QUIET;
+                     extmask = 1;
+                     break;
+
+                    case 'n':
+                     flags = EXTEXCEPT_NICK;
+                     extmask = 1;
+                     break;
+
+                   case 'c':
+                     flags = EXTEXCEPT_CHAN;
+                     break;
+
+                   case 'r':
+                     flags = EXTEXCEPT_REAL;
+                     break;
+
+                   default:
+                     break; /* isnt needed but better keep it */
+                 }
+               } else
+                 except = collapse(pretty_mask(ban));
+              }
 
               for (lp = chptr->exceptlist; lp; lp = lp->next) {
                 if (!ircd_strcmp(lp->value.except.exceptstr, except)) {
@@ -457,6 +502,18 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
                 newexcept = make_link(); /* create new except */
 
+                if (extended) {
+                  if (excepted && flags) {
+                    Debug((DEBUG_DEBUG, "Adding extended except: %s - %s (%i)", excepted, except, flags));
+                    DupString(newexcept->value.except.extstr, excepted);
+                    newexcept->value.except.extflag = flags;
+                  }
+                } else {
+                  Debug((DEBUG_DEBUG, "Adding normal except %s", except));
+                  DupString(newexcept->value.except.extstr, "");
+                  newexcept->value.except.extflag = 0;
+                }
+
                 DupString(newexcept->value.except.exceptstr, except);
 
                 DupString(newexcept->value.except.who,
@@ -467,6 +524,11 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
                 newexcept->flags = CHFL_EXCEPT | CHFL_BURST_EXCEPT; /* set flags */
                 if ((ptr = strrchr(except, '@')) && check_if_ipmask(ptr + 1))
                   newexcept->flags |= CHFL_EXCEPT_IPMASK;
+
+                if (extmask) { /* check for ipmask if its a quiet or nick ext ban */
+                   if ((eptr = strrchr(excepted, '@')) && check_if_ipmask(eptr + 1))
+                     newexcept->flags |= CHFL_EXCEPT_IPMASK;
+                }
 
                 newexcept->next = 0;
                 if (lp)
