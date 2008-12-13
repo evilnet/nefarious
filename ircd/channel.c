@@ -530,6 +530,7 @@ int add_banid(struct Client *cptr, struct Channel *chptr, char *banid,
 
     ban->value.ban.when = TStime();
     ban->flags = CHFL_BAN;      /* This bit is never used I think... */
+
     if ((ip_start = strrchr(banid, '@')) && check_if_ipmask(ip_start + 1))
       ban->flags |= CHFL_BAN_IPMASK;
     chptr->banlist = ban;
@@ -750,6 +751,147 @@ static int is_excepted(struct Client *cptr, struct Channel *chptr,
   return (tmpe != NULL);
 }
 
+int is_ext_banned(struct Client *cptr, struct Channel *chptr,
+                  struct Membership* member, int flags) {
+  struct SLink* tmp;
+  char          tmphost[HOSTLEN + 1];
+  char          nu_host[NUH_BUFSIZE];
+  char          nu_accthost[NUH_BUFSIZE];
+  char          nu_dnsblhost[NUH_BUFSIZE];
+  char          nu_realhost[NUH_BUFSIZE];
+  char          nu_fakehost[NUH_BUFSIZE];
+  char          nu_ip[NUI_BUFSIZE];
+  char*         s;
+  char*         sb;
+  char*         sa = NULL;
+  char*         sh = NULL;
+  char*         sf = NULL;
+  char*         sd = NULL;
+  char*         ip_s = NULL;
+  in_addr_t     cli_addr = 0;
+
+  if (!IsUser(cptr))
+    return 0;
+
+  /* eeeek */
+  s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+			  (cli_user(cptr))->realhost);
+
+  sb = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+			  (cli_user(cptr))->host);
+
+  if (HasSetHost(cptr))
+    sh = make_nick_user_host(nu_realhost, cli_name(cptr),
+			     cli_user(cptr)->realusername,
+			     cli_user(cptr)->realhost);
+
+  if (HasFakeHost(cptr))
+    sf = make_nick_user_host(nu_fakehost, cli_name(cptr),
+			     cli_user(cptr)->realusername,
+			     cli_user(cptr)->fakehost);
+
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    if (IsAccount(cptr)) {
+       if (HasHiddenHost(cptr) && !HasSetHost(cptr))
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                  cli_user(cptr)->realusername,
+                                  cli_user(cptr)->realhost);
+       else {
+	  make_hidden_hostmask(tmphost, cptr);
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                   cli_user(cptr)->realusername,
+                                   tmphost);
+       }
+    }
+  } else {
+     if (IsHiddenHost(cptr) && !HasSetHost(cptr))
+       sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               cli_user(cptr)->realhost);
+     else {
+       ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
+       sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                cli_user(cptr)->realusername,
+                                tmphost);
+     }
+  }
+
+  for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
+    if (tmp->value.ban.extflag & flags) {
+      if ((tmp->flags & CHFL_BAN_IPMASK)) {
+        char* ip_start;
+        char* cidr_start;
+
+        if (!ip_s) {
+          ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
+                                   (cli_user(cptr))->realusername, cli_ip(cptr));
+          if ((ip_start = strrchr(ip_s, '@')))
+            cli_addr = inet_addr(ip_start + 1);
+        }
+        if (match(tmp->value.ban.extstr, ip_s) == 0)
+          break;
+        if ((ip_start = strrchr(tmp->value.ban.extstr, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+          int bits = atoi(cidr_start + 1);
+          char* p = strchr(ip_s, '@');
+
+          if (p) {
+            *p = *ip_start = 0;
+            if (match(tmp->value.ban.extstr, ip_s) == 0) {
+              if ((bits > 0) && (bits < 33)) {
+                in_addr_t ban_addr;
+                *cidr_start = 0;
+                ban_addr = inet_addr(ip_start + 1);
+                *cidr_start = '/';
+                if ((NETMASK(bits) & cli_addr) == ban_addr) {
+                  *p = *ip_start = '@';
+                  break;
+                }
+              }
+            }
+            *p = *ip_start = '@';
+          }
+        }
+      }
+
+      if (IsDNSBLMarked(cptr)) {
+        struct SLink* lp;
+        char tmpdhostb[BUFSIZE + 1];
+        int dnsblb = 0;
+
+        for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
+          ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
+          sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                                    cli_user(cptr)->realusername,
+                                    tmpdhostb);
+
+          if (sd && match(tmp->value.ban.extstr, sd) == 0) {
+            dnsblb = 1;
+            break;
+          }
+        }
+
+        if (dnsblb == 1)
+          break;
+      }
+  
+      if (match(tmp->value.ban.extstr, s) == 0)
+        break;
+      else if (sb && match(tmp->value.ban.extstr, sb) == 0)
+      break;
+      else if (sh && match(tmp->value.ban.extstr, sh) == 0)
+        break;
+      else if (sf && match(tmp->value.ban.extstr, sf) == 0)
+        break;
+      else if (sa && match(tmp->value.ban.extstr, sa) == 0)
+        break;
+    }
+  }
+
+  if (tmp)
+    return 1;
+  else
+    return 0;
+}
 
 /*
  * is_banned - a non-zero value if banned else 0.
@@ -1112,6 +1254,10 @@ int member_can_send_to_channel(struct Membership* member)
 
   if (IsVoicedOrOpped(member))
     return 1;
+
+  if (is_ext_banned(member->user, member->channel, member, EXTBAN_QUIET))
+    return 0;
+
   /*
    * If it's moderated, and you aren't a privileged user, you can't
    * speak.  
@@ -3029,6 +3175,7 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   char *t_str, *s, *banned = NULL, *p;
   struct SLink *ban, *newban = 0;
   int typepos = 0, startarg = 0, extended = 0, flags = 0;
+  int extmask = 0;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
     if (MyUser(state->sptr) && !(state->done & DONE_BANLIST)) {
@@ -3083,14 +3230,16 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     switch (t_str[typepos]) {
       case 'q':
         flags = EXTBAN_QUIET;
+        extmask = 1;
         banned = collapse(pretty_mask(banned));
         ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
         break;
 
       case 'n':
         flags = EXTBAN_NICK;
+        extmask = 1;
         banned = collapse(pretty_mask(banned));
-        ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
+        ircd_snprintf(0, t_str, BUFSIZE, "~n:%s", banned);
         break;
 
       case 'c':
@@ -3139,6 +3288,11 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 
     if ((s = strrchr(t_str, '@')) && check_if_ipmask(s + 1))
       newban->flags |= CHFL_BAN_IPMASK;
+
+    if (extmask) { /* check for ipmask if its a quiet or nick ext ban */
+      if ((s = strrchr(banned, '@')) && check_if_ipmask(s + 1))
+        newban->flags |= CHFL_BAN_IPMASK;
+    }
   }
 
   if (!state->chptr->banlist) {

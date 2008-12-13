@@ -82,6 +82,7 @@
 #include "config.h"
 
 #include "IPcheck.h"
+#include "channel.h"
 #include "client.h"
 #include "gline.h"
 #include "hash.h"
@@ -146,7 +147,10 @@ extern int do_nick_name(char* nick)
  */
 int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  struct Client* acptr;
+  struct Client*     acptr;
+  struct Membership* member;
+  struct Membership *lp;
+  struct Channel     *chptr;
   char           nick[NICKLEN + 2];
   char*          arg;
   char*          s;
@@ -212,6 +216,20 @@ int m_nick(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     else {
       send_reply(sptr, ERR_ERRONEUSNICKNAME, nick);
       return 0;
+    }
+  }
+
+  if (sptr->cli_user) {
+    if (sptr->cli_user->joined > 0) {
+      for (lp = sptr->cli_user->channel; lp; lp = lp->next_channel) {
+        chptr = lp->channel;
+        if ((member = find_member_link(chptr, sptr))) {
+          if (is_ext_banned(sptr, chptr, member, EXTBAN_NICK)) {
+            send_reply(sptr, ERR_BANNICKCHANGE, chptr->chname);
+            return 0;
+          }
+        }
+      }
     }
   }
 

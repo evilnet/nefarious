@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-13  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/channel.h: Added is_ext_banned.
+
+	* ircd/channel.c: Added is_ext_banned for checking nick and quiet
+	extended bans. Also make sure CHFL_BAN_IPMASK is set if an
+	extended quiet or nick ban is an IP mask. Also made use of the
+	quiet extended bans.
+
+	* ircd/m_nick.c: Make use of nick change extended bans.
+
 2008-12-12  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_conf.c: Small fix for SFilter kill action not notifying
