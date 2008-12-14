@@ -107,6 +107,11 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
     }
   }
 
+  if (0 != ext_text_ban(sptr, chptr, text)) {
+    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
+    return;
+  }
+
   if (!IsService(sptr))
     chptr->last_message = CurrentTime;
 
@@ -165,6 +170,11 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
       send_reply(sptr, ERR_NOTEXTTOSEND);
       return;
     }
+  }
+
+  if (0 != ext_text_ban(sptr, chptr, text)) {
+    send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
+    return;
   }
 
   if (!IsService(sptr))

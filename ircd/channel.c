@@ -807,6 +807,34 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
   return (tmpe != NULL);
 }
 
+int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
+  struct SLink* tmp;
+  int excepted = 0, denied = 0;
+
+  for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
+    if (tmp->value.ban.extflag) {
+      if (tmp->value.ban.extflag & EXTBAN_TEXT) {
+        if (!mmatch(tmp->value.ban.extstr, text))
+          denied = 1;
+      }
+    }
+  }
+
+  for (tmp = chptr->exceptlist; tmp; tmp = tmp->next) {
+    if (tmp->value.except.extflag) {
+      if (tmp->value.except.extflag & EXTEXCEPT_TEXT) {
+        if (!mmatch(tmp->value.except.extstr, text))
+          excepted = 1;
+      }
+    }
+  }
+
+  if (denied && !excepted)
+    return 1;
+  else
+    return 0;
+}
+
 int is_ext_banned(struct Client *cptr, struct Channel *chptr,
                   struct Membership* member, int flags) {
   struct SLink* tmp;
@@ -3449,7 +3477,14 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         }
         break;
 
-       case 'a':
+      case 't':
+        if (flags)
+          flags |= EXTEXCEPT_TEXT;
+        else
+          flags = EXTEXCEPT_TEXT;
+        break;
+
+      case 'a':
         if (flags)
           flags |= EXTEXCEPT_ACCOUNT;
         else
@@ -3661,11 +3696,18 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         }
         break;
 
-       case 'a':
+      case 'a':
         if (flags)
           flags |= EXTBAN_ACCOUNT;
         else
           flags = EXTBAN_ACCOUNT;
+        break;
+
+      case 't':
+        if (flags)
+          flags |= EXTBAN_TEXT;
+        else
+          flags = EXTBAN_TEXT;
         break;
 
       case 'n':

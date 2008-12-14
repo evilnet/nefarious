@@ -3,6 +3,18 @@
 
 2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/channel.h: Added TEXT extended ban.
+
+	* ircd/channel.c: Added TEXT extended ban for blocking channel
+	privmsgs and notices. Wildcard *'s and ?'s are supported. Character
+	is t.
+
+	* ircd/ircd_features.c: Added t to EXTBANS.
+
+	* ircd/m_burst.c: Added TEXT, SHARE and ACCOUNT.
+
+2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/ircd_features.c: Added extra flags to EXTBANS.
 
 2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

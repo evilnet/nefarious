@@ -310,11 +310,13 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
             excepted = NULL;
 
             if (ban) {
-              if (*ban == '~' && ban[1] && (ban[2] == ':') && ban[3]) {
+              if ((*ban == '~') && ban[1] && ((ban[2] == ':') || ((ban[1] == '!') && (ban[3] == ':'))) && ban[3]) {
 
-                if (ban[1] == '!')
+                flags = 0;
+                if (ban[1] == '!') {
+                  flags = EXTBAN_REVERSE;
                   typepos = 2;
-                else
+                } else
                   typepos = 1;
 
                 startarg = typepos + 2;
@@ -323,21 +325,54 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
                 banned = substr(ban, startarg, strlen(ban)-1);
                 switch (ban[typepos]) {
                   case 'q':
-                    flags = EXTBAN_QUIET;
+                    if (flags)
+                      flags |= EXTBAN_QUIET;
+                    else
+                      flags = EXTBAN_QUIET;
                     extmask = 1;
                     break;
 
-                   case 'n':
-                    flags = EXTBAN_NICK;
+                  case 't':
+                    if (flags)
+                      flags |= EXTBAN_TEXT;
+                    else
+                      flags = EXTBAN_TEXT;
+                    break;
+
+                  case 'j':
+                    if (flags)
+                      flags |= EXTBAN_SHARE;
+                    else
+                      flags = EXTBAN_SHARE;
+                    break;
+
+                  case 'a':
+                    if (flags)
+                      flags |= EXTBAN_ACCOUNT;
+                    else
+                      flags = EXTBAN_ACCOUNT;
+                    break;
+
+                 case 'n':
+                   if (flags)
+                      flags |= EXTBAN_NICK;
+                   else
+                      flags = EXTBAN_NICK;
                     extmask = 1;
                     break;
 
                   case 'c':
-                    flags = EXTBAN_CHAN;
+                    if (flags)
+                      flags |= EXTBAN_CHAN;
+                    else
+                      flags = EXTBAN_CHAN;
                     break;
 
                   case 'r':
-                    flags = EXTBAN_REAL;
+                    if (flags)
+                      flags |= EXTBAN_REAL;
+                    else
+                      flags = EXTBAN_REAL;
                     break;
 
                   default:
@@ -432,11 +467,13 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
              excepted = NULL;
 
              if (ban) {
-               if (*ban == '~' && ban[1] && (ban[2] == ':') && ban[3]) {
+               if ((*ban == '~') && ban[1] && ((ban[2] == ':') || ((ban[1] == '!') && (ban[3] == ':'))) && ban[3]) {
 
-                 if (ban[1] == '!')
+                 flags = 0;
+                 if (ban[1] == '!') {
+                   flags = EXTBAN_REVERSE;
                    typepos = 2;
-                 else
+                 } else
                    typepos = 1;
 
                  startarg = typepos + 2;
@@ -445,21 +482,54 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
                  excepted = substr(except, startarg, strlen(except)-1);
                  switch (ban[typepos]) {
                    case 'q':
-                     flags = EXTEXCEPT_QUIET;
+                     if (flags)
+                       flags |= EXTEXCEPT_QUIET;
+                     else
+                       flags = EXTEXCEPT_QUIET;
                      extmask = 1;
                      break;
 
-                    case 'n':
-                     flags = EXTEXCEPT_NICK;
+                   case 't':
+                     if (flags)
+                       flags |= EXTEXCEPT_TEXT;
+                     else
+                       flags = EXTEXCEPT_TEXT;
+                     break;
+
+                   case 'j':
+                     if (flags)
+                       flags |= EXTEXCEPT_SHARE;
+                     else
+                       flags = EXTEXCEPT_SHARE;
+                     break;
+
+                    case 'a':
+                      if (flags)
+                        flags |= EXTEXCEPT_ACCOUNT;
+                      else
+                        flags = EXTEXCEPT_ACCOUNT;
+                      break;
+
+                   case 'n':
+                     if (flags)
+                       flags |= EXTEXCEPT_NICK;
+                     else
+                       flags = EXTEXCEPT_NICK;
                      extmask = 1;
                      break;
 
                    case 'c':
-                     flags = EXTEXCEPT_CHAN;
+                     if (flags)
+                       flags |= EXTEXCEPT_CHAN;
+                     else
+                       flags = EXTEXCEPT_CHAN;
                      break;
 
                    case 'r':
-                     flags = EXTEXCEPT_REAL;
+                     if (flags)
+                       flags |= EXTEXCEPT_REAL;
+                     else
+                       flags = EXTEXCEPT_REAL;
                      break;
 
                    default:
