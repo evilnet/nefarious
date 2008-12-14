@@ -1101,6 +1101,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
   char*         sd = NULL;
   char*         ip_s = NULL;
   in_addr_t     cli_addr = 0;
+  int           banned = 0;
 
   if (!IsUser(cptr))
     return 0;
@@ -1167,8 +1168,10 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
         if ((ip_start = strrchr(ip_s, '@')))
           cli_addr = inet_addr(ip_start + 1);
       }
-      if (match(tmp->value.ban.banstr, ip_s) == 0)
+      if (match(tmp->value.ban.banstr, ip_s) == 0) {
+        banned = 1;
         break;
+      }
       if ((ip_start = strrchr(tmp->value.ban.banstr, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
         int bits = atoi(cidr_start + 1);
         char* p = strchr(ip_s, '@');
@@ -1183,6 +1186,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
               *cidr_start = '/';
               if ((NETMASK(bits) & cli_addr) == ban_addr) {
                 *p = *ip_start = '@';
+                banned = 1;
                 break;
               }
             }
@@ -1209,8 +1213,10 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
         }
       }
 
-      if (dnsblb == 1)
+      if (dnsblb == 1) {
+        banned = 1;
         break;
+      }
     }
 
     if (tmp->value.ban.extflag & EXTBAN_CHAN) {
@@ -1218,54 +1224,110 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
       struct Channel *chptr;
       int cmatch = 0;
 
-      for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
-        chptr = lp->channel;
-        cmatch = 0;
 
-        if (*tmp->value.ban.extstr == '#') {
-          if (!mmatch(tmp->value.ban.extstr, chptr->chname)) {
-            cmatch = 1;
-            break;
-          }
-        } else {
-          if (!mmatch(tmp->value.ban.extstr+1, chptr->chname)) {
-            if ((*tmp->value.ban.extstr == '@') && IsChanOp(lp)) {
-              cmatch = 1;
-              break;
-            } else if ((*tmp->value.ban.extstr == '%') && IsHalfOp(lp)) {
-              cmatch = 1;
-              break;
-            } else if ((*tmp->value.ban.extstr == '+') && HasVoice(lp)) {
+      if (!(tmp->value.ban.extflag & EXTBAN_REVERSE)) {
+        for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
+          chptr = lp->channel;
+          cmatch = 0;
+
+          if (*tmp->value.ban.extstr == '#') {
+            if (!mmatch(tmp->value.ban.extstr, chptr->chname)) {
               cmatch = 1;
               break;
             }
+          } else {
+            if (!mmatch(tmp->value.ban.extstr+1, chptr->chname)) {
+              if ((*tmp->value.ban.extstr == '@') && IsChanOp(lp)) {
+                cmatch = 1;
+                break;
+              } else if ((*tmp->value.ban.extstr == '%') && IsHalfOp(lp)) {
+                cmatch = 1;
+                break;
+              } else if ((*tmp->value.ban.extstr == '+') && HasVoice(lp)) {
+                cmatch = 1;
+                break;
+              }
+            }
           }
         }
+        if (cmatch == 1)
+          banned = 1;
       }
-      if (cmatch)
+
+      if ((cmatch == 0) && (tmp->value.ban.extflag & EXTBAN_REVERSE)) {
+        for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
+          chptr = lp->channel;
+          cmatch = 0;
+
+          if (*tmp->value.ban.extstr == '#') {
+            if (!mmatch(tmp->value.ban.extstr, chptr->chname)) {
+              cmatch = 1;
+              break;
+            }
+          } else {
+            if (!mmatch(tmp->value.ban.extstr+1, chptr->chname)) {
+              if ((*tmp->value.ban.extstr == '@') && IsChanOp(lp)) {
+                cmatch = 1;
+                break;
+              } else if ((*tmp->value.ban.extstr == '%') && IsHalfOp(lp)) {
+                cmatch = 1;
+                break;
+              } else if ((*tmp->value.ban.extstr == '+') && HasVoice(lp)) {
+                cmatch = 1;
+                break;
+              }
+            }
+          }
+        }
+
+        if (cmatch == 0)
+          banned = 1;
+      }
+
+      if (banned == 1)
         break;
     }
 
     if (tmp->value.ban.extflag & EXTBAN_REAL) {
+      int rmatch = 0;
+
       if (!mmatch(decodespace(tmp->value.ban.extstr), cli_info(cptr)))
-        break;
+        rmatch = 1;
+
+      if (tmp->value.ban.extflag & EXTBAN_REVERSE) {
+        if (!rmatch) {
+          banned = 1;
+          break;
+        }
+      } else {
+        if (rmatch) {
+          banned = 1;
+          break;
+        }
+      }
     }
 
-    if (match(tmp->value.ban.banstr, s) == 0)
+    if (match(tmp->value.ban.banstr, s) == 0) {
+      banned = 1;
       break;
-    else if (sb && match(tmp->value.ban.banstr, sb) == 0)
+    } else if (sb && match(tmp->value.ban.banstr, sb) == 0) {
+      banned = 1;
       break;
-    else if (sh && match(tmp->value.ban.banstr, sh) == 0)
+    } else if (sh && match(tmp->value.ban.banstr, sh) == 0) {
+      banned = 1;
       break;
-    else if (sf && match(tmp->value.ban.banstr, sf) == 0)
+    } else if (sf && match(tmp->value.ban.banstr, sf) == 0) {
+      banned = 1;
       break;
-    else if (sa && match(tmp->value.ban.banstr, sa) == 0)
+    } else if (sa && match(tmp->value.ban.banstr, sa) == 0) {
+      banned = 1;
       break;
+    }
   }
 
   if (member) {
     SetBanValid(member);
-    if (tmp) {
+    if (banned) {
       SetBanned(member);
       return 1;
     }
@@ -1275,7 +1337,7 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
     }
   }
 
-  return (tmp != NULL);
+  return banned;
 }
 
 /*
@@ -3292,13 +3354,16 @@ mode_parse_except(struct ParseState *state, int *flag_p)
   if (!*t_str)
     return;
 
-  if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3] &&
-     (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
+  if (*t_str == '~' && t_str[1] && ((t_str[2] == ':') || ((t_str[1] == '!') && (t_str[3] == ':')))
+     && t_str[3] && (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
     if (strlen(t_str) > 80)
       t_str[80] = '\0';
-    if (t_str[1] == '!')
+
+    flags = 0;
+    if (t_str[1] == '!') {
+      flags &= EXTEXCEPT_REVERSE;
       typepos = 2;
-    else
+    } else
       typepos = 1;
 
     startarg = typepos + 2;
@@ -3307,21 +3372,30 @@ mode_parse_except(struct ParseState *state, int *flag_p)
     excepted = substr(t_str, startarg, strlen(t_str)-1);
     switch (t_str[typepos]) {
       case 'q':
-        flags = EXTEXCEPT_QUIET;
+        if (flags)
+          flags |= EXTEXCEPT_QUIET;
+        else
+          flags = EXTEXCEPT_QUIET;
         extmask = 1;
         excepted = collapse(pretty_mask(excepted));
         ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", excepted);
         break;
 
       case 'n':
-        flags = EXTEXCEPT_NICK;
+        if (flags)
+          flags |= EXTEXCEPT_NICK;
+        else
+          flags = EXTEXCEPT_NICK;
         extmask = 1;
         excepted = collapse(pretty_mask(excepted));
         ircd_snprintf(0, t_str, BUFSIZE, "~n:%s", excepted);
         break;
 
       case 'c':
-        flags = EXTEXCEPT_CHAN;
+        if (flags)
+          flags |= EXTEXCEPT_CHAN;
+        else
+          flags = EXTEXCEPT_CHAN;
         p = excepted;
         if ((*p == '+') || (*p == '%') || (*p == '@'))
           p++;
@@ -3332,7 +3406,10 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 'r':
-        flags = EXTEXCEPT_REAL;
+        if (flags)
+          flags |= EXTEXCEPT_REAL;
+        else
+          flags = EXTEXCEPT_REAL;
         break;
 
       default:
@@ -3481,13 +3558,16 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   if (!*t_str)
     return;
 
-  if (*t_str == '~' && t_str[1] && (t_str[2] == ':') && t_str[3] &&
-     (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
+  if (*t_str == '~' && t_str[1] && ((t_str[2] == ':') || ((t_str[1] == '!') && (t_str[3] == ':')))
+     && t_str[3] && (feature_bool(FEAT_EXTBANS) || IsServer(state->sptr))) {
     if (strlen(t_str) > 80)
       t_str[80] = '\0';
-    if (t_str[1] == '!')
+
+    flags = 0;
+    if (t_str[1] == '!') {
+      flags = EXTBAN_REVERSE;
       typepos = 2;
-    else
+    } else
       typepos = 1;
 
     startarg = typepos + 2;
@@ -3496,21 +3576,30 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     banned = substr(t_str, startarg, strlen(t_str)-1);
     switch (t_str[typepos]) {
       case 'q':
-        flags = EXTBAN_QUIET;
+        if (flags)
+          flags |= EXTBAN_QUIET;
+        else
+          flags = EXTBAN_QUIET;
         extmask = 1;
         banned = collapse(pretty_mask(banned));
         ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
         break;
 
       case 'n':
-        flags = EXTBAN_NICK;
+        if (flags)
+          flags |= EXTBAN_NICK;
+        else
+          flags = EXTBAN_NICK;
         extmask = 1;
         banned = collapse(pretty_mask(banned));
         ircd_snprintf(0, t_str, BUFSIZE, "~n:%s", banned);
         break;
 
       case 'c':
-        flags = EXTBAN_CHAN;
+        if (flags)
+          flags |= EXTBAN_CHAN;
+        else
+          flags = EXTBAN_CHAN;
         p = banned;
         if ((*p == '+') || (*p == '%') || (*p == '@'))
           p++;
@@ -3521,7 +3610,10 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'r':
-        flags = EXTBAN_REAL;
+        if (flags)
+          flags |= EXTBAN_REAL;
+        else
+          flags = EXTBAN_REAL;
         break;
 
       default:

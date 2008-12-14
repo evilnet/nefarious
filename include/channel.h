@@ -50,15 +50,17 @@ struct Client;
  * Macro's
  */
 
-#define EXTBAN_NICK   0x001
-#define EXTBAN_CHAN   0x002
-#define EXTBAN_REAL   0x004
-#define EXTBAN_QUIET  0x008
+#define EXTBAN_NICK    0x001
+#define EXTBAN_CHAN    0x002
+#define EXTBAN_REAL    0x004
+#define EXTBAN_QUIET   0x008
+#define EXTBAN_REVERSE 0x010
 
-#define EXTEXCEPT_NICK   0x001
-#define EXTEXCEPT_CHAN   0x002
-#define EXTEXCEPT_REAL   0x004
-#define EXTEXCEPT_QUIET  0x008
+#define EXTEXCEPT_NICK    0x001
+#define EXTEXCEPT_CHAN    0x002
+#define EXTEXCEPT_REAL    0x004
+#define EXTEXCEPT_QUIET   0x008
+#define EXTEXCEPT_REVERSE 0x010
 
 #define ChannelExists(n)        (0 != FindChannel(n))
 

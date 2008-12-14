@@ -3,6 +3,15 @@
 
 2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/channel.h: Added REVERSE entry for EXTBAN and EXTEXCEPT.
+
+	* ircd/channel.c: If ! is specified in a extended channel or realname
+	ban then the reverse will happen. Eg +b ~!c:#chan will prevent anyone
+	from joining if they are not in #chan. Ban exempts can be used for
+	quiet and nick extended bans.
+
+2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Revert some changes that should never have been
 	committed.
 
