@@ -245,7 +245,7 @@ set_isupport_excepts(void)
 static void
 set_isupport_extbans(void)
 {
-    add_isupport_s("EXTBANS", "~,cqnr");
+    add_isupport_s("EXTBANS", "~,acjnqr");
 }
 
 static void
