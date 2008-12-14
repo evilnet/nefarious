@@ -55,12 +55,16 @@ struct Client;
 #define EXTBAN_REAL    0x004
 #define EXTBAN_QUIET   0x008
 #define EXTBAN_REVERSE 0x010
+#define EXTBAN_SHARE   0x020
+#define EXTBAN_ACCOUNT 0x040
 
 #define EXTEXCEPT_NICK    0x001
 #define EXTEXCEPT_CHAN    0x002
 #define EXTEXCEPT_REAL    0x004
 #define EXTEXCEPT_QUIET   0x008
 #define EXTEXCEPT_REVERSE 0x010
+#define EXTEXCEPT_SHARE   0x020
+#define EXTEXCEPT_ACCOUNT 0x040
 
 #define ChannelExists(n)        (0 != FindChannel(n))
 
@@ -438,6 +442,6 @@ extern int joinbuf_flush(struct JoinBuf *jbuf);
 extern int SetAutoChanModes(struct Channel *chptr);
 extern int is_ext_banned(struct Client *cptr, struct Channel *chptr, struct Membership* member, int flags);
 extern int is_ext_excepted(struct Client *cptr, struct Channel *chptr, struct Membership* member, int flags);
-extern int is_excepted(struct Client *cptr, struct Channel *chptr, struct Membership* member);
+extern int is_excepted(struct Client *cptr, struct Channel *chptr, struct Membership* member, int shared);
 
 #endif /* INCLUDED_channel_h */

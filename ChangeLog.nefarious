@@ -3,6 +3,16 @@
 
 2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/channel.h: Added SHARE and ACCOUNT extended bans.
+
+	* ircd/channel.c: Added SHARE and ACCOUNT extended bans. SHARE (j)
+	allows a #channel to be specified. When a person joins if any
+	share bans are set then the ban list for the specified channel will
+	be checked. Account just allows account names / namemasks to be banned
+	or allowed. This is mostly for people who dont use style 1 host hiding.
+
+2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/channel.h: Added REVERSE entry for EXTBAN and EXTEXCEPT.
 
 	* ircd/channel.c: If ! is specified in a extended channel or realname

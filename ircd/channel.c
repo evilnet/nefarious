@@ -596,9 +596,10 @@ struct Membership* find_channel_member(struct Client* cptr, struct Channel* chpt
  * is_excepted - a non-zero value if except else 0.
  */
 int is_excepted(struct Client *cptr, struct Channel *chptr,
-                struct Membership* member)
+                struct Membership* member, int shared)
 {
   struct SLink* tmpe;
+  struct Channel *tchptr;
   char          tmphoste[HOSTLEN + 1];
   char          nu_hoste[NUH_BUFSIZE];
   char          nu_accthoste[NUH_BUFSIZE];
@@ -759,9 +760,24 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
         break;
     }
 
+
+    if ((tmpe->value.ban.extflag & EXTEXCEPT_ACCOUNT) && cli_user(cptr)->account) {
+      if (!match(tmpe->value.ban.extstr, cli_user(cptr)->account))
+        break;
+    }
+
     if (tmpe->value.except.extflag & EXTEXCEPT_REAL) {
       if (!mmatch(decodespace(tmpe->value.except.extstr), cli_info(cptr)))
         break;
+    }
+
+    if ((tmpe->value.except.extflag & EXTEXCEPT_SHARE)) {
+      if (shared == 0) {
+        if ((tchptr = FindChannel(tmpe->value.except.extstr))) {
+          if (is_excepted(cptr, tchptr, NULL, 1))
+            break;
+        }
+      }
     }
 
     if (match(tmpe->value.except.exceptstr, se) == 0)
@@ -1083,9 +1099,10 @@ int is_ext_excepted(struct Client *cptr, struct Channel *chptr,
  * is_banned - a non-zero value if banned else 0.
  */
 static int is_banned(struct Client *cptr, struct Channel *chptr,
-                     struct Membership* member)
+                     struct Membership* member, int shared)
 {
   struct SLink* tmp;
+  struct Channel *tchptr;
   char          tmphost[HOSTLEN + 1];
   char          nu_host[NUH_BUFSIZE];
   char          nu_accthost[NUH_BUFSIZE];
@@ -1307,6 +1324,36 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
       }
     }
 
+    if ((tmp->value.ban.extflag & EXTBAN_ACCOUNT) && cli_user(cptr)->account) {
+      int amatch = 0;
+
+      if (!match(tmp->value.ban.extstr, cli_user(cptr)->account))
+        amatch = 1;
+
+      if (tmp->value.ban.extflag & EXTBAN_REVERSE) {
+        if (!amatch) {
+          banned = 1;
+          break;
+        }
+      } else {
+        if (amatch) {
+          banned = 1;
+          break;
+        }
+      }
+    }
+
+    if ((tmp->value.ban.extflag & EXTBAN_SHARE)) {
+      if (shared == 0) {
+        if ((tchptr = FindChannel(tmp->value.ban.extstr))) {
+          if (is_banned(cptr, tchptr, NULL, 1)) {
+            banned = 1;
+            break;
+          }
+        }
+      }
+    }
+
     if (match(tmp->value.ban.banstr, s) == 0) {
       banned = 1;
       break;
@@ -1511,7 +1558,7 @@ int member_can_send_to_channel(struct Membership* member)
     return 1;
 
   if ((is_ext_banned(member->user, member->channel, member, EXTBAN_QUIET)) &&
-     (!is_excepted(member->user, member->channel, member) || is_ext_excepted(member->user, member->channel, member, EXTBAN_QUIET)))
+     (!is_excepted(member->user, member->channel, member, 0) || is_ext_excepted(member->user, member->channel, member, EXTBAN_QUIET)))
     return 0;
 
 
@@ -1527,7 +1574,7 @@ int member_can_send_to_channel(struct Membership* member)
    * but because of the amount of CPU time that is_banned chews
    * we only check it for our clients.
    */
-  if (MyUser(member->user) && is_banned(member->user, member->channel, member) && !is_excepted(member->user, member->channel, member))
+  if (MyUser(member->user) && is_banned(member->user, member->channel, member, 0) && !is_excepted(member->user, member->channel, member, 0))
     return 0;
   
   return 1;
@@ -1554,7 +1601,7 @@ int client_can_send_to_channel(struct Client *cptr, struct Channel *chptr)
 	((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(cptr)))
       return 0;
     else
-      return !is_banned(cptr, chptr, NULL);
+      return !is_banned(cptr, chptr, NULL, 0);
   }
 
  /*
@@ -1580,7 +1627,7 @@ const char* find_no_nickchange_channel(struct Client* cptr)
     struct Membership* member;
     for (member = (cli_user(cptr))->channel; member;
 	 member = member->next_channel) {
-      if (!IsVoicedOrOpped(member) && is_banned(cptr, member->channel, member) && !is_excepted(cptr, member->channel, member))
+      if (!IsVoicedOrOpped(member) && is_banned(cptr, member->channel, member, 0) && !is_excepted(cptr, member->channel, member, 0))
         return member->channel->chname;
     }
   }
@@ -2023,29 +2070,29 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
    * -Osiris
    */
   if (feature_bool(FEAT_CHMODE_e_CHMODEEXCEPTION)) {
-    if (is_excepted(sptr, chptr, NULL))
+    if (is_excepted(sptr, chptr, NULL, 0))
       exception_join = 1;
   }
 
   /*
    * now using compall (above) to test against a whole key ring -Kev
    */
-  if (*chptr->mode.key && !is_excepted(sptr, chptr, NULL) && (EmptyString(key) ||
+  if (*chptr->mode.key && !is_excepted(sptr, chptr, NULL, 0) && (EmptyString(key) ||
       compall(chptr->mode.key, key)) && (exception_join == 0))
         return overrideJoin + ERR_BADCHANNELKEY;
 
   if (*chptr->mode.key && (exception_join == 0))
     keyv = 1;
 
-  if ((chptr->mode.mode & MODE_INVITEONLY) && !is_excepted(sptr, chptr, NULL) && ((keyv == 0) ||
+  if ((chptr->mode.mode & MODE_INVITEONLY) && !is_excepted(sptr, chptr, NULL, 0) && ((keyv == 0) ||
      (!feature_bool(FEAT_FLEXABLEKEYS))) && (exception_join == 0))
   	return overrideJoin + ERR_INVITEONLYCHAN;
 
-  if (chptr->mode.limit && chptr->users >= chptr->mode.limit && !is_excepted(sptr, chptr, NULL)
+  if (chptr->mode.limit && chptr->users >= chptr->mode.limit && !is_excepted(sptr, chptr, NULL, 0)
      && ((keyv == 0) || (!feature_bool(FEAT_FLEXABLEKEYS))) && (exception_join == 0))
   	return overrideJoin + ERR_CHANNELISFULL;
 
-  if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr) && !is_excepted(sptr, chptr, NULL)
+  if ((chptr->mode.mode & MODE_REGONLY) && !IsAccount(sptr) && !is_excepted(sptr, chptr, NULL, 0)
       && ((keyv == 0) || (!feature_bool(FEAT_FLEXABLEKEYS))))
   	return overrideJoin + ERR_NEEDREGGEDNICK;
 
@@ -2060,7 +2107,7 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
 	return overrideJoin + ERR_SSLONLYCHAN;
 
-  if (is_banned(sptr, chptr, NULL) && !is_excepted(sptr, chptr, NULL))
+  if (is_banned(sptr, chptr, NULL, 0) && !is_excepted(sptr, chptr, NULL, 0))
   	return overrideJoin + ERR_BANNEDFROMCHAN;
   
 
@@ -3391,6 +3438,24 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         ircd_snprintf(0, t_str, BUFSIZE, "~n:%s", excepted);
         break;
 
+      case 'j':
+        if (flags)
+          flags |= EXTEXCEPT_SHARE;
+        else
+          flags = EXTEXCEPT_SHARE;
+        if (!IsChannelName(excepted)) {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Please use a valid channel name (eg: ~j:#blah)", state->sptr);
+          return;
+        }
+        break;
+
+       case 'a':
+        if (flags)
+          flags |= EXTEXCEPT_ACCOUNT;
+        else
+          flags = EXTEXCEPT_ACCOUNT;
+        break;
+
       case 'c':
         if (flags)
           flags |= EXTEXCEPT_CHAN;
@@ -3583,6 +3648,24 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         extmask = 1;
         banned = collapse(pretty_mask(banned));
         ircd_snprintf(0, t_str, BUFSIZE, "~q:%s", banned);
+        break;
+
+      case 'j':
+        if (flags)
+          flags |= EXTBAN_SHARE;
+        else
+          flags = EXTBAN_SHARE;
+        if (!IsChannelName(banned)) {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Please use a valid channel name (eg: ~j:#blah)", state->sptr);
+          return;
+        }
+        break;
+
+       case 'a':
+        if (flags)
+          flags |= EXTBAN_ACCOUNT;
+        else
+          flags = EXTBAN_ACCOUNT;
         break;
 
       case 'n':
