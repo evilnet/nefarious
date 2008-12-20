@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-20  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for global max user count being incremented
+	before global current user count.
+
 2008-12-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/channel.h: Added TEXT extended ban.

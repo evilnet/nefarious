@@ -732,6 +732,11 @@ int register_user(struct Client *cptr, struct Client *sptr,
   if (MyConnect(sptr) && feature_bool(FEAT_AUTOINVISIBLE))
     SetInvisible(sptr);
 
+  if (MyConnect(sptr))
+    Count_unknownbecomesclient(sptr, UserStats);
+  else
+    Count_newremoteclient(UserStats, user->server);
+
   /* increment global count if needed */
   if (UserStats.globalclients < UserStats.clients && IsUser(sptr)) {
     if (UserStats.globalclients >= 0) {
@@ -754,11 +759,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
     ++UserStats.opers;
   if (IsAccount(sptr))
     ++UserStats.authed;
-
-  if (MyConnect(sptr))
-    Count_unknownbecomesclient(sptr, UserStats);
-  else
-    Count_newremoteclient(UserStats, user->server);
 
   if (MyConnect(sptr)) {
     cli_handler(sptr) = CLIENT_HANDLER;
