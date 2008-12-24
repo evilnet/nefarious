@@ -700,7 +700,8 @@ zline_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
       send_reply(sptr, RPL_STATSZLINE, 'Z',
 		 zline->zl_host ? zline->zl_host : "",
 		 zline->zl_expire + TSoffset,
-                 zline->zl_lastmod + TSoffset, zline->zl_reason);
+                 zline->zl_lastmod + TSoffset,
+                 ZlineIsActive(zline) ? '+' : '-', zline->zl_reason);
   }
 }
 

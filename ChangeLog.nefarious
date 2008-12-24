@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/gline.c: Fix for SF bug #2401693 (gsync not working properly).
+
+	* ircd/s_err.c: Fix for SF bug #2401693 (gsync not working properly).
+
+	* ircd/shun.c: Fix for SF bug #2401693 (gsync not working properly).
+
+	* ircd/zline.c: Fix for SF bug #2401693 (gsync not working properly).
+
 2008-12-20  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fix for global max user count being incremented

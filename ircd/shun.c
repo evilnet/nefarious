@@ -750,7 +750,8 @@ shun_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
 		 shun->sh_host ? "@" : "",
 		 shun->sh_host ? shun->sh_host : "",
 		 shun->sh_expire + TSoffset,
-                 shun->sh_lastmod + TSoffset, shun->sh_reason);
+                 shun->sh_lastmod + TSoffset,
+                 ShunIsActive(shun) ? '+' : '-', shun->sh_reason);
   }
 }
 

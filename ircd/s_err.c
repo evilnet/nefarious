@@ -523,7 +523,7 @@ static Numeric replyTable[] = {
 /* 246 */
   { RPL_STATSTLINE, "%c %s %s", "246" },
 /* 247 */
-  { RPL_STATSGLINE, "%c %s%s%s %Tu %Tu :%s", "247" },
+  { RPL_STATSGLINE, "%c %s%s%s %Tu %Tu %c :%s", "247" },
 /* 248 */
   { RPL_STATSULINE, "U %s", "248" },
 /* 249 */
@@ -1113,7 +1113,7 @@ static Numeric replyTable[] = {
 /* 541 */
   { RPL_ENDOFEXEMPTLIST, "%s :End of DNSBL Exempt List", "541" },
 /* 542 */
-  { RPL_STATSSLINE, "%c %s%s%s %Tu %Tu :%s", "542" },
+  { RPL_STATSSLINE, "%c %s%s%s %Tu %Tu %c :%s", "542" },
 /* 543 */
   { ERR_NOSUCHSHUN, "%s :No such shun", "543" },
 /* 544 */
@@ -1121,7 +1121,7 @@ static Numeric replyTable[] = {
 /* 545 */
   { RPL_ENDOFSLIST, ":End of Shun List", "545" },
 /* 546 */
-  { RPL_STATSZLINE, "%c %s %Tu %Tu :%s", "546" },
+  { RPL_STATSZLINE, "%c %s %Tu %Tu %c :%s", "546" },
 /* 547 */
   { ERR_NOSUCHZLINE, "%s :No such Z:Line", "547" },
 /* 548 */

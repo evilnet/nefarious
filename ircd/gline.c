@@ -898,7 +898,8 @@ gline_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
 		 gline->gl_host ? "@" : "",
 		 gline->gl_host ? gline->gl_host : "",
 		 gline->gl_expire + TSoffset,
-                 gline->gl_lastmod + TSoffset, gline->gl_reason);
+                 gline->gl_lastmod + TSoffset,
+                 GlineIsActive(gline) ? '+' : '-', gline->gl_reason);
   }
 }
 
