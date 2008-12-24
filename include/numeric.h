@@ -433,7 +433,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_CHANOPRIVSNEEDED 482
 #define ERR_CANTKILLSERVER   483
 #define ERR_ISCHANSERVICE    484        /* Undernet extension */
-#define ERR_ISREALSERVICE    485        /* QuakeNet Asuka / Nefarious extension */
+/*      ERR_ISREALSERVICE    485        */
 /*	ERR_DESYNC	     484	 Dalnet,PTlink */
 /*	ERR_ATTACKDENY	     484	 unreal */
 /*	ERR_RESTRICTED	     484	   IRCnet extension */

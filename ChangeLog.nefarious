@@ -3,7 +3,23 @@
 
 2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
-	* ircd/m_account.c: Fix for bug SF bug 1585384.
+	* include/numeric.h: Removed ERR_ISREALSERVICE.
+
+	* ircd/channel.c: Fix for SF bug #1598028. Merged ERR_ISREALSERVICE
+	into ERR_ISCHANSERVICE.
+
+	* ircd/m_kick.c: Fix for SF bug #1598028. Merged ERR_ISREALSERVICE
+	into ERR_ISCHANSERVICE.
+
+	* ircd/m_kill.c: Fix for SF bug #1598028. Merged ERR_ISREALSERVICE
+	into ERR_ISCHANSERVICE.
+
+	* ircd/m_nick.c: Bug fix.
+
+	* ircd/s_err.c: Removed ERR_ISREALSERVICE.
+2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_account.c: Fix for SF bug 1585384.
 
 2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 

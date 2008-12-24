@@ -134,10 +134,10 @@ int m_kick(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
    * --Bigfoot
    */
   if (IsChannelService(who) && IsService(cli_user(who)->server))
-    return send_reply(sptr, ERR_ISREALSERVICE, cli_name(who), chptr->chname);
+    return send_reply(sptr, ERR_ISCHANSERVICE, cli_name(who), chptr->chname, "a network service");
 
   if (IsChannelService(who) && !IsXtraOp(sptr) && (who!=sptr))
-    return send_reply(sptr, ERR_ISCHANSERVICE, cli_name(who), chptr->chname);
+    return send_reply(sptr, ERR_ISCHANSERVICE, cli_name(who), chptr->chname, "an IRC operator");
 
   /* Don't allow halfops to kick chanops */
   if (is_chan_op(who, chptr) && is_half_op(sptr, chptr) && !is_chan_op(sptr, chptr))

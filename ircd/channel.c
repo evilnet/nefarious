@@ -4206,13 +4206,13 @@ mode_process_clients(struct ParseState *state)
 
 	else if (MyUser(state->sptr) && state->flags & MODE_PARSE_SET && (state->sptr != state->cli_change[i].client)) {
 	  if(IsService(cli_user(state->cli_change[i].client)->server) && IsChannelService(state->cli_change[i].client)){
-	    send_reply(state->sptr, ERR_ISREALSERVICE,
+	    send_reply(state->sptr, ERR_ISCHANSERVICE,
 		       cli_name(state->cli_change[i].client),
-		       state->chptr->chname);
+		       state->chptr->chname, "a network service");
 	  }else{
 	    send_reply(state->sptr, ERR_ISCHANSERVICE,
 		       cli_name(state->cli_change[i].client),
-		       state->chptr->chname);
+		       state->chptr->chname, "an IRC operator");
 	  }
 	  continue;
 	}

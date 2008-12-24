@@ -283,10 +283,10 @@ int mo_kill(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    * --Bigfoot
    */
   if (IsChannelService(victim) && IsService(cli_user(victim)->server))
-    return send_reply(sptr, ERR_ISREALSERVICE, "KILL", cli_name(victim));
+    return send_reply(sptr, ERR_ISCHANSERVICE, "KILL", cli_name(victim), "a network service");
 
   if (IsChannelService(victim) && !IsXtraOp(sptr) && !(victim==sptr))
-    return send_reply(sptr, ERR_ISCHANSERVICE, "KILL", cli_name(victim));
+    return send_reply(sptr, ERR_ISCHANSERVICE, "KILL", cli_name(victim), "an IRC operator");
 
 
   if (!MyConnect(victim) && !HasPriv(sptr, PRIV_KILL)) {
