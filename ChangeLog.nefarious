@@ -3,6 +3,10 @@
 
 2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_account.c: Fix for bug SF bug 1585384.
+
+2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/gline.c: Fix for SF bug #2401693 (gsync not working properly).
 
 	* ircd/s_err.c: Fix for SF bug #2401693 (gsync not working properly).
