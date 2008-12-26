@@ -1863,3 +1863,8 @@ EXTBANS
 If enabled extended bans will be allowed. Servers will still be able to set
 them. This only controls /mode +b <extended ban> by clients.
 
+LISTDELAY
+ * Type: integer
+ * Default: 15
+
+Length (in seconds) users will need to wait before /LIST will give results.

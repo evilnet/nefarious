@@ -1,6 +1,20 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added Feature LISTDELAY (default 15 seconds).
+
+	* doc/readme.features: Added LISTDELAY.
+
+	* include/ircd_features.h:  Added Feature LISTDELAY.
+
+	* ircd/ircd_features.c: Added Feature LISTDELAY.
+
+	* ircd/m_list.c: Added Feature LISTDELAY. Users will need to wait
+	the length (in seconds) set in LISTDELAY before they will get LIST
+	results.
+
 2008-12-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/numeric.h: Removed ERR_ISREALSERVICE.

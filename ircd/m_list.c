@@ -367,6 +367,15 @@ int m_list(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   int show_channels = 0, param;
   struct ListingArgs args;
 
+
+  if ((cli_firsttime(sptr) + feature_int(FEAT_LISTDELAY) > CurrentTime) && !IsOper(sptr)) {
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** You have not been connected long enough to use /list. You must wait %d seconds after connecting",
+                  sptr, feature_int(FEAT_LISTDELAY));
+    send_reply(sptr, RPL_LISTSTART);
+    send_reply(sptr, RPL_LISTEND);
+    return 0;
+  }
+
   if (cli_listing(sptr))            /* Already listing ? */
   {
     if (cli_listing(sptr))
