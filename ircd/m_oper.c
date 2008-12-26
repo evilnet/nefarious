@@ -281,8 +281,8 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     }
 
     if (IsAdmin(sptr)) {
-      sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator",
-                    parv[0], cli_user(sptr)->username, cli_sockhost(sptr));
+      sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Administrator as %s",
+                    parv[0], cli_user(sptr)->username, cli_sockhost(sptr), name);
 
       /* Autojoin admins to admin channel and oper channel (if enabled) */
       if (feature_bool(FEAT_AUTOJOIN_ADMIN)) {
@@ -295,9 +295,9 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
         m_join(sptr, sptr, 2, join);
       }
     } else
-      sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c)",
+      sendto_allops(&me, SNO_OLDSNO, "%s (%s@%s) is now an IRC Operator (%c) as %s",
                          parv[0], cli_user(sptr)->username, cli_sockhost(sptr),
-                         IsOper(sptr) ? 'O' : 'o'); 
+                         IsOper(sptr) ? 'O' : 'o', name); 
 
     if (feature_bool(FEAT_OPERMOTD))
       m_opermotd(sptr, sptr, 1, parv);
@@ -419,8 +419,8 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
          if (OIsAdmin(sptr)) {
            sendto_allops(&me, SNO_OLDSNO,
-                              "%s (%s@%s) is now an IRC Administrator",
-                              parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost);
+                              "%s (%s@%s) is now an IRC Administrator as %s",
+                              parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost, parv[2]);
 
            /* Autojoin admins to admin channel and oper channel (if enabled) */
            if (feature_bool(FEAT_AUTOJOIN_ADMIN)) {
@@ -434,8 +434,8 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
            }
          } else
             sendto_allops(&me, SNO_OLDSNO, 
-                               "%s (%s@%s) is now an IRC Operator (O)",
-                               parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost);
+                               "%s (%s@%s) is now an IRC Operator (O) as %s",
+                               parv[0], cli_user(sptr)->username, cli_user(sptr)->realhost, parv[2]);
 
 	 if (feature_bool(FEAT_OPERMOTD))
 	   m_opermotd(sptr, sptr, 1, parv);
