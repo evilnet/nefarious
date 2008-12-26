@@ -112,7 +112,8 @@ static int eline_flags[] = {
   EFLAG_GLINE,    'g',
   EFLAG_ZLINE,    'z',
   EFLAG_SHUN,     's',
-  EFLAG_SFILTER,  'S'
+  EFLAG_SFILTER,  'S',
+  EFLAG_LIST,     'L'
 };
 
 static int fline_rflags[] = {

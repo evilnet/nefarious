@@ -972,6 +972,8 @@ struct Client {
 #define EFLAG_SHUN      0x008
 /** Exception for Spam Filters */
 #define EFLAG_SFILTER   0x010
+/** Exception for List delays */
+#define EFLAG_LIST      0x020
 
 #define RFFLAG_AUTH     0x001
 #define RFFLAG_KILL     0x002

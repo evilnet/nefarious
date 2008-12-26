@@ -3,6 +3,17 @@
 
 2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added Exempt flag L for allowing people past
+	the new LISTDELAY feature.
+
+	* include/client.h: Added Exempt flag L.
+
+	* ircd/m_list.c: Added Exempt flag L.
+
+	* ircd/s_conf.c: Added Exempt flag L.
+
+2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added Feature LISTDELAY (default 15 seconds).
 
 	* doc/readme.features: Added LISTDELAY.
