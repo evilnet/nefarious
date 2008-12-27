@@ -3,6 +3,12 @@
 
 2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* configure: Regenerated.
+
+	* configure.in: SF feature Req 2263657. Enable SSL by default.
+
+2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added i exempt block flag and IDENT_PROMPT feature.
 
 	* doc/readme.features: Added IDENT_PROMPT feature.

@@ -23,7 +23,7 @@ dnl $Id$
 
 dnl Make sure we are in the correct directory (someone could have run
 dnl 'configure' with a wrong '--srcdir').
-AC_INIT(Nefarious IRCu, 1.2.0, evilnet-devel@lists.sourceforge.net)
+AC_INIT(Nefarious IRCu, 1.3.0, evilnet-devel@lists.sourceforge.net)
 AC_CONFIG_SRCDIR([ircd/ircd.c])
 
 dnl Set the default prefix
@@ -420,20 +420,20 @@ fi
 dnl **
 dnl **  SSL Library checks (OpenSSL)
 dnl ** 
-AC_MSG_CHECKING([whether to enable OpenSSL support])
+AC_MSG_CHECKING([whether to disable OpenSSL support])
 AC_ARG_ENABLE([ssl],
-[  --enable-ssl            Enable Secure Sockets Layer support],
-[unet_cv_enable_ssl=$enable_ssl],
-[AC_CACHE_VAL(unet_cv_enable_ssl,
-[unet_cv_enable_ssl=no])])
-AC_MSG_RESULT([$unet_cv_enable_ssl])
+[  --disable-ssl           Disable Secure Sockets Layer support],
+[unet_cv_disable_ssl=$enable_ssl],
+[AC_CACHE_VAL(unet_cv_disable_ssl, [unet_cv_disable_ssl=no])])
 
-dnl if test x"$unet_cv_enable_ssl" != xno; then
+AC_MSG_RESULT([$unet_cv_disable_ssl])
+
+dnl if test x"$unet_cv_disable_ssl" != xno; then
 dnl 	AC_DEFINE([USE_SSL], , [Define if you are using OpenSSL])
 dnl	SSL_C="ssl.c $SSL_C"
 dnl fi
 
-if test x"$unet_cv_enable_ssl" = xyes; then
+if test x"$unet_cv_disable_ssl" = xno; then
   AC_MSG_CHECKING([for OpenSSL includes])
   AC_ARG_WITH([openssl-includes],
   AS_HELP_STRING([--with-openssl-includes=dir], [Specify location of OpenSSL header files (default: /usr/include)]),
@@ -463,12 +463,12 @@ if test x"$unet_cv_enable_ssl" = xyes; then
   save_CFLAGS=$CFLAGS;
   CFLAGS="-lcrypto";
 
-  unet_cv_enable_ssl="no";
+  unet_cv_disable_ssl="yes";
   OPENSSL_LDFLAGS="";
   AC_CHECK_LIB(ssl, SSL_read, [
     AC_CHECK_LIB(crypto, X509_new, [
       AC_CHECK_HEADERS($base_ssl_inc/openssl/ssl.h $base_ssl_inc/openssl/err.h, [
-        unet_cv_enable_ssl="yes";
+        unet_cv_disable_ssl="no";
         OPENSSL_LDFLAGS="-lssl -lcrypto"
         SSL_C=ssl.c
         AC_SUBST(SSL_C)
@@ -477,7 +477,7 @@ if test x"$unet_cv_enable_ssl" = xyes; then
   ])
   CFLAGS=$save_CFLAGS
 
-  if test "x$unet_cv_enable_ssl" = xyes; then
+  if test "x$unet_cv_disable_ssl" = xno; then
     AC_DEFINE([USE_SSL], , [Define if you are using OpenSSL])
 
     LIBS="$LIBS -L$unet_cv_with_openssl_prefix $OPENSSL_LDFLAGS"
@@ -488,8 +488,8 @@ if test x"$unet_cv_enable_ssl" = xyes; then
 fi
 
 dnl dnl SSL/TLS Library checks (GNU TLS)
-dnl if test x"$unet_cv_enable_ssl" = xyes; then
-dnl   unet_cv_enable_ssl="no";
+dnl if test x"$unet_cv_disable_ssl" = xyes; then
+dnl   unet_cv_disable_ssl="no";
 dnl   AC_CHECK_HEADER(gnutls/gnutls.h,
 dnl    dnl Save the current libraries so the crypto stuff isn't always
 dnl    dnl included...
@@ -498,13 +498,13 @@ dnl    save_LIBS="$LIBS"
 dnl    TEST_GNUTLS_LIBS=`libgnutls-config --libs`
 dnl    AC_CHECK_LIB(gnutls, gnutls_init,
 dnl      [SSLLIBS=$TEST_GNUTLS_LIBS
-dnl       unet_cv_enable_ssl="yes"],,
+dnl       unet_cv_disable_ssl="yes"],,
 dnl       $TEST_GNUTLS_LIBS)
 dnl 
 dnl    LIBS=$save_LIBS)
 dnl fi
 
-dnl if test "x$unet_cv_enable_ssl" = xyes; then
+dnl if test "x$unet_cv_disable_ssl" = xyes; then
 dnl     AC_DEFINE([USE_SSL], , [Define if you are using SSL/TLS])
 dnl     SSL_C=ssl.c
 dnl     AC_SUBST(SSL_C)
@@ -596,7 +596,7 @@ fi
 dnl **
 dnl ** FIXME: KQUEUE + OpenSSL does not work with *BSD at present
 dnl **
-if test x"$unet_cv_enable_ssl" = xyes -a x"$OSDEP_C" = xos_bsd.c; then
+if test x"$unet_cv_disable_ssl" = xno -a x"$OSDEP_C" = xos_bsd.c; then
     unet_cv_enable_kqueue=no
 fi
 
