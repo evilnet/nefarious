@@ -3,6 +3,24 @@
 
 2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* configure: Regenerated.
+
+	* configure.in: Tweaks to the SVN checks.
+
+	* doc/example.conf: Added HIS_STATS_FORWARDS.
+
+	* doc/readme.features: Added HIS_STATS_FORWARDS.
+
+	* include/ircd_features.h: Added HIS_STATS_FORWARDS.
+
+	* ircd/ircd_features.c: Added HIS_STATS_FORWARDS.
+
+	* ircd/s_conf.c: Added /stats b.
+
+	* ircd/s_err.c: Tweaked RPL_STATSbLINE.
+
+2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_oper.c: Display oper usernames in "is an oper" notices.
 
 2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

@@ -385,6 +385,16 @@ stats_configured_svcs(struct Client* to, const struct StatDesc *sd, char* param)
 }
 
 static void
+stats_configured_forwards(struct Client* to, const struct StatDesc *sd, char* param)
+{
+  unsigned int i;
+  for (i=0; i<=255; i++) {
+    if (GlobalForwards[i])
+      send_reply(to, RPL_STATSbLINE, i, GlobalForwards[i]);
+  }
+}
+
+static void
 stats_sline(struct Client* to, const struct StatDesc *sd, char* param)
 {
   int y = 1, i = 1;
@@ -504,6 +514,9 @@ stats_help(struct Client* to, const struct StatDesc *sd, char* param)
  * stats.  Struct StatDesc is defined in s_stats.h.
  */
 struct StatDesc statsinfo[] = {
+  { 'b', "forwards", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FORWARDS,
+    stats_configured_forwards, 0,
+    "Service forwards." },
   { 'B', "mappings", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MAPPINGS,
     stats_configured_svcs, 0,
     "Service mappings." },

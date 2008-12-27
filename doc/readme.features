@@ -1105,6 +1105,12 @@ HIS_STATS_MODULES
 
 As per UnderNet CFV-165, this removes /STATS L from users.
 
+HIS_STATS_FORWARDS
+ * Type: boolean
+ * Default: TRUE
+
+As per UnderNet CFV-165, this removes /STATS b from users.
+
 HIS_STATS_MAPPINGS
  * Type: boolean
  * Default: TRUE

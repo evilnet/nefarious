@@ -513,14 +513,14 @@ dnl fi
 
 
 AC_CHECK_HEADERS(pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
-if test "$ac_cv_header_pcreposix_h" == "yes"; then
+if test x"$ac_cv_header_pcreposix_h" = xyes; then
         TRELIBS="-lpcreposix -lpcre"
 	AC_SUBST(TRELIBS)
  	AC_DEFINE([PCRE_SYSTEM], , [Define if PCRE is installed in /usr])
 else
 	ac_cv_header_pcreposix_h=no
 	AC_CHECK_HEADERS($HOME/include/pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
-	if test "$ac_cv_header_pcreposix_h" == "yes"; then
+	if test x"$ac_cv_header_pcreposix_h" = xyes; then
 		CPPFLAGS="$CPPFLAGS -I$HOME/include"
 		TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
 		AC_SUBST(TRELIBS)
@@ -552,6 +552,8 @@ done
 AC_MSG_RESULT([$found_svn])
 
 if test "x$found_svn" = "xno" ; then
+	SVNUPDATE=" "
+	AC_SUBST(SVNUPDATE)
 	echo ""
 	echo "Apparently you do not have subversion installed.  If you want the"
 	echo "latest updates to Nefarious IRCu then you should install this and"
