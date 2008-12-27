@@ -1290,7 +1290,11 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
       do {
         cli_cookie(sptr) = (ircrandom() & 0x7fffffff);
       } while (!cli_cookie(sptr));
-      sendrawto_one(cptr, MSG_PING " :%u", cli_cookie(sptr));
+
+      if (!IsIdented(sptr) && !find_eline(cptr, EFLAG_IDENT) && feature_bool(FEAT_IDENT_PROMPT)) {
+        sendrawto_one(cptr, MSG_NOTICE " %C :*** No response to ident check, to continue to connect you must type /QUOTE PONG %d", sptr, cli_cookie(sptr));
+      } else
+        sendrawto_one(cptr, MSG_PING " :%u", cli_cookie(sptr));
     }
     else if (*(cli_user(sptr))->host && cli_cookie(sptr) == COOKIE_VERIFIED) {
       /*

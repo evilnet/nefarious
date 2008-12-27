@@ -1874,3 +1874,12 @@ LISTDELAY
  * Default: 15
 
 Length (in seconds) users will need to wait before /LIST will give results.
+
+IDENT_PROMPT
+ * Type: boolean
+ * Default: FALSE
+
+If enabled clients who fail ident checks are not exempted will be presented
+with a message like the following to continue with the connection process.
+
+*** No response to ident check, to continue to connect you must type /QUOTE PONG COOKIE

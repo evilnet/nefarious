@@ -95,6 +95,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "s_bsd.h"
+#include "s_conf.h"
 #include "send.h"
 
 /* #include <assert.h> -- Now using assert in ircd_log.h */

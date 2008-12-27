@@ -974,6 +974,8 @@ struct Client {
 #define EFLAG_SFILTER   0x010
 /** Exception for List delays */
 #define EFLAG_LIST      0x020
+/** Exception for ident prompt checks */
+#define EFLAG_IDENT     0x040
 
 #define RFFLAG_AUTH     0x001
 #define RFFLAG_KILL     0x002
