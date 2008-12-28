@@ -670,6 +670,7 @@ static struct FeatureDesc {
   F_B(IPCHECK, FEAT_READ, 1, 0),
   F_I(MAX_BOUNCE, 0, 5, 0),
   F_I(LISTDELAY, 0, 15, 0),
+  F_B(ALLOWRMX, 0, 0, 0),
   F_B(IDENT_PROMPT, 0, 0, 0),
 
   F_B(CTCP_VERSIONING, 0, 0, 0), /* added by Vadtec 02/25/2008 */

@@ -1875,6 +1875,13 @@ LISTDELAY
 
 Length (in seconds) users will need to wait before /LIST will give results.
 
+ALLOWRMX
+ * Type: boolean
+ * Default: FALSE
+
+If enabled when HOST_HIDING_STYLE is set to 1 users will be able to remove
+their hidden host (-x).
+
 IDENT_PROMPT
  * Type: boolean
  * Default: FALSE

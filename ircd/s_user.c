@@ -2150,7 +2150,18 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
   	    ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
 	    ClearHiddenHost(acptr);
-	  }
+	  } else if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+            if (feature_bool(FEAT_ALLOWRMX)) {
+              if (!IsAccount(sptr)) {
+                ClearHiddenHost(sptr);
+              } else {
+                if (FlagHas(&setflags, FLAG_HIDDENHOST)) {
+                  unhide_hostmask(sptr);
+                  ClearHiddenHost(sptr);
+                }
+              }
+            }
+          }
 	}
 	break;
       case 'C':

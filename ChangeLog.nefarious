@@ -1,6 +1,19 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added Feature ALLOWRMX.
+
+	* doc/readme.features: Added ALLOWRMX.
+
+	* include/ircd_features.h: Added ALLOWRMX.
+
+	* ircd/ircd_features.c: Added ALLOWRMX (default FALSE).
+
+	* ircd/s_user.c: Added ALLOWRMX, allows people to remove their
+	hidden host when style 1 host hiding is enabled.
+
 2008-12-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenerated.
