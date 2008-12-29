@@ -1620,7 +1620,9 @@ int hide_hostmask(struct Client *cptr)
     return 0;
   }
 
-  sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":Registered");
+  if (feature_bool(FEAT_HIDDEN_HOST_QUIT))
+    sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":%s", feature_str(FEAT_HIDDEN_HOST_SET_MESSAGE));
+
   if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
     make_hidden_hostmask(cli_user(cptr)->host, cptr);
   else
@@ -1699,7 +1701,9 @@ int unhide_hostmask(struct Client *cptr)
     return 0;
   }
 
-  sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":UnRegistered");
+  if (feature_bool(FEAT_HIDDEN_HOST_QUIT))
+    sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":%s", feature_str(FEAT_HIDDEN_HOST_UNSET_MESSAGE));
+
   ircd_strncpy(cli_user(cptr)->host, cli_user(cptr)->realhost, HOSTLEN);
 
   /*

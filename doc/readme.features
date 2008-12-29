@@ -1898,3 +1898,15 @@ HIDDEN_HOST_QUIT
 When enabled the ircd will send "Registered" and "Unregistered" when clients
 set and unset +x (hidden host). This applies to both host hiding styles.
 
+HIDDEN_HOST_SET_MESSAGE
+ * Type: string
+ * Default: Registered
+
+The message sent in the quit message when a user sets +x.
+
+HIDDEN_HOST_UNSET_MESSAGE
+ * Type: string
+ * Default: UnRegistered
+
+The message sent in the quit message when a user sets -x.
+

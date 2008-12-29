@@ -3,6 +3,19 @@
 
 2008-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added Features HIDDEN_HOST_SET_MESSAGE/HIDDEN_HOST_UNSET_MESSAGE.
+
+	* doc/readme.features: Added Features HIDDEN_HOST_SET_MESSAGE/HIDDEN_HOST_UNSET_MESSAGE.
+
+	* include/ircd_features.c: Added Features HIDDEN_HOST_SET_MESSAGE/HIDDEN_HOST_UNSET_MESSAGE.
+
+	* ircd/ircd_features.c: Added Features HIDDEN_HOST_SET_MESSAGE/HIDDEN_HOST_UNSET_MESSAGE.
+
+	* ircd/s_user.c: Added Feature HIDDEN_HOST_SET_MESSAGE/HIDDEN_HOST_UNSET_MESSAGE.
+	These control what is sent out in the quit messages when users set and unset +x.
+
+2008-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added Feature HIDDEN_HOST_QUIT.
 
 	* doc/readme.features: Added Feature HIDDEN_HOST_QUIT.
