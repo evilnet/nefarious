@@ -1131,7 +1131,7 @@ static Numeric replyTable[] = {
 /* 550 */
   { ERR_INVALIDMASK, ":Z:line masks must an IP address mask.", "550" },
 /* 551 */
-  { 0 },
+  { ERR_LINKCHAN, ":%s is redirecting you to %s . As you have +L set you will need to /join this manually", "551"  },
 /* 552 */
   { 0 },
 /* 553 */

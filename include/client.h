@@ -185,6 +185,7 @@ enum Flag {
     FLAG_NAMESX,                    /**< Client supports extended NAMES replies */
     FLAG_UHNAMES,                   /**< Client supports extended NAMES replies */
     FLAG_PROPAGATED,                /**< Client has been propagated to other servers */
+    FLAG_NOLINK,                    /**< Client will not automatically get redirected if +L is set on a chan */
 
     FLAG_PRIVDEAF,                  /**< Client is deaf to all private messages */
 
@@ -712,6 +713,8 @@ struct Client {
 #define IsPropagated(x)         HasFlag(x, FLAG_PROPAGATED)
 /** Return non-zero if the client is private deaf */
 #define IsPrivDeaf(x)           HasFlag(x, FLAG_PRIVDEAF)
+/** Return non-zero if the client doesnt follow +L */
+#define IsNoLink(x)             HasFlag(x, FLAG_NOLINK)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -799,6 +802,8 @@ struct Client {
 #define SetPropagated(x)        SetFlag(x, FLAG_PROPAGATED)
 /** Mark a client as being private deaf. */
 #define SetPrivDeaf(x)          SetFlag(x, FLAG_PRIVDEAF)
+/** Mark a client as being not following +L */
+#define SetNoLink(x)            SetFlag(x, FLAG_NOLINK)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -868,6 +873,8 @@ struct Client {
 #define ClearPropagated(x)      ClrFlag(x, FLAG_PROPAGATED)
 /** Client is no longer private deaf. */
 #define ClearPrivDeaf(x)        ClrFlag(x, FLAG_PRIVDEAF)
+/** Client is no longer not following +L */
+#define ClearNoLink(x)          ClrFlag(x, FLAG_NOLINK)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \

@@ -270,10 +270,14 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
     if (chptr) {
       if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
-        send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
-        bjoin[0] = cli_name(sptr);
-        bjoin[1] = chptr->mode.redirect;
-        do_join(cptr, sptr, 2, bjoin);
+        if (IsNoLink(sptr))
+          send_reply(sptr, ERR_LINKCHAN, chptr->chname, chptr->mode.redirect);
+        else {
+          send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+          bjoin[0] = cli_name(sptr);
+          bjoin[1] = chptr->mode.redirect;
+          do_join(cptr, sptr, 2, bjoin);
+        }
         continue;
       }
 

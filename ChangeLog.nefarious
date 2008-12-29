@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/client.c: Added FLAG_NOLINK.
+
+	* include/numeric.h: Added ERR_LINKCHAN.
+
+	* include/supported.h: Added usermode +L.
+
+	* ircd/m_join.c: Make +L do what its intended to do (see below).
+
+	* ircd/s_err.c: Added ERR_LINKCHAN.
+
+	* ircd/s_user.c: Added usermode +L. When set users joining channels
+	that have +L set will not be automatically redirected. Instead they
+	will be notified via ERR_LINKCHAN.
+
 2008-12-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added Feature ALLOWRMX.

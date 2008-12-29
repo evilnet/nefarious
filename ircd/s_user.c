@@ -1050,7 +1050,8 @@ static const struct UserMode {
   { FLAG_NOIDLE,      'I' },
   { FLAG_ADMIN,       'a' },
   { FLAG_WHOIS,       'W' },
-  { FLAG_SSL,         'z' }
+  { FLAG_SSL,         'z' },
+  { FLAG_NOLINK,      'L' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -2231,6 +2232,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
             ClearSSL(acptr);
           }
         }
+        break;
+      case 'L':
+        if (what == MODE_ADD)
+          SetNoLink(acptr);
+        else
+          ClearNoLink(acptr);
         break;
       default:
 	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, *m);
