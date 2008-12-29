@@ -3,6 +3,20 @@
 
 2008-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added Feature HIDDEN_HOST_QUIT.
+
+	* doc/readme.features: Added Feature HIDDEN_HOST_QUIT.
+
+	* include/ircd_features.c: Added Feature HIDDEN_HOST_QUIT.
+
+	* ircd/ircd_features.c: Added Feature HIDDEN_HOST_QUIT.
+
+	* ircd/s_user.c: Added Feature HIDDEN_HOST_QUIT. When enabled the ircd will
+	send Registered and UnRegistered quit messages when users set and unset +x
+	(hidden hosts). This applies to both host hiding styles.
+
+2008-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/client.c: Added FLAG_NOLINK.
 
 	* include/numeric.h: Added ERR_LINKCHAN.

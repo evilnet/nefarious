@@ -1596,17 +1596,23 @@ int hide_hostmask(struct Client *cptr)
   if (MyConnect(cptr) && !feature_bool(FEAT_HOST_HIDING))
     return 0;
 
-  if (!HasHiddenHost(cptr))
-    return 0;
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    if (!HasHiddenHost(cptr))
+      return 0;
+  } else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
+    if (!IsHiddenHost(cptr))
+      return 0;
+  }
 
   /* Invalidate all bans against the user so we check them again */
-  for (chan = (cli_user(cptr))->channel; chan;
-       chan = chan->next_channel)
-    ClearBanValid(chan);
+  if (feature_bool(FEAT_HIDDEN_HOST_QUIT)) {
+    for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
+      ClearBanValid(chan);
 
-  /* Invalidate all excepts against the user so we check them again */
-  for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
-    ClearExceptValid(chan);
+    /* Invalidate all excepts against the user so we check them again */
+    for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
+      ClearExceptValid(chan);
+  }
 
   /* If user is +h, don't hide the host. Set flag to keep sync though. */
   if (HasSetHost(cptr)) {
@@ -1615,7 +1621,10 @@ int hide_hostmask(struct Client *cptr)
   }
 
   sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":Registered");
-  make_hidden_hostmask(cli_user(cptr)->host, cptr);
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
+    make_hidden_hostmask(cli_user(cptr)->host, cptr);
+  else
+    ircd_snprintf(0, cli_user(cptr)->host, HOSTLEN, "%s", cli_user(cptr)->virthost);
 
   /* ok, the client is now fully hidden, so let them know -- hikari */
   if (MyConnect(cptr) && IsRegistered(cptr) &&
@@ -1626,38 +1635,40 @@ int hide_hostmask(struct Client *cptr)
    * Go through all channels the client was on, rejoin him
    * and set the modes, if any
    */
-  for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
-    if (IsZombie(chan))
-      continue;
-    sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr, 0,
-      "%H", chan->channel);
-    if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
-      sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
-        "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
-    } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
-      if(IsChanOp(chan) && IsHalfOp(chan)) {
-      	sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+  if (feature_bool(FEAT_HIDDEN_HOST_QUIT)) {
+    for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
+      if (IsZombie(chan))
+        continue;
+      sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr, 0,
+        "%H", chan->channel);
+      if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
+        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+          "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
+      } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
+        if(IsChanOp(chan) && IsHalfOp(chan)) {
+        	sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
 	                  	         "%H +oh %C %C", chan->channel, cptr, cptr);
-      }
-      else if(IsChanOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+       }
+        else if(IsChanOp(chan) && HasVoice(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                         "%H +ov %C %C", chan->channel, cptr, cptr);
-      }
-      else if(IsHalfOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(IsHalfOp(chan) && HasVoice(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +hv %C %C", chan->channel, cptr, cptr);
-      }
-      else if(IsChanOp(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(IsChanOp(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +o %C", chan->channel, cptr);
-      }
-      else if(IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(IsHalfOp(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +h %C", chan->channel, cptr);
-      }
-      else if(HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(HasVoice(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +v %C", chan->channel, cptr);
+        }
       }
     }
   }
@@ -1673,13 +1684,14 @@ int unhide_hostmask(struct Client *cptr)
   struct Membership *chan;
 
   /* Invalidate all bans against the user so we check them again */
-  for (chan = (cli_user(cptr))->channel; chan;
-       chan = chan->next_channel)
-    ClearBanValid(chan);
+  if (feature_bool(FEAT_HIDDEN_HOST_QUIT)) {
+    for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
+      ClearBanValid(chan);
 
-  /* Invalidate all excepts against the user so we check them again */
-  for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
-    ClearExceptValid(chan);
+    /* Invalidate all excepts against the user so we check them again */
+    for (chan = (cli_user(cptr))->channel; chan; chan = chan->next_channel)
+      ClearExceptValid(chan);
+  }
 
   /* If user is +h, don't unhide the host. Set flag to keep sync though. */
   if (HasSetHost(cptr)) {
@@ -1694,38 +1706,40 @@ int unhide_hostmask(struct Client *cptr)
    * Go through all channels the client was on, rejoin him
    * and set the modes, if any
    */
-  for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
-    if (IsZombie(chan))
-      continue;
-    sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr, 0,
-      "%H", chan->channel);
-    if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
-      sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
-        "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
-    } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
-      if(IsChanOp(chan) && IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+  if (feature_bool(FEAT_HIDDEN_HOST_QUIT)) {
+    for (chan = cli_user(cptr)->channel; chan; chan = chan->next_channel) {
+      if (IsZombie(chan))
+        continue;
+      sendcmdto_channel_butserv_butone(cptr, CMD_JOIN, chan->channel, cptr, 0,
+        "%H", chan->channel);
+      if (IsChanOp(chan) && HasVoice(chan) && IsHalfOp(chan)) {
+        sendcmdto_channel_butserv_butone(&me, CMD_MODE, chan->channel, cptr, 0,
+          "%H +ohv %C %C %C", chan->channel, cptr, cptr, cptr);
+      } else if (IsChanOp(chan) || HasVoice(chan) || IsHalfOp(chan)) {
+        if(IsChanOp(chan) && IsHalfOp(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +oh %C %C", chan->channel, cptr, cptr);
-      }
-      else if(IsChanOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+       }
+        else if(IsChanOp(chan) && HasVoice(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                         "%H +ov %C %C", chan->channel, cptr, cptr);
-      }
-      else if(IsHalfOp(chan) && HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(IsHalfOp(chan) && HasVoice(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +hv %C %C", chan->channel, cptr, cptr);
-      }
-      else if(IsChanOp(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(IsChanOp(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +o %C", chan->channel, cptr);
-      }
-      else if(IsHalfOp(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(IsHalfOp(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +h %C", chan->channel, cptr);
-      }
-      else if(HasVoice(chan)) {
-        sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
+        }
+        else if(HasVoice(chan)) {
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_MODE, chan->channel, cptr, 0,
                                          "%H +v %C", chan->channel, cptr);
+        }
       }
     }
   }
@@ -2149,8 +2163,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	    do_host_hiding = 1;
 	} else {
 	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-  	    ircd_strncpy(cli_user(acptr)->host, cli_user(acptr)->realhost, HOSTLEN);
-	    ClearHiddenHost(acptr);
+            unhide_hostmask(sptr);
+	    ClearHiddenHost(sptr);
 	  } else if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
             if (feature_bool(FEAT_ALLOWRMX)) {
               if (!IsAccount(sptr)) {
@@ -2351,7 +2365,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	hide_hostmask(acptr);
     }
     else if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-      ircd_snprintf(0, cli_user(acptr)->host, HOSTLEN, "%s", cli_user(acptr)->virthost);
+      hide_hostmask(acptr);
       SetFlag(acptr, FLAG_HIDDENHOST);
     }
   }

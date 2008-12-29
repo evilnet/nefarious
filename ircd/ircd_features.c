@@ -672,6 +672,7 @@ static struct FeatureDesc {
   F_I(LISTDELAY, 0, 15, 0),
   F_B(ALLOWRMX, 0, 0, 0),
   F_B(IDENT_PROMPT, 0, 0, 0),
+  F_B(HIDDEN_HOST_QUIT, 0, 1, 0),
 
   F_B(CTCP_VERSIONING, 0, 0, 0), /* added by Vadtec 02/25/2008 */
   F_B(CTCP_VERSIONING_KILL, 0, 0, 0), /* added by Vadtec 02/27/2008 */

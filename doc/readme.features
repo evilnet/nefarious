@@ -1890,3 +1890,11 @@ If enabled clients who fail ident checks are not exempted will be presented
 with a message like the following to continue with the connection process.
 
 *** No response to ident check, to continue to connect you must type /QUOTE PONG COOKIE
+
+HIDDEN_HOST_QUIT
+ * Type: boolean
+ * Default: TRUE
+
+When enabled the ircd will send "Registered" and "Unregistered" when clients
+set and unset +x (hidden host). This applies to both host hiding styles.
+
