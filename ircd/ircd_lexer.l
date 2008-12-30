@@ -86,6 +86,7 @@ static struct lexer_token {
   TOKEN(NUMERIC),
   TOKEN(NICK),
   TOKEN(JUPE),
+  TOKEN(NICKJUPE),
   TOKEN(DESCRIPTION),
   TOKEN(CLIENT),
   TOKEN(REAL),
@@ -191,6 +192,7 @@ static struct lexer_token {
   { "walk_lchan", TPRIV_WALK_LCHAN },
   { "wide_gline", TPRIV_WIDE_GLINE },
   { "whox", TPRIV_WHOX },
+  { "display_mode", TPRIV_DISPLAY_MODE },
   { NULL, 0 }
 };
 static int ntokens;

@@ -209,6 +209,7 @@ static void free_slist(struct SLink **link) {
 %token EXEMPT
 %token MOTD
 %token JUPE
+%token NICKJUPE
 %token NICK
 %token NUMERIC
 %token DESCRIPTION
@@ -282,6 +283,7 @@ static void free_slist(struct SLink **link) {
 %token TPRIV_HIDE_IDLE
 %token TPRIV_XTRAOP
 %token TPRIV_HIDE_CHANNELS
+%token TPRIV_DISPLAY_MODE
 /* and some types... */
 %type <num> sizespec
 %type <num> timespec timefactor factoredtimes factoredtime
@@ -488,6 +490,30 @@ connectmaxhops: MAXHOPS '=' expr ';'
 };
 connectauto: AUTOCONNECT '=' YES ';' { flags |= CONF_AUTOCONNECT; }
  | AUTOCONNECT '=' NO ';' { flags &= ~CONF_AUTOCONNECT; };
+
+
+uworldblock: UWORLD '{' uworlditems '}' ';';
+uworlditems: uworlditem uworlditems | uworlditem;
+uworlditem: uworldname;
+uworldname: NAME '=' QSTRING ';'
+{
+  conf_make_uworld($3);
+};
+
+uworldblock: UWORLD QSTRING ';'
+{
+  conf_make_uworld($2);
+}
+
+
+jupeblock: NICKJUPE '{' jupeitems '}' ';';
+jupeitems: jupeitem jupeitems | jupeitem;
+jupeitem: jupenick;
+jupenick: NICK '=' QSTRING ';'
+{
+  addNickJupes($3);
+  MyFree($3);
+};
 
 
 clientblock: CLIENT
@@ -763,7 +789,8 @@ priv: privtype '=' yesorno ';'
   invert = 0;
 };
 
-privtype:  TPRIV_CHAN_LIMIT { $$ = PRIV_CHAN_LIMIT; } |
+privtype:  TPRIV_DISPLAY_MODE { $$ = PRIV_DISPLAY_MODE; } |
+           TPRIV_CHAN_LIMIT { $$ = PRIV_CHAN_LIMIT; } |
            TPRIV_MODE_LCHAN { $$ = PRIV_MODE_LCHAN; } |
            TPRIV_WALK_LCHAN { $$ = PRIV_WALK_LCHAN; } |
            TPRIV_DEOP_LCHAN { $$ = PRIV_DEOP_LCHAN; } |
@@ -805,8 +832,8 @@ privtype:  TPRIV_CHAN_LIMIT { $$ = PRIV_CHAN_LIMIT; } |
            TPRIV_WHOIS_NOTICE { $$ = PRIV_WHOIS_NOTICE; } |
            TPRIV_HIDE_IDLE { $$ = PRIV_HIDE_IDLE; } |
            TPRIV_XTRAOP { $$ = PRIV_XTRAOP; } |
-           TPRIV_HIDE_CHANNELS { $$ = PRIV_HIDE_CHANNELS; }; |
-           LOCAL { $$ = PRIV_PROPAGATE; invert = 1; }
+           TPRIV_HIDE_CHANNELS { $$ = PRIV_HIDE_CHANNELS; } |
+           LOCAL { $$ = PRIV_PROPAGATE; invert = 1; } ;
 
 yesorno: YES { $$ = 1; } | NO { $$ = 0; };
 
@@ -1021,30 +1048,6 @@ featureitem: QSTRING
   for (ii = 0; ii < stringno; ++ii)
     MyFree(stringlist[ii]);
 };
-
-uworldblock: UWORLD '{' uworlditems '}' ';';
-uworlditems: uworlditem uworlditems | uworlditem;
-uworlditem: uworldname;
-uworldname: NAME '=' QSTRING ';'
-{
-  conf_make_uworld($3);
-};
-
-uworldblock: UWORLD QSTRING ';'
-{
-  conf_make_uworld($2);
-}
-
-
-jupeblock: JUPE '{' jupeitems '}' ';' ;
-jupeitems: jupeitem jupeitems | jupeitem;
-jupeitem: jupenick;
-jupenick: NICK '=' QSTRING ';'
-{
-  addNickJupes($3);
-  MyFree($3);
-};
-
 
 /* The port block... */
 portblock: PORT {

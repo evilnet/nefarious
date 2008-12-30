@@ -105,6 +105,7 @@ enum Priv {
   PRIV_SEE_CHAN,        /**< oper can see in secret chans */
   PRIV_PROPAGATE,       /**< propagate oper status */
   PRIV_DISPLAY,         /**< "Is an oper" displayed */
+  PRIV_DISPLAY_MODE,    /**< oper can set +H hide oper */
   PRIV_SEE_OPERS,       /**< display hidden opers */
   PRIV_WIDE_GLINE,      /**< oper can set wider G-lines */
   PRIV_WIDE_ZLINE,      /**< oper can set wider Z-lines */
@@ -186,6 +187,7 @@ enum Flag {
     FLAG_UHNAMES,                   /**< Client supports extended NAMES replies */
     FLAG_PROPAGATED,                /**< Client has been propagated to other servers */
     FLAG_NOLINK,                    /**< Client will not automatically get redirected if +L is set on a chan */
+    FLAG_DISPLAY_MODE,              /**< Oper can hide "Is an IRC Operator/Administrator */
 
     FLAG_PRIVDEAF,                  /**< Client is deaf to all private messages */
 
@@ -715,6 +717,8 @@ struct Client {
 #define IsPrivDeaf(x)           HasFlag(x, FLAG_PRIVDEAF)
 /** Return non-zero if the client doesnt follow +L */
 #define IsNoLink(x)             HasFlag(x, FLAG_NOLINK)
+/** Return non-zero if the oper has +H set */
+#define IsHideOper(x)           HasFlag(x, FLAG_DISPLAY_MODE)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -804,6 +808,8 @@ struct Client {
 #define SetPrivDeaf(x)          SetFlag(x, FLAG_PRIVDEAF)
 /** Mark a client as being not following +L */
 #define SetNoLink(x)            SetFlag(x, FLAG_NOLINK)
+/** Mark a oper as having +H set */
+#define SetHideOper(x)          SetFlag(x, FLAG_DISPLAY_MODE)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -875,11 +881,17 @@ struct Client {
 #define ClearPrivDeaf(x)        ClrFlag(x, FLAG_PRIVDEAF)
 /** Client is no longer not following +L */
 #define ClearNoLink(x)          ClrFlag(x, FLAG_NOLINK)
+/** Oper is no longer hiding their status */
+#define ClearHideOper(x)        ClrFlag(x, FLAG_DISPLAY_MODE)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \
 			      && (HasPriv(acptr, PRIV_DISPLAY) \
 			      || HasPriv(sptr, PRIV_SEE_OPERS)))
+
+#define HideOper(acptr) (IsAnOper(acptr) \
+                         && HasPriv(acptr, PRIV_DISPLAY_MODE) \
+                         && IsHideOper(acptr))
 
 /** Oper flag global (+O). */
 #define OFLAG_GLOBAL	0x001

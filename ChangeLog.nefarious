@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added DISPLAY_MODE priv. Also renamed Jupe to
+	NickJupe.
+
+	* include/client.h: Added DISPLAY_MODE +H oper mode.
+
+	* include/supported.h: Added H to the usermode list.
+
+	* ircd/client.c: Added DISPLAY_MODE priv.
+
+	* ircd/ircd_lexer.l: Added DISPLAY_MODE priv.
+
+	* ircd/ircd_parser.y: Added DISPLAY_MODE priv. Also renamed the Jupe section
+	to NickJupe as its conflicting with the JUPE priv.
+
+	* ircd/m_whois.c: Added DISPLAY_MODE +H oper mode. Allows an oper to
+	hide their whois is an oper reply. For use in situations where an oper needs
+	to join a drone channel without being detected as an oper.
+
+	* ircd/s_misc.c: Adjsut oper count checks.
+
+	* ircd/s_user.c: Added DISPLAY_MODE +H oper mode.
+
 2008-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added Features HIDDEN_HOST_SET_MESSAGE/HIDDEN_HOST_UNSET_MESSAGE.

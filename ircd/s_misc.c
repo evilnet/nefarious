@@ -263,7 +263,7 @@ static void exit_one_client(struct Client* bcptr, const char* comment)
 
     if (IsInvisible(bcptr))
       --UserStats.inv_clients;
-    if (IsOper(bcptr))
+    if (IsOper(bcptr) && !IsHideOper(bcptr))
       --UserStats.opers;
     if (IsAccount(bcptr))
       --UserStats.authed;

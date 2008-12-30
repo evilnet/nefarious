@@ -755,8 +755,10 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
   if (IsInvisible(sptr))
     ++UserStats.inv_clients;
-  if (IsOper(sptr))
+  if (IsOper(sptr)) {
+Debug((DEBUG_DEBUG, "Test 4"));
     ++UserStats.opers;
+}
   if (IsAccount(sptr))
     ++UserStats.authed;
 
@@ -1051,6 +1053,7 @@ static const struct UserMode {
   { FLAG_ADMIN,       'a' },
   { FLAG_WHOIS,       'W' },
   { FLAG_SSL,         'z' },
+  { FLAG_DISPLAY_MODE, 'H' },
   { FLAG_NOLINK,      'L' }
 };
 
@@ -2086,6 +2089,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
           SetOper(acptr);
         }
         else {
+          /* ClearHideOper(acptr); done later on */
           ClearAdmin(acptr);
           ClearOper(acptr);
           ClearLocOp(acptr);
@@ -2241,6 +2245,21 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	else
 	  ClearWhois(acptr);
 	break;
+      case 'H':
+        if (what == MODE_ADD) {
+          if (!IsHideOper(acptr)) {
+Debug((DEBUG_DEBUG, "Test 5"));
+            --UserStats.opers;
+          }
+          SetHideOper(acptr);
+        } else {
+          if (IsHideOper(acptr)) {
+            ++UserStats.opers;
+Debug((DEBUG_DEBUG, "Test 6"));
+          }
+          ClearHideOper(acptr);
+        }
+        break;
       case 'z':
         if ( IsServer(cptr) ) {
           if (what == MODE_ADD) {
@@ -2331,6 +2350,13 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	!((feature_bool(FEAT_OPER_WHOIS_PARANOIA) ||
         HasPriv(acptr, PRIV_WHOIS_NOTICE)) && IsOper(acptr)))
       ClearWhois(acptr);
+
+    if (!FlagHas(&setflags, FLAG_DISPLAY_MODE) && !(HasPriv(acptr, PRIV_DISPLAY_MODE) && IsOper(acptr))) {
+Debug((DEBUG_DEBUG, "Test 1"));
+      if (IsHideOper(acptr))
+        ++UserStats.opers; /* count is added when mode is set, decrement if they cant set +H */
+      ClearHideOper(acptr);
+    }
   }
 
   if (MyConnect(acptr)) {
@@ -2350,13 +2376,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
    * Compare new flags with old flags and send string which
    * will cause servers to update correctly.
    */
-  if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr)) { /* user now oper */
+  if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr) && !IsHideOper(acptr)) { /* user now oper */
+Debug((DEBUG_DEBUG, "Test 2"));
     ++UserStats.opers;
   }
   if (HasPriv(acptr, PRIV_PROPAGATE)) /* remember propagate privilege setting */
     prop = 1;
   if (FlagHas(&setflags, FLAG_OPER) && !IsOper(acptr)) { /* user no longer oper */
-    --UserStats.opers;
+    if (!IsHideOper(acptr))
+      --UserStats.opers;
+    ClearHideOper(acptr);
     client_set_privs(acptr, NULL); /* will clear propagate privilege */
   }
   if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(acptr))
