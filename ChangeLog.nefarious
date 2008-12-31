@@ -3,6 +3,11 @@
 
 2009-01-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_connect.c: Show the real server instead of the wildcard
+	server during remote connects.
+
+2009-01-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/map.h: Update dump_map args.
 
 	* ircd/m_endburst.c: : Show a map of new servers on links (from QuakeNet).
