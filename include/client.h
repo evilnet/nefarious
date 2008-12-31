@@ -886,8 +886,9 @@ struct Client {
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \
-			      && (HasPriv(acptr, PRIV_DISPLAY) \
-			      || HasPriv(sptr, PRIV_SEE_OPERS)))
+                              && ((HasPriv(acptr, PRIV_DISPLAY) \
+                              && !HideOper(acptr)) || \
+                              HasPriv(sptr, PRIV_SEE_OPERS)))
 
 #define HideOper(acptr) (IsAnOper(acptr) \
                          && HasPriv(acptr, PRIV_DISPLAY_MODE) \

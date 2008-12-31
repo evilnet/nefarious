@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-31  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_whois.c: Removed the "is oper hidden" check from here.
+
+	* include/client.h: Re-added "is oper hidden" check to SeeOper()
+	macro here. This way the check will be used everywhere an oper's
+	status will show.
+
 2008-12-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added DISPLAY_MODE priv. Also renamed Jupe to

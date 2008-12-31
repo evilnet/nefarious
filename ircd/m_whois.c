@@ -227,10 +227,9 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
       send_reply(sptr, RPL_AWAY, name, user->away);
 
     if (SeeOper(sptr, acptr)) {
-      if (!HideOper(acptr))
-        send_reply(sptr, RPL_WHOISOPERATOR, name, IsAdmin(acptr) ?
-  		   feature_str(FEAT_WHOIS_ADMIN) :
-		   feature_str(FEAT_WHOIS_OPER));
+      send_reply(sptr, RPL_WHOISOPERATOR, name, IsAdmin(acptr) ?
+		 feature_str(FEAT_WHOIS_ADMIN) :
+		 feature_str(FEAT_WHOIS_OPER));
       if (IsWhois(acptr) && (sptr != acptr))
 	sendcmdto_one(&me, CMD_NOTICE, acptr,
 		      "%C :*** Notice -- %s (%s@%s) did a /whois on you.",
