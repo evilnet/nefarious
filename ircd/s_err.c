@@ -507,7 +507,7 @@ static Numeric replyTable[] = {
 /* 238 */
   { RPL_STATSFLINE, "%c %s %s", "238" },
 /* 239 */
-  { RPL_STATSFILTERLINE, "f %s %s %s %d :%s", "239" },
+  { RPL_STATSFILTERLINE, "f %s %s %s %d %s :%s", "239" },
 /* 240 */
   { RPL_STATSXLINE, "X %s %s %s %s %s :%s", "240" },
 /* 241 */

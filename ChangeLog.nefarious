@@ -1,6 +1,27 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2008-12-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added FILTER_FATAL_TIME (500ms) and FILTER_WARN_TIME (250ms).
+
+	* doc/readme.features: Added FILTER_FATAL_TIME and FILTER_WARN_TIME.
+
+	* include/ircd_features.h: Added FILTER_FATAL_TIME and FILTER_WARN_TIME.
+
+	* include/s_conf.h: Added spam filter active marker.
+
+	* ircd/ircd_features.c: Added FILTER_FATAL_TIME and FILTER_WARN_TIME.
+
+	* ircd/ircd_parser.y: Added spam filter active marker.
+
+	* ircd/m_svsident.c: Bug fix.
+
+	* ircd/s_conf.c: Check each spam filter, they take too long to execute
+	then disable them.
+
+	* ircd/s_err.c: Added extra field to RPL_STATSFILTERLINE.
+
 2008-12-31  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_oper.c: Small fix for PRIVS on OPER propagation

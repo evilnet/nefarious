@@ -76,8 +76,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#ifdef HPUX
+#include <sys/syscall.h>
+#define getrusage(a,b) syscall(SYS_GETRUSAGE, a, b)
+#endif
 
 #ifndef INADDR_NONE
 #define INADDR_NONE 0xffffffff
@@ -1046,6 +1052,7 @@ void clear_fline_list(void)
     GlobalFList = fline->next;
     regfree(&fline->filter);
     fline->length = 0;
+    fline->active = 0;
     MyFree(fline->nchan);
     MyFree(fline->rawfilter);
     MyFree(fline->wflags);
@@ -1776,6 +1783,9 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   struct fline *fline;
   struct Channel *chptr;
   struct Membership *member,*nmember;
+  struct rusage rnow, rprev;
+  long ms_past;
+  int regmatch = 0;
   int ret = 0;
   int brk = 0;
   char temp1[BUFSIZE]; 
@@ -1788,11 +1798,17 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
 
 
   for (fline = GlobalFList; fline; fline = fline->next) {
+    regmatch = 0;
     rf_flag = reactfflagstr(fline->rflags);
     wf_flag = watchfflagstr(fline->wflags);
 
     if (IsAnOper(sptr))
       break;
+
+    if (fline->active == 0) {
+      Debug((DEBUG_DEBUG, "filter has been disabled"));
+      break;
+    }
 
     if (rf_flag & RFFLAG_AUTH && IsAccount(sptr)) {
       Debug((DEBUG_DEBUG, "regexec IsAccount and FFLAG_AUTH yes, breaking"));
@@ -1837,11 +1853,31 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
     }
 
     if (wf_flag & flags) {
-      if(0 == regexec(&fline->filter, string, 0, 0, 0)) {
+      memset(&rnow, 0, sizeof(rnow));
+      memset(&rprev, 0, sizeof(rnow));
+
+      getrusage(RUSAGE_SELF, &rprev);
+      regmatch = regexec(&fline->filter, string, 0, 0, 0);
+      getrusage(RUSAGE_SELF, &rnow);
+
+
+      ms_past = ((rnow.ru_utime.tv_sec - rprev.ru_utime.tv_sec) * 1000) +
+                ((rnow.ru_utime.tv_usec - rprev.ru_utime.tv_usec) / 1000);
+
+      if ((feature_int(FEAT_FILTER_FATAL_TIME) > 0) && (ms_past > feature_int(FEAT_FILTER_FATAL_TIME))) {
+        sendto_allops(&me, SNO_OLDSNO, "Warning: Very slow spam filter detected (%s) - (took %ld msec to execute). Filter has been disabled",
+                      fline->rawfilter, ms_past);
+        fline->active = 0;
+        break;
+      } else if ((feature_int(FEAT_FILTER_WARN_TIME) > 0) && (ms_past > feature_int(FEAT_FILTER_WARN_TIME))) {
+        sendto_allops(&me, SNO_OLDSNO, "Warning: Slow spam filter detected (%s) - (took %ld msec to execute).",
+                      fline->rawfilter, ms_past);
+      }
+
+      if (0 == regmatch) {
         Debug((DEBUG_DEBUG, "regexec match"));
         if (rf_flag & RFFLAG_CALERT) {
           chptr = FindChannel(fline->nchan);
-
           if (chptr) {
             ircd_snprintf(0, temp1, sizeof(temp1), "%s has triggered a filter the following %s%s%s%s", cli_name(sptr), get_type(flags),
                           !EmptyString(target) ? " (Targets: " : "", !EmptyString(target) ? target : "", !EmptyString(target) ? ")" : "");

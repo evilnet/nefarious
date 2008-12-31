@@ -1598,6 +1598,7 @@ sfilterblock: SFILTER {
       }
 
       fline->length = length;
+      fline->active = 1;
 
       fline->next = GlobalFList;
       GlobalFList = fline;

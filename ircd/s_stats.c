@@ -216,7 +216,8 @@ stats_flines(struct Client* to, const struct StatDesc *sd, char* param)
 
   for (fline = GlobalFList; fline; fline = fline->next)
     send_reply(to, RPL_STATSFILTERLINE, fline->rawfilter, fline->wflags ? fline->wflags : "",
-               fline->rflags ? fline->rflags : "", fline->length, fline->reason);
+               fline->rflags ? fline->rflags : "", fline->length, fline->active ? "active" : "disabled",
+               fline->reason);
 }
 
 static void

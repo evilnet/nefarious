@@ -1910,3 +1910,16 @@ HIDDEN_HOST_UNSET_MESSAGE
 
 The message sent in the quit message when a user sets -x.
 
+FILTER_FATAL_TIME
+ * Type: integer
+ * Default: 500
+
+If a spam filter regular expression takes longer than this (in miliseconds) to
+process then it will be disabled.
+
+FILTER_WARN_TIME
+ * Type: integer
+ * Default: 250
+
+If a spam filter regular expression takes longer than this (in miliseconds) to
+process a warning notice will be sent out.

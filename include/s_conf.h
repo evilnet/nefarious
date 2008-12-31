@@ -245,6 +245,7 @@ struct fline {
   char *reason;
   char *nchan;
   int length;
+  int active;
 };
 
 /*
