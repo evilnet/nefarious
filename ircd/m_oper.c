@@ -313,6 +313,7 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   char             chan[CHANNELLEN-1];
   char*            join[2];
+  char *privbuf;
 
   struct ConfItem *aconf;
   assert(0 != cptr);
@@ -402,6 +403,10 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
          /* Tell client_set_privs to send privileges to the user */
          client_set_privs(sptr, aconf);
+
+         ClearRemoteOper(sptr);
+         privbuf = client_print_privs(sptr);
+         sendcmdto_one(&me, CMD_PRIVS, sptr, "%C %s", sptr, privbuf);
 
 	 sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
 		       (OIsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");

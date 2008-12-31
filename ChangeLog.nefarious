@@ -3,6 +3,14 @@
 
 2008-12-31  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/m_oper.c: Small fix for PRIVS on OPER propagation
+
+	* ircd/m_challenge.c: Small fix for PRIVS on OPER propagation
+
+	* ircd/client.c: Small fix for PRIVS on OPER propagation
+
+2008-12-31  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/m_whois.c: Removed the "is oper hidden" check from here.
 
 	* include/client.h: Re-added "is oper hidden" check to SeeOper()

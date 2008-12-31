@@ -32,6 +32,7 @@
 #include "ircd_struct.h"
 #include "list.h"
 #include "msgq.h"
+#include "msg.h"
 #include "numeric.h"
 #include "s_conf.h"
 #include "s_debug.h"
@@ -131,6 +132,27 @@ static struct Privs privs_local;
 /** Non-zero if #privs_global and #privs_local have been initialized. */
 static int privs_defaults_set;
 
+/** Array mapping privilege values to names and vice versa. */
+static struct {
+  char        *name;
+  unsigned int priv;
+} privtab[] = {
+#define P(priv)         { #priv, PRIV_ ## priv }
+  P(CHAN_LIMIT),     P(MODE_LCHAN),     P(WALK_LCHAN),    P(DEOP_LCHAN),
+  P(SHOW_INVIS),     P(SHOW_ALL_INVIS), P(UNLIMIT_QUERY), P(KILL),
+  P(LOCAL_KILL),     P(REHASH),         P(RESTART),       P(DIE),
+  P(GLINE),          P(LOCAL_GLINE),    P(JUPE),          P(LOCAL_JUPE),
+  P(OPMODE),         P(LOCAL_OPMODE),   P(SET),           P(WHOX),
+  P(BADCHAN),        P(LOCAL_BADCHAN),  P(SEE_CHAN),      P(PROPAGATE),
+  P(DISPLAY),        P(SEE_OPERS),      P(WIDE_GLINE),    P(FORCE_OPMODE),
+  P(FORCE_LOCAL_OPMODE), P(REMOTEREHASH), P(CHECK), P(SEE_SECRET_CHAN),
+  P(SHUN),           P(LOCAL_SHUN),     P(WIDE_SHUN),     P(ZLINE),
+  P(LOCAL_ZLINE),    P(WIDE_ZLINE),     P(LIST_CHAN),     P(WHOIS_NOTICE),
+  P(HIDE_IDLE),      P(XTRAOP),         P(HIDE_CHANNELS), P(DISPLAY_MODE),
+#undef P
+  { 0, 0 }
+};
+
 /* client_set_privs(struct Client* client)
  *
  * Sets the privileges for opers.
@@ -144,6 +166,8 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
 {
   struct Privs *source, *defaults;
   enum Priv priv;
+  char *privbuf;
+  int i = 0;
 
   if (!MyConnect(client))
     return;
@@ -226,28 +250,10 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
     ClrPriv(client, PRIV_OPMODE);
     ClrPriv(client, PRIV_BADCHAN);
   }
-}
 
-/** Array mapping privilege values to names and vice versa. */
-static struct {
-  char        *name;
-  unsigned int priv;
-} privtab[] = {
-#define P(priv)		{ #priv, PRIV_ ## priv }
-  P(CHAN_LIMIT),     P(MODE_LCHAN),     P(WALK_LCHAN),    P(DEOP_LCHAN),
-  P(SHOW_INVIS),     P(SHOW_ALL_INVIS), P(UNLIMIT_QUERY), P(KILL),
-  P(LOCAL_KILL),     P(REHASH),         P(RESTART),       P(DIE),
-  P(GLINE),          P(LOCAL_GLINE),    P(JUPE),          P(LOCAL_JUPE),
-  P(OPMODE),         P(LOCAL_OPMODE),   P(SET),           P(WHOX),
-  P(BADCHAN),        P(LOCAL_BADCHAN),  P(SEE_CHAN),      P(PROPAGATE),
-  P(DISPLAY),        P(SEE_OPERS),      P(WIDE_GLINE),    P(FORCE_OPMODE),
-  P(FORCE_LOCAL_OPMODE), P(REMOTEREHASH), P(CHECK), P(SEE_SECRET_CHAN),
-  P(SHUN),           P(LOCAL_SHUN),     P(WIDE_SHUN),     P(ZLINE),
-  P(LOCAL_ZLINE),    P(WIDE_ZLINE),     P(LIST_CHAN),     P(WHOIS_NOTICE),
-  P(HIDE_IDLE),      P(XTRAOP),         P(HIDE_CHANNELS), P(DISPLAY_MODE),
-#undef P
-  { 0, 0 }
-};
+  privbuf = client_print_privs(client);
+  sendcmdto_serv_butone(&me, CMD_PRIVS, client, "%C %s", client, privbuf);
+}
 
 /** Report privileges of \a client to \a to.
  * @param[in] to Client requesting privilege list.

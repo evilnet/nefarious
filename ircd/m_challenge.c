@@ -317,6 +317,7 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   char*            join[2];
   int nl;
   struct Client *acptr = NULL;
+  char *privbuf;
 
   if (!IsServer(cptr))
     return 0;
@@ -415,6 +416,10 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
 
       /* Tell client_set_privs to send privileges to the user */
       client_set_privs(sptr, aconf);
+
+      ClearRemoteOper(sptr);
+      privbuf = client_print_privs(sptr);
+      sendcmdto_one(&me, CMD_PRIVS, sptr, "%C %s", sptr, privbuf);
     }
 
     sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
