@@ -197,28 +197,43 @@ void map_dump_links_head_in_sand(struct Client *sptr, char *mask)
              cli_info(&me));
 }
 
-void map_dump(struct Client *cptr, struct Client *server, char *mask, int prompt_length)
+void map_dump(struct Client *server, char *mask, int prompt_length, void (*reply_function)(void **, const char *, int), void **args)
 {
+  const char *chr;
   static char prompt[64];
   struct DLink *lp;
-  char *p = &prompt[prompt_length];
+  char *p = prompt + prompt_length;
   int cnt = 0;
-
+  static char buf[512];
+  
   *p = '\0';
   if (prompt_length > 60)
-    send_reply(cptr, RPL_MAPMORE, prompt, cli_name(server));
-  else {
+  {
+    ircd_snprintf(0, buf, sizeof(buf), "%s%s --> *more*", prompt, cli_name(server));
+    reply_function(args, buf, 1);
+  }
+  else
+  {
     char lag[512];
     if (cli_serv(server)->lag>10000)
-        lag[0]=0;
+      lag[0]=0;
     else if (cli_serv(server)->lag<0)
-        strcpy(lag,"(0s)");
+      strcpy(lag,"(0s)");
     else
-        sprintf(lag,"(%is)",cli_serv(server)->lag);
-    send_reply(cptr, RPL_MAP, prompt, (
-                (IsBurst(server)) ? "*" : (IsBurstAck(server) ? "!" : "")),
-               cli_name(server), lag, (server == &me) ? UserStats.local_clients :
-               cli_serv(server)->clients);
+      sprintf(lag,"(%is)",cli_serv(server)->lag);
+    if (IsBurst(server))
+      chr = "*";
+    else if (IsBurstAck(server))
+      chr = "!";
+    else
+      chr = "";
+
+    ircd_snprintf(0, buf, sizeof(buf), "%s%s%s %s [%u clients]",
+                  prompt, chr, cli_name(server), lag,
+                  (server == &me) ? UserStats.local_clients :
+                                    cli_serv(server)->clients);
+
+    reply_function(args, buf, 0);
   }
   if (prompt_length > 0)
   {
@@ -243,7 +258,7 @@ void map_dump(struct Client *cptr, struct Client *server, char *mask, int prompt
       continue;
     if (--cnt == 0)
       *p = '`';
-    map_dump(cptr, lp->value.cptr, mask, prompt_length + 2);
+    map_dump(lp->value.cptr, mask, prompt_length + 2, reply_function, args);
   }
   if (prompt_length > 0)
     p[-1] = '-';

@@ -102,6 +102,16 @@
 #include <stdio.h>
 #include <string.h>
 
+static void map_reply(void **args, const char *buf, int overflow)
+{
+  struct Client *cptr = (struct Client *)args[0];
+
+  if (!overflow)
+    send_reply(cptr, RPL_MAP, buf);
+  else
+    send_reply(cptr, RPL_MAPMORE, buf);
+}
+
 
 /*
  * m_map - generic message handler
@@ -112,6 +122,8 @@
  */
 int m_map(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
+  void *args[1];
+
   if (feature_bool(FEAT_HIS_MAP) && !IsAnOper(sptr)) {
     sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s %s", sptr,
 		  "/MAP has been disabled; visit",
@@ -123,8 +135,10 @@ int m_map(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   if (feature_bool(FEAT_HIS_MAP_SCRAMBLED) && !IsAnOper(sptr))
     map_dump_head_in_sand(sptr);
-  else
-    map_dump(sptr, &me, parv[1], 0);
+  else {
+    args[0] = sptr;
+    map_dump(&me, parv[1], 0, map_reply, args);
+  }
 
   send_reply(sptr, RPL_MAPEND);
 

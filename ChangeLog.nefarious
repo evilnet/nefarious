@@ -1,6 +1,20 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/map.h: Update dump_map args.
+
+	* ircd/m_endburst.c: : Show a map of new servers on links (from QuakeNet).
+
+	* ircd/m_map.c: Show a map of new servers on links (from QuakeNet).
+
+	* ircd/map.c: Show a map of new servers on links (from QuakeNet).
+
+	* ircd/s_err.c: Tweaked MAP replies.
+
+	* ircd/s_misc.c: Show a map of lost servers on splits (from QuakeNet).
+
 2008-12-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added FILTER_FATAL_TIME (500ms) and FILTER_WARN_TIME (250ms).
