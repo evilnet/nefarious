@@ -196,10 +196,10 @@ int ms_connect(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
    * Notify all operators about remote connect requests
    */
   sendwallto_group_butone(&me, WALL_WALLOPS, 0,
-			"Remote CONNECT %s %s from %s", aconf->name,
+			"Remote CONNECT %s (%s) %s from %s", aconf->name, parv[1],
 			parv[2] ? parv[2] : "",
 			get_client_name(sptr, HIDE_IP));
-  log_write(LS_NETWORK, L_INFO, 0, "CONNECT From %C : %s %s", sptr, aconf->name,
+  log_write(LS_NETWORK, L_INFO, 0, "CONNECT From %C : %s (%s) %s", sptr, aconf->name, parv[1],
 	    parv[2] ? parv[2] : "");
 
   if (connect_server(aconf, sptr, 0)) {

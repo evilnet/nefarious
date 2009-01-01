@@ -3,6 +3,11 @@
 
 2009-01-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_connect.c: Show the given server in brackets after the
+	real server in remote connects.
+
+2009-01-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_connect.c: Show the real server instead of the wildcard
 	server during remote connects.
 
