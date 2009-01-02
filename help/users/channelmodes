@@ -20,7 +20,7 @@ c		Block control codes (colours)
 S		Strip control codes (colours)
 C		Block CTCP's to the channel
 N		No notices to the channel
-L		Channels modes do not show in /LIST
+L <channel>	Redirect users to <channel> when they attempt to join
 Q		Strip quit/part message reasons
 T		Attempt to prevent amsg's
 Z		Only SSL users may join
