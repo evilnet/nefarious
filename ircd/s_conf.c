@@ -63,8 +63,10 @@
 #include "sys.h"
 
 #ifdef PCRE_SYSTEM
+#include <pcre.h>
 #include <pcreposix.h>
 #else
+#include "pcre.h"
 #include "pcreposix.h"
 #endif
 
@@ -1050,7 +1052,7 @@ void clear_fline_list(void)
   struct fline *fline;
   while ((fline = GlobalFList)) {
     GlobalFList = fline->next;
-    regfree(&fline->filter);
+    pcre_free(fline->filter);
     fline->length = 0;
     fline->active = 0;
     MyFree(fline->nchan);
@@ -1788,6 +1790,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   int regmatch = 0;
   int ret = 0;
   int brk = 0;
+  int ovector[186];
   char temp1[BUFSIZE]; 
   char temp2[BUFSIZE]; 
   char temphost[HOSTLEN +3]; 
@@ -1795,7 +1798,6 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   char* gline[5];
   char* zline[5];
   char* shun[5];
-
 
   for (fline = GlobalFList; fline; fline = fline->next) {
     regmatch = 0;
@@ -1857,7 +1859,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
       memset(&rprev, 0, sizeof(rnow));
 
       getrusage(RUSAGE_SELF, &rprev);
-      regmatch = regexec(&fline->filter, string, 0, 0, 0);
+      regmatch = pcre_exec(fline->filter, NULL, string, strlen(string), 0, 0, ovector, 186);
       getrusage(RUSAGE_SELF, &rnow);
 
 
@@ -1874,7 +1876,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
                       fline->rawfilter, ms_past);
       }
 
-      if (0 == regmatch) {
+      if (regmatch > 0) {
         Debug((DEBUG_DEBUG, "regexec match"));
         if (rf_flag & RFFLAG_CALERT) {
           chptr = FindChannel(fline->nchan);
@@ -1973,6 +1975,8 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
         if ((rf_flag & RFFLAG_BLOCK) && (ret != 2)) {
            ret = 1;
         }
+        if (ret)
+          return ret;
       }
     }
   }

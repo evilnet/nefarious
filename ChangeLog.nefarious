@@ -1,6 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/s_conf.h: Switched over to pcre* functions just to be
+	sure we are using pcre and not the system regex.
+
+	* ircd/ircd_parser.y: Switched over to pcre* functions just to be
+	sure we are using pcre and not the system regex.
+
+	* ircd/s_conf.c: Switched over to pcre* functions just to be sure
+	we are using pcre and not the system regex. Also fixed a crash bug
+	with spam filters.
+
+	* ircd/s_misc.c: Switched over to pcre* functions just to be sure
+	we are using pcre and not the system regex.
+
 2009-01-02  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* help/users/channelmodes: Update for channel mode changes

@@ -57,8 +57,10 @@
 #include "support.h"
 
 #ifdef PCRE_SYSTEM
+#include <pcre.h>
 #include <pcreposix.h>
 #else
+#include "pcre.h"
 #include "pcreposix.h"
 #endif
 
@@ -1560,6 +1562,8 @@ sfilterblock: SFILTER {
 {
   struct fline *fline;
   char *errbuf;
+  const char *error;
+  int erroffset;
 
   if (!regex)
     parse_error("Your Filter block must contain a filter.");
@@ -1579,7 +1583,7 @@ sfilterblock: SFILTER {
       if (length == 0)
         length = feature_int(FEAT_FILTER_DEFAULT_LENGTH);
 
-      regcomp(&fline->filter, regex, REG_ICASE|REG_EXTENDED);
+      fline->filter = pcre_compile(regex, PCRE_CASELESS|PCRE_EXTENDED, &error, &erroffset, NULL);
       DupString(fline->rawfilter, regex);
       DupString(fline->wflags, rtype);
       DupString(fline->rflags, action);

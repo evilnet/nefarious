@@ -66,6 +66,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef PCRE_SYSTEM
+#include <pcre.h>
+#include <pcreposix.h>
+#else
+#include "pcre.h"
+#include "pcreposix.h"
+#endif
 
 static char *months[] = {
   "January", "February", "March", "April",
@@ -661,44 +668,43 @@ void tstats(struct Client *cptr, const struct StatDesc *sd, char *param)
 
 char *checkregex(char *s, int check_broadness)
 {
-int errorcode, errorbufsize, regex=0;
-char *errtmp, *tmp;
-static char errorbuf[512];
-regex_t expr;
+  const char *error;
+  char *errtmp, *tmp;
+  static char errorbuf[512];
+  pcre *expr;
+  int errorcode, errorbufsize, regex=0;
+  int ovector[186];
+  int erroffset;
 
+  for (tmp = s; *tmp; tmp++) {
+    if (!IsAlnum(*tmp) && !(*tmp >= 128)) {
+      if ((s == tmp) && (*tmp == '*'))
+        continue;
+      if ((*(tmp + 1) == '\0') && (*tmp == '*'))
+        continue;
+      regex = 1;
+      break;
+    }
+  }
 
-        for (tmp = s; *tmp; tmp++) {
-                if (!IsAlnum(*tmp) && !(*tmp >= 128)) {
-                        if ((s == tmp) && (*tmp == '*'))
-                                continue;
-                        if ((*(tmp + 1) == '\0') && (*tmp == '*'))
-                                continue;
-                        regex = 1;
-                        break;
-                }
-        }
-        if (regex)
-        {
-                errorcode = regcomp(&expr, s, REG_ICASE|REG_EXTENDED);
-                if (errorcode > 0)
-                {
-                        errorbufsize = regerror(errorcode, &expr, NULL, 0)+1;
-                        errtmp = MyMalloc(errorbufsize);
-                        regerror(errorcode, &expr, errtmp, errorbufsize);
-                        strncpy(errorbuf, errtmp, sizeof(errorbuf));
-                        free(errtmp);
-                        regfree(&expr);
-                        return errorbuf;
-                }
-                if (check_broadness && !regexec(&expr, "", 0, NULL, 0))
-                {
-                        strncpy(errorbuf, "Regular expression is too broad", sizeof(errorbuf));
-                        regfree(&expr);
-                        return errorbuf;
-                }
-                regfree(&expr);
-        }
-        return NULL;
+  if (regex)
+  {
+    expr = pcre_compile(s, PCRE_CASELESS|PCRE_EXTENDED, &error, &erroffset, NULL);
+    if (error)
+    {
+      ircd_snprintf(0, errorbuf, sizeof(errorbuf), "%s (offset %d)", error, erroffset);
+      pcre_free(expr);
+      return errorbuf;
+    }
+    if (check_broadness && !pcre_exec(expr, NULL, s, strlen(s), 0, 0, ovector, 186))
+    {
+      strncpy(errorbuf, "Regular expression is too broad", sizeof(errorbuf));
+      pcre_free(expr);
+      return errorbuf;
+    }
+    pcre_free(expr);
+  }
+  return NULL;
 }
 
 char *decodespace(char *s)

@@ -24,8 +24,10 @@
 #include "client.h"
 
 #ifdef PCRE_SYSTEM
+#include <pcre.h>
 #include <pcreposix.h>
 #else
+#include "pcre.h"
 #include "pcreposix.h"
 #endif
 
@@ -238,7 +240,7 @@ struct eline {
 
 struct fline {
   struct fline *next;
-  regex_t filter;
+  pcre *filter;
   char *rawfilter;
   char *rflags;
   char *wflags;
