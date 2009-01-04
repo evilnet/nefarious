@@ -305,7 +305,7 @@ EXTENDED_ACCOUNTS
  * Default: TRUE
 
 This enables 'extended' style AC syntax (used by your service to set
-the account name.)  TRUE uses the subcommand paramiter R,M,U,C,A,D
+the account name.)  TRUE uses the subcommand paramiter R,M,U,C,A,D,H
 to do LOC, rename and removal. FALSE uses old style. Set this to
 TRUE if you use X3, FALSE for other services.
 
@@ -815,7 +815,7 @@ MAX_CHECK_OUTPUT
  * Type: integer
  * Default: 1000
 
-Maximum amount of records displayed in any CHECK query.
+Maximum number of records displayed in any CHECK query.
 
 CONFIG_OPERCMDS
  * Type: boolean
@@ -1470,20 +1470,6 @@ NOIDENT
 
 NOIDENT disables RFC 1413 (ident protocol) lookups of clients'
 usernames.
-
-MAX_CHECK_OUTPUT
- * Type: integer
- * Default: 1000
-
-The maximum results in a /CHECK response.
-
-EXTENDED_ACCOUNTS
- * Type: boolean
- * Default: TRUE
-
-Allows the IRCd to use the extended account system which X3 uses. If
-you plan to use services other than X3 then this will need to be set
-to FALSE in most cases.
 
 AUTOINVISIBLE
  * Type: boolean

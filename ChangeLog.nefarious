@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-04  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/readme.features: Removed a couple of duplicate feature
+	descriptions and a tweak to some wording
+
 2009-01-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* help/Makefile.in: Small tweak.
