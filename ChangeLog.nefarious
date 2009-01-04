@@ -3,6 +3,10 @@
 
 2009-01-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/Makefile.in: Small tweak.
+
+2009-01-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/s_conf.h: Switched over to pcre* functions just to be
 	sure we are using pcre and not the system regex.
 

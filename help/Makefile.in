@@ -28,8 +28,12 @@ install:
 	-@if test ! -d $(prefix)/help; then \
 		echo "mkdir $(prefix)/help"; \
 		mkdir $(prefix)/help; \
+	fi
+	-@if test ! -d $(prefix)/help/users; then \
 		echo "mkdir $(prefix)/help/users"; \
 		mkdir $(prefix)/help/users; \
+	fi
+	-@if test ! -d $(prefix)/help/opers; then \
 		echo "mkdir $(prefix)/help/opers"; \
 		mkdir $(prefix)/help/opers; \
 	fi
