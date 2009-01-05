@@ -3,6 +3,12 @@
 
 2009-01-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_svsident.c: Removed exec svn prop.
+
+	* ircd/m_svsmode.c: Removed exec svn prop.
+
+2009-01-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/users/*: SVN propset cleanup.
 
 	* help/opers/*: SVN propset cleanup.
