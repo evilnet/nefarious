@@ -15,7 +15,7 @@
  */
 /** @file
  * @brief MD5 implementation for ircu.
- * @version $Id: ircd_md5.h,v 1.3 2004/10/05 22:51:46 entrope Exp $
+ * @version $Id$
  */
 #ifndef ircd_md5_h
 #define ircd_md5_h

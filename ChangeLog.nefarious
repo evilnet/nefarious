@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* help/users/*: SVN propset cleanup.
+
+	* help/opers/*: SVN propset cleanup.
+
+	* include/*.h: SVN propset cleanup.
+
+	* ircd/*.c|l|y: SVN propset cleanup.
+
 2009-01-04  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* doc/readme.features: Removed a couple of duplicate feature

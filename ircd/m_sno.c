@@ -21,7 +21,7 @@
  */
 /** @file
  * @brief SNO command
- * @version $Id: m_sno.c, $
+ * @version $Id$
  */
 
  #include "config.h"

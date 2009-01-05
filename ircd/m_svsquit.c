@@ -20,7 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_svsquit.c 2063 2008-03-11 03:14:35Z sirvulcan $
+ * $Id$
  */
 #include "config.h"
 

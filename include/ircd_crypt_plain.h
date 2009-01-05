@@ -18,7 +18,7 @@
  */
 /** @file
  * @brief Declarations for plaintext password "crypting".
- * @version $Id: ircd_crypt_plain.h,v 1.2 2004/10/05 04:21:37 entrope Exp $
+ * @version $Id$
  */
 #ifndef INCLUDED_ircd_crypt_plain_h
 #define INCLUDED_ircd_crypt_plain_h

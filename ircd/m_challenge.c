@@ -23,7 +23,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_oper.c 2057 2008-03-03 22:31:52Z rubin $
+ * $Id$
  */
 
  /* Port of Hybrid-IRCd's Oper Challenge System */

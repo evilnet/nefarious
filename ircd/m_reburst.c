@@ -20,7 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_burst.c,v 1.40.2.6 2008/01/03 00:07:21 klmitch Exp $
+ * $Id$
  */
 
 /*

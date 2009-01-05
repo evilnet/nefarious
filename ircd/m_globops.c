@@ -21,7 +21,7 @@
  */
 /** @file
  * @brief GLOBOPS command
- * @version $Id: m_globops.c, $
+ * @version $Id$
  */
 
  #include "config.h"

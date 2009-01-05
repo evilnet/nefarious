@@ -17,7 +17,7 @@
  */
 /** @file
  * @brief Structures and macros for handling sets of boolean flags.
- * @version $Id: flagset.h,v 1.1 2006/12/08 02:07:51 entrope Exp $
+ * @version $Id$
  */
 
 #ifndef INCLUDED_flagset_h

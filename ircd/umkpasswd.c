@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: umkpasswd.c,v 1.8.2.3 2007/11/17 13:48:15 entrope Exp $
+ * $Id$
 */
 #include "config.h"
 #include <unistd.h>

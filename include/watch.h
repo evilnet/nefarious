@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: ircd_struct.h 2016 2008-02-24 08:13:24Z sirvulcan $
+ * $Id$
  */
 
 #ifndef INCLUDED_watch_h

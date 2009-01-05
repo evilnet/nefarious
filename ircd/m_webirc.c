@@ -20,7 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: m_webirc.c 1969 2007-06-30 10:09:22Z sirvulcan $
+ * $Id$
  */
 
 /*

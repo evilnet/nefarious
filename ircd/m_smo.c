@@ -21,7 +21,7 @@
  */
 /** @file
  * @brief SMO command
- * @version $Id: m_smo.c, $
+ * @version $Id$
  */
 
  #include "config.h"

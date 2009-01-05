@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: umkpasswd.h,v 1.1 2004/06/15 01:20:36 entrope Exp $
+ * $Id$
  */
 #ifndef INCLUDED_umkpasswd_h
 #define INCLUDED_umkpasswd_h 

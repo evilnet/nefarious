@@ -1,6 +1,6 @@
 /** @file
  * @brief Native crypt() function declarations.
- * @version $Id: ircd_crypt_native.h,v 1.2 2004/10/05 04:21:37 entrope Exp $
+ * @version $Id$
  */
 #ifndef INCLUDED_ircd_crypt_native_h
 #define INCLUDED_ircd_crypt_native_h
