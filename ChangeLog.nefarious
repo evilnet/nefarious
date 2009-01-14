@@ -1,6 +1,26 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* help/opers/silence: Updated SILENCE help.
+
+	* include/s_user.h: Added silence flags.
+
+	* ircd/ircd_relay.c: Implemented silence exemptions.
+
+	* ircd/m_invite.c: Implemented silence exemptions.
+
+	* ircd/m_silence.c: Implemented silence exemptions. The format is the same as standard ircu, /SILENCE +/-[~]mask. If the ~ is specified then it will be classed as an exempt.
+
+	* ircd/s_err.c: Added extra %s to RPL_SILELIST.
+
+	* ircd/s_misc.c: Implemented silence exemptions.
+
+	* ircd/s_user.c: Implemented silence exemptions.
+
+	* ircd/send.c: Implemented silence exemptions.
+
 2009-01-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Code from Quakenet.

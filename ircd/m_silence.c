@@ -93,6 +93,7 @@
 #include "numeric.h"
 #include "numnicks.h"
 #include "s_user.h"
+#include "s_debug.h"
 #include "send.h"
 #include "ircd_struct.h"
 
@@ -116,8 +117,9 @@ int m_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct SLink*  lp;
   struct Client* acptr;
-  char           c;
+  char           c,d;
   char*          cp;
+  int            exempt = 0;
 
   assert(0 != cptr);
   assert(cptr == sptr);
@@ -128,7 +130,7 @@ int m_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     if (!(cli_user(acptr)))
       return 0;
     for (lp = cli_user(acptr)->silence; lp; lp = lp->next)
-      send_reply(sptr, RPL_SILELIST, cli_name(acptr), lp->value.cp);
+      send_reply(sptr, RPL_SILELIST, cli_name(acptr), (lp->flags & SILENCE_EXEMPT) ? "~" : "", lp->value.cp);
     send_reply(sptr, RPL_ENDOFSILELIST, cli_name(acptr));
     return 0;
   }
@@ -141,10 +143,18 @@ int m_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   }
   else
     c = '+';
+
+  d = *cp;
+  if (d == '~') {
+    exempt = 1;
+    cp++;
+  }
+
   cp = pretty_mask(cp);
-  if ((c == '-' && !del_silence(sptr, cp)) || (c != '-' && !add_silence(sptr, cp))) {
-    sendcmdto_one(sptr, CMD_SILENCE, sptr, "%c%s", c, cp);
-    sendcmdto_serv_butone(sptr, CMD_SILENCE, cptr, "%C %s%s", cptr, (c == '-') ? "-" : "+", cp);
+  Debug((DEBUG_DEBUG, "test: %s %d", cp, exempt));
+  if ((c == '-' && !del_silence(sptr, cp, exempt)) || (c != '-' && !add_silence(sptr, cp, exempt))) {
+    sendcmdto_one(sptr, CMD_SILENCE, sptr, "%c%s%s", c, (d == '~') ? "~" : "", cp);
+    sendcmdto_serv_butone(sptr, CMD_SILENCE, cptr, "%C %s%s%s", cptr, (c == '-') ? "-" : "+", (d == '~') ? "~" : "", cp);
   }
   return 0;
 }
@@ -162,6 +172,8 @@ int m_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 int ms_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   struct Client* acptr;
+  char* mask;
+  int exempt = 0;
 
   if (parc < 3 || EmptyString(parv[2]))
     return need_more_params(sptr, "SILENCE");
@@ -171,10 +183,22 @@ int ms_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (!acptr)
     return 0; /* Ignore silences for a user that has quit */
 
-  if (*parv[2] == '-')
-    del_silence(acptr, parv[2] + 1);
-  else
-    add_silence(acptr, parv[2] + 1);
+  mask = parv[2];
+  if (*mask == '-') {
+    mask++;
+    if (*mask == '~') {
+      exempt = 1;
+      mask++;
+    }
+    del_silence(acptr, mask, exempt);
+  } else {
+    mask++;
+    if (*mask == '~') {
+      exempt = 1;
+      mask++;
+    }
+    add_silence(acptr, mask, exempt);
+  }
 
   if (MyUser(acptr))
     sendcmdto_one(acptr, CMD_SILENCE, acptr, "%s", parv[2]);

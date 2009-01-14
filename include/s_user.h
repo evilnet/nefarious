@@ -53,6 +53,9 @@ struct Flags;
 #define MATCH_SERVER  1
 #define MATCH_HOST    2
 
+#define SILENCE_IPMASK 0x01
+#define SILENCE_EXEMPT 0x02
+
 #define COOKIE_VERIFIED 0xffffffff
 
 extern struct SLink *opsarray[];
@@ -77,7 +80,7 @@ extern int whisper(struct Client* source, const char* nick,
                    const char* channel, const char* text, int is_notice);
 extern void send_user_info(struct Client* to, char* names, int rpl,
                            InfoFormatter fmt);
-extern int add_silence(struct Client* sptr, const char* mask);
+extern int add_silence(struct Client* sptr, const char* mask, int exempt);
 
 extern void make_hidden_hostmask(char *buffer, struct Client *cptr);
 extern int hide_hostmask(struct Client *cptr);
@@ -87,6 +90,7 @@ extern int set_hostmask(struct Client *sptr, struct Client *cptr,
 extern int set_user_mode(struct Client *cptr, struct Client *sptr,
                          int parc, char *parv[]);
 extern int is_silenced(struct Client *sptr, struct Client *acptr);
+extern int is_silence_exempted(struct Client *sptr, struct Client *acptr);
 extern int hunt_server(int, struct Client *cptr, struct Client *sptr,
     char *command, int server, int parc, char *parv[]);
 extern int hunt_server_cmd(struct Client *from, const char *cmd,
@@ -101,7 +105,7 @@ extern struct Client* next_client(struct Client* next, const char* ch);
 extern char *umode_str(struct Client *cptr);
 extern void send_umode(struct Client *cptr, struct Client *sptr,
                        struct Flags *old, int sendset);
-extern int del_silence(struct Client *sptr, char *mask);
+extern int del_silence(struct Client *sptr, char *mask, int exempt);
 extern void set_snomask(struct Client *, unsigned int, int);
 extern int is_snomask(char *);
 extern int check_target_limit(struct Client *sptr, void *target, const char *name,

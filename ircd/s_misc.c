@@ -252,7 +252,7 @@ static void exit_one_client(struct Client* bcptr, const char* comment)
 
     /* Clean up silencefield */
     while ((lp = cli_user(bcptr)->silence))
-      del_silence(bcptr, lp->value.cp);
+      del_silence(bcptr, lp->value.cp, (lp->flags & SILENCE_EXEMPT) ? 1 : 0);
 
     /* Clean up sdnsblsfield */
     while ((lp = cli_sdnsbls(bcptr)))

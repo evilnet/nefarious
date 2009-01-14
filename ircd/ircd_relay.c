@@ -314,7 +314,7 @@ void relay_directed_message(struct Client* sptr, char* name, char* server, const
     }
   }
 
-  if (!(is_silenced(sptr, acptr)))
+  if (!(is_silenced(sptr, acptr)) || is_silence_exempted(sptr, acptr))
     sendcmdto_one(sptr, CMD_PRIVATE, acptr, "%s :%s", name, text);
 }
 
@@ -382,7 +382,7 @@ void relay_directed_notice(struct Client* sptr, char* name, char* server, const 
     }
   }
 
-  if (!(is_silenced(sptr, acptr)))
+  if (!(is_silenced(sptr, acptr)) || is_silence_exempted(sptr, acptr))
     sendcmdto_one(sptr, CMD_NOTICE, acptr, "%s :%s", name, text);
 }
 
@@ -400,7 +400,7 @@ void relay_private_message(struct Client* sptr, const char* name, const char* te
   }
   if ((!IsChannelService(acptr) &&
        check_target_limit(sptr, acptr, cli_name(acptr), 0)) ||
-      is_silenced(sptr, acptr))
+      (is_silenced(sptr, acptr) && !is_silence_exempted(sptr, acptr)))
     return;
 
   /*
@@ -456,7 +456,7 @@ void relay_private_notice(struct Client* sptr, const char* name, const char* tex
     return;
   if ((!IsChannelService(acptr) && 
        check_target_limit(sptr, acptr, cli_name(acptr), 0)) ||
-      is_silenced(sptr, acptr))
+      (is_silenced(sptr, acptr) && !is_silence_exempted(sptr, acptr)))
     return;
 
   /*
@@ -510,7 +510,7 @@ void server_relay_private_message(struct Client* sptr, const char* name, const c
 	       "Failed to deliver: [%.20s]", feature_str(FEAT_NETWORK), text);
     return;
   }
-  if (is_silenced(sptr, acptr))
+  if (is_silenced(sptr, acptr) && !is_silence_exempted(sptr, acptr))
     return;
 
   if (MyUser(acptr))
@@ -532,7 +532,7 @@ void server_relay_private_notice(struct Client* sptr, const char* name, const ch
   if (0 == (acptr = findNUser(name)) || !IsUser(acptr))
     return;
 
-  if (is_silenced(sptr, acptr))
+  if (is_silenced(sptr, acptr) && !is_silence_exempted(sptr, acptr))
     return;
 
   if (MyUser(acptr))

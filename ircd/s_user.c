@@ -1484,8 +1484,10 @@ int whisper(struct Client* source, const char* nick, const char* channel,
     return send_reply(source, ERR_USERNOTINCHANNEL, cli_name(dest),
 		      chptr->chname);
 
-  if (is_silenced(source, dest))
-    return 0;
+  if (!is_silence_exempted(source, dest)) {
+    if (is_silenced(source, dest))
+      return 0;
+  }
 
   if (cli_user(dest)->away)
     send_reply(source, RPL_AWAY, cli_name(dest), cli_user(dest)->away);
@@ -2857,18 +2859,67 @@ int is_silenced(struct Client *sptr, struct Client *acptr)
 		  user->username, user->realhost);
   for (; lp; lp = lp->next)
   {
-    if ((!(lp->flags & CHFL_SILENCE_IPMASK) && (!match(lp->value.cp, sender) ||
-        (HasHiddenHost(sptr) && !match(lp->value.cp, senderh)) ||
-        (HasSetHost(sptr) && !match(lp->value.cp, senderh)))) ||
-        ((lp->flags & CHFL_SILENCE_IPMASK) && !match(lp->value.cp, senderip)))
-    {
+    if (!(lp->flags & SILENCE_EXEMPT)) {
+      if ((!(lp->flags & SILENCE_IPMASK) && (!match(lp->value.cp, sender) ||
+          (HasHiddenHost(sptr) && !match(lp->value.cp, senderh)) ||
+          (HasSetHost(sptr) && !match(lp->value.cp, senderh)))) ||
+          ((lp->flags & SILENCE_IPMASK) && !match(lp->value.cp, senderip)))
+      {
 /*      if (!MyConnect(sptr))
  *      {
  *       sendcmdto_one(acptr, CMD_SILENCE, cli_from(sptr), "%C %s", sptr,
  *                     lp->value.cp);
- *     }
+ *      }
  */
-      return 1;
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+/*
+ * is_silence_exempted : Does the actual check wether sptr is allowed
+ *                       to send a message to acptr.
+ *                       Both must be registered persons.
+ * If sptr is silenced by acptr, his message should not be propagated,
+ * but more over, if this is detected on a server not local to sptr
+ * the SILENCE mask is sent upstream.
+ */
+int is_silence_exempted(struct Client *sptr, struct Client *acptr)
+{
+  struct SLink *lp;
+  struct User *user;
+  static char sender[HOSTLEN + NICKLEN + USERLEN + 5];
+  static char senderip[16 + NICKLEN + USERLEN + 5];
+  static char senderh[HOSTLEN + ACCOUNTLEN + USERLEN + 6];
+
+  if (!cli_user(acptr) || !(lp = cli_user(acptr)->silence) || !(user = cli_user(sptr)))
+    return 0;
+  ircd_snprintf(0, sender, sizeof(sender), "%s!%s@%s", cli_name(sptr),
+		user->username, user->host);
+  ircd_snprintf(0, senderip, sizeof(senderip), "%s!%s@%s", cli_name(sptr),
+		user->username, ircd_ntoa((const char*) &(cli_ip(sptr))));
+  if (((feature_int(FEAT_HOST_HIDING_STYLE) == 1) ? HasHiddenHost(sptr) :
+       IsHiddenHost(sptr)) || HasSetHost(sptr))
+    ircd_snprintf(0, senderh, sizeof(senderh), "%s!%s@%s", cli_name(sptr),
+		  user->username, user->realhost);
+  for (; lp; lp = lp->next)
+  {
+    if (lp->flags & SILENCE_EXEMPT) {
+      if ((!(lp->flags & SILENCE_IPMASK) && (!match(lp->value.cp, sender) ||
+          (HasHiddenHost(sptr) && !match(lp->value.cp, senderh)) ||
+          (HasSetHost(sptr) && !match(lp->value.cp, senderh)))) ||
+          ((lp->flags & SILENCE_IPMASK) && !match(lp->value.cp, senderip)))
+      {
+/*      if (!MyConnect(sptr))
+ *      {
+ *       sendcmdto_one(acptr, CMD_SILENCE, cli_from(sptr), "%C %s", sptr,
+ *                     lp->value.cp);
+ *      }
+ */
+        return 1;
+      }
     }
   }
   return 0;
@@ -2880,7 +2931,7 @@ int is_silenced(struct Client *sptr, struct Client *acptr)
  * Removes all silence masks from the list of sptr that fall within `mask'
  * Returns -1 if none where found, 0 otherwise.
  */
-int del_silence(struct Client *sptr, char *mask)
+int del_silence(struct Client *sptr, char *mask, int exempt)
 {
   struct SLink **lp;
   struct SLink *tmp;
@@ -2889,11 +2940,14 @@ int del_silence(struct Client *sptr, char *mask)
   for (lp = &(cli_user(sptr))->silence; *lp;) {
     if (!mmatch(mask, (*lp)->value.cp))
     {
-      tmp = *lp;
-      *lp = tmp->next;
-      MyFree(tmp->value.cp);
-      free_link(tmp);
-      ret = 0;
+      if ((((*lp)->flags & SILENCE_EXEMPT) && exempt) || (!((*lp)->flags & SILENCE_EXEMPT) && !exempt)) {
+        tmp = *lp;
+        *lp = tmp->next;
+        MyFree(tmp->value.cp);
+        free_link(tmp);
+        ret = 0;
+      } else
+         lp = &(*lp)->next;
     }
     else
       lp = &(*lp)->next;
@@ -2901,7 +2955,7 @@ int del_silence(struct Client *sptr, char *mask)
   return ret;
 }
 
-int add_silence(struct Client* sptr, const char* mask)
+int add_silence(struct Client* sptr, const char* mask, int exempt)
 {
   struct SLink *lp, **lpp;
   int cnt = 0, len = strlen(mask);
@@ -2928,8 +2982,12 @@ int add_silence(struct Client* sptr, const char* mask)
         send_reply(sptr, ERR_SILELISTFULL, mask);
         return -1;
       }
-      else if (!mmatch(lp->value.cp, mask))
-        return -1;
+      else if (!mmatch(lp->value.cp, mask)) {
+        if (exempt && (lp->flags & SILENCE_EXEMPT))
+          return -1;
+        else if (!exempt && !(lp->flags & SILENCE_EXEMPT))
+          return -1;
+      }
     }
     lpp = &lp->next;
     lp = *lpp;
@@ -2940,8 +2998,10 @@ int add_silence(struct Client* sptr, const char* mask)
   lp->value.cp = (char*) MyMalloc(strlen(mask) + 1);
   assert(0 != lp->value.cp);
   strcpy(lp->value.cp, mask);
+  if (exempt)
+    lp->flags |= SILENCE_EXEMPT;
   if ((ip_start = strrchr(mask, '@')) && check_if_ipmask(ip_start + 1))
-    lp->flags = CHFL_SILENCE_IPMASK;
+    lp->flags |= SILENCE_IPMASK;
   cli_user(sptr)->silence = lp;
   return 0;
 }

@@ -1,5 +1,8 @@
-/SILENCE [+/-hostmask] 
+/SILENCE [+/-[~]hostmask] 
 
 This command is used to manage your server side ignore list. If you do not
 specifiy a hostname then the list will be displayed. Prefix a hostmask with
 a + to add a new hostmask, prefix a - to remove a hostmask.
+
+If you wish to exempt a person then add a ~ before the hostmask.
+
