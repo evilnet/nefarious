@@ -101,25 +101,6 @@
 #include <string.h>
 
 
-/*
- * A little spin-marking utility to tell us wich clients we have already
- * processed and wich not
- */
-static int who_marker = 0;
-static void move_marker(void)
-{
-  if (!++who_marker)
-  {
-    struct Client *cptr = GlobalClientList;
-    while (cptr)
-    {
-      cli_marker(cptr) = 0;
-      cptr = cli_next(cptr);
-    }
-    who_marker++;
-  }
-}
-
 #define CheckMark(x, y) ((x == y) ? 0 : (x = y))
 #define Process(cptr) CheckMark(cli_marker(cptr), who_marker)
 
@@ -156,6 +137,7 @@ int m_who(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char *p;                      /* Scratch char pointer                     */
   char *qrt;                    /* Pointer to the query type                */
   static char mymask[512];      /* To save the mask before corrupting it    */
+  unsigned int who_marker;      /* Used to mark clients we've touched       */
 
   /* Let's find where is our mask, and if actually contains something */
   mask = ((parc > 1) ? parv[1] : 0);
@@ -304,7 +286,7 @@ int m_who(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   counter = (2048 / (counter + 4));
   if (mask && (strlen(mask) > 510))
     mask[510] = '\0';
-  move_marker();
+  who_marker = get_client_marker();
   commas = (mask && strchr(mask, ','));
 
   /* First treat mask as a list of plain nicks/channels */

@@ -2015,13 +2015,18 @@ static void send_except_list(struct Client* cptr, struct Channel* chptr)
 static void send_ban_list(struct Client* cptr, struct Channel* chptr)
 {
   struct SLink* lp;
+  int showbanowner = 0;
 
   assert(0 != cptr);
   assert(0 != chptr);
 
+  /* hide who set the ban from non-chanops */
+  if (IsAnOper(cptr) || is_chan_op(cptr, chptr) || (!feature_bool(FEAT_HIDE_BAN_SETTER)))
+    showbanowner = 1;
+
   for (lp = chptr->banlist; lp; lp = lp->next)
     send_reply(cptr, RPL_BANLIST, chptr->chname, lp->value.ban.banstr,
-	       lp->value.ban.who, lp->value.ban.when);
+               showbanowner ? lp->value.ban.who : "*", lp->value.ban.when);
 
   send_reply(cptr, RPL_ENDOFBANLIST, chptr->chname);
 }
@@ -4860,3 +4865,59 @@ const char* StripColour(const char* text)
   *dest = '\0';
   return (const char*) stripped;
 }
+
+
+/* Returns the number of common channels between two users, upto max. */
+int common_chan_count(struct Client *a, struct Client *b, int max)
+{
+  int count = 0;
+  struct Membership *cptr;
+  struct User *ua, *ub;
+  unsigned int marker = get_client_marker();
+
+  ua = cli_user(a);
+  ub = cli_user(b);
+
+  /* makes no difference to the big O complexity I know */
+  if(ua->joined > ub->joined)
+  {
+    struct User *swapee = ua;
+    ua = ub;
+    ub = swapee;
+  }
+
+  for (cptr=ua->channel;cptr;cptr=cptr->next_channel)
+  {
+    cptr->channel->marker = marker;
+  }
+
+  for (cptr=ub->channel;cptr;cptr=cptr->next_channel)
+  {
+    if (cptr->channel->marker == marker) {
+      count++;
+      if (max && (count >= max))
+        return count;
+    }
+  }
+
+  return count;
+}
+
+unsigned int get_channel_marker(void)
+{
+  static unsigned int marker = 0;
+
+  if (!++marker)
+  {
+    struct Channel *cptr;
+    for (cptr=GlobalChannelList;cptr;cptr=cptr->next)
+    {
+      cptr->marker = 0;
+    }
+
+    marker++;
+  }
+
+  return marker;
+}
+

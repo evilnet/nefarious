@@ -307,6 +307,13 @@ void relay_directed_message(struct Client* sptr, char* name, char* server, const
     return;
   }
 
+  if (sptr != acptr) {
+    if (IsCommonChansOnly(acptr) && !IsAnOper(sptr) && !common_chan_count(acptr, sptr, 1)) {
+      send_reply(sptr, ERR_COMMONCHANSONLY, cli_name(acptr), "PRIVMSG");
+      return;
+    }
+  }
+
   if (!(is_silenced(sptr, acptr)))
     sendcmdto_one(sptr, CMD_PRIVATE, acptr, "%s :%s", name, text);
 }
@@ -368,6 +375,13 @@ void relay_directed_notice(struct Client* sptr, char* name, char* server, const 
     return;
   }
 
+  if (sptr != acptr) {
+    if (IsCommonChansOnly(acptr) && !IsAnOper(sptr) && !common_chan_count(acptr, sptr, 1)) {
+      send_reply(sptr, ERR_COMMONCHANSONLY, cli_name(acptr), "NOTICE");
+      return;
+    }
+  }
+
   if (!(is_silenced(sptr, acptr)))
     sendcmdto_one(sptr, CMD_NOTICE, acptr, "%s :%s", name, text);
 }
@@ -408,6 +422,13 @@ void relay_private_message(struct Client* sptr, const char* name, const char* te
     send_reply(sptr, ERR_PRIVDEAF, cli_name(sptr), "PRIVMSG",
                cli_name(acptr));
     return;
+  }
+
+  if (sptr != acptr) {
+    if (IsCommonChansOnly(acptr) && !IsAnOper(sptr) && !common_chan_count(acptr, sptr, 1)) {
+      send_reply(sptr, ERR_COMMONCHANSONLY, cli_name(acptr), "PRIVMSG");
+      return;
+    }
   }
 
   /*
@@ -457,6 +478,13 @@ void relay_private_notice(struct Client* sptr, const char* name, const char* tex
     send_reply(sptr, ERR_PRIVDEAF, cli_name(sptr), "NOTICE",
                cli_name(acptr));
     return;
+  }
+
+  if (sptr != acptr) {
+    if (IsCommonChansOnly(acptr) && !IsAnOper(sptr) && !common_chan_count(acptr, sptr, 1)) {
+      send_reply(sptr, ERR_COMMONCHANSONLY, cli_name(acptr), "NOTICE");
+      return;
+    }
   }
 
   /*

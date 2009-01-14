@@ -669,12 +669,12 @@ void tstats(struct Client *cptr, const struct StatDesc *sd, char *param)
 char *checkregex(char *s, int check_broadness)
 {
   const char *error;
-  char *errtmp, *tmp;
-  static char errorbuf[512];
+  char *tmp;
   pcre *expr;
-  int errorcode, errorbufsize, regex=0;
+  int regex=0;
   int ovector[186];
   int erroffset;
+  static char errorbuf[512];
 
   for (tmp = s; *tmp; tmp++) {
     if (!IsAlnum(*tmp) && !(*tmp >= 128)) {

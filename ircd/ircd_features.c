@@ -675,6 +675,7 @@ static struct FeatureDesc {
   F_B(HIDDEN_HOST_QUIT, 0, 1, 0),
   F_S(HIDDEN_HOST_SET_MESSAGE, 0, "Registered", 0),
   F_S(HIDDEN_HOST_UNSET_MESSAGE, 0, "UnRegistered", 0),
+  F_B(HIDE_BAN_SETTER, 0, 0, 0),
 
   F_B(CTCP_VERSIONING, 0, 0, 0), /* added by Vadtec 02/25/2008 */
   F_B(CTCP_VERSIONING_KILL, 0, 0, 0), /* added by Vadtec 02/27/2008 */

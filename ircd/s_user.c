@@ -1054,7 +1054,8 @@ static const struct UserMode {
   { FLAG_WHOIS,       'W' },
   { FLAG_SSL,         'z' },
   { FLAG_DISPLAY_MODE, 'H' },
-  { FLAG_NOLINK,      'L' }
+  { FLAG_NOLINK,      'L' },
+  { FLAG_COMMONCHANSONLY, 'q' }
 };
 
 #define USERMODELIST_SIZE sizeof(userModeList) / sizeof(struct UserMode)
@@ -2275,6 +2276,12 @@ Debug((DEBUG_DEBUG, "Test 6"));
           SetNoLink(acptr);
         else
           ClearNoLink(acptr);
+        break;
+      case 'q':
+        if (what == MODE_ADD)
+           SetCommonChansOnly(sptr);
+         else
+           ClearCommonChansOnly(sptr);
         break;
       default:
 	send_reply(acptr, ERR_UMODEUNKNOWNFLAG, *m);

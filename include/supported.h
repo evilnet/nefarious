@@ -28,6 +28,6 @@
 #define infochanmodes "abcehiklmnoprstvzCLMNOQSTZ"
 #define clearchanmodes "abcehiklmoprsvzCLMNOQSTZ" /* ditto except for +nt */
 #define infochanmodeswithparams "behklovL"
-#define infousermodes "acdfghiknoswxzBCHILRWX"
+#define infousermodes "acdfghiknoqswxzBCHILRWX"
 
 #endif /* INCLUDED_supported_h */

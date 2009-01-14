@@ -1,6 +1,46 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Code from Quakenet.
+
+	* doc/example.conf: Added HIDE_BAN_SETTER (default FALSE).
+
+	* doc/readme.features: Documented HIDE_BAN_SETTER.
+
+	* include/channel.h: Added usermode +q.
+
+	* include/client.h: Added usermode +q.
+
+	* include/ircd_features.c: Added Feature HIDE_BAN_SETTER.
+
+	* include/numeric.h: Added ERR_COMMONCHANSONLY (485).
+
+	* include/supported.h: Added usermode +q.
+
+	* ircd/channel.c: Added channel marker function. Also if HIDE_BAN_SETTER
+	is enabled then ban setters will be hidden to non ops and non opers.
+
+	* ircd/client:c Refactor marker code.
+
+	* ircd/ircd_features.c: Added Feature HIDE_BAN_SETTER (default FALSE).
+
+	* ircd/ircd_relay.c: Check for +q when NOTICE'ing and PRIVMSG'ing users.
+
+	* ircd/m_invite.c: If the invitee is not on any of the channels the inviter
+	is on and +q is set on the invitee then deny the INVITE.
+
+	* ircd/m_who.c: Refactor marker code.
+
+	* ircd/s_err.c: Added ERR_COMMONCHANSONLY (485).
+
+	* ircd/s_misc.c: Warning fixes.
+
+	* ircd/s_user.c: Added usermode +q. When enabled people messaging or
+	inviting a person with +q set will need to be on a channel the person
+	is on. If they are not then the message will be denied.
+
 2009-01-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Small tweak to DNSBL_LOC_EXEMPT_N_TWO example.

@@ -188,6 +188,8 @@ enum Flag {
     FLAG_PROPAGATED,                /**< Client has been propagated to other servers */
     FLAG_NOLINK,                    /**< Client will not automatically get redirected if +L is set on a chan */
     FLAG_DISPLAY_MODE,              /**< Oper can hide "Is an IRC Operator/Administrator */
+    FLAG_COMMONCHANSONLY,           /**< SNIRCD_q: hide privmsgs/notices if in no
+                                         common channels (with +ok exceptions) */
 
     FLAG_PRIVDEAF,                  /**< Client is deaf to all private messages */
 
@@ -280,7 +282,7 @@ struct Client {
 				
   time_t         cli_firsttime; /**< time client was created */
   time_t         cli_lastnick;  /**< TimeStamp on nick */
-  int            cli_marker;    /**< /who processing marker */
+  unsigned int   cli_marker;    /**< /who processing marker */
   struct Flags   cli_flags;     /**< client flags */
   unsigned int   cli_oflags;    /**< oper flags */
   unsigned int   cli_hopcount;  /**< number of servers to this 0 = local */
@@ -719,6 +721,8 @@ struct Client {
 #define IsNoLink(x)             HasFlag(x, FLAG_NOLINK)
 /** Return non-zero if the oper has +H set */
 #define IsHideOper(x)           HasFlag(x, FLAG_DISPLAY_MODE)
+/** Return non-zero if the client has set mode +q (common chans only). */
+#define IsCommonChansOnly(x)    HasFlag(x, FLAG_COMMONCHANSONLY)
 
 /** Mark a client as having access. */
 #define SetAccess(x)            SetFlag(x, FLAG_CHKACCESS)
@@ -810,6 +814,8 @@ struct Client {
 #define SetNoLink(x)            SetFlag(x, FLAG_NOLINK)
 /** Mark a oper as having +H set */
 #define SetHideOper(x)          SetFlag(x, FLAG_DISPLAY_MODE)
+/** Mark a client as having mode +q (common chans only). */
+#define SetCommonChansOnly(x)   SetFlag(x, FLAG_COMMONCHANSONLY)
 
 /** Clear the client's access flag. */
 #define ClearAccess(x)          ClrFlag(x, FLAG_CHKACCESS)
@@ -883,6 +889,8 @@ struct Client {
 #define ClearNoLink(x)          ClrFlag(x, FLAG_NOLINK)
 /** Oper is no longer hiding their status */
 #define ClearHideOper(x)        ClrFlag(x, FLAG_DISPLAY_MODE)
+/** Remove mode +q (common chans only) from a client */
+#define ClearCommonChansOnly(x) ClrFlag(x, FLAG_COMMONCHANSONLY)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \
@@ -1104,5 +1112,7 @@ extern char *client_print_privs(struct Client* client);
 extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
 
 extern void DoMD5(unsigned char *mdout, unsigned char *src, unsigned long n);
+
+extern unsigned int get_client_marker(void);
 
 #endif /* INCLUDED_client_h */

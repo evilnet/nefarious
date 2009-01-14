@@ -441,6 +441,7 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	ERR_KILLDENY         485	   unreal */
 /*	ERR_CANTKICKADMIN    485	   PTlink */
 /*	ERR_HTMDISABLED      486	   unreal */
+#define ERR_COMMONCHANSONLY  485        /* QuakeNet/snircd extension */
 #define ERR_ACCOUNTONLY      486	/* ASUKA/Nefarious extension */
 #define ERR_PRIVDEAF         487        /* Nefarious extension */
 /*      ERR_CHANTOORECENT    487           IRCnet extension (?) */

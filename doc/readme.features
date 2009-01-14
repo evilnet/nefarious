@@ -1909,3 +1909,11 @@ FILTER_WARN_TIME
 
 If a spam filter regular expression takes longer than this (in miliseconds) to
 process a warning notice will be sent out.
+
+HIDE_BAN_SETTER
+ * Type: boolean
+ * Default: FALSE
+ 
+When enabled the ban setter will be hidden from all non channel ops. Both opers
+and channel ops will be able to see the setter.
+

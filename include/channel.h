@@ -275,6 +275,7 @@ struct Channel {
   struct SLink*      banlist;
   struct SLink*      exceptlist;
   struct Mode        mode;
+  unsigned int       marker;       /**< Channel marker */
   char               topic[TOPICLEN + 1];
   char               topic_nick[NICKLEN + USERLEN + HOSTLEN + 3];
   char               chname[1];
@@ -446,5 +447,8 @@ extern int is_ext_banned(struct Client *cptr, struct Channel *chptr, struct Memb
 extern int is_ext_excepted(struct Client *cptr, struct Channel *chptr, struct Membership* member, int flags);
 extern int is_excepted(struct Client *cptr, struct Channel *chptr, struct Membership* member, int shared);
 extern int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text);
+extern int common_chan_count(struct Client *a, struct Client *b, int max);
+
+extern unsigned int get_channel_marker(void);
 
 #endif /* INCLUDED_channel_h */
