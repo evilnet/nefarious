@@ -3,6 +3,10 @@
 
 2009-01-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_info.c: Cleanup.
+
+2009-01-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/opers/silence: Updated SILENCE help.
 
 	* include/s_user.h: Added silence flags.
