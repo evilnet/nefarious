@@ -131,7 +131,6 @@ int m_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 int ms_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
   const char **text;
-  const char **otext;
 
   if (IsServer(sptr))
     return 0;
@@ -148,7 +147,7 @@ int ms_info(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   else
   {
     for (text=othertext;*text;text++)
-      send_reply(sptr, RPL_INFO, *otext);
+      send_reply(sptr, RPL_INFO, *text);
   }
 
   send_reply(sptr, SND_EXPLICIT | RPL_INFO, ":Birth Date: %s, compile # %s",

@@ -274,7 +274,8 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
         }
       }
 
-      send_reply(sptr, RPL_WHOISDNSBL, name, cli_dnsbls(acptr));
+      send_reply(sptr, RPL_WHOISDNSBL, name, cli_dnsbls(acptr), cli_killmark(acptr) ? " " : "",
+                 cli_killmark(acptr) ? cli_killmark(acptr) : "");
     }
 
     if (IsSSL(acptr) && ((parc >= 3) || (acptr == sptr) ||

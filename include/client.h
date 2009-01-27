@@ -295,6 +295,7 @@ struct Client {
   char cli_info[REALLEN + 1];        /**< Free form additional client information */
   char cli_version[VERSIONLEN + 1];  /**< Free form client version information - added by Vadtec 02/26/2008 */
   char cli_webirc[BUFSIZE + 1];      /**< webirc description */
+  char cli_killmark[BUFSIZE + 1];    /**< Kill block mark */
   char cli_dnsbl[BUFSIZE + 1];       /**< dnsbl hostname identifier */
   char cli_dnsbls[BUFSIZE + 1];      /**< all dnsbls matched identifier */
   struct SLink*   cli_sdnsbls;       /**< chain of dnsbl pointer blocks */
@@ -359,6 +360,8 @@ struct Client {
 #define cli_version(cli)	((cli)->cli_version)
 /** Get client webirc description */
 #define cli_webirc(cli)         ((cli)->cli_webirc)
+/** Get client killmark information */
+#define cli_killmark(cli)       ((cli)->cli_killmark)
 /** Get client realname (information field). */
 #define cli_info(cli)		((cli)->cli_info)
 /** Get client oper flags. */

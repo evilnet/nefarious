@@ -132,6 +132,7 @@ static struct lexer_token {
   TOKEN(VERSION),
   TOKEN(WEBIRC),
   TOKEN(CHANNEL),
+  TOKEN(KLINEPROMPT),
 #undef TOKEN
   { "administrator", ADMIN },
   { "auto", AUTOCONNECT },

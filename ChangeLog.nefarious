@@ -1,6 +1,40 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added klineprompt feature to Kill blocks.
+
+	* include/client.h: Added cli_killmark.
+
+	* include/ircd_features.h: Added 2 new Feature block entries.
+
+	* include/mark.h: Added MARK_KILL.
+
+	* include/s_conf.h: Added promptcomment and find_prompt.
+
+	* ircd/channel.c: Ban check killmark's like how dnsbl marks are done.
+
+	* ircd/ircd_features.c: Added and KLINE_PROMPT_ONE and KLINE_PROMPT_TWO.
+
+	* ircd/ircd_lexer.l: Added KLINEPROMPT.
+
+	* ircd/ircd_parser.y: Added KLINEPROMPT support.
+
+	* ircd/m_info.c: Warning fix.
+
+	* ircd/m_mark.c: Added MARK_KILL.
+
+	* ircd/m_whois.c: Show client killmark information in RPL_WHOISDNSBL.
+
+	* ircd/s_conf.c: Added promptcomment and find_prompt.
+
+	* ircd/s_err.c: Updated RPL_WHOISDNSBL.
+
+	* ircd/s_user.c: If a user is Kill'ed (K:lined) and if the block has
+	the prompt feature then they will be asked to auth to services to
+	continue.
+
 2009-01-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_info.c: Cleanup.
@@ -15,7 +49,9 @@
 
 	* ircd/m_invite.c: Implemented silence exemptions.
 
-	* ircd/m_silence.c: Implemented silence exemptions. The format is the same as standard ircu, /SILENCE +/-[~]mask. If the ~ is specified then it will be classed as an exempt.
+	* ircd/m_silence.c: Implemented silence exemptions. The format is the same
+	as standard ircu, /SILENCE +/-[~]mask. If the ~ is specified then it will
+	be classed as an exempt.
 
 	* ircd/s_err.c: Added extra %s to RPL_SILELIST.
 

@@ -29,6 +29,7 @@
 #define MARK_CVERSION		"CVERSION"
 #define MARK_WEBIRC		"WEBIRC"
 #define MARK_SFILTER            "SFILTER"
+#define MARK_KILL               "KILL"
 
 #endif /* INCLUDED_mark_h */
 

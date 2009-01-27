@@ -369,6 +369,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 {
   struct ConfItem* aconf;
   struct Shun*     ashun = NULL;
+  struct DenyConf* deny;
   char*            parv[4];
   char*            join[2];
   char*            tmpstr;
@@ -500,6 +501,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
       return exit_client(cptr, sptr, &me,
         killreason == -1 ? "K-lined" : "G-lined");
     }
+
     /*
      * Check for mixed case usernames, meaning probably hacked.  Jon2 3-94
      * Summary of rules now implemented in this patch:         Ensor 11-94
@@ -626,6 +628,31 @@ int register_user(struct Client *cptr, struct Client *sptr,
     }
     return 0;
 
+  }
+
+  if ((deny=find_prompt(sptr)) && !IsAccount(sptr) && MyConnect(sptr)) {
+    log_write(LS_DNSBL, L_INFO, 0, "Offering kline loc exemption to %s", cli_name(sptr));
+    if (!EmptyString(deny->mark)) {
+    }
+
+    if (deny->flags & DENY_FLAGS_FILE)
+      promptcomment(cptr, deny->message);
+    else {
+      if (EmptyString(deny->message))
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :K-lined: Connection from your host is refused on this server.", sptr);
+      else
+        sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :K-lined: %s", sptr, deny->message);
+    }
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_KLINE_PROMPT_ONE));
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :%s", sptr, feature_str(FEAT_KLINE_PROMPT_TWO));
+
+    if (!EmptyString(deny->mark)) {
+      ircd_strncpy(cli_killmark(sptr), deny->mark, BUFSIZE);
+      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(cptr), MARK_KILL, cli_killmark(sptr));
+    }
+
+    MyFree(cli_loc(sptr));
+    return 0;
   }
 
   ircd_snprintf(0, userhostgecos, sizeof(userhostgecos), "%s!%s@%s:%s", cli_name(sptr), user->username, cli_user(sptr)->realhost, cli_info(sptr));

@@ -336,6 +336,40 @@ static void killcomment(struct Client* sptr, const char* filename)
   fbclose(file);
 }
 
+/*
+ * output the reason for being k lined from a file  - Mmmm
+ * sptr is client being dumped
+ * filename is the file that is to be output to the K lined client
+ */
+int promptcomment(struct Client* sptr, const char* filename)
+{
+  FBFILE*     file = 0;
+  char        line[80];
+  struct stat sb;
+  struct tm*  tm;
+
+  if (NULL == (file = fbopen(filename, "r"))) {
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :K-lined: Connection from your host is refused on this server.", sptr);
+    return 0;
+  }
+  fbstat(&sb, file);
+  tm = localtime((time_t*) &sb.st_mtime);        /* NetBSD needs cast */
+  while (fbgets(line, sizeof(line) - 1, file)) {
+    char* end = line + strlen(line);
+    while (end > line) {
+      --end;
+      if ('\n' == *end || '\r' == *end)
+        *end = '\0';
+      else
+        break;
+    }
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :K-lined: %s", line);
+  }
+
+  fbclose(file);
+  return 0;
+}
+
 struct ConfItem* make_conf(void)
 {
   struct ConfItem* aconf;
@@ -2092,6 +2126,9 @@ int find_kill(struct Client *cptr)
    *             -- Isomer
    */
   for (deny = denyConfList; deny; deny = deny->next) {
+    if (deny->flags & DENY_FLAGS_PROMPT) /* handled by find_prompt */
+      continue;
+
     if (0 != match(deny->usermask, name))
       continue;
 
@@ -2139,6 +2176,72 @@ int find_kill(struct Client *cptr)
     return -2;
     
   return 0;
+}
+
+/*
+ * find_prompt
+ * input:
+ *  client pointer
+ * returns:
+ *  dconf
+ */
+struct DenyConf *find_prompt(struct Client *cptr)
+{
+  const char*      host;
+  const char*      name;
+  const char*      realname;
+  const char*      version; /* added by Vadtec 02/26/2008 */
+  struct DenyConf* deny;
+
+  assert(0 != cptr);
+
+  if (!cli_user(cptr))
+    return 0;
+
+  host = cli_sockhost(cptr);
+  name = cli_user(cptr)->username;
+  realname = cli_info(cptr);
+  version = cli_version(cptr); /* added by Vadtec 02/26/2008 */
+
+  assert(strlen(host) <= HOSTLEN);
+  assert((name ? strlen(name) : 0) <= HOSTLEN);
+  assert((realname ? strlen(realname) : 0) <= REALLEN);
+  assert((version ? strlen(version) : 0) <= VERSIONLEN); /* added by Vadtec 02/26/2008 */
+
+  /* 2000-07-14: Rewrote this loop for massive speed increases.
+   *             -- Isomer
+   */
+  for (deny = denyConfList; deny; deny = deny->next) {
+    if (deny->flags & DENY_FLAGS_PROMPT) {
+
+      if (0 != match(deny->usermask, name))
+        continue;
+
+      if (EmptyString(deny->hostmask))
+        break;
+
+      if (deny->flags & DENY_FLAGS_VERSION && feature_bool(FEAT_CTCP_VERSIONING) && feature_bool(FEAT_CTCP_VERSIONING_KILL)) { /* K: by version - added by Vadtec 02/25/2006 */
+        if (0 == match(deny->hostmask, version))
+	break;
+      }
+      else if (deny->flags & DENY_FLAGS_REALNAME) { /* K: by real name */
+        if (0 == match(deny->hostmask, realname))
+	  break;
+      } else if (deny->flags & DENY_FLAGS_IP) { /* k: by IP */
+        Debug((DEBUG_DEBUG, "ip: %08x network: %08x/%i mask: %08x",
+               cli_ip(cptr).s_addr, deny->address, deny->bits, NETMASK(deny->bits)));
+        if ((cli_ip(cptr).s_addr & NETMASK(deny->bits)) == deny->address)
+          break;
+      }
+      else if (0 == match(deny->hostmask, host))
+        break;
+    }
+  }
+
+  if (deny && !find_eline(cptr, EFLAG_KLINE))
+    return deny;
+  else
+    return NULL;
 }
 
 /*

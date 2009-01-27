@@ -101,6 +101,7 @@ struct DenyConf {
   char*               hostmask;
   char*               message;
   char*               usermask;
+  char*               mark;
   unsigned int        address;
   unsigned int        flags;
   char                bits;        /* Number of bits for ipkills */
@@ -110,6 +111,7 @@ struct DenyConf {
 #define DENY_FLAGS_IP       0x0002 /* K-line by IP address */
 #define DENY_FLAGS_REALNAME 0x0004 /* K-line by real name */
 #define DENY_FLAGS_VERSION  0x0008 /* K-line by CTCP version - added by Vadtec 02/26/2008 */
+#define DENY_FLAGS_PROMPT   0x0010
 
 /*
  * A line: A:<line 1>:<line 2>:<line 3>
@@ -308,6 +310,8 @@ extern void read_tlines(void);
 extern int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned int flags, char *target);
 extern int find_eline(struct Client *cptr, unsigned int flags);
 extern int find_kill(struct Client *cptr);
+extern struct DenyConf *find_prompt(struct Client *cptr);
+
 extern int find_restrict(struct Client *cptr);
 extern struct MotdItem* read_motd(const char* motdfile);
 
@@ -334,6 +338,7 @@ extern int add_dnsbl(struct Client* sptr, const char* dnsbl);
 extern int del_dnsbl(struct Client* sptr, char* dnsbl);
 extern int watchfflagstr(const char* fflags);
 extern int reactfflagstr(const char* fflags);
+extern int promptcomment(struct Client* sptr, const char* filename);
 
 extern void yyerror(const char *msg);
 extern void yyserror(const char *fmt, ...);

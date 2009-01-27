@@ -727,6 +727,18 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
         break;
     }
 
+    if (!EmptyString(cli_killmark(cptr))) {
+      char tmpdhoste[BUFSIZE + 1];
+
+      ircd_snprintf(0, tmpdhoste, BUFSIZE, "%s.%s", cli_killmark(cptr), cli_user(cptr)->realhost);
+      sde = make_nick_user_host(nu_dnsblhoste, cli_name(cptr),
+                                cli_user(cptr)->realusername,
+                                tmpdhoste);
+
+      if (sde && match(tmpe->value.except.exceptstr, sde) == 0)
+        break;
+    }
+
     if (tmpe->value.except.extflag & EXTEXCEPT_CHAN) {
       struct Membership *lp;
       struct Channel *chptr;
@@ -958,6 +970,18 @@ int is_ext_banned(struct Client *cptr, struct Channel *chptr,
           if (dnsblb == 1)
             break;
         }
+
+        if (!EmptyString(cli_killmark(cptr))) {
+          char tmpdhostb[BUFSIZE + 1];
+
+          ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", cli_killmark(cptr), cli_user(cptr)->realhost);
+          sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                                    cli_user(cptr)->realusername,
+                                    tmpdhostb);
+
+          if (sd && match(tmp->value.ban.extstr, sd) == 0)
+            break;
+        }
   
         if (match(tmp->value.ban.extstr, s) == 0)
           break;
@@ -1100,6 +1124,18 @@ int is_ext_excepted(struct Client *cptr, struct Channel *chptr,
           }
 
           if (dnsblb == 1)
+            break;
+        }
+
+        if (!EmptyString(cli_killmark(cptr))) {
+          char tmpdhostb[BUFSIZE + 1];
+
+          ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", cli_killmark(cptr), cli_user(cptr)->realhost);
+          sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                                   cli_user(cptr)->realusername,
+                                   tmpdhostb);
+
+          if (sd && match(tmp->value.except.extstr, sd) == 0)
             break;
         }
   
@@ -1259,6 +1295,20 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
       }
 
       if (dnsblb == 1) {
+        banned = 1;
+        break;
+      }
+    }
+
+    if (!EmptyString(cli_killmark(cptr))) {
+      char tmpdhostb[BUFSIZE + 1];
+
+      ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", cli_killmark(cptr), cli_user(cptr)->realhost);
+      sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               tmpdhostb);
+
+      if (sd && match(tmp->value.ban.banstr, sd) == 0) {
         banned = 1;
         break;
       }

@@ -238,6 +238,7 @@ static void free_slist(struct SLink **link) {
 %token FROM
 %token LENGTH
 %token CHANNEL
+%token KLINEPROMPT
 %token TEOF
 %token LOGICAL_AND LOGICAL_OR
 %token CONNECTED DIRECTCON VIA DIRECTOP
@@ -876,7 +877,7 @@ killblock: KILL
 } '{' killitems '}' ';'
 {
   if (dconf->usermask || dconf->hostmask || (dconf->flags & DENY_FLAGS_REALNAME) ||
-          (dconf->flags & DENY_FLAGS_VERSION))
+          (dconf->flags & DENY_FLAGS_VERSION) || (dconf->flags & DENY_FLAGS_PROMPT))
   {
     if ((dconf->flags & DENY_FLAGS_REALNAME) || (dconf->flags & DENY_FLAGS_VERSION))
       DupString(dconf->usermask, "*");
@@ -895,7 +896,7 @@ killblock: KILL
   dconf = NULL;
 };
 killitems: killitem killitems | killitem;
-killitem: killuhost | killversion | killreal | killusername | killreasonfile | killreason;
+killitem: killuhost | killversion | killreal | killusername | killreasonfile | killreason | killname | killprompt;
 killuhost: HOST '=' QSTRING ';'
 {
   char *h;
@@ -969,12 +970,20 @@ killreason: REASON '=' QSTRING ';'
  MyFree(dconf->message);
  dconf->message = $3;
 };
-
 killreasonfile: TFILE '=' QSTRING ';'
 {
  dconf->flags |= DENY_FLAGS_FILE;
  MyFree(dconf->message);
  dconf->message = $3;
+};
+killname: NAME '=' QSTRING ';'
+{
+ MyFree(dconf->mark);
+ dconf->mark= $3;
+};
+killprompt: KLINEPROMPT ';'
+{
+  dconf->flags |= DENY_FLAGS_PROMPT;
 };
 
 
