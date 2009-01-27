@@ -1,4 +1,4 @@
-/NOTICE <target> :<message>
+/PRIVMSG <target> :<message>
 
 Sends a notice to a target, where <target> can be
 a comma separated list of one or more nicks or channels.
@@ -15,4 +15,4 @@ message to all users on a server.
 Parameter <target> can be a $@<hostmask> to broadcast a
 message to all users with a matching host.
 
-See Also: PRIVMSG
+See Also: NOTICE

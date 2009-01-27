@@ -1,6 +1,28 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* help/Makefile.in: Symlink user from opers dir.
+
+	* help/users/index: Added PRIVMSG and USER.
+
+	* help/users/notice: Added Non oper specific NOTICE help file.
+
+	* help/users/privmsg: Added non oper specific PRIVMSG help file.
+
+	* help/opers/index: Added PRIVMSG, UPING and USER.
+
+	* help/opers/notice: Updated NOTICE help.
+
+	* help/opers/privmsg: Added oper specific PRIVMSG help file.
+
+	* help/opers/privs: Spelling fixes.
+
+	* help/opers/uping: Added UPING help file.
+
+	* help/opers/user: Added USER help file.
+
 2009-01-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added klineprompt feature to Kill blocks.

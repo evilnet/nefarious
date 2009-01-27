@@ -1,0 +1,5 @@
+/UPING <server> [<port>] [<remote server>] [<number of packets>]
+
+Pings the host of the server with UDP packets - server
+does not have to be linked. By default port 7007 is used,
+and 5 packets are sent (maximum is 20).

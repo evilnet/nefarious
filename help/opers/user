@@ -1,0 +1,6 @@
+/USER <username> <hostname> <servername> :<realname>
+
+Registers a new client connection. Parameters <hostname>
+and <servername> are ignored.
+
+See Also: NICK

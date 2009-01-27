@@ -16,7 +16,7 @@ SYMLINKS=	admin away challenge invite names nick version \
 		cprivmsg credits copyright info ircops ison links \
 		lusers map notice pass rules silence sethost topic \
 		userhost userip wallchops wallhops wallvoices whois \
-		commands
+		commands user
 
 all:
 build:

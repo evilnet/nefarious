@@ -9,10 +9,5 @@ to all channel operators (same as WALLCHOPS)
 Parameter <target> can be in the form of <nick>@<server>
 to send to a service.
 
-Parameter <target> can be a $<servername> to broadcast a
-message to all users on a server.
-
-Parameter <target> can be a $@<hostmask> to broadcast a
-message to all users with a matching host.
-
 See Also: PRIVMSG
+

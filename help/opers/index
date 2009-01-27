@@ -19,7 +19,7 @@ PASS            PRIVS           QUIT            REHASH          RESET           
 RULES           SET             SETTIME         SETHOST         SHUN            SILENCE
 SQUIT           STATS           TIME            TOPIC           TRACE           UHELP
 USERHOST        USERIP          WALLCHOPS       WALLHOPS        WALLVOICES      WHO
-WHOIS           ZLINE           GLOBOPS
+WHOIS           ZLINE           GLOBOPS         PRIVMSG         UPING           USER
 
 
 Other help which may be of use:
