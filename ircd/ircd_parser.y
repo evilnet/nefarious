@@ -103,6 +103,7 @@
   extern struct CRuleConf*  cruleConfList;
   extern struct LocalConf   localConf;
 
+  struct sline *spoof;
   struct Privs privs;
   struct Privs privs_dirty;
 
@@ -1382,76 +1383,73 @@ exceptflags: FLAGS '=' QSTRING ';'
   dflags = $3;
 };
 
-spoofhostblock: SPOOFHOST '{' spoofhostitems '}' ';'
+spoofhostblock: SPOOFHOST QSTRING '{'
 {
+  spoof = MyCalloc(1, sizeof(struct sline));
+  spoof->spoofhost = $2;
+  spoof->passwd = NULL;
+  spoof->realhost = NULL;
+  spoof->username = NULL;
+}
+spoofhostitems '}' ';'
+{
+  int valid = 0;
   struct prefix *p;
-  struct sline *sline;
 
-  if (!hostmask && ident)
-    parse_error("Spoofhost block error, if using a hostname then the username must not be empty.");
-  else if (!ident && hostmask)
-    parse_error("Spoofhost block error, if using a usernamen then the hostname must not be empty.");
-  else {
-    p = (struct prefix *) MyMalloc(sizeof(struct prefix));
-    sline = (struct sline *) MyMalloc(sizeof(struct sline));
-    DupString(sline->spoofhost, spoofhost);
-    if (pass)
-     DupString(sline->passwd, pass);
-    else
-      sline->passwd = NULL;
-    if (hostmask) {
-      DupString(sline->realhost, hostmask);
-      if (check_if_ipmask(sline->realhost)) {
-        if (str2prefix(sline->realhost, p) != 0) {
-          sline->address = p->address;
-          sline->bits = p->bits;
-          sline->flags = SLINE_FLAGS_IP;
+  if (spoof->username == NULL && spoof->realhost) {
+    parse_error("Username missing in spoofhost.");
+  } else if (spoof->realhost == NULL && spoof->username) {
+    parse_error("Realhost missing in spoofhost.");
+  } else 
+    valid = 1;
+
+  if (valid) {
+    if (spoof->realhost) {
+      if (check_if_ipmask(spoof->realhost)) {
+        if (str2prefix(spoof->realhost, p) != 0) {
+          spoof->address = p->address;
+          spoof->bits = p->bits;
+          spoof->flags = SLINE_FLAGS_IP;
         } else {
-           sline->flags = SLINE_FLAGS_HOSTNAME;
+           spoof->flags = SLINE_FLAGS_HOSTNAME;
         }
       } else
-        sline->flags = SLINE_FLAGS_HOSTNAME;
+        spoof->flags = SLINE_FLAGS_HOSTNAME;
     } else {
-      sline->realhost = NULL;
-      sline->flags = 0;
+      spoof->realhost = NULL;
+      spoof->flags = 0;
     }
-    if (username)
-      DupString(sline->username, ident);
-    else
-       sline->username = NULL;
 
-    sline->next = GlobalSList;
-    GlobalSList = sline;
-    MyFree(p);
-
-    spoofhost = NULL;
-    pass = NULL;
-    hostmask = NULL;
-    ident = NULL;
+    spoof->next = GlobalSList;
+    GlobalSList = spoof;
+  } else {
+    MyFree(spoof->spoofhost);
+    MyFree(spoof->passwd);
+    MyFree(spoof->realhost);
+    MyFree(spoof->username);
+    MyFree(spoof);
   }
+  spoof = NULL;
 };
-spoofhostitems: spoofhostitem | spoofhostitems spoofhostitem;
-spoofhostitem: spoofhostspoof | spoofhostpass | spoofhostmask | spoofhostident;
-spoofhostspoof: SPOOF '=' QSTRING ';'
+
+spoofhostitems: spoofhostitem spoofhostitems | spoofhostitem;
+spoofhostitem: spoofhostpassword | spoofhostrealhost | spoofhostrealident;
+spoofhostpassword: PASS '=' QSTRING ';'
 {
-  MyFree(spoofhost);
-  spoofhost = $3;
+  MyFree(spoof->passwd);
+  spoof->passwd = $3;
 };
-spoofhostpass: PASS '=' QSTRING ';'
+spoofhostrealhost: HOST '=' QSTRING ';'
 {
-  MyFree(pass);
-  pass = $3;
+  MyFree(spoof->realhost);
+  spoof->realhost = $3;
 };
-spoofhostmask: HOSTMASK '=' QSTRING ';'
+spoofhostrealident: USERNAME '=' QSTRING ';'
 {
-  MyFree(host);
-  hostmask = $3;
+  MyFree(spoof->username);
+  spoof->username = $3;
 };
-spoofhostident: IDENT '=' QSTRING ';'
-{
-  MyFree(ident);
-  ident = $3;
-};
+
 
 redirectblock: REDIRECT '{' redirectitems '}' ';'
 {

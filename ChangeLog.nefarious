@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-01-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Updated spoofhost block syntax.
+
+	* ircd/ircd_parser.y: Updated spoofhost block parser.
+
 2009-01-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* help/Makefile.in: Symlink user from opers dir.
