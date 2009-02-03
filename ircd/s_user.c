@@ -1844,7 +1844,7 @@ int set_hostmask(struct Client *sptr, struct Client *cptr, char *hostmask, char 
     if (MyConnect(cptr) && !IsServer(sptr)) {
       if (IsAnOper(cptr)) {
         if ((new_vhost = IsVhost(host, 1)) == NULL) {
-          if (!feature_bool(FEAT_SETHOST_FREEFORM)) {
+          if (!HasPriv(cptr, PRIV_FREEFORM)) {
             send_reply(cptr, ERR_HOSTUNAVAIL, hostmask);
             log_write(LS_SETHOST, L_INFO, LOG_NOSNOTICE,
                 "SETHOST (%s@%s) by (%#R): no such s-line",

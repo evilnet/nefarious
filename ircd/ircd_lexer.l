@@ -187,6 +187,7 @@ static struct lexer_token {
   { "see_chan", TPRIV_SEE_CHAN },
   { "see_opers", TPRIV_SEE_OPERS },
   { "set", TPRIV_SET },
+  { "freeform", TPRIV_FREEFORM },
   { "show_all_invis", TPRIV_SHOW_ALL_INVIS },
   { "show_invis", TPRIV_SHOW_INVIS },
   { "unlimit_query", TPRIV_UNLIMIT_QUERY },

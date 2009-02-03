@@ -3,6 +3,26 @@
 
 2009-02-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Change SETHOST_FREEFROM to a PRIV setting (FREEFORM).
+
+	* doc/readme.features: Removed SETHOST_FREEFORM.
+
+	* include/client.h: Moved SETHOST_FREEFORM to a PRIV (FREEFORM).
+
+	* include/ircd_features.h: Removed SETHOST_FREEFORM.
+
+	* ircd/client.c: Moved SETHOST_FREEFORM to a PRIV (FREEFORM).
+
+	* ircd/ircd_features.c: Removed SETHOST_FREEFORM.
+
+	* ircd/ircd_lexer.l: Added FREEFORM priv.
+
+	* ircd/ircd_parser.y: Added FREEFORM priv.
+
+	* ircd/s_user.c: Moved SETHOST_FREEFORM to a PRIV (FREEFORM).
+
+2009-02-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Typo fix.
 
 2009-02-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

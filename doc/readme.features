@@ -897,14 +897,6 @@ SETHOST_AUTO
 
  This enables the automatic application of Sethosts on matching idents and hosts.
 
-SETHOST_FREEFORM
- * Type: boolean
- * Default: TRUE
-
- This enables opers to set new hostnames that do not have a corresponding S: line
- in the configuration file, as long as the hostname supplied is reasonably valid.
- The usage if this is logged via SNOTICE.
-
 REMOTE_OPER
  * Type: boolean
  * Default: TRUE

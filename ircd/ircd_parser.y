@@ -244,6 +244,7 @@ static void free_slist(struct SLink **link) {
 %token LOGICAL_AND LOGICAL_OR
 %token CONNECTED DIRECTCON VIA DIRECTOP
 /* and now a lot of priviledges... */
+%token TPRIV_FREEFORM
 %token TPRIV_CHAN_LIMIT
 %token TPRIV_MODE_LCHAN
 %token TPRIV_WALK_LCHAN
@@ -838,6 +839,7 @@ privtype:  TPRIV_DISPLAY_MODE { $$ = PRIV_DISPLAY_MODE; } |
            TPRIV_HIDE_IDLE { $$ = PRIV_HIDE_IDLE; } |
            TPRIV_XTRAOP { $$ = PRIV_XTRAOP; } |
            TPRIV_HIDE_CHANNELS { $$ = PRIV_HIDE_CHANNELS; } |
+           TPRIV_FREEFORM { $$ = PRIV_FREEFORM; } |
            LOCAL { $$ = PRIV_PROPAGATE; invert = 1; } ;
 
 yesorno: YES { $$ = 1; } | NO { $$ = 0; };

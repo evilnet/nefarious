@@ -119,6 +119,8 @@ enum Priv {
   PRIV_HIDE_IDLE,       /**< oper can set/unset user mode +I */
   PRIV_XTRAOP,          /**< oper can set/unset user mode +X */
   PRIV_HIDE_CHANNELS,   /**< oper can set/unset user mode +n */
+  PRIV_FREEFORM,        /**< oper can set any host on themseves using set host
+                              as long as its a valid host */
   PRIV_LAST_PRIV        /**< number of privileges */
 };
 
