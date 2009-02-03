@@ -431,23 +431,23 @@ static Numeric replyTable[] = {
 /* 200 */
   { RPL_TRACELINK, "Link %s.%s %s %s", "200" },
 /* 201 */
-  { RPL_TRACECONNECTING, "Try. %d %s", "201" },
+  { RPL_TRACECONNECTING, "Try. %s %s", "201" },
 /* 202 */
-  { RPL_TRACEHANDSHAKE, "H.S. %d %s", "202" },
+  { RPL_TRACEHANDSHAKE, "H.S. %s %s", "202" },
 /* 203 */
-  { RPL_TRACEUNKNOWN, "???? %d %s", "203" },
+  { RPL_TRACEUNKNOWN, "???? %s %s", "203" },
 /* 204 */
-  { RPL_TRACEOPERATOR, "Oper %d %s %ld", "204" },
+  { RPL_TRACEOPERATOR, "Oper %s %s %ld", "204" },
 /* 205 */
-  { RPL_TRACEUSER, "User %d %s %ld", "205" },
+  { RPL_TRACEUSER, "User %s %s %ld", "205" },
 /* 206 */
-  { RPL_TRACESERVER, "Serv %d %dS %dC %s %s!%s@%s %ld %ld", "206" },
+  { RPL_TRACESERVER, "Serv %s %dS %dC %s %s!%s@%s %ld %ld", "206" },
 /* 207 */
   { 0 },
 /* 208 */
   { RPL_TRACENEWTYPE, "<newtype> 0 %s", "208" },
 /* 209 */
-  { RPL_TRACECLASS, "Class %d %d", "209" },
+  { RPL_TRACECLASS, "Class %s %u", "209" },
 /* 210 */
   { 0 },
 /* 211 */
@@ -455,17 +455,17 @@ static Numeric replyTable[] = {
 /* 212 */
   { RPL_STATSCOMMANDS, "%s %u %u", "212" },
 /* 213 */
-  { RPL_STATSCLINE, "C %s %s %d %d %s %d", "213" },
+  { RPL_STATSCLINE, "C %s %s %d %d %s %s", "213" },
 /* 214 */
   { 0 },
 /* 215 */
-  { RPL_STATSILINE, "I %s * %s %d %d", "215" },
+  { RPL_STATSILINE, "I %s * %s %d %s", "215" },
 /* 216 */
   { RPL_STATSKLINE, "%c %s \"%s\" %s %s 0 0", "216" },
 /* 217 */
   { RPL_STATSPLINE, "P %d %d %s %s", "217" },
 /* 218 */
-  { RPL_STATSYLINE, "%c %d %d %d %d %ld %d", "218" },
+  { RPL_STATSYLINE, "%c %s %d %d %d %ld %d", "218" },
 /* 219 */
   { RPL_ENDOFSTATS, "%s :End of /STATS report", "219" },
 /* 220 */
@@ -515,7 +515,7 @@ static Numeric replyTable[] = {
 /* 242 */
   { RPL_STATSUPTIME, ":Server Up %d days, %d:%02d:%02d", "242" },
 /* 243 */
-  { RPL_STATSOLINE, "O %s * %s %s %d", "243" },
+  { RPL_STATSOLINE, "O %s * %s %s %s", "243" },
 /* 244 */
   { RPL_STATSHLINE, "H %s * %s %d", "244" },
 /* 245 */

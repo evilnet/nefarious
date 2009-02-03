@@ -704,8 +704,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
       else {
         int class_exempt = 0, loc_exempt = 0;
 
-        if ((get_client_class(sptr) == feature_int(FEAT_DNSBL_EXEMPT_CLASS)) &&
-  	   (feature_int(FEAT_DNSBL_EXEMPT_CLASS) > 0)) {
+        if (0 == ircd_strcmp(get_client_class(sptr), feature_str(FEAT_DNSBL_EXEMPT_CLASS))) {
     	  class_exempt = 1;
           log_write(LS_DNSBL, L_INFO, 0, "Client %s is class exempted.", cli_name(sptr));
         }
@@ -2339,14 +2338,12 @@ Debug((DEBUG_DEBUG, "Test 6"));
     if (!FlagHas(&setflags, FLAG_CHSERV) &&
 	!(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr) &&
         (HasPriv(acptr, PRIV_XTRAOP) ||
-	((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
-	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS))))))
+        (0 == ircd_strcmp(feature_str(FEAT_XTRAOP_CLASS), get_client_class(acptr))))))
       ClearChannelService(acptr);
     if (!FlagHas(&setflags, FLAG_XTRAOP) &&
 	!(feature_bool(FEAT_OPER_XTRAOP) && IsOper(acptr) &&
 	(HasPriv(acptr, PRIV_XTRAOP) ||
-        ((feature_int(FEAT_XTRAOP_CLASS) > 0) &&
-	 (get_client_class(acptr) == feature_int(FEAT_XTRAOP_CLASS))))))
+        (0 == ircd_strcmp(feature_str(FEAT_XTRAOP_CLASS), get_client_class(acptr))))))
       ClearXtraOp(acptr);
     if (!FlagHas(&setflags, FLAG_NOCHAN) && !((feature_bool(FEAT_OPER_HIDECHANS) ||
         HasPriv(acptr, PRIV_HIDE_CHANNELS)) && IsOper(acptr)))
@@ -2360,7 +2357,7 @@ Debug((DEBUG_DEBUG, "Test 6"));
      * run into problems (interference with +s if user is +B). -reed
      */
     if (!(FlagHas(&setflags, FLAG_BOT)) &&
-	(get_client_class(acptr) != feature_int(FEAT_BOT_CLASS)))
+        (0 == ircd_strcmp(feature_str(FEAT_BOT_CLASS), get_client_class(acptr))))
       ClearBot(acptr);
 
     /*

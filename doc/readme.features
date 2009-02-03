@@ -509,7 +509,7 @@ this value is overridden by a Y-line in ircd.conf if the C-lines in
 ircd.conf assign a specific class to the connection (recommended).
 
 DEFAULTMAXSENDQLENGTH
- * Type: integer
+ * Type: unsigned integer
  * Default: 40000
 
 This is the default value of the maximum sendQ length of Y-line
@@ -772,8 +772,8 @@ OPER_XTRAOP
 Controls the use of the Xtra Op oper mode (+X).
 
 XTRAOP_CLASS
- * Type: integer
- * Default: 0
+ * Type: string
+ * Default: XtraOp
 
 This is the class an oper must be in to use the Xtra Op mode if it
 is enabled.
@@ -913,8 +913,8 @@ Allows remote users to oper up remotly witthout requiring an O:Line on the serve
 they are on.
 
 BOT_CLASS
- * Type: integer
- * Default: 0
+ * Type: string
+ * Default: Bots
 
 Defines the class a bot must be on to be able to use +B bot mode.
 
@@ -995,8 +995,8 @@ Enables DNS blacklist checks controlled via X:Lines. THIS FEATURE
 IS HIGHLY BETA! Do not use it in a production enviroment yet.
 
 DNSBL_EXEMPT_CLASS
- * Type: integer
- * Default: 0
+ * Type: string
+ * Default: DNSBL_Exempt
 
 Anyone in this class is immune to DNSBL checks if they are enabled.
 

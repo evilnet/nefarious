@@ -20,7 +20,6 @@
  * @brief Implementation of connection class handling functions.
  * @version $Id$
  */
-
 #include "config.h"
 
 #include "class.h"
@@ -30,6 +29,7 @@
 #include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
+#include "ircd_string.h"
 #include "list.h"
 #include "numeric.h"
 #include "s_conf.h"
@@ -38,15 +38,8 @@
 
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 
-/** Class representing bad conf's. */
-#define BAD_CONF_CLASS          ((unsigned int)-1)
-/** Class representing bad pings's. */
-#define BAD_PING                ((unsigned int)-2)
-/** Class representing bad clients's. */
-#define BAD_CLIENT_CLASS        ((unsigned int)-3)
-
 /** List of all connection classes. */
-static struct ConnectionClass* connClassList = 0;
+static struct ConnectionClass* connClassList;
 /** Number of allocated connection classes. */
 static unsigned int connClassAllocCount;
 
@@ -57,15 +50,22 @@ const struct ConnectionClass* get_class_list(void)
 }
 
 /** Allocate a new connection class.
+ * If #connClassList is not null, insert the new class just after it.
  * @return Newly allocated connection class structure.
  */
+static
 struct ConnectionClass* make_class(void)
 {
   struct ConnectionClass *tmp;
 
-  tmp = (struct ConnectionClass*) MyMalloc(sizeof(struct ConnectionClass));
+  tmp = (struct ConnectionClass*) MyCalloc(1, sizeof(struct ConnectionClass));
   assert(0 != tmp);
-  tmp->ref_count = 0;
+  tmp->ref_count = 1;
+  if (connClassList)
+  {
+    tmp->next = connClassList->next;
+    connClassList->next = tmp;
+  }
   ++connClassAllocCount;
   return tmp;
 }
@@ -73,10 +73,14 @@ struct ConnectionClass* make_class(void)
 /** Dereference a connection class.
  * @param[in] p Connection class to dereference.
  */
+static
 void free_class(struct ConnectionClass* p)
 {
-  if (p) {
+  if (p)
+  {
     assert(0 == p->valid);
+    MyFree(p->cc_name);
+    MyFree(p->default_umode);
     MyFree(p);
     --connClassAllocCount;
   }
@@ -89,17 +93,19 @@ void free_class(struct ConnectionClass* p)
  */
 void init_class(void)
 {
-  if (!connClassList)
+  if (!connClassList) {
     connClassList = (struct ConnectionClass*) make_class();
+    connClassList->next   = 0;
+  }
 
-  ConClass(connClassList) = 0;
+  /* We had better not try and free this... */
+  ConClass(connClassList) = "default";
   PingFreq(connClassList) = feature_int(FEAT_PINGFREQUENCY);
   ConFreq(connClassList)  = feature_int(FEAT_CONNECTFREQUENCY);
   MaxLinks(connClassList) = feature_int(FEAT_MAXIMUM_LINKS);
-  MaxSendq(connClassList) = feature_int(FEAT_DEFAULTMAXSENDQLENGTH);
+  MaxSendq(connClassList) = feature_uint(FEAT_DEFAULTMAXSENDQLENGTH);
   connClassList->valid    = 1;
-  Links(connClassList)    = 0;
-  connClassList->next     = 0;
+  Links(connClassList)    = 1;
 }
 
 /** Mark current connection classes as invalid.
@@ -126,17 +132,18 @@ void class_delete_marked(void)
   Debug((DEBUG_DEBUG, "Class check:"));
 
   for (prev = cl = connClassList; cl; cl = prev->next) {
-    Debug((DEBUG_DEBUG, "Class %d : CF: %d PF: %d ML: %d LI: %d SQ: %d",
-           ConClass(cl), ConFreq(cl), PingFreq(cl), MaxLinks(cl), Links(cl), MaxSendq(cl)));
+    Debug((DEBUG_DEBUG, "Class %s : CF: %d PF: %d ML: %d LI: %d SQ: %d",
+           ConClass(cl), ConFreq(cl), PingFreq(cl), MaxLinks(cl),
+           Links(cl), MaxSendq(cl)));
     /*
      * unlink marked classes, delete unreferenced ones
      */
-    if (cl->valid)
+    if (cl->valid || Links(cl) > 1)
       prev = cl;
-    else {
+    else
+    {
       prev->next = cl->next;
-      if (0 == cl->ref_count)
-        free_class(cl);
+      free_class(cl);
     }
   }
 }
@@ -145,14 +152,15 @@ void class_delete_marked(void)
  * @param[in] aconf Configuration item to check.
  * @return Name of connection class associated with \a aconf.
  */
-unsigned int get_conf_class(const struct ConfItem* aconf)
+char*
+get_conf_class(const struct ConfItem* aconf)
 {
   if ((aconf) && (aconf->conn_class))
     return (ConfClass(aconf));
 
   Debug((DEBUG_DEBUG, "No Class For %s", (aconf) ? aconf->name : "*No Conf*"));
 
-  return (BAD_CONF_CLASS);
+  return NULL;
 }
 
 /** Get ping time for a configuration item.
@@ -174,88 +182,70 @@ int get_conf_ping(const struct ConfItem* aconf)
  * @param[in] acptr Client to check.
  * @return Name of connection class to which \a acptr belongs.
  */
-unsigned int get_client_class(struct Client *acptr)
+char*
+get_client_class(struct Client *acptr)
 {
   struct SLink *tmp;
   struct ConnectionClass *cl;
-  unsigned int retc = BAD_CLIENT_CLASS;
 
+  /* Return the most recent(first on LL) client class... */
   if (acptr && !IsMe(acptr) && (cli_confs(acptr)))
     for (tmp = cli_confs(acptr); tmp; tmp = tmp->next)
     {
-      if (!tmp->value.aconf || !(cl = tmp->value.aconf->conn_class))
-        continue;
-      if (ConClass(cl) > retc || retc == BAD_CLIENT_CLASS)
-        retc = ConClass(cl);
+      if (tmp->value.aconf && (cl = tmp->value.aconf->conn_class))
+        return ConClass(cl);
     }
-
-  Debug((DEBUG_DEBUG, "Returning Class %d For %s", retc, cli_name(acptr)));
-
-  return (retc);
-}
-
-/** Get connection interval for a connection class.
- * @param[in] clptr Connection class to check (or NULL).
- * @return If \a clptr != NULL, its connection frequency; else default
- * connection frequency.
- */
-unsigned int get_con_freq(struct ConnectionClass * clptr)
-{
-  if (clptr)
-    return (ConFreq(clptr));
-  else
-    return feature_int(FEAT_CONNECTFREQUENCY);
+  return "(null-class)";
 }
 
 /** Make sure we have a connection class named \a name.
  * If one does not exist, create it.  Then set its ping frequency,
  * connection frequency, maximum link count, and max SendQ according
  * to the parameters.
+ * @param[in] name Connection class name.
  * @param[in] ping Ping frequency for clients in this class.
  * @param[in] confreq Connection frequency for clients.
  * @param[in] maxli Maximum link count for class.
  * @param[in] sendq Max SendQ for clients.
  */
-void add_class(unsigned int conClass, unsigned int ping, unsigned int confreq,
+void add_class(char *name, unsigned int ping, unsigned int confreq,
                unsigned int maxli, unsigned int sendq)
 {
-  struct ConnectionClass* t;
   struct ConnectionClass* p;
 
-  t = find_class(conClass);
-  if ((t == connClassList) && (conClass != 0))
-  {
-    p = (struct ConnectionClass *) make_class();
-    p->next = t->next;
-    t->next = p;
-  }
+  Debug((DEBUG_DEBUG, "Add Class %s: cf: %u pf: %u ml: %u sq: %d",
+         name, confreq, ping, maxli, sendq));
+  assert(name != NULL);
+  p = do_find_class(name, 1);
+  if (!p)
+    p = make_class();
   else
-    p = t;
-  Debug((DEBUG_DEBUG, "Add Class %u: cf: %u pf: %u ml: %u sq: %d",
-         conClass, confreq, ping, maxli, sendq));
-  ConClass(p) = conClass;
+    MyFree(ConClass(p));
+  ConClass(p) = name;
   ConFreq(p) = confreq;
   PingFreq(p) = ping;
   MaxLinks(p) = maxli;
-  MaxSendq(p) = (sendq > 0) ? sendq : feature_int(FEAT_DEFAULTMAXSENDQLENGTH);
+  MaxSendq(p) = (sendq > 0U) ?
+    sendq : feature_uint(FEAT_DEFAULTMAXSENDQLENGTH);
   p->valid = 1;
-  if (p != t)
-    Links(p) = 0;
 }
 
 /** Find a connection class by name.
- * @param[in] class Class to search for.
+ * @param[in] name Name of connection class to search for.
+ * @param[in] extras If non-zero, include unreferenced classes.
  * @return Pointer to connection class structure (or NULL if none match).
  */
-struct ConnectionClass* find_class(unsigned int cclass)
+struct ConnectionClass* do_find_class(const char *name, int extras)
 {
   struct ConnectionClass *cltmp;
 
   for (cltmp = connClassList; cltmp; cltmp = cltmp->next) {
-    if (ConClass(cltmp) == cclass)
+    if (!cltmp->valid && !extras)
+      continue;
+    if (!ircd_strcmp(ConClass(cltmp), name))
       return cltmp;
   }
-  return connClassList;
+  return NULL;
 }
 
 /** Report connection classes to a client.
@@ -263,22 +253,24 @@ struct ConnectionClass* find_class(unsigned int cclass)
  * @param[in] sd Stats descriptor for request (ignored).
  * @param[in] param Extra parameter from user (ignored).
  */
-void report_classes(struct Client *sptr, const struct StatDesc *sd,
-		    char *param)
+void
+report_classes(struct Client *sptr, const struct StatDesc *sd,
+               char *param)
 {
   struct ConnectionClass *cltmp;
 
   for (cltmp = connClassList; cltmp; cltmp = cltmp->next)
-    send_reply(sptr, RPL_STATSYLINE, 'Y', ConClass(cltmp), PingFreq(cltmp),
-	       ConFreq(cltmp), MaxLinks(cltmp), MaxSendq(cltmp),
-	       Links(cltmp));
+    send_reply(sptr, RPL_STATSYLINE, (cltmp->valid ? 'Y' : 'y'),
+               ConClass(cltmp), PingFreq(cltmp), ConFreq(cltmp),
+               MaxLinks(cltmp), MaxSendq(cltmp), Links(cltmp) - 1);
 }
 
 /** Return maximum SendQ length for a client.
  * @param[in] cptr Local client to check.
  * @return Number of bytes allowed in SendQ for \a cptr.
  */
-unsigned int get_sendq(struct Client *cptr)
+unsigned int
+get_sendq(struct Client *cptr)
 {
   assert(0 != cptr);
   assert(0 != cli_local(cptr));
@@ -293,13 +285,13 @@ unsigned int get_sendq(struct Client *cptr)
     for (tmp = cli_confs(cptr); tmp; tmp = tmp->next) {
       if (!tmp->value.aconf || !(cl = tmp->value.aconf->conn_class))
         continue;
-      if (ConClass(cl) != BAD_CLIENT_CLASS) {
+      if (ConClass(cl) != NULL) {
         cli_max_sendq(cptr) = MaxSendq(cl);
         return cli_max_sendq(cptr);
       }
     }
   }
-  return feature_int(FEAT_DEFAULTMAXSENDQLENGTH);
+  return feature_uint(FEAT_DEFAULTMAXSENDQLENGTH);
 }
 
 /** Report connection class memory statistics to a client.
@@ -309,7 +301,8 @@ unsigned int get_sendq(struct Client *cptr)
 void class_send_meminfo(struct Client* cptr)
 {
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG, ":Classes: inuse: %d(%d)",
-             connClassAllocCount, connClassAllocCount * sizeof(struct ConnectionClass));
+             connClassAllocCount,
+             connClassAllocCount * sizeof(struct ConnectionClass));
 }
 
 

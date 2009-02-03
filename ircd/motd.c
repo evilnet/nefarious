@@ -232,7 +232,7 @@ static struct Motd *
 motd_lookup(struct Client *cptr)
 {
   struct Motd *ptr;
-  int class = -1;
+  char *class = NULL;
 
   assert(0 != cptr);
 
@@ -241,13 +241,16 @@ motd_lookup(struct Client *cptr)
     return MotdList.remote;
 
   class = get_client_class(cptr);
+  assert(class != NULL);
 
-  /* check the T-lines first */
-  for (ptr = MotdList.other; ptr; ptr = ptr->next) {
-    if (ptr->type == MOTD_CLASS && ptr->id.class == class)
+  /* check the motd blocks first */
+  for (ptr = MotdList.other; ptr; ptr = ptr->next)
+  {
+    if (ptr->type == MOTD_CLASS
+        && !match(ptr->id.hostmask, class))
       return ptr;
-    else if (ptr->type == MOTD_HOSTMASK &&
-	     !match(ptr->id.hostmask, cli_sockhost(cptr)))
+    else if (ptr->type == MOTD_HOSTMASK
+             && !match(ptr->id.hostmask, cli_sockhost(cptr)))
       return ptr;
   }
 
@@ -394,7 +397,7 @@ motd_report(struct Client *to, const struct StatDesc *sd, char *param)
 
   for (ptr = MotdList.other; ptr; ptr = ptr->next) {
     if (ptr->type == MOTD_CLASS) /* class requires special handling */
-      send_reply(to, SND_EXPLICIT | RPL_STATSTLINE, "T %d %s", ptr->id.class,
+      send_reply(to, SND_EXPLICIT | RPL_STATSTLINE, "T %s %s", ptr->id.class,
 		 ptr->path);
     else if (ptr->type == MOTD_HOSTMASK)
       send_reply(to, RPL_STATSTLINE, 'T', ptr->id.hostmask, ptr->path);

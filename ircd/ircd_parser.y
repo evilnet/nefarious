@@ -456,11 +456,11 @@ connectpass: PASS '=' QSTRING ';'
  MyFree(pass);
  pass = $3;
 };
-connectclass: CLASS '=' NUMBER ';'
+connectclass: CLASS '=' QSTRING ';'
 {
  c_class = find_class($3);
  if (!c_class)
-  parse_error("No such connection class '%d' for Connect block", $3);
+  parse_error("No such connection class '%s' for Connect block", $3);
 };
 connecthost: HOST '=' QSTRING ';'
 {
@@ -592,11 +592,11 @@ clientip: IP '=' QSTRING ';'
 /*  MyFree(ipaddr); */
   ipaddr = $3;
 };
-clientclass: CLASS '=' NUMBER ';'
+clientclass: CLASS '=' QSTRING ';'
 {
   c_class = find_class($3);
   if (!c_class)
-    parse_error("No such connection class '%d' for Client block", $3);
+    parse_error("No such connection class '%s' for Client block", $3);
 };
 clientpass: PASS '=' QSTRING ';'
 {
@@ -617,11 +617,11 @@ classblock: CLASS {
   tping = 90;
 } '{' classitems '}' ';'
 {
-  if (i_class)
+  if (name != NULL)
   {
     struct ConnectionClass *c_class;
-    add_class(i_class, tping, tconn, maxlinks, sendq);
-    c_class = find_class(i_class);
+    add_class(name, tping, tconn, maxlinks, sendq);
+    c_class = find_class(name);
     c_class->default_umode = pass;
     memcpy(&c_class->privs, &privs, sizeof(c_class->privs));
     memcpy(&c_class->privs_dirty, &privs_dirty, sizeof(c_class->privs_dirty));
@@ -641,9 +641,10 @@ classblock: CLASS {
 classitems: classitem classitems | classitem;
 classitem: classname | classpingfreq | classconnfreq | classmaxlinks | priv |
            classsendq | classusermode;
-classname: NAME '=' NUMBER ';'
+classname: NAME '=' QSTRING ';'
 {
-  i_class = $3;
+  MyFree(name);
+  name = $3;
 };
 classpingfreq: PINGFREQ '=' timespec ';'
 {
@@ -685,7 +686,7 @@ operblock: OPER '{' operitems '}' ';'
     parse_error("Invalid or missing class in operator block");
   else if (!FlagHas(&privs_dirty, PRIV_PROPAGATE)
            && !FlagHas(&c_class->privs_dirty, PRIV_PROPAGATE))
-    parse_error("Operator block for %s and class %d have no LOCAL setting", name, c_class->cc_class);
+    parse_error("Operator block for %s and class %s have no LOCAL setting", name, c_class->cc_name);
   else for (link = hosts; link != NULL; link = link->next) {
     aconf = make_conf();
 
@@ -776,11 +777,11 @@ operflags: FLAGS '=' QSTRING ';'
   MyFree(oflags);
   oflags = $3;
 };
-operclass: CLASS '=' NUMBER ';'
+operclass: CLASS '=' QSTRING ';'
 {
  c_class = find_class($3);
  if (!c_class)
-  parse_error("No such connection class '%d' for Operator block", $3);
+  parse_error("No such connection class '%s' for Operator block", $3);
 };
 
 priv: privtype '=' yesorno ';'

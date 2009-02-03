@@ -40,16 +40,15 @@ struct ConfItem;
 /** Represents a connection class. */
 struct ConnectionClass {
   struct ConnectionClass* next;           /**< Link to next connection class. */
-  int                     cc_class;       /**< Number of connection class. */
-  struct Privs            privs;
-  struct Privs            privs_dirty;
-  char                    *default_umode;
+  char                    *cc_name;       /**< Name of connection class. */
+  char                    *default_umode; /**< Default usermode for users in this class. */
+  struct Privs            privs;          /**< Privilege bits that are set on or off. */
+  struct Privs            privs_dirty;    /**< Indication of which bits in ConnectionClass::privs are valid. */
   unsigned int            max_sendq;      /**< Maximum client SendQ in bytes. */
   short                   ping_freq;      /**< Ping frequency for clients. */
   short                   conn_freq;      /**< Auto-connect frequency. */
   short                   max_links;      /**< Maximum connections allowed. */
-  unsigned char           valid;          /**< Valid flag (cleared after this
-                                             class is removed from the config).*/
+  unsigned char           valid;          /**< Valid flag (cleared after this class is removed from the config).*/
   int                     ref_count;      /**< Number of references to class. */
 };
 
@@ -58,7 +57,7 @@ struct ConnectionClass {
  */
 
 /** Get class name for \a x. */
-#define ConClass(x)     ((x)->cc_class)
+#define ConClass(x)     ((x)->cc_name)
 /** Get ping frequency for \a x. */
 #define PingFreq(x)     ((x)->ping_freq)
 /** Get connection frequency for \a x. */
@@ -71,7 +70,7 @@ struct ConnectionClass {
 #define Links(x)        ((x)->ref_count)
 
 /** Get class name for ConfItem \a x. */
-#define ConfClass(x)    ((x)->conn_class->cc_class)
+#define ConfClass(x)    ((x)->conn_class->cc_name)
 /** Get ping frequency for ConfItem \a x. */
 #define ConfPingFreq(x) ((x)->conn_class->ping_freq)
 /** Get connection frequency for ConfItem \a x. */
@@ -82,7 +81,10 @@ struct ConnectionClass {
 #define ConfSendq(x)    ((x)->conn_class->max_sendq)
 /** Get number of references to class in ConfItem \a x. */
 #define ConfLinks(x)    ((x)->conn_class->ref_count)
+/** Get default usermode for ConfItem \a x. */
 #define ConfUmode(x)    ((x)->conn_class->default_umode)
+/** Find a valid configuration class by name. */
+#define find_class(name) do_find_class((name), 0)
 
 
 /*
@@ -91,19 +93,18 @@ struct ConnectionClass {
 
 extern void init_class(void);
 
+extern struct ConnectionClass *do_find_class(const char *name, int extras);
 extern const struct ConnectionClass* get_class_list(void);
 extern void class_mark_delete(void);
 extern void class_delete_marked(void);
 
-extern struct ConnectionClass *find_class(unsigned int cclass);
-extern struct ConnectionClass *make_class(void);
-extern void free_class(struct ConnectionClass * tmp);
 extern unsigned int get_con_freq(struct ConnectionClass * clptr);
-extern unsigned int get_conf_class(const struct ConfItem *aconf);
+extern char *get_conf_class(const struct ConfItem *aconf);
 extern int get_conf_ping(const struct ConfItem *aconf);
-extern unsigned int get_client_class(struct Client *acptr);
-extern void add_class(unsigned int conclass, unsigned int ping,
-                      unsigned int confreq, unsigned int maxli, unsigned int sendq);
+extern char *get_client_class(struct Client *acptr);
+extern void add_class(char *name, unsigned int ping,
+                      unsigned int confreq, unsigned int maxli,
+                      unsigned int sendq);
 extern void check_class(void);
 extern void report_classes(struct Client *sptr, const struct StatDesc *sd,
 			   char *param);

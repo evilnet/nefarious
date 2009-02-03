@@ -1,6 +1,35 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-02-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Updated class examples.
+
+	* doc/readme.features: Updated class related features.
+
+	* include/class.h: Implemented string based class names instead
+	of numbers.
+
+	* ircd/class.c:Implemented string based class names instead of numbers.
+
+	* ircd/ircd.c: Updated try_connections.
+
+	* ircd/ircd_features.c: Implemented string based class names instead
+	of numbers.
+
+	* ircd/ircd_parser.y: Implemented string based class names instead
+	of numbers.
+
+	* ircd/m_trace.c: Implemented string based class names instead of numbers.
+
+	* ircd/motd.c: : Implemented string based class names instead of numbers.
+
+	* ircd/s_conf.c: Removed conf_add_server.
+
+	* ircd/s_err.c:: Implemented string based class names instead of numbers.
+
+	* ircd/s_user.c: : Implemented string based class names instead of numbers.
+
 2009-01-30  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Updated spoofhost block syntax.

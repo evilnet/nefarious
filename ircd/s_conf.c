@@ -1491,43 +1491,6 @@ const struct CRuleConf* conf_get_crule_list(void)
   return cruleConfList;
 }
 
-void conf_add_server(const char* const* fields, int count)
-{
-  struct ServerConf* server;
-  struct in_addr    addr;
-  assert(0 != fields);
-  /*
-   * missing host, password, or alias?
-   */
-  if (count < 6 || EmptyString(fields[1]) || EmptyString(fields[2]) || EmptyString(fields[3]))
-    return;
-  /*
-   * check the host
-   */
-  if (string_is_hostname(fields[1]))
-    addr.s_addr = INADDR_NONE;
-  else if (INADDR_NONE == (addr.s_addr = inet_addr(fields[1])))
-    return;
-
-  server = (struct ServerConf*) MyMalloc(sizeof(struct ServerConf));
-  assert(0 != server);
-  DupString(server->hostname, fields[1]);
-  DupString(server->passwd,   fields[2]);
-  DupString(server->alias,    fields[3]);
-  server->address.s_addr = addr.s_addr;
-  server->port           = atoi(fields[4]);
-  server->dns_pending    = 0;
-  server->connected      = 0;
-  server->hold           = 0;
-  server->conn_class      = find_class(atoi(fields[5]));
-
-  server->next = serverConfList;
-  serverConfList = server;
-
-  /* if (INADDR_NONE == server->address.s_addr) */
-    /* lookup_confhost(server); */
-}
-
 void conf_add_deny(const char* const* fields, int count, int ip_kill)
 {
   struct DenyConf* conf;
