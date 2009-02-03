@@ -3,6 +3,10 @@
 
 2009-02-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Typo fix.
+
+2009-02-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Updated class examples.
 
 	* doc/readme.features: Updated class related features.
