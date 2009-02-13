@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-02-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/ircd_features.c: Only show EXTBANS in ISUPPORT if its enabled.
+
+	* ircd/ircd_lexer.l: Bug fix for exempt lines in Port blocks.
+
 2009-02-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Give QuakeNet credit as we have added their +q spam
