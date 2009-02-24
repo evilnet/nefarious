@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/ircd_lexer.l: Re ordering and added/removed a few tokens
+
+	* ircd/ircd_parser.y: Re ordering and added/removed a few tokens
+
 2009-02-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Spoofhost examples and some tweaks.
