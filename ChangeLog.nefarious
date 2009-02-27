@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-02-27  Alex Schumann  <rubin@afternet.org>
+
+	* doc/example.conf: applied typos.patch from Julien Chalhoub to fix
+	many typos in config file comments
+
 2009-02-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_lexer.l: Re ordering and added/removed a few tokens
