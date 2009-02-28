@@ -70,6 +70,7 @@ struct ConfItem {
   struct ConnectionClass*  conn_class;  /* Class of connection */
   struct in_addr           origin;      /* ip number of connect origin */
   struct in_addr           ipnum;       /* ip number of host field */
+  char*                    username;
   char*                    host;
   char*                    passwd;
   char*                    name;

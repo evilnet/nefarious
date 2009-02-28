@@ -1,6 +1,44 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-02-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/numeric.h: Added STATSHEADER.
+
+	* include/s_conf.h: Added username to conf struct.
+	
+	* ircd/class.c: Display RPL_STATSHEADER with information on what
+	each column is.
+
+	* ircd/gline.c: Display RPL_STATSHEADER with information on what
+	each column is.
+
+	* ircd/hash.c: Display RPL_STATSHEADER with information on what
+	each column is.
+
+	* ircd/ircd_features.c Display RPL_STATSHEADER with information on
+	what each column is.
+
+	* ircd/ircd_parser.y: Re worked the Client block parser.
+
+	* ircd/listener.c: Display RPL_STATSHEADER with information on what
+	each column is.
+
+	* ircd/motd.c Display RPL_STATSHEADER with information on what each
+	column is.
+
+	* ircd/s_conf.c: Re worked the Client block parser. Also Added more stats
+	header changes.
+
+	* ircd/s_debug.h: Make debug stats more human readable.
+
+	* ircd/s_err.c: Tweaked STATSK/ILINE and added STATSHEADER.
+
+	* ircd/s_stats.c: Display RPL_STATSHEADER with information on what each
+	column is.
+
+	* ircd/shun.c Display RPL_STATSHEADER with information on what each column is.
+
 2009-02-27  Alex Schumann  <rubin@afternet.org>
 
 	* doc/example.conf: applied typos.patch from Julien Chalhoub to fix

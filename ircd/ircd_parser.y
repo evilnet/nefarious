@@ -79,9 +79,9 @@
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class;
   static int is_leaf, is_hub, invert, length;
-  static char *name, *pass, *host, *vhost, *ipaddr, *username, *hub_limit;
+  static char *name, *pass, *host, *vhost, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
-  static char *rtype, *action, *reason, *sport, *spoofhost, *hostmask, *oflags;
+  static char *rtype, *action, *reason, *sport, *oflags, *ip;
   static char *prefix, *command, *service, *regex, *channel;
 
   struct SLink *hosts;
@@ -522,69 +522,105 @@ clientblock: CLIENT
 '{' clientitems '}' ';'
 {
   struct ConfItem *aconf = 0;
-  struct ConfItem *bconf;
+  int bits = 0;
+  int g = 0;
+
+  if (ip) {
+    if (!strcmp(ip, "*"))
+      g = 1;
+  }
 
   if (!c_class)
     parse_error("Invalid or missing class in Client block");
   else if (pass && strlen(pass) > PASSWDLEN)
     parse_error("Password too long in connect block");
+  else if (!g && ip && !check_if_ipmask(ip))
+    parse_error("Invalid IP address %s in Client block", ip);
   else {
     aconf = make_conf();
     aconf->status = CONF_CLIENT;
 
-    aconf->host = ipaddr;
-    aconf->name = host;
+    if (ip) {
+      int  c_class;
+      char ipname[16];
+      int  ad[4] = { 0 };
+      int  bits2 = 0;
+
+      c_class = sscanf(ip, "%d.%d.%d.%d/%d", &ad[0], &ad[1], &ad[2], &ad[3], &bits2);
+      if (c_class != 5) {
+        bits = c_class * 8;
+      }
+      else {
+        bits = bits2;
+      }
+      ircd_snprintf(0, ipname, sizeof(ipname), "%d.%d.%d.%d", ad[0], ad[1],
+                    ad[2], ad[3]);
+
+      aconf->bits = bits;
+      aconf->ipnum.s_addr = inet_addr(ipname);
+    }
+
+
+    aconf->conn_class = c_class;
+    aconf->username = username;
+    aconf->host = host;
+    aconf->port = port;
+    aconf->name = ip;
     aconf->maximum = maxlinks;
     aconf->passwd = pass;
-    aconf->conn_class = c_class;
-    if (aconf->conn_class == 0)
-      aconf->conn_class = find_class(0);
-
-    if ((bconf = find_conf_entry(aconf, aconf->status))) {
-      delist_conf(bconf);
-      bconf->status &= ~CONF_ILLEGAL;
-      if (aconf->status == CONF_CLIENT) {
-        MyFree(bconf->passwd);
-        bconf->passwd = aconf->passwd;
-        aconf->passwd = 0;
-        ConfLinks(bconf) -= bconf->clients;
-        bconf->conn_class = aconf->conn_class;
-        if (bconf->conn_class)
-          ConfLinks(bconf) += bconf->clients;
-      }
-      free_conf(aconf);
-      aconf = bconf;
-    }
+    Debug((DEBUG_DEBUG, "CLIENT: %s %s %d", host, ip ? ip : "", bits));
   }
   if (!aconf) {
     MyFree(username);
     MyFree(host);
-/*    MyFree(ipaddr); */
+    MyFree(ip);
     MyFree(pass);
- } else {
-   aconf->next = GlobalConfList;
-   GlobalConfList = aconf;
-   aconf = NULL;
- }
+  } else {
+    aconf->next = GlobalConfList;
+    GlobalConfList = aconf;
+    aconf = NULL;
+  }
 
-  ipaddr = NULL;
   host = NULL;
   username = NULL;
   c_class = NULL;
+  ip = NULL;
   pass = NULL;
   port = 0;
 };
 clientitems: clientitem clientitems | clientitem;
-clientitem: clienthost | clientip | clientclass | clientpass | clientmaxlinks | clientport;
+clientitem: clienthost | clientip | clientusername | clientclass | clientpass | clientmaxlinks | clientport;
 clienthost: HOST '=' QSTRING ';'
 {
+  char *sep = strchr($3, '@');
   MyFree(host);
-  host = $3;
+  if (sep) {
+    *sep++ = '\0';
+    MyFree(username);
+    DupString(host, sep);
+    username = $3;
+  } else {
+    host = $3;
+  }
 };
 clientip: IP '=' QSTRING ';'
 {
-/*  MyFree(ipaddr); */
-  ipaddr = $3;
+  char *sep;
+  sep = strchr($3, '@');
+  MyFree(ip);
+  if (sep) {
+    *sep++ = '\0';
+    MyFree(username);
+    DupString(ip, sep);
+    username = $3;
+  } else {
+    ip = $3;
+  }
+};
+clientusername: USERNAME '=' QSTRING ';'
+{
+  MyFree(username);
+  username = $3;
 };
 clientclass: CLASS '=' QSTRING ';'
 {
@@ -1390,7 +1426,7 @@ spoofhostblock: SPOOFHOST QSTRING '{'
 spoofhostitems '}' ';'
 {
   int valid = 0;
-  struct prefix *p;
+  struct prefix *p = NULL;
 
   if (spoof->username == NULL && spoof->realhost) {
     parse_error("Username missing in spoofhost.");

@@ -92,6 +92,14 @@ stats_configured_links(struct Client *sptr, const struct StatDesc* sd,
   int maximum;
   char *host, *pass, *name, *hub_limit;
 
+  /* send header so the client knows what we are showing */
+  if (sd->sd_funcdata == CONF_SERVER)
+    send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+      "C Server * Port Hoplimit Hubmask Class");
+  else if (sd->sd_funcdata == CONF_OPS)
+    send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+      "O Mask * Name Flags Class");
+
   for (tmp = GlobalConfList; tmp; tmp = tmp->next)
   {
     if ((tmp->status & sd->sd_funcdata))
@@ -111,7 +119,11 @@ stats_configured_links(struct Client *sptr, const struct StatDesc* sd,
         if (hub_limit)
           send_reply(sptr, RPL_STATSHLINE, hub_limit, name, maximum);
       } else if (tmp->status & CONF_CLIENT)
-        send_reply(sptr, RPL_STATSILINE, host, name, port, get_conf_class(tmp));
+        send_reply(sptr, RPL_STATSILINE,
+                   (tmp->username ? tmp->username : ""), (tmp->username ? "@" : ""),
+                   (tmp->host ? tmp->host : "*"), maximum,
+                   (name[0] == ':' ? "0" : ""), (tmp->name ? tmp->name : "*"),
+                   port, get_conf_class(tmp));
       else if (tmp->status & CONF_OPERATOR)
         send_reply(sptr, RPL_STATSOLINE, host, name, oflagstr(port), get_conf_class(tmp));
     }
@@ -127,6 +139,10 @@ stats_crule_list(struct Client* to, const struct StatDesc *sd,
 		  char* param)
 {
   const struct CRuleConf* p = conf_get_crule_list();
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "D Server Rule");
 
   for ( ; p; p = p->next) {
     if (p->type & sd->sd_funcdata)
@@ -178,6 +194,10 @@ stats_access(struct Client *to, const struct StatDesc *sd, char *param)
   int wilds = 0;
   int count = 1000;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "I Hostmask Maximum IPmask Port Class");
+
   if (!param) {
     stats_configured_links(to, sd, param);
     return;
@@ -191,8 +211,12 @@ stats_access(struct Client *to, const struct StatDesc *sd, char *param)
 		      !match(aconf->name, param))) ||
 	  (wilds && (!mmatch(param, aconf->host) ||
 		     !mmatch(param, aconf->name)))) {
-	send_reply(to, RPL_STATSILINE, 'I', aconf->host, aconf->name,
-		   aconf->port, get_conf_class(aconf));
+      send_reply(to, RPL_STATSILINE,
+                 (aconf->username ? aconf->username : ""), (aconf->username ? "@" : ""),
+                 (aconf->host ? aconf->host : "*"), aconf->maximum,
+                 (aconf->name && aconf->name[0] == ':' ? "0":""),
+                 aconf->name ? aconf->name : "*",
+                 aconf->port, get_conf_class(aconf));
 	if (--count == 0)
 	  break;
       }
@@ -205,6 +229,10 @@ stats_elines(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct eline *eline;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "E Mask * Flags");
+
   for (eline = GlobalEList; eline; eline = eline->next)
     send_reply(to, RPL_STATSELINE, eline->mask, eline->flags ? eline->flags : "");
 }
@@ -213,6 +241,10 @@ static void
 stats_flines(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct fline *fline;
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "f Match \"Watch Flags\" \"React Flags\" Length Status :Reason");
 
   for (fline = GlobalFList; fline; fline = fline->next)
     send_reply(to, RPL_STATSFILTERLINE, fline->rawfilter, fline->wflags ? fline->wflags : "",
@@ -224,6 +256,10 @@ static void
 stats_webirc(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct wline *wline;
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "W Mask Flags Ident Description");
 
   for (wline = GlobalWList; wline; wline = wline->next)
     send_reply(to, RPL_STATSWLINE, wline->mask, wline->flags ? wline->flags : "",
@@ -238,10 +274,18 @@ static void
 report_deny_list(struct Client* to)
 {
   const struct DenyConf* p = conf_get_deny_list();
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "K Mask \"Message/File\" \"Realname\" Flags 0 0");
+
   for ( ; p; p = p->next)
-    send_reply(to, RPL_STATSKLINE, (p->flags & DENY_FLAGS_IP) ? 'k' : 'K',
-               p->hostmask, p->message, p->usermask,
-               (p->flags & DENY_FLAGS_VERSION ? "v" : (p->flags & DENY_FLAGS_REALNAME ? "r" : "h")));
+    send_reply(to, RPL_STATSKLINE, p->bits > 0 ? 'k' : 'K',
+               (p->flags & DENY_FLAGS_REALNAME ? "" : (p->flags & DENY_FLAGS_REALNAME ? "" : (p->usermask ? p->usermask : "*"))),
+               (p->flags & DENY_FLAGS_REALNAME ? "" : (p->flags & DENY_FLAGS_REALNAME ? "" : "@")),
+                p->hostmask ? p->hostmask : "*",
+                p->message ? p->message : "(none)",
+               ((p->flags & DENY_FLAGS_PROMPT) ? "p" : ""), (p->flags & DENY_FLAGS_VERSION ? "v" : (p->flags & DENY_FLAGS_REALNAME ? "r" : "h")));
 }
 
 static void
@@ -283,10 +327,12 @@ stats_klines(struct Client* sptr, const struct StatDesc *sd, char* mask)
 		    (!user || !match(conf->usermask, user)))) ||
 	(wilds && !mmatch(host, conf->hostmask) &&
 	 (!user || !mmatch(user, conf->usermask)))) {
-      send_reply(sptr, RPL_STATSKLINE,
-		 (conf->flags & DENY_FLAGS_IP) ? 'k' : 'K',
-                 conf->hostmask, conf->message, conf->usermask,
-                 (conf->flags & DENY_FLAGS_VERSION ? "v" : (conf->flags & DENY_FLAGS_REALNAME ? "r" : "h")));
+      send_reply(sptr, RPL_STATSKLINE, conf->bits > 0 ? 'k' : 'K',
+                 (conf->flags & DENY_FLAGS_REALNAME ? "" : (conf->flags & DENY_FLAGS_REALNAME ? "" : conf->usermask ? conf->usermask : "*")),
+                 (conf->flags & DENY_FLAGS_REALNAME ? "" : (conf->flags & DENY_FLAGS_REALNAME ? "" : "@")),
+                  conf->hostmask ? conf->hostmask : "*",
+                  conf->message ? conf->message : "(none)",
+                 ((conf->flags & DENY_FLAGS_PROMPT) ? "p" : ""), (conf->flags & DENY_FLAGS_VERSION ? "v" : (conf->flags & DENY_FLAGS_REALNAME ? "r" : "h")));
       if (--count == 0)
 	return;
     }
@@ -341,6 +387,9 @@ stats_commands(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct Message *mptr;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER, "Command Count Bytes");
+
   for (mptr = msgtab; mptr->cmd; mptr++)
     if (mptr->count)
       send_reply(to, RPL_STATSCOMMANDS, mptr->cmd, mptr->count, mptr->bytes);
@@ -351,6 +400,10 @@ stats_cslines(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct csline *csline;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "R Mask Server Port");
+
   for (csline = GlobalConnStopList; csline; csline = csline->next)
     send_reply(to, RPL_STATSRLINE, csline->mask, csline->server, csline->port);
 }
@@ -360,6 +413,10 @@ stats_dnsbl(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct blline *blline;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "X Server Name Flags Replies Rank :Reply");
+
   for (blline = GlobalBLList; blline; blline = blline->next)
     send_reply(to, RPL_STATSXLINE, blline->server, blline->name, blline->flags, blline->replies, blline->rank, blline->reply);
 }
@@ -368,6 +425,10 @@ static void
 stats_quarantine(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct qline *qline;
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "Q Channel :Reason");
 
   for (qline = GlobalQuarantineList; qline; qline = qline->next) {
     if (param && match(param, qline->chname)) /* narrow search */
@@ -380,6 +441,11 @@ static void
 stats_configured_svcs(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct svcline *bline;
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "B Command Target Prepend");
+
   for (bline = GlobalServicesList; bline; bline = bline->next) {
      send_reply(to, RPL_STATSBLINE, bline->cmd, bline->target, bline->prepend ? bline->prepend : "*");
   }
@@ -389,6 +455,11 @@ static void
 stats_configured_forwards(struct Client* to, const struct StatDesc *sd, char* param)
 {
   unsigned int i;
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+            "b Character Server");
+
   for (i=0; i<=255; i++) {
     if (GlobalForwards[i])
       send_reply(to, RPL_STATSbLINE, i, GlobalForwards[i]);
@@ -402,9 +473,9 @@ stats_sline(struct Client* to, const struct StatDesc *sd, char* param)
   struct sline *sline;
 
   if (IsAnOper(to))
-    send_reply(to, SND_EXPLICIT | RPL_TEXT, "# Type Spoofhost Realhost Ident");
+    send_reply(to, SND_EXPLICIT | RPL_STATSHEADER, "s Type Spoofhost Realhost Ident");
   else
-    send_reply(to, SND_EXPLICIT | RPL_TEXT, "# Type Spoofhost");
+    send_reply(to, SND_EXPLICIT | RPL_STATSHEADER, "s Type Spoofhost");
 
   for (sline = GlobalSList; sline; sline = sline->next) {
     if (param && match(param, sline->spoofhost)) { /* narrow search */
@@ -599,7 +670,10 @@ struct StatDesc statsinfo[] = {
   { 'u', "uptime", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_UPTIME,
     stats_uptime, 0,
     "Current uptime & highest connection count." },
-  { 'v', "vservers", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM), FEAT_HIS_STATS_VSERVERS,
+  { 'v', "vservers", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_VSERVERS,
+    stats_servers_verbose, 1,
+    "Verbose server information." },
+  { 'V', "vserversmach", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_VSERVERS,
     stats_servers_verbose, 0,
     "Verbose server information." },
   { 'W', "webircs", (STAT_FLAG_OPERFEAT | STAT_FLAG_VARPARAM | STAT_FLAG_CASESENS), FEAT_HIS_STATS_WEBIRCS,

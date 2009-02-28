@@ -395,6 +395,10 @@ motd_report(struct Client *to, const struct StatDesc *sd, char *param)
 {
   struct Motd *ptr;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "T Hostmask/Class File");
+
   for (ptr = MotdList.other; ptr; ptr = ptr->next) {
     if (ptr->type == MOTD_CLASS) /* class requires special handling */
       send_reply(to, SND_EXPLICIT | RPL_STATSTLINE, "T %s %s", ptr->id.class,

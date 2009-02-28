@@ -668,6 +668,10 @@ void
 stats_nickjupes(struct Client* to, const struct StatDesc *sd, char* param)
 {
   int i;
+
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER, "J Nick");
+
   for (i = 0; i < JUPEHASHSIZE; i++)
     if (jupeTable[i][0])
       send_reply(to, RPL_STATSJLINE, jupeTable[i]);

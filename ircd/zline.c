@@ -691,17 +691,22 @@ zline_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
   struct Zline *zline;
   struct Zline *szline;
 
+  /* send header so the client knows what we are showing */
+  send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+             "Z Mask Expire Lastmod Status :Reason");
+
   for (zline = GlobalZlineList; zline; zline = szline) {
     szline = zline->zl_next;
 
     if (zline->zl_expire <= CurrentTime)
       zline_free(zline);
-    else
+    else {
       send_reply(sptr, RPL_STATSZLINE, 'Z',
 		 zline->zl_host ? zline->zl_host : "",
 		 zline->zl_expire + TSoffset,
                  zline->zl_lastmod + TSoffset,
                  ZlineIsActive(zline) ? '+' : '-', zline->zl_reason);
+    }
   }
 }
 

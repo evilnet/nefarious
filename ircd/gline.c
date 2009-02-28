@@ -888,18 +888,23 @@ gline_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
   struct Gline *gline;
   struct Gline *sgline;
 
+  /* send header so the client knows what we are showing */
+  send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+             "G Mask Expire Lastmod Status :Reason");
+
   for (gline = GlobalGlineList; gline; gline = sgline) {
     sgline = gline->gl_next;
 
     if (gline->gl_expire <= CurrentTime)
       gline_free(gline);
-    else
+    else {
       send_reply(sptr, RPL_STATSGLINE, 'G', gline->gl_user, 
 		 gline->gl_host ? "@" : "",
 		 gline->gl_host ? gline->gl_host : "",
 		 gline->gl_expire + TSoffset,
                  gline->gl_lastmod + TSoffset,
                  GlineIsActive(gline) ? '+' : '-', gline->gl_reason);
+    }
   }
 }
 

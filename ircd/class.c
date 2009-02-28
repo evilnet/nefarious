@@ -259,6 +259,10 @@ report_classes(struct Client *sptr, const struct StatDesc *sd,
 {
   struct ConnectionClass *cltmp;
 
+  /* send header so the client knows what we are showing */
+  send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+    "Y ConnClass PingFreq ConnFreq MaxLinks MaxSendQ Links");
+
   for (cltmp = connClassList; cltmp; cltmp = cltmp->next)
     send_reply(sptr, RPL_STATSYLINE, (cltmp->valid ? 'Y' : 'y'),
                ConClass(cltmp), PingFreq(cltmp), ConFreq(cltmp),

@@ -115,6 +115,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_STATSRLINE       227	/* Nefarious extension */
 #define RPL_STATSQLINE       228        /* Undernet extension */
 #define RPL_STATSBLINE       229	/* Nefarious extension */
+#define RPL_STATSHEADER      230        /* Nefarious extension */
 
 #define RPL_SERVICEINFO      231	/* unused */
 /* 	RPL_ENDOFSERVICES    232	unused */

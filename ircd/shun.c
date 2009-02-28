@@ -740,18 +740,23 @@ shun_stats(struct Client *sptr, const struct StatDesc *sd, char *param)
   struct Shun *shun;
   struct Shun *sshun;
 
+  /* send header so the client knows what we are showing */
+  send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+             "S Mask Expire Lastmod Status :Reason");
+
   for (shun = GlobalShunList; shun; shun = sshun) {
     sshun = shun->sh_next;
 
     if (shun->sh_expire <= CurrentTime)
       shun_free(shun);
-    else
+    else {
       send_reply(sptr, RPL_STATSSHUN, 'S', shun->sh_user, 
 		 shun->sh_host ? "@" : "",
 		 shun->sh_host ? shun->sh_host : "",
 		 shun->sh_expire + TSoffset,
                  shun->sh_lastmod + TSoffset,
                  ShunIsActive(shun) ? '+' : '-', shun->sh_reason);
+    }
   }
 }
 

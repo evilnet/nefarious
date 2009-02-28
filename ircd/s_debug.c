@@ -406,7 +406,7 @@ void count_memory(struct Client *cptr, const struct StatDesc *sd,
 #endif
 
   send_reply(cptr, SND_EXPLICIT | RPL_STATSDEBUG,
-	     ":Total: ww %zu ch %zu cl %zu co %zu db %zu ms %zu mb %zu",
+	     ":Total: Whowas %zu Channels %zu Clients %zu Config %zu DBufs %zu Msgs %zu MsgBufs %zu",
 	     totww, totch, totcl, com, dbufs_allocated, msg_allocated,
 	     msgbuf_allocated);
 }

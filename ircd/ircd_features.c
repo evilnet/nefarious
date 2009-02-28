@@ -1143,6 +1143,10 @@ feature_report(struct Client* to, const struct StatDesc* sd, char* param)
 {
   int i;
 
+  /* send header so the client knows what we are showing */
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "F Feature/Log Value");
+
   for (i = 0; features[i].type; i++) {
     if ((features[i].flags & FEAT_NODISP) ||
 	(features[i].flags & FEAT_MYOPER && !MyOper(to)) ||

@@ -110,7 +110,7 @@ struct LocalConf   localConf;
 struct DenyConf*   denyConfList;
 struct CRuleConf*  cruleConfList;
 
-static struct ServerConf* serverConfList;
+/* static struct ServerConf* serverConfList; */
 
 /** Current line number in scanner input. */
 int lineno;
@@ -598,34 +598,13 @@ void det_confs_butmask(struct Client* cptr, int mask)
 }
 
 /*
- * check_limit_and_attach - check client limits and attach I:line
- *
- * Made it accept 1 charactor, and 2 charactor limits (0->99 now), 
- * and dislallow more than 255 people here as well as in ipcheck.
- * removed the old "ONE" scheme too.
- *  -- Isomer 2000-06-22
- */
-static enum AuthorizationCheckResult
-check_limit_and_attach(struct Client* cptr, struct ConfItem* aconf)
-{
-  if (feature_bool(FEAT_IPCHECK)) {
-    Debug((DEBUG_DEBUG, "IPcheck current connection count %d", IPcheck_nr(cptr)));
-    if (IPcheck_nr(cptr) > aconf->maximum)
-      return ACR_TOO_MANY_FROM_IP;
-  }
-
-  return attach_conf(cptr, aconf);
-}
-
-/*
  * Find the first (best) I line to attach.
  */
 enum AuthorizationCheckResult attach_iline(struct Client*  cptr)
 {
   struct ConfItem* aconf;
   const char*      hname;
-  int              i;
-  static char      uhost[HOSTLEN + USERLEN + 3];
+  int              i, m = 0;
   static char      fullname[HOSTLEN + 1];
   struct hostent*  hp = 0;
 
@@ -639,75 +618,36 @@ enum AuthorizationCheckResult attach_iline(struct Client*  cptr)
       continue;
     if (aconf->port && aconf->port != cli_listener(cptr)->port)
       continue;
-    if (!aconf->host || !aconf->name)
+    if (aconf->username && match(aconf->username, cli_username(cptr)))
       continue;
-    if (hp) {
+
+    if (hp && aconf->host) {
       for (i = 0, hname = hp->h_name; hname; hname = hp->h_aliases[i++]) {
+        m = 0;
         ircd_strncpy(fullname, hname, HOSTLEN);
         fullname[HOSTLEN] = '\0';
 
         Debug((DEBUG_DNS, "a_il: %s->%s", cli_sockhost(cptr), fullname));
 
-        if (strchr(aconf->name, '@')) {
-          strcpy(uhost, cli_username(cptr));
-          strcat(uhost, "@");
-        }
-        else
-          *uhost = '\0';
-        strncat(uhost, fullname, sizeof(uhost) - 1 - strlen(uhost));
-        uhost[sizeof(uhost) - 1] = 0;
-        if (0 == match(aconf->name, uhost)) {
-          if (strchr(uhost, '@'))
-            SetFlag(cptr, FLAG_DOID);
-          return check_limit_and_attach(cptr, aconf);
+        if (match(aconf->host, fullname)) {
+           m = 1;
+           break;
         }
       }
-    }
-    if (strchr(aconf->host, '@')) {
-      ircd_strncpy(uhost, cli_username(cptr), sizeof(uhost) - 2);
-      uhost[sizeof(uhost) - 2] = 0;
-      strcat(uhost, "@");
-    }
-    else
-      *uhost = '\0';
-    strncat(uhost, cli_sock_ip(cptr), sizeof(uhost) - 1 - strlen(uhost));
-    uhost[sizeof(uhost) - 1] = 0;
-    if (match(aconf->host, uhost)) {
-      char* ip_start;
-      char* cidr_start;
-      struct in_addr conf_addr;
-      int bits;
-      
-      ip_start = strrchr(aconf->host, '@');
-      if (ip_start == NULL)
-        ip_start = aconf->host;
-      else {
-        *ip_start = 0;
-        if (match(aconf->host, cli_username(cptr))) {
-          *ip_start = '@';
-          continue;
-        }
-        *ip_start++ = '@';
-      }
-      cidr_start = strchr(ip_start, '/');
-      if (!cidr_start)
-        continue;
-      *cidr_start = 0;
-      if (inet_aton(ip_start, &conf_addr) == 0) {
-        *cidr_start = '/';
-        continue;
-      }
-      bits = atoi(cidr_start + 1);
-      *cidr_start = '/';
-      if ((bits < 1) || (bits > 32))
-        continue;
-      if ((cli_ip(cptr).s_addr & NETMASK(bits)) != conf_addr.s_addr)
+      if (m == 1)
         continue;
     }
-    if (strchr(uhost, '@'))
-      SetFlag(cptr, FLAG_DOID);
+ 
+    if ((aconf->bits >= 0) && ((cli_ip(cptr).s_addr & NETMASK(aconf->bits)) != aconf->ipnum.s_addr))
+        continue;
 
-    return check_limit_and_attach(cptr, aconf);
+    if (feature_bool(FEAT_IPCHECK)) {
+      if (IPcheck_nr(cptr) > aconf->maximum)
+        return ACR_TOO_MANY_FROM_IP;
+    }
+    if (aconf->username)
+      SetFlag(cptr, FLAG_DOID);
+    return attach_conf(cptr, aconf);
   }
   return ACR_NO_AUTHORIZATION;
 }
@@ -1463,6 +1403,9 @@ stats_uworld(struct Client* to, const struct StatDesc *sd, char* param)
 {
   struct SLink *sp;
   char *tmp = NULL;
+
+  send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
+    "U Server");
 
   for (sp = uworlds; sp; sp = sp->next) {
     tmp = strdup(sp->value.cp);

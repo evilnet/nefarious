@@ -130,6 +130,11 @@ void show_ports(struct Client* sptr, const struct StatDesc* sd,
 
   assert(0 != sptr);
 
+ 
+  /* send header so the client knows what we are showing */
+  send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
+    "P Port Conns Flags Status");
+
   if (param)
     port = atoi(param);
 

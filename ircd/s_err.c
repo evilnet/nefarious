@@ -459,9 +459,9 @@ static Numeric replyTable[] = {
 /* 214 */
   { 0 },
 /* 215 */
-  { RPL_STATSILINE, "I %s * %s %d %s", "215" },
+  { RPL_STATSILINE, "I %s%s%s %d %s%s %d %s", "215" },
 /* 216 */
-  { RPL_STATSKLINE, "%c %s \"%s\" %s %s 0 0", "216" },
+  { RPL_STATSKLINE, "%c %s%s%s \"%s\" %s%s 0 0", "216" },
 /* 217 */
   { RPL_STATSPLINE, "P %d %d %s %s", "217" },
 /* 218 */
@@ -489,7 +489,7 @@ static Numeric replyTable[] = {
 /* 229 */
   { RPL_STATSBLINE, "B %s %s :%s", "229" },
 /* 230 */
-  { 0 },
+  { RPL_STATSHEADER, 0, "230" },
 /* 231 */
   { RPL_SERVICEINFO, 0, "231" },
 /* 232 */
