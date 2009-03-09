@@ -1436,6 +1436,8 @@ spoofhostitems '}' ';'
     valid = 1;
 
   if (valid) {
+    p = (struct prefix *) MyMalloc(sizeof(struct prefix));
+
     if (spoof->realhost) {
       if (check_if_ipmask(spoof->realhost)) {
         if (str2prefix(spoof->realhost, p) != 0) {
