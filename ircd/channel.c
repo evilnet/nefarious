@@ -826,7 +826,7 @@ int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
   for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
     if (tmp->value.ban.extflag) {
       if (tmp->value.ban.extflag & EXTBAN_TEXT) {
-        if (!mmatch(tmp->value.ban.extstr, text))
+        if (!mmatch(decodespace(tmp->value.ban.extstr), text))
           denied = 1;
       }
     }
@@ -835,7 +835,7 @@ int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
   for (tmp = chptr->exceptlist; tmp; tmp = tmp->next) {
     if (tmp->value.except.extflag) {
       if (tmp->value.except.extflag & EXTEXCEPT_TEXT) {
-        if (!mmatch(tmp->value.except.extstr, text))
+        if (!mmatch(decodespace(tmp->value.except.extstr), text))
           excepted = 1;
       }
     }

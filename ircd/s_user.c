@@ -764,7 +764,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
     Count_newremoteclient(UserStats, user->server);
 
   /* increment global count if needed */
-  if (UserStats.globalclients < UserStats.clients && IsUser(sptr)) {
+  if (UserStats.globalclients < UserStats.clients) {
     if (UserStats.globalclients >= 0) {
       ++UserStats.globalclients;
       save_tunefile();
@@ -772,7 +772,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
   }
 
   /* increment local count if needed */
-  if (UserStats.localclients < UserStats.local_clients && IsUser(sptr)) {
+  if (UserStats.localclients < UserStats.local_clients) {
     if (UserStats.localclients >= 0) {
       ++UserStats.localclients;
       save_tunefile();
@@ -781,10 +781,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
   if (IsInvisible(sptr))
     ++UserStats.inv_clients;
-  if (IsOper(sptr)) {
-Debug((DEBUG_DEBUG, "Test 4"));
+  if (IsOper(sptr))
     ++UserStats.opers;
-}
   if (IsAccount(sptr))
     ++UserStats.authed;
 
@@ -2277,14 +2275,12 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       case 'H':
         if (what == MODE_ADD) {
           if (!IsHideOper(acptr)) {
-Debug((DEBUG_DEBUG, "Test 5"));
             --UserStats.opers;
           }
           SetHideOper(acptr);
         } else {
           if (IsHideOper(acptr)) {
             ++UserStats.opers;
-Debug((DEBUG_DEBUG, "Test 6"));
           }
           ClearHideOper(acptr);
         }
@@ -2385,7 +2381,6 @@ Debug((DEBUG_DEBUG, "Test 6"));
       ClearWhois(acptr);
 
     if (!FlagHas(&setflags, FLAG_DISPLAY_MODE) && !(HasPriv(acptr, PRIV_DISPLAY_MODE) && IsOper(acptr))) {
-Debug((DEBUG_DEBUG, "Test 1"));
       if (IsHideOper(acptr))
         ++UserStats.opers; /* count is added when mode is set, decrement if they cant set +H */
       ClearHideOper(acptr);
@@ -2410,7 +2405,6 @@ Debug((DEBUG_DEBUG, "Test 1"));
    * will cause servers to update correctly.
    */
   if (!FlagHas(&setflags, FLAG_OPER) && IsOper(acptr) && !IsHideOper(acptr)) { /* user now oper */
-Debug((DEBUG_DEBUG, "Test 2"));
     ++UserStats.opers;
   }
   if (HasPriv(acptr, PRIV_PROPAGATE)) /* remember propagate privilege setting */
