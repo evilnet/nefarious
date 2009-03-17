@@ -3,6 +3,10 @@
 
 2009-03-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/convert-conf.c: Small tweak.
+
+2009-03-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/convert-conf.c: Command line version of the conf converter.
 
 	* ircd/ircd_parser.y: Small tweak.

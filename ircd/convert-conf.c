@@ -581,7 +581,7 @@ static void finish_forwards(void)
 {
     struct string_list *sl;
 
-    if (quarantines)
+    if (forwards)
     {
         fputs("Forward {\n", stdout);
         for (sl = forwards; sl; sl = sl->next)
