@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-03-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/convert-conf.c: Command line version of the conf converter.
+
+	* ircd/ircd_parser.y: Small tweak.
+
+	* ircd/Makefile.in: Added convert-conf.c.
+
 2009-03-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Bug fix with _'s not working in extended text
