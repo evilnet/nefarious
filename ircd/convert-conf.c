@@ -33,7 +33,6 @@ static const char *admin_names[] = { "location", "contact", "contact", 0 },
     *general_names[] = { "name", "vhost", "description", "", "#numeric", 0 },
     *motd_names[] = { "host", "file", 0 },
     *redirect_names[] = { "mask", "server", "port", 0 },
-    *webirc_names[] = { "mask", "pass", "flags", "ident", "desc", 0 },
 
     *removed_features[] = { "OPERS_SEE_IN_SECRET_CHANNELS", "LOCOP_SEE_IN_SECRET_CHANNELS", "HIS_STATS_h", "HIS_STATS_M", "WEBIRC_USERIDENT", 
                             "WEBIRC_SPOOFIDENT", "WEBIRC_FAKEIDENT", "OPER_WHOIS_SECRET", 0 };
@@ -657,6 +656,35 @@ static void do_client(void)
     emit_client(fields[2], passwd, fields[4], maxlinks, 0);
 }
 
+static void do_webirc(void)
+{
+    const char *mask = fields[0], *pass = fields[1], * flags = fields[2], *ident = fields[3], *desc = fields[4];
+
+    /* Print the current line. */
+    fprintf(stdout, "# %s\nWebIRC {\n", orig_line);
+
+    fprintf(stdout, "\tmask = \"%s\";\n", mask);
+    fprintf(stdout, "\tpass = \"%s\";\n", pass);
+
+    if (flags && flags[0] != '\0') {
+        if (strcmp(flags, "*"))
+            fprintf(stdout, "\tflags = \"%s\";\n", flags);
+    }
+
+    if (ident && ident[0] != '\0')
+        fprintf(stdout, "\tident = \"%s\";\n", ident);
+    else
+        fprintf(stdout, "\tident = \"change_me\";\n");
+
+    if (desc && desc[0] != '\0')
+        fprintf(stdout, "\tdesc = \"%s\";\n", desc);
+    else
+        fprintf(stdout, "\tdesc = \"webirc_change_me\";\n");
+
+    /* Close the block. */
+    fprintf(stdout, "};\n");
+}
+
 int main(int argc, char *argv[])
 {
     FILE *ifile;
@@ -717,7 +745,7 @@ int main(int argc, char *argv[])
         case 'S': case 's': do_spoofhost(); break;
         case 'T': case 't': simple_line("Motd", motd_names, NULL); break;
         case 'U': case 'u': do_uworld(); break;
-        case 'W':           simple_line("WebIRC", webirc_names, NULL); break;
+        case 'W':           do_webirc(); break;
         case 'Y': case 'y': simple_line("Class", class_names, NULL); break;
         case 'X':           simple_line("DNSBL", dnsbl_names, NULL); break;
         default:
