@@ -244,7 +244,7 @@ stats_flines(struct Client* to, const struct StatDesc *sd, char* param)
 
   /* send header so the client knows what we are showing */
   send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
-            "f Match \"Watch Flags\" \"React Flags\" Length Status :Reason");
+            "C Match \"Watch Flags\" \"React Flags\" Length Status :Reason");
 
   for (fline = GlobalFList; fline; fline = fline->next)
     send_reply(to, RPL_STATSFILTERLINE, fline->rawfilter, fline->wflags ? fline->wflags : "",
@@ -592,7 +592,10 @@ struct StatDesc statsinfo[] = {
   { 'B', "mappings", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MAPPINGS,
     stats_configured_svcs, 0,
     "Service mappings." },
-  { 'c', "connect", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_CONNECT,
+  { 'C', "filters", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FILTERS,
+    stats_flines, 0,
+    "Filter lines." },
+  { 'c', "connect", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_CONNECT,
     stats_configured_links, CONF_SERVER,
     "Remote server connection lines." },
   { 'd', "rules", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_CRULES,
@@ -604,12 +607,12 @@ struct StatDesc statsinfo[] = {
   { 'e', "engine", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_ENGINE,
     stats_engine, 0,
     "Report server event loop engine." },
-  { 'F', "features", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FEATURES,
+  { 'f', "features", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FEATURES,
     feature_report, 0,
     "Feature settings." },
-  { 'f', "filters", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FILTERS,
-    stats_flines, 0,
-    "Filter lines." },
+  { 'F', "featuresall", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_FEATURES,
+    feature_report, 1,
+    "All feature settings, including defaulted values." },
   { 'g', "glines", STAT_FLAG_OPERFEAT, FEAT_HIS_STATS_GLINES,
     gline_stats, 0,
     "Global bans (G-lines)." },

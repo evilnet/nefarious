@@ -3964,6 +3964,7 @@ mode_process_excepts(struct ParseState *state)
           MyFree(except->value.except.extstr);
       } else {
 	if (state->flags & MODE_PARSE_SET && MyUser(state->sptr) &&
+            !(state->mbuf->mb_dest & MODEBUF_DEST_OPMODE) &&
 	    (len > (feature_int(FEAT_AVEXCEPTLEN) * feature_int(FEAT_MAXEXCEPTS)) ||
 	     count > feature_int(FEAT_MAXEXCEPTS))) {
 	  send_reply(state->sptr, ERR_EXCEPTLISTFULL, state->chptr->chname,
@@ -4076,6 +4077,7 @@ mode_process_bans(struct ParseState *state)
 	  MyFree(ban->value.ban.extstr);
       } else {
 	if (state->flags & MODE_PARSE_SET && MyUser(state->sptr) &&
+            !(state->mbuf->mb_dest & MODEBUF_DEST_OPMODE) &&
 	    (len > (feature_int(FEAT_AVBANLEN) * feature_int(FEAT_MAXBANS)) ||
 	     count > feature_int(FEAT_MAXBANS))) {
 	  send_reply(state->sptr, ERR_BANLISTFULL, state->chptr->chname,

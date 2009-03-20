@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-03-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/channel.c (mode_process_bans): Bypass total ban count and
+	length checks for OPMODEs.
+
+	* ircd/ircd_features.c (feature_report): If sd->sd_funcdata is
+	non-zero, report even unchanged features (using prefix 'f').
+
+	* ircd/s_stats.c (statsinfo): Make "/stats f" case-sensitive, and
+	use the upper case variant to report all features.
+
 2009-03-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/convert-conf.c: Dont cause the ircd to freak out with
