@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-03-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_server.c: Removed an unneeded %s which was causing linking	
+	issues. 
+
 2009-03-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c (mode_process_bans): Bypass total ban count and
