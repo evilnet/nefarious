@@ -192,10 +192,19 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char *keys;
   char format_reply[BUFSIZE + 1];
 
-#define RET { bouncedtimes--; continue; }
+#define RET(x) { bouncedtimes--; return x; }
 
   if (parc < 2 || *parv[1] == '\0')
     return need_more_params(sptr, "JOIN");
+
+  bouncedtimes++;
+
+  /* don't use 'return x;' but 'RET' from here ;p */
+  if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
+  {
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, parv[1]);
+    RET(0)
+  }
 
   joinbuf_init(&join, sptr, cptr, JOINBUF_TYPE_JOIN, 0, 0);
   joinbuf_init(&create, sptr, cptr, JOINBUF_TYPE_CREATE, 0, TStime());
@@ -210,15 +219,6 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
     if (join0(&join, cptr, sptr, name)) /* did client do a JOIN 0? */
       continue;
-
-    bouncedtimes++;
-    /* don't use 'return x;' but 'RET' from here ;p */
-
-    if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
-    {
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, name);
-      RET
-    }
 
     /* bad channel name */
     if ((!IsChannelName(name)) || (HasCntrl(name))) {
@@ -397,7 +397,7 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     sendcmdto_serv_butone(&me, CMD_MODE, sptr,
                           "%H +%s", chptr, feature_str(FEAT_AUTOCHANMODES_LIST));
 
-  return 0;
+  RET(0);
 }
 
 /*
