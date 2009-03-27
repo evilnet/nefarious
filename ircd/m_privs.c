@@ -109,49 +109,75 @@ int mo_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   for (i = 1; i < parc; i++) {
     for (name = ircd_strtok(&p, parv[i], " "); name;
 	 name = ircd_strtok(&p, 0, " ")) {
-      if ((acptr = FindUser(name)))
-	client_report_privs(sptr, acptr);
+      if (!(acptr = FindUser(name)))
+        send_reply(sptr, ERR_NOSUCHNICK, name);
+      else if (MyUser(acptr))
+        client_report_privs(sptr, acptr);
+      else
+        sendcmdto_one(cptr, CMD_PRIVS, acptr, "%s%s", NumNick(acptr));
     }
   }
 
   return 0;
 }
 
-int ms_privs(struct Client *cptr, struct Client *sptr, int parc, char *parv[]) {
-  struct Client *acptr = parc > 1 ? findNUser(parv[1]) : NULL;
+
+int ms_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
+{
+  struct Client *acptr;
+  char *numnick, *p = 0;
   char buf[512] = "";
+  int i;
   int what = PRIV_ADD;
   int modified = 0;
-  char *p = 0;
   char *tmp;
-  int i;
 
-  if (parc < 3)
-    return need_more_params(sptr, "PRIVS");
+  if (IsServer(sptr)) {
+    if (parc < 3)
+      return 0;
 
-  if (!acptr)
-    return 0;
+    acptr = parc > 1 ? findNUser(parv[1]) : NULL;
 
-  for (i=1; i<parc; i++) {
-    strcat(buf, parv[i]);
-    strcat(buf, " ");
-  }
+    for (i=1; i<parc; i++) {
+      strcat(buf, parv[i]);
+      strcat(buf, " ");
+    }
 
-  for (i = 2; i < parc; i++) {
-    if (*parv[i] == '+') { what = PRIV_ADD; parv[i]++; }
-    if (*parv[i] == '-') { what = PRIV_DEL; parv[i]++; }
-    for (tmp = ircd_strtok(&p, parv[i], ","); tmp;
-	 tmp = ircd_strtok(&p, NULL, ",")) {
-    client_modify_priv_by_name(acptr, tmp, what);
-    if (!modified)
-      modified = 1;
+    for (i = 2; i < parc; i++) {
+      if (*parv[i] == '+') { what = PRIV_ADD; parv[i]++; }
+      if (*parv[i] == '-') { what = PRIV_DEL; parv[i]++; }
+      for (tmp = ircd_strtok(&p, parv[i], ","); tmp;
+           tmp = ircd_strtok(&p, NULL, ",")) {
+        if (!strcmp(tmp, "PRIV_NONE")) {
+          memset(cli_privs(acptr), 0, sizeof(struct Privs));
+          break;
+        } else
+          client_modify_priv_by_name(acptr, tmp, what);
+        if (!modified)
+          modified = 1;
+      }
+    }
+
+    if (MyConnect(acptr) && modified)
+      sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Your privileges were modified", acptr);
+
+    sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%s", buf);
+  } else {
+    if (parc < 2)
+      return protocol_violation(cptr, "PRIVS (from remote oper) with no arguments");
+
+    for (i = 1; i < parc; i++) {
+      for (numnick = ircd_strtok(&p, parv[i], " "); numnick;
+           numnick = ircd_strtok(&p, 0, " ")) {
+        if (!(acptr = findNUser(numnick)))
+          continue;
+        else if (MyUser(acptr))
+          client_report_privs(sptr, acptr);
+        else
+          sendcmdto_one(sptr, CMD_PRIVS, acptr, "%s%s", NumNick(acptr));
+      }
     }
   }
 
-  if (MyConnect(acptr) && modified)
-    sendcmdto_one(&me, CMD_NOTICE, acptr,
-		  "%C :Your privileges were modified", acptr);
-
-  sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%s", buf);
   return 0;
 }

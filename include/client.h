@@ -1113,6 +1113,7 @@ extern void client_add_sendq(struct Connection* con,
 			     struct Connection** con_p);
 extern void client_set_privs(struct Client *client, struct ConfItem *oper);
 extern int client_report_privs(struct Client* to, struct Client* client);
+extern int client_debug_privs(struct Client *client);
 extern char *client_print_privs(struct Client* client);
 extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
 

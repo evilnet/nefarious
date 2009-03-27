@@ -955,8 +955,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
   /* Send umode to client */
   if (MyUser(sptr))
   {
-    struct Flags flags;
     struct SLink*  lp;
+    static struct Flags flags;
 
     if (IsDNSBL(sptr) && IsDNSBLAllowed(sptr)) {
       char flagbuf[BUFSIZE];
@@ -1020,6 +1020,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
       FlagSet(&flags, FLAG_ACCOUNT);
     else
       FlagClr(&flags, FLAG_ACCOUNT);
+
+    client_set_privs(sptr, NULL);
+    sendcmdto_serv_butone(cli_user(sptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", sptr);
 
     /* Send server notice mask to client */
     if (MyUser(sptr) && (cli_snomask(sptr) != SNO_DEFAULT) && HasFlag(sptr, FLAG_SERVNOTICE))
@@ -1131,6 +1134,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
         }
       }
     }
+
     /*
      * Set new nick name.
      */
@@ -2414,6 +2418,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       --UserStats.opers;
     ClearHideOper(acptr);
     client_set_privs(acptr, NULL); /* will clear propagate privilege */
+    sendcmdto_serv_butone(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", acptr);
   }
   if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(acptr))
     --UserStats.inv_clients;
@@ -2448,21 +2453,22 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
  */
 char *umode_str(struct Client *cptr)
 {
-  char* m = umodeBuf;                /* Maximum string size: "owidgrx\0" */
-  int   i;
-  struct Flags c_flags;
 
-  c_flags = cli_flags(cptr);
-  if (HasPriv(cptr, PRIV_PROPAGATE))
-    FlagSet(&c_flags, FLAG_OPER);
-  else
+  /* Maximum string size: "owidgrx\0" */
+  char *m = umodeBuf;
+  int i;
+  struct Flags c_flags = cli_flags(cptr);
+
+  if (!HasPriv(cptr, PRIV_PROPAGATE))
     FlagClr(&c_flags, FLAG_OPER);
 
-  for (i = 0; i < USERMODELIST_SIZE; ++i) {
+  for (i = 0; i < USERMODELIST_SIZE; ++i)
+  {
     if (FlagHas(&c_flags, userModeList[i].flag) &&
-        (userModeList[i].flag >= FLAG_GLOBAL_UMODES))
+        userModeList[i].flag >= FLAG_GLOBAL_UMODES)
       *m++ = userModeList[i].c;
   }
+
 
   if (IsAccount(cptr)) {
     char* t = cli_user(cptr)->account;

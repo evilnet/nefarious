@@ -280,6 +280,21 @@ client_report_privs(struct Client *to, struct Client *client)
   return 0;
 }
 
+
+int
+client_debug_privs(struct Client *client)
+{
+  struct MsgBuf *mb;
+  int found1 = 0;
+  int i;
+  for (i = 0; privtab[i].name; i++) {
+    if (HasPriv(client, privtab[i].priv))
+      Debug((DEBUG_DEBUG, "PRIV Set: %s", privtab[i].name));
+  }
+
+  return 0;
+}
+
 char *client_print_privs(struct Client *client)
 {
   int i;

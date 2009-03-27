@@ -1,6 +1,23 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-03-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/client.h: Added client_debug_privs.
+
+	* ircd/client.c: Added client_debug_privs
+
+	* ircd/convert-conf.c: Small bug fix.
+
+	* ircd/m_privs.c: /PRIV requests from opers for remote users now get
+	sent out remotely. The server to server ms_privs now will detect if
+	an incoming privs is a server or from an oper from another server and
+	take appropiate action.
+
+	* ircd/s_user.c: Fixed a bug with all users being given +o.
+
+	* ircd/s_serv.c: Send PRIV_NONE if there is no privs for a user.
+
 2009-03-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_join.c: Fixed a bug with the +L bounce checks when joining

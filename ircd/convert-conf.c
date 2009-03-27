@@ -538,7 +538,7 @@ static void do_spoofhost(void)
         fprintf(stdout, "};\n");
     } else {
         /* Print the current line */
-        fprintf(stdout, "# %s");
+        fprintf(stdout, "# %s", orig_line);
         fprintf(stdout, "# Unable to convert spoofhost block, password or hostname required");
     }
 }
