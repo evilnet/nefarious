@@ -344,6 +344,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    struct Channel *chptr;
    struct Membership *lp;
    char outbuf[BUFSIZE];
+   char *privs;
    time_t nowr;
 
    /* Header */
@@ -391,6 +392,12 @@ void checkClient(struct Client *sptr, struct Client *acptr)
      send_reply(sptr, RPL_DATASTR, "         Status:: IRC Operator");
    } else {
      send_reply(sptr, RPL_DATASTR, "         Status:: Client");
+   }
+
+   privs = client_print_privs(acptr);
+   if (strlen(privs) > 1) {
+     ircd_snprintf(0, outbuf, sizeof(outbuf), "     Privileges:: %s", privs);
+     send_reply(sptr, RPL_DATASTR, outbuf);
    }
 
    ircd_snprintf(0, outbuf, sizeof(outbuf), "   Connected to:: %s", cli_name(acptr->cli_user->server));

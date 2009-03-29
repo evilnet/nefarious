@@ -255,7 +255,6 @@ struct Connection {
                                          caused this clients socket to be `dead' */
   struct Socket       con_socket;     /**< socket descriptor for client */
   struct Timer        con_proc;       /**< process latent messages from client */
-  struct Privs        con_privs;     /**< Oper privileges */
   struct AuthRequest* con_auth;       /**< auth request for client */
   struct LOCInfo*     con_loc;        /**< Login-on-connect information */
 };
@@ -286,6 +285,7 @@ struct Client {
   time_t         cli_lastnick;  /**< TimeStamp on nick */
   unsigned int   cli_marker;    /**< /who processing marker */
   struct Flags   cli_flags;     /**< client flags */
+  struct Privs   cli_privs;     /**< client privs */
   unsigned int   cli_oflags;    /**< oper flags */
   unsigned int   cli_hopcount;  /**< number of servers to this 0 = local */
   unsigned int   cli_dnsblcount; /**< number of dnsbls left to check */
@@ -344,6 +344,8 @@ struct Client {
 #define cli_marker(cli)		((cli)->cli_marker)
 /** Get flags flagset for client. */
 #define cli_flags(cli)		((cli)->cli_flags)
+/** Get flags flagset for client. */
+#define cli_privs(cli)		((cli)->cli_privs)
 /** Get hop count to client. */
 #define cli_hopcount(cli)	((cli)->cli_hopcount)
 /** Get client IP address. */
@@ -352,8 +354,6 @@ struct Client {
 #define cli_status(cli)		((cli)->cli_status)
 /** Return non-zero if the client is local. */
 #define cli_local(cli)		((cli)->cli_local)
-/** Get oper privileges for client. */
-#define cli_privs(cli)		con_privs(cli_connect(cli))
 /** Get client name. */
 #define cli_name(cli)		((cli)->cli_name)
 /** Get client username (ident). */
@@ -1087,11 +1087,11 @@ struct Client {
 #define SNO_NOISY (SNO_SERVKILL|SNO_UNAUTH)
 
 /** Test whether a privilege has been granted to a client. */
-#define HasPriv(cli, priv)  FlagHas(cli_privs(cli), priv)
+#define HasPriv(cli, priv)  FlagHas(&cli_privs(cli), priv)
 /** Grant a privilege to a client. */
-#define SetPriv(cli, priv)  FlagSet(cli_privs(cli), priv)
+#define SetPriv(cli, priv)  FlagSet(&cli_privs(cli), priv)
 /** Revoke a privilege from a client. */
-#define ClrPriv(cli, priv)  FlagClr(cli_privs(cli), priv)
+#define ClrPriv(cli, priv)  FlagClr(&cli_privs(cli), priv)
 
 /** Used in setting and unsetting privs. */
 #define PRIV_ADD 1

@@ -133,12 +133,18 @@ int ms_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char *tmp;
 
   if (IsServer(sptr)) {
-    if (parc < 3)
-      return 0;
-
     acptr = parc > 1 ? findNUser(parv[1]) : NULL;
 
-    for (i=1; i<parc; i++) {
+    if (parc < 3) {
+      if (acptr) { 
+        memset(&cli_privs(acptr), 0, sizeof(struct Privs));
+        clear_privs(acptr);
+      }
+      return 0;
+    }
+
+
+    for (i=2; i<parc; i++) {
       strcat(buf, parv[i]);
       strcat(buf, " ");
     }
@@ -146,22 +152,40 @@ int ms_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     for (i = 2; i < parc; i++) {
       if (*parv[i] == '+') { what = PRIV_ADD; parv[i]++; }
       if (*parv[i] == '-') { what = PRIV_DEL; parv[i]++; }
-      for (tmp = ircd_strtok(&p, parv[i], ","); tmp;
-           tmp = ircd_strtok(&p, NULL, ",")) {
-        if (!strcmp(tmp, "PRIV_NONE")) {
-          memset(cli_privs(acptr), 0, sizeof(struct Privs));
-          break;
-        } else
-          client_modify_priv_by_name(acptr, tmp, what);
-        if (!modified)
-          modified = 1;
+      /* sigh, this can be simplified in 1.4 */
+      if (strstr(parv[i], ",")) {
+        for (tmp = ircd_strtok(&p, parv[i], ","); tmp;
+             tmp = ircd_strtok(&p, 0, ",")) {
+          if (!strcmp(tmp, "PRIV_NONE")) {
+            memset(&cli_privs(acptr), 0, sizeof(struct Privs));
+            clear_privs(acptr);
+            break;
+          } else {
+            client_modify_priv_by_name(acptr, tmp, what);
+          }
+          if (!modified)
+            modified = 1;
+        }
+      } else {
+        for (tmp = ircd_strtok(&p, parv[i], " "); tmp;
+             tmp = ircd_strtok(&p, 0, " ")) {
+          if (!strcmp(tmp, "PRIV_NONE")) {
+            memset(&cli_privs(acptr), 0, sizeof(struct Privs));
+            clear_privs(acptr);
+            break;
+          } else {
+            client_modify_priv_by_name(acptr, tmp, what);
+          }
+          if (!modified)
+            modified = 1;
+        }
       }
     }
 
     if (MyConnect(acptr) && modified)
       sendcmdto_one(&me, CMD_NOTICE, acptr, "%C :Your privileges were modified", acptr);
 
-    sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%s", buf);
+    sendcmdto_serv_butone(sptr, CMD_PRIVS, cptr, "%C %s", acptr, buf);
   } else {
     if (parc < 2)
       return protocol_violation(cptr, "PRIVS (from remote oper) with no arguments");

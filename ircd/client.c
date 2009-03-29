@@ -173,7 +173,7 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
     return;
 
   /* Clear out client's privileges. */
-  memset(cli_privs(client), 0, sizeof(struct Privs));
+  memset(&cli_privs(client), 0, sizeof(struct Privs));
 
   if (!IsAnOper(client) || !oper)
       return;
@@ -303,7 +303,7 @@ char *client_print_privs(struct Client *client)
   for (i = 0; privtab[i].name; i++) {
     if (HasPriv(client, privtab[i].priv)) {
       strcat(privbufp, privtab[i].name);
-      strcat(privbufp, ",");
+      strcat(privbufp, " ");
     }
   }
   privbufp[strlen(privbufp)] = 0;
@@ -312,19 +312,29 @@ char *client_print_privs(struct Client *client)
 }
 
 int client_modify_priv_by_name(struct Client *who, char *priv, int what) {
- int i = 0;
- assert(0 != priv);
- assert(0 != who);
+  int i = 0;
+  assert(0 != priv);
+  assert(0 != who);
 
- for (i = 0; privtab[i].name; i++)
+  for (i = 0; privtab[i].name; i++)
   if (0 == ircd_strcmp(privtab[i].name, priv)) {
-   if (what == PRIV_ADD)
-    SetPriv(who, privtab[i].priv);
-   else if (what == PRIV_DEL) {
-    ClrPriv(who, privtab[i].priv);
-   }
+    if (what == PRIV_ADD) {
+      SetPriv(who, privtab[i].priv);
+    } else if (what == PRIV_DEL) {
+      ClrPriv(who, privtab[i].priv);
+    }
   }
- return 0;
+  return 0;
+}
+
+int clear_privs(struct Client *who) {
+  int i = 0;
+  assert(0 != who);
+
+  for (i = 0; privtab[i].name; i++)
+    ClrPriv(who, privtab[i].priv);
+
+  return 0;
 }
 
 /*

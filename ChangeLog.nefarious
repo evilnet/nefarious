@@ -1,6 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-03-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/client.h: Move cli_privs from Connection to Client.
+
+	* ircd/client.c: Bug fixes plus moved cli_privs from Connection to
+	Client.
+
+	* ircd/m_check.c: Show PRIVS in check output on users.
+
+	* ircd/m_privs.c: Final fixes for the +o issues.
+
+	* ircd/m_server.c: Move cli_privs from Connection to Client.
+
+	* ircd/s_user.c: Clear privs.
+
 2009-03-27  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/client.h: Added client_debug_privs.

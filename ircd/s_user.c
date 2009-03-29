@@ -952,6 +952,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
   
   SetPropagated(sptr);
 
+  clear_privs(sptr);
+
   /* Send umode to client */
   if (MyUser(sptr))
   {
@@ -2418,6 +2420,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       --UserStats.opers;
     ClearHideOper(acptr);
     client_set_privs(acptr, NULL); /* will clear propagate privilege */
+    clear_privs(acptr);
     sendcmdto_serv_butone(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", acptr);
   }
   if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(acptr))
