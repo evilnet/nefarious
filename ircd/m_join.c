@@ -197,12 +197,10 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   if (parc < 2 || *parv[1] == '\0')
     return need_more_params(sptr, "JOIN");
 
-  bouncedtimes++;
-
   /* don't use 'return x;' but 'RET' from here ;p */
   if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
   {
-    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, parv[1]);
+    sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Redirection (+L) setting was too bouncy", sptr, parv[1]);
     RET(0)
   }
 
@@ -274,6 +272,7 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
           send_reply(sptr, ERR_LINKCHAN, chptr->chname, chptr->mode.redirect);
         else {
           send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+          bouncedtimes++;
           bjoin[0] = cli_name(sptr);
           bjoin[1] = chptr->mode.redirect;
           do_join(cptr, sptr, 2, bjoin);

@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-04-19  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_join.c: Fix for bouncy links error when joining more
+	then F:MAX_BOUNCE channels in a , seperated list
+ 
+	* ircd/m_svsjoin.c: Fix for bouncy links error when joining more
+	then F:MAX_BOUNCE channels in a , seperated list
+
+	* ircd/s_err.c: Change in the wording of channel redirection
+	errors to say redirection (+L) instead of link
+
 2009-03-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/client.h: Move cli_privs from Connection to Client.

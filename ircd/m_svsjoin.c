@@ -192,12 +192,11 @@ int do_svsjoin(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     if (join0(&join, cptr, sptr, name)) /* did client do a JOIN 0? */
       continue;
 
-    bouncedtimes++;
     /* don't use 'return x;' but 'RET' from here ;p */
 
     if (bouncedtimes > feature_int(FEAT_MAX_BOUNCE))
     {
-      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Link setting was too bouncy", sptr, name);
+      sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :*** Couldn't join %s ! - Redirection (+L) setting was too bouncy", sptr, name);
       RET
     }
 
@@ -241,6 +240,7 @@ int do_svsjoin(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     if (chptr) {
       if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
         send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+        bouncedtimes++;
         bjoin[0] = cli_name(sptr);
         bjoin[1] = chptr->mode.redirect;
         do_join(cptr, sptr, 2, bjoin);
