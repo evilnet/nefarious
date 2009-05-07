@@ -3400,6 +3400,11 @@ mode_parse_redirect(struct ParseState *state, int *flag_p)
       send_reply(state->sptr, ERR_NOSUCHCHANNEL, t_str);
       return;
     }
+
+    if (!ircd_strcmp(t_str, state->chptr->chname)) {
+      send_reply(state->sptr, ERR_LINKSELF, t_str);
+      return;
+    }
   }
 
   if (!(state->dir == MODE_ADD)) /* grab what is set now if we are removing */
