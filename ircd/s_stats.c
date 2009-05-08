@@ -95,7 +95,7 @@ stats_configured_links(struct Client *sptr, const struct StatDesc* sd,
   /* send header so the client knows what we are showing */
   if (sd->sd_funcdata == CONF_SERVER)
     send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
-      "C Server * Port Hoplimit Hubmask Class");
+      "c Server * Port Hoplimit Hubmask Class");
   else if (sd->sd_funcdata == CONF_OPS)
     send_reply(sptr, SND_EXPLICIT | RPL_STATSHEADER,
       "O Mask * Name Flags Class");

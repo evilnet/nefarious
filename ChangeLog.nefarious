@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-05-08  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_err.c: Small cosmetic /stats reply output fix
+
+	* ircd/s_stats.c: Small cosmetic /stats reply output fix
+
 2009-05-07  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/channel.c: Prevent users from redirecting a channel to
