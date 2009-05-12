@@ -45,6 +45,7 @@ static struct lexer_token {
   TOKEN(ADMIN),
   TOKEN(ALL),
   TOKEN(AUTOCONNECT),
+  TOKEN(BAN),
   TOKEN(BYTES),
   TOKEN(CHANNEL),
   TOKEN(CHNAME),

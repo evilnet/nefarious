@@ -465,7 +465,7 @@ static void do_kill(void)
     }
 
     /* Print the current line and start the new block. */
-    fprintf(stdout, "# %s\nKill {\n", orig_line);
+    fprintf(stdout, "# %s\nBan {\n", orig_line);
 
     /* Translate the user-matching portions. */
     if (host[0] == '$' && host[1] == 'R') {

@@ -3,6 +3,20 @@
 
 2009-05-12  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/convert-conf.c: Change Kill block to Ban block due to
+	config parser conflics
+
+	* ircd/ircd_parser.y: Change Kill block to Ban block due to
+	config parser conflics
+
+	* ircd/ircd_lexer.l: Change Kill block to Ban block due to
+	config parser conflics
+
+	* doc/example.conf: Change Kill block to Ban block due to
+	config parser conflics
+
+2009-05-12  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/m_challenge.c: Fixed remote oper not getting PRIVS
 
 	* ircd/m_oper.c: Fixed remote oper not getting PRIVS

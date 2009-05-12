@@ -147,6 +147,7 @@ static void free_slist(struct SLink **link) {
 %token ADMIN
 %token ALL
 %token AUTOCONNECT
+%token BAN
 %token BYTES
 %token CHANNEL
 %token CHNAME
@@ -903,7 +904,7 @@ motdfile: TFILE '=' QSTRING ';'
 };
 
 
-killblock: KILL
+killblock: BAN
 {
   dconf = (struct DenyConf*) MyMalloc(sizeof(struct DenyConf));
   memset(dconf, 0, sizeof(struct DenyConf));
