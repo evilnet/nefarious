@@ -408,14 +408,20 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
         /* Global Oper */
         ClearAdmin(sptr);
         OSetGlobal(sptr);
+        SetOper(sptr);
       } else {
         /* Admin */
         OSetGlobal(sptr);
         OSetAdmin(sptr);
+        SetOper(sptr);
+        SetAdmin(sptr);
       }
 
       /* Tell client_set_privs to send privileges to the user */
       client_set_privs(sptr, aconf);
+
+      ClearOper(sptr);
+      ClearAdmin(sptr);
 
       ClearRemoteOper(sptr);
       privbuf = client_print_privs(sptr);

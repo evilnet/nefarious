@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-05-12  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_challenge.c: Fixed remote oper not getting PRIVS
+
+	* ircd/m_oper.c: Fixed remote oper not getting PRIVS
+
+	* ircd/client.c: Fixed remote oper not getting PRIVS
+
 2009-05-09  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* doc/example.conf: Updated WebIRC description to mention that

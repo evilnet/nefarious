@@ -395,10 +395,13 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
 	 if (!feature_bool(FEAT_OPERFLAGS) || !(aconf->port & OFLAG_ADMIN)) {
 	   ClearAdmin(sptr);
+           SetOper(sptr);
            OSetGlobal(sptr);
 	 } else {
 	   OSetGlobal(sptr);
            OSetAdmin(sptr);
+           SetOper(sptr);
+           SetAdmin(sptr);
 	 }
 
          /* Tell client_set_privs to send privileges to the user */
@@ -407,6 +410,9 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
          ClearRemoteOper(sptr);
          privbuf = client_print_privs(sptr);
          sendcmdto_one(&me, CMD_PRIVS, sptr, "%C %s", sptr, privbuf);
+
+         ClearAdmin(sptr);
+         ClearOper(sptr);
 
 	 sendcmdto_one(&me, CMD_MODE, sptr, "%s %s", cli_name(sptr),
 		       (OIsAdmin(sptr)) ? "+aoiwsg" : "+oiwsg");

@@ -169,8 +169,13 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
   enum Priv priv;
   char *privbuf;
 
+/* 
+ * This stopped remote OPER from working properly resulting in opers
+ * not getting proper PRIVS
+ *
   if (!MyConnect(client))
     return;
+*/
 
   /* Clear out client's privileges. */
   memset(&cli_privs(client), 0, sizeof(struct Privs));
