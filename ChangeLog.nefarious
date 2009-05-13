@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-05-13  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_notice.c: Fix for MARK CVERSION being sent more then
+	once when CTCP_VERSIONING_CHAN is FALSE
+
 2009-05-12  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/convert-conf.c: Change Kill block to Ban block due to

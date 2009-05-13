@@ -191,6 +191,9 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
           ircd_strncpy(cli_version(sptr), normalizeBuffer(clean), VERSIONLEN);
           sendcmdto_serv_butone(&me, CMD_MARK, cptr, "%s %s :%s", cli_name(sptr), MARK_CVERSION, cli_version(sptr));
 
+          /* Moved here to solve duplicate MARK's if any of the CTCP_* conditions were false 05/13/2009 */
+          sent = 1;
+
           if (feature_bool(FEAT_CTCP_VERSIONING_CHAN)) {
             sprintf(temp, "%s has version \002%s\002", cli_name(sptr), cli_version(sptr));
             /* Announce to channel. */
@@ -199,7 +202,8 @@ int m_notice(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
                 sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp);
               else
                 sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp);
-              sent = 1;
+              /* Removed sent=1 from here because it caused the MARK above to be sent
+                 more then once if any of the conditions leading here are false 05/13/2009 */
             }
           }
 
