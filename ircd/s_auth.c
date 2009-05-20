@@ -16,8 +16,6 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id$
- *
  * Changes:
  *   July 6, 1999 - Rewrote most of the code here. When a client connects
  *     to the server and passes initial socket validation checks, it
@@ -26,6 +24,10 @@
  *     released, the server does not know it exists and does not process
  *     any messages from it.
  *     --Bleep  Thomas Helvey <tomh@inxpress.net>
+ */
+/** @file
+ * @brief Implementation of DNS and ident lookups.
+ * @version $Id$
  */
 #include "config.h"
 
@@ -68,9 +70,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-/*
- * a bit different approach
- * this replaces the original sendheader macros
+/** Array of message text (with length) pairs for AUTH status
+ * messages.  Indexed using #ReportType.
  */
 static struct {
   const char*  message;
@@ -93,6 +94,7 @@ static struct {
 #undef MSG
 };
 
+/** Enum used to index messages in the HeaderMessages[] array. */
 typedef enum {
   REPORT_DO_DNS,
   REPORT_FIN_DNS,
@@ -108,6 +110,7 @@ typedef enum {
   REPORT_P_DNSBL
 } ReportType;
 
+/** Sends response \a r (from #HeaderMessages) to client \a c. */
 #ifdef USE_SSL
 #define sendheader(c, r) \
    ssl_send(c, HeaderMessages[(r)].message, HeaderMessages[(r)].length)
@@ -125,6 +128,10 @@ static void unlink_auth_request(struct AuthRequest* request,
 void free_auth_request(struct AuthRequest* auth);
 
 
+/** Process a DNSBL DNS reply against DNSBLBlocks.
+ * @param[in] vptr Callback data containing the AuthRequest.
+ * @param[in] reply Struct containing the DNS reply.
+ */
 void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
 {
   struct AuthRequest* auth = (struct AuthRequest*) vptr;
@@ -186,6 +193,10 @@ void auth_dnsbl_callback(void* vptr, struct DNSReply* reply)
   return;
 }
 
+/** Begin the DNSBL checks if there are any DNSBLBlocks setup.
+ * @param[in] auth struct containing the AuthRequest.
+ * @param[in] client struct containing the client who is connecting.
+ */
 static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
 {
   u_long ip;
@@ -247,8 +258,9 @@ static int start_dnsblcheck(struct AuthRequest* auth, struct Client* client)
   return 0;
 }
 
-/*
- * auth_timeout - timeout a given auth request
+/** Timeout a given auth request.
+ * @param[in] ev A timer event whose associated data is the expired
+ *   struct AuthRequest.
  */
 static void auth_timeout_callback(struct Event* ev)
 {
@@ -274,8 +286,9 @@ static void auth_timeout_callback(struct Event* ev)
   }
 }
 
-/*
- * auth_sock_callback - called when an event occurs on the socket
+/** Handle socket I/O activity.
+ * @param[in] ev A socket event whos associated data is the active
+ *   struct AuthRequest.
  */
 static void auth_sock_callback(struct Event* ev)
 {
@@ -319,8 +332,9 @@ static void auth_sock_callback(struct Event* ev)
   }
 }
 
-/*
- * destroy_auth_request - stop an auth request completely
+/** Stop an auth request completely.
+ * @param[in] auth The struct AuthRequest to cancel.
+ * @param[in] send_reports If set to 1 then send the headers from HeaderMessages.
  */
 void destroy_auth_request(struct AuthRequest* auth, int send_reports)
 {
@@ -358,8 +372,8 @@ void destroy_auth_request(struct AuthRequest* auth, int send_reports)
   free_auth_request(auth);
 }
 
-/*
- * make_auth_request - allocate a new auth request
+/** Allocate a new auth request
+ * @param[in] client The client who we are allocating the request to.
  */
 static struct AuthRequest* make_auth_request(struct Client* client)
 {
@@ -376,8 +390,8 @@ static struct AuthRequest* make_auth_request(struct Client* client)
   return auth;
 }
 
-/*
- * free_auth_request - cleanup auth request allocations
+/** Cleanup auth request allocations
+ * @param[in] auth An authrequest who is being free'ed.
  */
 void free_auth_request(struct AuthRequest* auth)
 {
@@ -417,10 +431,10 @@ static void link_auth_request(struct AuthRequest* request,
   *list = request;
 }
 
-/*
- * release_auth_client - release auth client from auth system
+/** Release auth client from auth system
  * this adds the client into the local client lists so it can be read by
  * the main io processing loop
+ * @param[in] client Client who we are releasing the auth request for.
  */
 static void release_auth_client(struct Client* client)
 {
@@ -436,7 +450,10 @@ static void release_auth_client(struct Client* client)
   Debug((DEBUG_INFO, "Auth: release_auth_client %s@%s[%s]",
          cli_username(client), cli_sockhost(client), cli_sock_ip(client)));
 }
- 
+
+/** If part of an auth request has failed then this is used to kill their request
+ * @param[in] auth Authrequest containing client that is being killed.
+ */
 static void auth_kill_client(struct AuthRequest* auth)
 {
   assert(0 != auth);
@@ -453,9 +470,11 @@ static void auth_kill_client(struct AuthRequest* auth)
   free_auth_request(auth);
 }
 
-/* auth_verify_hostname - verify that a hostname is valid, i.e., only
- * contains characters valid for a hostname and that a hostname is not
- * too long.
+/** Verify that a hostname is valid, i.e., only contains characters
+ * valid for a hostname and that a hostname is not too long.
+ * @param host Hostname to check.
+ * @param maxlen Maximum length of hostname, not including NUL terminator.
+ * @return Non-zero if the hostname is valid.
  */
 static int auth_verify_hostname(char *host, int maxlen)
 {
@@ -470,12 +489,11 @@ static int auth_verify_hostname(char *host, int maxlen)
   return 1; /* it's a valid hostname */
 }
 
-/*
- * auth_dns_callback - called when resolver query finishes
- * if the query resulted in a successful search, hp will contain
- * a non-null pointer, otherwise hp will be null.
- * set the client on it's way to a connection completion, regardless
- * of success of failure
+/** Handle a complete DNS lookup.  Send the client on it's way to a
+ * connection completion, regardless of success or failure -- unless
+ * there was a mismatch and KILL_IPMISMATCH is set.
+ * @param[in] vptr The pending struct AuthRequest.
+ * @param[in] reply Resolved name, or NULL if lookup failed.
  */
 static void auth_dns_callback(void* vptr, struct DNSReply* reply)
 {
@@ -541,8 +559,9 @@ static void auth_dns_callback(void* vptr, struct DNSReply* reply)
   }
 }
 
-/*
- * authsenderr - handle auth send errors
+/** Handle auth send errors.
+ * @param[in] auth The request for which to handle the error for.
+ * @param[in] kill If 1 then kill the auth request.
  */
 static void auth_error(struct AuthRequest* auth, int kill)
 {
@@ -578,12 +597,11 @@ static void auth_error(struct AuthRequest* auth, int kill)
   }
 }
 
-/*
- * start_auth_query - Flag the client to show that an attempt to 
- * contact the ident server on the client's host.  The connect and
- * subsequently the socket are all put into 'non-blocking' mode.  
- * Should the connect or any later phase of the identifing process fail,
- * it is aborted and the user is given a username of "unknown".
+/** Flag the client to show an attempt to contact the ident server on
+ * the client's host.  Should the connect or any later phase of the
+ * identifying process fail, it is aborted and the user is given a
+ * username of "unknown".
+ * @param[in] auth The request for which to start the ident lookup.
  */
 static int start_auth_query(struct AuthRequest* auth)
 {
@@ -653,7 +671,7 @@ static int start_auth_query(struct AuthRequest* auth)
   return 1;
 }
 
-
+/** Enum used to index ident reply fields in a human-readable way. */
 enum IdentReplyFields {
   IDENT_PORT_NUMBERS,
   IDENT_REPLY_TYPE,
@@ -662,6 +680,10 @@ enum IdentReplyFields {
   USERID_TOKEN_COUNT
 };
 
+/** Parse an ident reply line and extract the userid from it.
+ * @param[in] reply The ident reply line.
+ * @return The userid, or NULL on parse failure.
+ */
 static char* check_ident_reply(char* reply)
 {
   char* token;
@@ -730,11 +752,11 @@ static char* check_ident_reply(char* reply)
   return token;
 }
 
-/*
- * start_auth - starts auth (identd) and dns queries for a client
- */
 enum { LOOPBACK = 127 };
 
+/** Starts auth (identd) and dns queries for a client.
+ * @param[in] client The client for which to start queries.
+ */
 void start_auth(struct Client* client)
 {
   struct AuthRequest* auth = 0;
@@ -793,12 +815,12 @@ void start_auth(struct Client* client)
   }
 }
 
-/*
- * send_auth_query - send the ident server a query giving "theirport , ourport"
- * The write is only attempted *once* so it is deemed to be a fail if the
- * entire write doesn't write all the data given.  This shouldnt be a
- * problem since the socket should have a write buffer far greater than
- * this message to store it in should problems arise. -avalon
+/** Send the ident server a query giving "theirport , ourport". The
+ * write is only attempted *once* so it is deemed to be a fail if the
+ * entire write doesn't write all the data given.  This shouldn't be a
+ * problem since the socket should have a write buffer far greater
+ * than this message to store it in should problems arise. -avalon
+ * @param[in] auth The request to send.
  */
 void send_auth_query(struct AuthRequest* auth)
 {
@@ -827,12 +849,10 @@ void send_auth_query(struct AuthRequest* auth)
     auth_error(auth, 0);
 }
 
-
-/*
- * read_auth_reply - read the reply (if any) from the ident server 
- * we connected to.
- * We only give it one shot, if the reply isn't good the first time
- * fail the authentication entirely. --Bleep
+/** Read the reply (if any) from the ident server we connected to.  We
+ * only give it one shot, if the reply isn't good the first time fail
+ * the authentication entirely. --Bleep
+ * @param[in] auth The request to read.
  */
 void read_auth_reply(struct AuthRequest* auth)
 {

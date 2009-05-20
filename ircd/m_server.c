@@ -404,23 +404,20 @@ check_loop_and_lh(struct Client* cptr, struct Client *sptr, time_t *ghost, const
       LHcptr = sptr;
     if (active_lh_line == 1)
     {
-      if (exit_client_msg(cptr, LHcptr, &me,
-                          "Leaf-only link %s <- %s, check L:",
-                          cli_name(cptr), host) == CPTR_KILLED)
-        return CPTR_KILLED;
-    }
+      sendto_opmask_butone(&me, SNO_OLDSNO,
+                           "%s SQUIT by %s [Leaf-only link %s <- %s, check L:]",
+                           host, cli_name(&me), cli_name(cptr), host);
+      return exit_new_server(cptr, sptr, host, timestamp,
+                             "Leaf-only link %s <- %s, check L:",
+                             cli_name(cptr), host);
     else if (active_lh_line == 2)
     {
-      if (exit_client_msg(cptr, LHcptr, &me,
-                          "Non-Hub link %s <- %s, check H:",
-                          cli_name(cptr), host) == CPTR_KILLED)
-        return CPTR_KILLED;
-    }
-    else
-    {
-      ServerStats->is_ref++;
-      if (exit_client(cptr, LHcptr, &me, "I'm a leaf, define HUB") == CPTR_KILLED)
-        return CPTR_KILLED;
+      sendto_opmask_butone(&me, SNO_OLDSNO,
+                           "%s SQUIT by %s [Non-Hub link %s <- %s, check H:]",
+                           host, cli_name(&me), cli_name(cptr), host);      
+      return exit_new_server(cptr, sptr, host, timestamp,
+                             "Non-Hub link %s <- %s, check H:",
+                             cli_name(cptr), host);
     }
     /*
      * Did we kill the incoming server off already ?

@@ -15,19 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
-
-/* Inhibit complaints when we use GCC extensions */
-#if defined(__GNUC__) && defined(HAVE_LONG_LONG)
-# define EXTENSION __extension__
-#else
-# define EXTENSION
-#endif
-
-#include <stddef.h>
-
+/** @file
+ * @brief IRC-specific printf() clone implementation.
+ * @version $Id$
+ */
 #include "config.h"
 
 #include "client.h"
@@ -38,12 +30,21 @@
 
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <errno.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
+/* Inhibit complaints when we use GCC extensions */
+#if defined(__GNUC__) && SIZEOF_LONG_LONG
+# define EXTENSION __extension__
+#else
+/** Fallback (empty) definition of EXTENSION. */
+# define EXTENSION
+#endif
+
 /* Find the largest type */
-#ifdef HAVE_LONG_LONG
+#if SIZEOF_LONG_LONG
 EXTENSION typedef long long _large_t;
 EXTENSION typedef unsigned long long _ularge_t;
 # define SIZEOF__LARGE_T SIZEOF_LONG_LONG
@@ -53,14 +54,18 @@ typedef _ularge_t _pointer_t;
 #  define HAVE_POINTER_T
 # endif
 #else
+/** Fallback definition of the largest integer type. */
 typedef long _large_t;
+/** Fallback definition of the largest unsigned integer type. */
 typedef unsigned long _ularge_t;
+/** Fallback definition of SIZEOF__LARGE_T. */
 # define SIZEOF__LARGE_T SIZEOF_LONG
 #endif
 
 /* Select something for _pointer_t */
 #ifndef HAVE_POINTER_T
 # if SIZEOF_LONG == SIZEOF_VOID_P
+/** Unsigned integer type large enough to hold a pointer. */
 typedef unsigned long _pointer_t;
 # elif SIZEOF_INT == SIZEOF_VOID_P
 typedef unsigned int _pointer_t;
@@ -69,136 +74,144 @@ typedef unsigned int _pointer_t;
 # endif
 #endif /* HAVE_POINTER_T */
 
-/* rough length sufficient to hold an octal number, since those can be large */
+/** rough length sufficient to hold an octal number, since those can be large */
 #define INTBUF_LEN (SIZEOF__LARGE_T * 3)
 
+/** Return minimum of \a i1 and \a i2. */
 #define SNP_MIN(i1, i2)	((i1) < (i2) ? (i1) : (i2))
+/** Return maximum of \a i1 and \a i2. */
 #define SNP_MAX(i1, i2)	((i1) > (i2) ? (i1) : (i2))
+/** Indicate total number of bytes "pseudo-output" in buffer. */
 #define TOTAL(buf_p)	((buf_p)->buf_loc + \
 			 SNP_MAX((buf_p)->buf_overflow, (buf_p)->overflow))
 
-#define WIDTH_MAX	999	/* keep from overflowing width */
+#define WIDTH_MAX	999	/**< keep from overflowing width */
 
-/* data about the buffer */
+/** data about the output buffer */
 struct BufData {
-  char	       *buf;		/* pointer to buffer */
-  size_t	buf_size;	/* maximum size of buffer */
-  size_t	buf_overflow;	/* how much buffer has been overflowed */
-  size_t	buf_loc;	/* where we are in the buffer */
-  short		limit;		/* max # of chars to convert */
-  size_t	overflow;	/* how much we overflowed the limit */
+  char	       *buf;		/**< pointer to buffer */
+  size_t	buf_size;	/**< maximum size of buffer */
+  size_t	buf_overflow;	/**< how much buffer has been overflowed */
+  size_t	buf_loc;	/**< where we are in the buffer */
+  short		limit;		/**< max # of chars to convert */
+  size_t	overflow;	/**< how much we overflowed the limit */
 };
 
+/** initializer for BufData */
 #define BUFDATA_INIT	{ 0, 0, 0, 0, 0, 0 }
 
-/* data about the fields */
+/** data about format fields */
 struct FieldData {
-  unsigned int	flags;		/* flags describing argument */
-  short		base;		/* base for integer conversions */
-  short		width;		/* width of field */
-  short		prec;		/* precision of field */
+  unsigned int	flags;		/**< flags describing argument */
+  short		base;		/**< base for integer conversions */
+  short		width;		/**< width of field */
+  short		prec;		/**< precision of field */
   union {
-    _ularge_t	v_int;		/* an integer value */
-    long double	v_float;	/* a floating point value -- NOT SUPPORTED */
-    void       *v_ptr;		/* a pointer value */
-  }		value;		/* value of a field */
+    _ularge_t	v_int;		/**< an integer value */
+    long double	v_float;	/**< a floating point value -- NOT SUPPORTED */
+    void       *v_ptr;		/**< a pointer value */
+  }		value;		/**< value of a field */
 };
 
+/** initializer for FieldData */
 #define FIELDDATA_INIT	{ 0, 0, 0, 0, { 0 } }
 
 /* Specifier flags */
-#define FLAG_MINUS	0x00000001	/* found a '-' flag */
-#define FLAG_PLUS	0x00000002	/* found a '+' flag */
-#define FLAG_SPACE	0x00000004	/* found a ' ' flag */
-#define FLAG_ALT	0x00000008	/* found a '#' flag */
-#define FLAG_ZERO	0x00000010	/* found a '0' flag */
-#define FLAG_COLON	0x00000020	/* found a ':' flag */
+#define FLAG_MINUS	0x00000001	/**< found a '-' flag */
+#define FLAG_PLUS	0x00000002	/**< found a '+' flag */
+#define FLAG_SPACE	0x00000004	/**< found a ' ' flag */
+#define FLAG_ALT	0x00000008	/**< found a '#' flag */
+#define FLAG_ZERO	0x00000010	/**< found a '0' flag */
+#define FLAG_COLON	0x00000020	/**< found a ':' flag */
 
-#define FLAG_RESERVED1	0x00000040	/* reserved for future expansion */
-#define FLAG_RESERVED0	0x00000080
+#define FLAG_RESERVED1	0x00000040	/**< reserved for future expansion */
+#define FLAG_RESERVED0	0x00000080	/**< reserved for future expansion */
 
 /* integer types */
-#define TYPE_CHAR	0x00000100	/* number is a char */
-#define TYPE_SHORT	0x00000200	/* number is a short */
-#define TYPE_LONG	0x00000400	/* number is a long */
-#define TYPE_QUAD	0x00000800	/* number is a quad */
+#define TYPE_CHAR	0x00000100	/**< number is a char */
+#define TYPE_SHORT	0x00000200	/**< number is a short */
+#define TYPE_LONG	0x00000400	/**< number is a long */
+#define TYPE_QUAD	0x00000800	/**< number is a quad */
 
 /* special integer types */
-#define TYPE_INTMAX	0x00001000	/* number is an intmax_t */
-#define TYPE_PTRDIFF	0x00002000	/* number is a ptrdiff_t */
-#define TYPE_SIZE	0x00004000	/* number is a size_t */
-#define TYPE_TIME	0x00008000	/* number is a time_t */
-#define TYPE_POINTER	0x00010000	/* number is a pointer_t */
+#define TYPE_INTMAX	0x00001000	/**< number is an intmax_t */
+#define TYPE_PTRDIFF	0x00002000	/**< number is a ptrdiff_t */
+#define TYPE_SIZE	0x00004000	/**< number is a size_t */
+#define TYPE_TIME	0x00008000	/**< number is a time_t */
+#define TYPE_POINTER	0x00010000	/**< number is a pointer_t */
 
 /* floating point types */
-#define TYPE_LONGDOUBLE	0x00020000	/* number is a long double */
+#define TYPE_LONGDOUBLE	0x00020000	/**< number is a long double */
 
-#define TYPE_RESERVED1	0x00040000	/* reserved for future expansion */
-#define TYPE_RESERVED0	0x00080000
+#define TYPE_RESERVED1	0x00040000	/**< reserved for future expansion */
+#define TYPE_RESERVED0	0x00080000	/**< reserved for future expansion */
 
-/* Mask to get just the type data */
+/** Mask to get just the type data */
 #define TYPE_MASK	(TYPE_CHAR | TYPE_SHORT | TYPE_LONG | TYPE_QUAD | \
 			 TYPE_INTMAX | TYPE_PTRDIFF | TYPE_SIZE | TYPE_TIME | \
 			 TYPE_POINTER | TYPE_LONGDOUBLE)
 
 /* type of argument to extract */
-#define ARG_INT		0x00100000	/* argument is an integer */
-#define ARG_FLOAT	0x00200000	/* argument is a float */
-#define ARG_PTR		0x00300000	/* argument is a pointer */
+#define ARG_INT		0x00100000	/**< argument is an integer */
+#define ARG_FLOAT	0x00200000	/**< argument is a float */
+#define ARG_PTR		0x00300000	/**< argument is a pointer */
 
-#define ARG_RESERVED11	0x00400000	/* reserved for future expansion */
-#define ARG_RESERVED10	0x00500000
-#define ARG_RESERVED9	0x00600000
-#define ARG_RESERVED8	0x00700000
-#define ARG_RESERVED7	0x00800000
-#define ARG_RESERVED6	0x00900000
-#define ARG_RESERVED5	0x00a00000
-#define ARG_RESERVED4	0x00b00000
-#define ARG_RESERVED3	0x00c00000
-#define ARG_RESERVED2	0x00d00000
-#define ARG_RESERVED1	0x00e00000
-#define ARG_RESERVED0	0x00f00000
+#define ARG_RESERVED11	0x00400000	/**< reserved for future expansion */
+#define ARG_RESERVED10	0x00500000	/**< reserved for future expansion */
+#define ARG_RESERVED9	0x00600000	/**< reserved for future expansion */
+#define ARG_RESERVED8	0x00700000	/**< reserved for future expansion */
+#define ARG_RESERVED7	0x00800000	/**< reserved for future expansion */
+#define ARG_RESERVED6	0x00900000	/**< reserved for future expansion */
+#define ARG_RESERVED5	0x00a00000	/**< reserved for future expansion */
+#define ARG_RESERVED4	0x00b00000	/**< reserved for future expansion */
+#define ARG_RESERVED3	0x00c00000	/**< reserved for future expansion */
+#define ARG_RESERVED2	0x00d00000	/**< reserved for future expansion */
+#define ARG_RESERVED1	0x00e00000	/**< reserved for future expansion */
+#define ARG_RESERVED0	0x00f00000	/**< reserved for future expansion */
 
 /* Mask to get just the argument data */
-#define ARG_MASK	0x00f00000
+#define ARG_MASK	0x00f00000      /**< masks off non-argument bits */
 
 /* type of conversion to perform */
-#define CONV_INT	0x01000000	/* convert integers */
-#define CONV_FLOAT	0x02000000	/* convert floats */
-#define CONV_CHAR	0x03000000	/* convert chars */
-#define CONV_STRING	0x04000000	/* convert strings */
-#define CONV_VARARGS	0x05000000	/* convert a %v */
-#define CONV_CLIENT	0x06000000	/* convert a struct Client */
-#define CONV_CHANNEL	0x07000000	/* convert a struct Channel */
-#define CONV_REAL	0x08000000	/* convert a struct Client and show realhost */
+#define CONV_INT	0x01000000	/**< convert integers */
+#define CONV_FLOAT	0x02000000	/**< convert floats */
+#define CONV_CHAR	0x03000000	/**< convert chars */
+#define CONV_STRING	0x04000000	/**< convert strings */
+#define CONV_VARARGS	0x05000000	/**< convert a %v */
+#define CONV_CLIENT	0x06000000	/**< convert a struct Client */
+#define CONV_CHANNEL	0x07000000	/**< convert a struct Channel */
 
-#define CONV_RESERVED6	0x09000000	/* reserved for future expansion */
-#define CONV_RESERVED5	0x0a000000
-#define CONV_RESERVED4	0x0b000000
-#define CONV_RESERVED3	0x0c000000
-#define CONV_RESERVED2	0x0d000000
-#define CONV_RESERVED1	0x0e000000
-#define CONV_RESERVED0	0x0f000000
+#define CONV_RESERVED7	0x08000000	/**< reserved for future expansion */
+#define CONV_RESERVED6	0x09000000	/**< reserved for future expansion */
+#define CONV_RESERVED5	0x0a000000	/**< reserved for future expansion */
+#define CONV_RESERVED4	0x0b000000	/**< reserved for future expansion */
+#define CONV_RESERVED3	0x0c000000	/**< reserved for future expansion */
+#define CONV_RESERVED2	0x0d000000	/**< reserved for future expansion */
+#define CONV_RESERVED1	0x0e000000	/**< reserved for future expansion */
+#define CONV_RESERVED0	0x0f000000	/**< reserved for future expansion */
 
 /* Mask to get just the conversion data */
-#define CONV_MASK	0x0f000000
+#define CONV_MASK	0x0f000000      /**< masks off non-conversion bits */
 
 /* Value information flags */
-#define INFO_RESERVED0	0x10000000	/* reserved for future expansion */
-#define INFO_UPPERCASE	0x20000000	/* use uppercase characters */
-#define INFO_UNSIGNED	0x40000000	/* number is unsigned */
-#define INFO_NEGATIVE	0x80000000	/* number is negative */
+#define INFO_RESERVED0	0x10000000	/**< reserved for future expansion */
+#define INFO_UPPERCASE	0x20000000	/**< use uppercase characters */
+#define INFO_UNSIGNED	0x40000000	/**< number is unsigned */
+#define INFO_NEGATIVE	0x80000000	/**< number is negative */
 
-#define BASE_OCTAL	9	/* octal base; bits-per-char * 3 */
-#define BASE_DECIMAL	-1000	/* decimal base; 10 ** 3 */
-#define BASE_HEX	12	/* hexadecimal base; bits-per-char * 3 */
+#define BASE_OCTAL	9	/**< octal base; bits-per-char * 3 */
+#define BASE_DECIMAL	-1000	/**< decimal base; 10 ** 3 */
+#define BASE_HEX	12	/**< hexadecimal base; bits-per-char * 3 */
 
 
 /* padding...			 1	   2	     3	       4	 5 */
 /*			12345678901234567890123456789012345678901234567890 */
+/** Predefined space padding. */
 static char spaces[] = "                                                  ";
+/** Predefined zero padding. */
 static char zeros[]  = "00000000000000000000000000000000000000000000000000";
 
+/** Length of predefined padding strings. */
 #define PAD_LENGTH	(sizeof(spaces) - 1)
 
 /*
@@ -206,7 +219,7 @@ static char zeros[]  = "00000000000000000000000000000000000000000000000000";
  * course, a reason for this; check out how they're built in doprintf.
  */
 
-/* string table for octal values */
+/** string table for octal values */
 static char *octal[] = {
      "",   "1",   "2",   "3",   "4",   "5",   "6",   "7",
    "01",  "11",  "21",  "31",  "41",  "51",  "61",  "71",
@@ -274,7 +287,7 @@ static char *octal[] = {
   "077", "177", "277", "377", "477", "577", "677", "777"
 };
 
-/* string table for decimal values */
+/** string table for decimal values */
 static char *decimal[] = {
      "",   "1",   "2",   "3",   "4",   "5",   "6",   "7",   "8",   "9",
    "01",  "11",  "21",  "31",  "41",  "51",  "61",  "71",  "81",  "91",
@@ -378,7 +391,7 @@ static char *decimal[] = {
   "099", "199", "299", "399", "499", "599", "699", "799", "899", "999"
 };
 
-/* string table for lower-case hexadecimal values */
+/** string table for lower-case hexadecimal values */
 static char *hex[] = {
      "",   "1",   "2",   "3",   "4",   "5",   "6",   "7",
     "8",   "9",   "a",   "b",   "c",   "d",   "e",   "f",
@@ -894,7 +907,7 @@ static char *hex[] = {
   "8ff", "9ff", "aff", "bff", "cff", "dff", "eff", "fff"
 };
 
-/* string table for upper-case hexadecimal values */
+/** string table for upper-case hexadecimal values */
 static char *HEX[] = {
      "",   "1",   "2",   "3",   "4",   "5",   "6",   "7",
     "8",   "9",   "A",   "B",   "C",   "D",   "E",   "F",
@@ -1410,7 +1423,10 @@ static char *HEX[] = {
   "8FF", "9FF", "AFF", "BFF", "CFF", "DFF", "EFF", "FFF"
 };
 
-/* Add a character to the buffer */
+/** Append a single character to an output buffer.
+ * @param[in,out] buf_p Buffer to append to.
+ * @param[in] c Character to append.
+ */
 static void
 addc(struct BufData *buf_p, int c)
 {
@@ -1431,13 +1447,19 @@ addc(struct BufData *buf_p, int c)
     buf_p->buf[buf_p->buf_loc++] = c;
 }
 
-/* Add a string to the buffer */
+/** Append a string to an output buffer.
+ * @param[in,out] buf_p Buffer to append to.
+ * @param[in] s_len Length of string to append.
+ * @param[in] s String to append.
+ */
 static void
 adds(struct BufData *buf_p, int s_len, const char *s)
 {
   int overflow = 0;
 
-  while (s_len && *s) { /* while the string exists and has non-zero length */
+  /* while the string exists and has non-zero length */
+  while (s_len && *s)
+  {
     /* poor man's inlining; see addc(), above */
     if (buf_p->limit == 0) { /* We've gone past the limit... */
       buf_p->overflow++;
@@ -1459,7 +1481,11 @@ adds(struct BufData *buf_p, int s_len, const char *s)
   }
 }
 
-/* Add padding */
+/** Add certain padding to an output buffer.
+ * @param[in,out] buf_p Buffer to append to.
+ * @param[in] padlen Length of padding to add.
+ * @param[in] pad Padding string (at least PAD_LENGTH bytes long).
+ */
 static void
 do_pad(struct BufData *buf_p, int padlen, char *pad)
 {
@@ -1471,7 +1497,11 @@ do_pad(struct BufData *buf_p, int padlen, char *pad)
   adds(buf_p, padlen, pad);
 }
 
-/* Find string length up to maxlen */
+/** Return length of string, up to a maximum.
+ * @param[in] str String to find length for.
+ * @param[in] maxlen Maximum value to return.
+ * @return Minimum of \a maxlen and length of \a str.
+ */
 static int
 my_strnlen(const char *str, int maxlen)
 {
@@ -1483,7 +1513,12 @@ my_strnlen(const char *str, int maxlen)
   return len;
 }
 
-/* the function that actually puts it all together */
+/** Workhorse printing function.
+ * @param[in] dest Client to format the message.
+ * @param[in,out] buf_p Description of output buffer.
+ * @param[in] fmt Message format string.
+ * @param[in] vp Variable-length argument list for format string.
+ */
 static void
 doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	 va_list vp)
@@ -1708,10 +1743,8 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	  *((char *)va_arg(vp, int *)) = TOTAL(buf_p);
 	else if (fld_s.flags & TYPE_SHORT) /* eg, %hn */
 	  *((short *)va_arg(vp, int *)) = TOTAL(buf_p);
-#ifdef HAVE_LONG_LONG
 	else if (fld_s.flags & TYPE_QUAD) /* eg, %qn */
-	  *((my_quad_t *)va_arg(vp, my_quad_t *)) = TOTAL(buf_p);
-#endif /* HAVE_LONG_LONG */
+	  *((int64_t *)va_arg(vp, int64_t *)) = TOTAL(buf_p);
 	else if (fld_s.flags & TYPE_LONG) /* eg, %ln */
 	  *((long *)va_arg(vp, long *)) = TOTAL(buf_p);
 	else if (fld_s.flags & TYPE_INTMAX) /* eg, %jn */
@@ -1745,11 +1778,6 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	fld_s.flags |= ARG_PTR | CONV_CLIENT;
 	break;
 
-      case 'R': /* convert a client name... */
-	fld_s.flags &= ~(FLAG_PLUS | FLAG_SPACE | FLAG_ZERO | TYPE_MASK);
-	fld_s.flags |= ARG_PTR | CONV_REAL;
-	break;
-
       case 'H': /* convert a channel name... */
 	fld_s.flags &= ~(FLAG_PLUS | FLAG_SPACE | FLAG_ALT | FLAG_ZERO |
 			 FLAG_COLON | TYPE_MASK);
@@ -1777,11 +1805,9 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	if (fld_s.flags & TYPE_CHAR) /* eg, %hhu */
 	  fld_s.value.v_int = (unsigned char)va_arg(vp, unsigned int);
 	else if (fld_s.flags & TYPE_SHORT) /* eg, %hu */
-	  fld_s.value.v_int = (short)va_arg(vp, unsigned int);
-#ifdef HAVE_LONG_LONG
+	  fld_s.value.v_int = (unsigned short)va_arg(vp, unsigned int);
 	else if (fld_s.flags & TYPE_QUAD) /* eg, %qu */
-	  fld_s.value.v_int = va_arg(vp, _large_t);
-#endif
+	  fld_s.value.v_int = va_arg(vp, uint64_t);
 	else if (fld_s.flags & TYPE_LONG) /* eg, %lu */
 	  fld_s.value.v_int = va_arg(vp, unsigned long);
 	else if (fld_s.flags & TYPE_INTMAX) /* eg, %ju */
@@ -1803,10 +1829,8 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	  signed_int = (char)va_arg(vp, unsigned int);
 	else if (fld_s.flags & TYPE_SHORT) /* eg, %hd */
 	  signed_int = (short)va_arg(vp, unsigned int);
-#ifdef HAVE_LONG_LONG
 	else if (fld_s.flags & TYPE_QUAD) /* eg, %qd */
-	  signed_int = va_arg(vp, _large_t);
-#endif
+	  signed_int = va_arg(vp, int64_t);
 	else if (fld_s.flags & TYPE_LONG) /* eg, %ld */
 	  signed_int = va_arg(vp, long);
 	else if (fld_s.flags & TYPE_INTMAX) /* eg, %jd */
@@ -2014,10 +2038,9 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 
       vdata->vd_chars = buf_s.buf_loc; /* return relevant data */
       vdata->vd_overflow = SNP_MAX(buf_s.buf_overflow, buf_s.overflow);
-    } else if (((fld_s.flags & CONV_MASK) == CONV_CLIENT) ||
-               ((fld_s.flags & CONV_MASK) == CONV_REAL)) {
+    } else if ((fld_s.flags & CONV_MASK) == CONV_CLIENT) {
       struct Client *cptr = (struct Client*) fld_s.value.v_ptr;
-      char *str1 = 0, *str2 = 0, *str3 = 0;
+      const char *str1 = 0, *str2 = 0, *str3 = 0;
       int slen1 = 0, slen2 = 0, slen3 = 0, elen = 0, plen = 0;
 
       /* &me is used if it's not a definite server */
@@ -2034,13 +2057,8 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	if (!IsServer(cptr) && !IsMe(cptr) && fld_s.flags & FLAG_ALT) {
 	  assert(0 != cli_user(cptr));
 	  assert(0 != *(cli_name(cptr)));
-	  if ((fld_s.flags & CONV_MASK) == CONV_REAL) {
-	    str2 = cli_user(cptr)->realusername;
-	    str3 = cli_user(cptr)->realhost;
-	  } else {
-	    str2 = cli_user(cptr)->username;
-	    str3 = cli_user(cptr)->host;
-	  }
+	  str2 = cli_user(cptr)->username;
+	  str3 = cli_user(cptr)->host;
 	} else
 	  fld_s.flags &= ~FLAG_ALT;
       }
@@ -2098,6 +2116,7 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
   } /* for (; *fmt; fmt++) { */
 }
 
+/* ircd_snprintf() has a big Doxygen comment in the header file. */
 int
 ircd_snprintf(struct Client *dest, char *buf, size_t buf_len,
 	      const char *format, ...)
@@ -2121,6 +2140,14 @@ ircd_snprintf(struct Client *dest, char *buf, size_t buf_len,
   return TOTAL(&buf_s);
 }
 
+/** Like ircd_snprintf() but with a va_list argument list.
+ * @param[in] dest Client receiving of message.
+ * @param[out] buf Output buffer for formatted message.
+ * @param[in] buf_len Number of bytes that can be written to \a buf.
+ * @param[in] format Format string for message.
+ * @param[in] args Variable-length argument list for format string.
+ * @return Number of bytes that would be written to \a buf without truncation.
+ */
 int
 ircd_vsnprintf(struct Client *dest, char *buf, size_t buf_len,
 	       const char *format, va_list args)

@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Implementation of configurable feature support.
+ * @version $Id$
  */
 #include "config.h"
 
@@ -53,11 +55,11 @@
 
 struct Client his;
 
-/* List of log output types that can be set */
+/** List of log output types that can be set */
 static struct LogTypes {
-  char *type;
-  int (*set)(const char *, const char *);
-  char *(*get)(const char *);
+  char *type; /**< Settable name. */
+  int (*set)(const char *, const char *); /**< Function to set the value. */
+  char *(*get)(const char *); /**< Function to get the value. */
 } logTypes[] = {
   { "FILE", log_set_file, log_get_file },
   { "FACILITY", log_set_facility, log_get_facility },
@@ -100,7 +102,11 @@ feature_notify_serverinfo(void)
   ircd_strncpy(cli_info(&his), feature_str(FEAT_HIS_SERVERINFO), REALLEN);
 }
 
-/* Look up a struct LogType given the type string */
+/** Look up a struct LogType given the type string.
+ * @param[in] from &Client requesting type, or NULL.
+ * @param[in] type Name of log type to find.
+ * @return Pointer to the found LogType, or NULL if none was found.
+ */
 static struct LogTypes *
 feature_log_desc(struct Client* from, const char *type)
 {
@@ -121,7 +127,12 @@ feature_log_desc(struct Client* from, const char *type)
   return 0; /* not found */
 }
 
-/* Set the value of a log output type for a log subsystem */
+/** Set the value of a log output type for a log subsystem.
+ * @param[in] from &Client trying to set the log type, or NULL.
+ * @param[in] fields Array of parameters to set.
+ * @param[in] count Number of parameters in \a fields.
+ * @return -1 to clear the mark, 0 to leave the mask alone, 1 to set the mask.
+ */
 static int
 feature_log_set(struct Client* from, const char* const* fields, int count)
 {
@@ -161,7 +172,12 @@ feature_log_set(struct Client* from, const char* const* fields, int count)
   return 0;
 }
 
-/* reset a log type for a subsystem to its default value */
+/** Reset a log type for a subsystem to its default value.
+ * @param[in] from &Client trying to reset the subsystem.
+ * @param[in] fields Array of parameters to reset.
+ * @param[in] count Number of fields in \a fields.
+ * @return -1 to unmark the entry, or zero to leave it alone.
+ */
 static int
 feature_log_reset(struct Client* from, const char* const* fields, int count)
 {
@@ -183,7 +199,11 @@ feature_log_reset(struct Client* from, const char* const* fields, int count)
   return 0;
 }
 
-/* report the value of a log setting */
+/** Report the value of a log setting.
+ * @param[in] from &Client asking for details.
+ * @param[in] fields Array of parameters to get.
+ * @param[in] count Number of fields in \a fields.
+ */
 static void
 feature_log_get(struct Client* from, const char* const* fields, int count)
 {
@@ -210,6 +230,7 @@ feature_log_get(struct Client* from, const char* const* fields, int count)
   }
 }
 
+/** Set PREFIX and STATUSMSG modes based on if HALFOPS are enabled or not */
 static void
 set_isupport_halfops(void)
 {
@@ -217,6 +238,7 @@ set_isupport_halfops(void)
     add_isupport_s("STATUSMSG", feature_bool(FEAT_HALFOPS) ? "@%+" : "@+");
 }
 
+/** Set EXCEPTS, MAXEXCEPTS, and CHANMODES based on if HALFOPS are enabled or not */
 static void
 set_isupport_excepts(void)
 {
@@ -242,6 +264,7 @@ set_isupport_excepts(void)
     add_isupport_s("MAXLIST", imaxlist);
 }
 
+/** Set EXTBANS if they are enabled. */
 static void
 set_isupport_extbans(void)
 {
@@ -249,18 +272,21 @@ set_isupport_extbans(void)
     add_isupport_s("EXTBANS", "~,acjnqtr");
 }
 
+/** Set WATCH if they are enabled. */
 static void
 set_isupport_watchs(void)
 {
     add_isupport_i("WATCH", feature_int(FEAT_MAXWATCHS));
 }
 
+/** Set MAXSILES (maximum silences). */
 static void
 set_isupport_maxsiles(void)
 {
     add_isupport_i("SILENCE", feature_int(FEAT_MAXSILES));
 }
 
+/** Set MAXCHANNNELS, self explanatory */
 static void
 set_isupport_maxchannels(void)
 {
@@ -268,12 +294,14 @@ set_isupport_maxchannels(void)
     add_isupport_i("MAXCHANNELS", feature_int(FEAT_MAXCHANNELSPERUSER));
 }
 
+/** Set MAXBANS, self explanatory */
 static void
 set_isupport_maxbans(void)
 {
     add_isupport_i("MAXBANS", feature_int(FEAT_MAXBANS));
 }
 
+/** Set NICKLEN, self explanatory */
 static void
 set_isupport_nicklen(void)
 {
@@ -281,6 +309,7 @@ set_isupport_nicklen(void)
     add_isupport_i("NICKLEN", feature_int(FEAT_NICKLEN));
 }
 
+/** Set CHANNELLEN, self explanatory */
 static void
 set_isupport_channellen(void)
 {
@@ -288,72 +317,102 @@ set_isupport_channellen(void)
     add_isupport_i("CHANNELLEN", feature_int(FEAT_CHANNELLEN));
 }
 
+/** Set CHANTYPES, self explanatory */
 static void
 set_isupport_chantypes(void)
 {
     add_isupport_s("CHANTYPES", feature_bool(FEAT_LOCAL_CHANNELS) ? "#&" : "#");
 }
 
+/** Set NETWORK, self explanatory */
 static void
 set_isupport_network(void)
 {
     add_isupport_s("NETWORK", feature_str(FEAT_NETWORK));
 }
 
-/* sets a feature to the given value */
-typedef int  (*feat_set_call)(struct Client*, const char* const*, int);
-/* gets the value of a feature */
-typedef void (*feat_get_call)(struct Client*, const char* const*, int);
-/* callback to notify of a feature's change */
-typedef void (*feat_notify_call)(void);
-/* unmarks all sub-feature values prior to reading .conf */
-typedef void (*feat_unmark_call)(void);
-/* resets to defaults all currently unmarked values */
-typedef int  (*feat_mark_call)(int);
-/* reports features as a /stats f list */
-typedef void (*feat_report_call)(struct Client*, int);
+/** Update whether #me is a hub or not.
+ */
+static void
+feature_notify_hub(void)
+{
+  if (feature_bool(FEAT_HUB))
+    SetHub(&me);
+  else
+    ClearHub(&me);
+}
 
-#define FEAT_NONE   0x0000	/* no value */
-#define FEAT_INT    0x0001	/* set if entry contains an integer value */
-#define FEAT_BOOL   0x0002	/* set if entry contains a boolean value */
-#define FEAT_STR    0x0003	/* set if entry contains a string value */
+/** Sets a feature to the given value.
+ * @param[in] from Client trying to set parameters.
+ * @param[in] fields Array of parameters to set.
+ * @param[in] count Number of fields in \a count.
+ * @return <0 to clear the feature mark, 0 to leave it, >0 to set the feature mark.
+ */
+typedef int  (*feat_set_call)(struct Client* from, const char* const* fields, int count);
+/** Gets the value of a feature.
+ * @param[in] from Client trying to get parameters.
+ * @param[in] fields Array of parameters to set.
+ * @param[in] count Number of fields in \a count.
+ */
+typedef void (*feat_get_call)(struct Client* from, const char* const* fields, int count);
+/** Callback to notify of a feature's change. */
+typedef void (*feat_notify_call)(void);
+/** Unmarks all sub-feature values prior to reading .conf. */
+typedef void (*feat_unmark_call)(void);
+/** Resets to defaults all currently unmarked values.
+ * @param[in] marked Non-zero if the feature is marked.
+ */
+typedef int  (*feat_mark_call)(int marked);
+/* Reports features as a /stats f list.
+ * @param[in] sptr Client asking for feature list.
+ * @param[in] marked Non-zero if the feature is marked.
+ */
+typedef void (*feat_report_call)(struct Client* sptr, int marked);
+
+#define FEAT_NONE   0x0000	/**< no value */
+#define FEAT_INT    0x0001	/**< set if entry contains an integer value */
+#define FEAT_BOOL   0x0002	/**< set if entry contains a boolean value */
+#define FEAT_STR    0x0003	/**< set if entry contains a string value */
 #define FEAT_ALIAS  0x0004      /**< set if entry is alias for another entry */
 #define FEAT_DEP    0x0005      /**< set if entry is deprecated feature */
 #define FEAT_UINT   0x0006      /**< set if entry contains an unsigned value */
-#define FEAT_MASK   0x000f	/* possible value types */
+#define FEAT_MASK   0x000f	/**< possible value types */
 
 /** Extract just the feature type from a feature descriptor. */
 #define feat_type(feat)         ((feat)->flags & FEAT_MASK)
 
-#define FEAT_MARK   0x0010	/* set if entry has been changed */
-#define FEAT_NULL   0x0020	/* NULL string is permitted */
-#define FEAT_CASE   0x0040	/* string is case-sensitive */
+#define FEAT_MARK   0x0010	/**< set if entry has been changed */
+#define FEAT_NULL   0x0020	/**< NULL string is permitted */
+#define FEAT_CASE   0x0040	/**< string is case-sensitive */
 
-#define FEAT_OPER   0x0100	/* set to display only to opers */
-#define FEAT_MYOPER 0x0200	/* set to display only to local opers */
-#define FEAT_NODISP 0x0400	/* feature must never be displayed */
+#define FEAT_OPER   0x0100	/**< set to display only to opers */
+#define FEAT_MYOPER 0x0200	/**< set to display only to local opers */
+#define FEAT_NODISP 0x0400	/**< feature must never be displayed */
 
-#define FEAT_READ   0x1000	/* feature is read-only (for now, perhaps?) */
+#define FEAT_READ   0x1000	/**< feature is read-only (for now, perhaps?) */
 
+/** Table of feature descriptions. */
 static struct FeatureDesc {
-  enum Feature	   feat;    /* feature identifier */
-  char*		   type;    /* string describing type */
-  unsigned int     flags;   /* flags for feature */
-  int		   v_int;   /* integer value */
-  int		   def_int; /* default value */
-  char*		   v_str;   /* string value */
-  char*		   def_str; /* default value */
-  feat_set_call	   set;	    /* set feature values */
-  feat_set_call	   reset;   /* reset feature values to defaults */
-  feat_get_call	   get;	    /* get feature values */
-  feat_notify_call notify;  /* notify of value change */
-  feat_unmark_call unmark;  /* unmark all feature change values */
-  feat_mark_call   mark;    /* reset to defaults all unchanged features */
-  feat_report_call report;  /* report feature values */
+  enum Feature	   feat;    /**< feature identifier */
+  char*		   type;    /**< string describing type */
+  unsigned int     flags;   /**< flags for feature */
+  int		   v_int;   /**< integer value */
+  int		   def_int; /**< default value */
+  char*		   v_str;   /**< string value */
+  char*		   def_str; /**< default value */
+  feat_set_call	   set;	    /**< set feature values */
+  feat_set_call	   reset;   /**< reset feature values to defaults */
+  feat_get_call	   get;	    /**< get feature values */
+  feat_notify_call notify;  /**< notify of value change */
+  feat_unmark_call unmark;  /**< unmark all feature change values */
+  feat_mark_call   mark;    /**< reset to defaults all unchanged features */
+  feat_report_call report;  /**< report feature values */
 } features[] = {
+/** Declare a feature with custom behavior. */
 #define F_N(type, flags, set, reset, get, notify, unmark, mark, report)	      \
   { FEAT_ ## type, #type, FEAT_NONE | (flags), 0, 0, 0, 0,		      \
     (set), (reset), (get), (notify), (unmark), (mark), (report) }
+/** Declare a feature that takes integer values. */
 #define F_I(type, flags, v_int, notify)					      \
   { FEAT_ ## type, #type, FEAT_INT | (flags), 0, (v_int), 0, 0,		      \
     0, 0, 0, (notify), 0, 0, 0 }
@@ -361,9 +420,11 @@ static struct FeatureDesc {
 #define F_U(type, flags, v_uint, notify)                                      \
   { FEAT_ ## type, #type, FEAT_UINT | (flags), 0, (v_uint), 0, 0,             \
     0, 0, 0, (notify), 0, 0, 0 }
+/** Declare a feature that takes boolean values. */
 #define F_B(type, flags, v_int, notify)					      \
   { FEAT_ ## type, #type, FEAT_BOOL | (flags), 0, (v_int), 0, 0,	      \
     0, 0, 0, (notify), 0, 0, 0 }
+/** Declare a feature that takes string values. */
 #define F_S(type, flags, v_str, notify)					      \
   { FEAT_ ## type, #type, FEAT_STR | (flags), 0, 0, 0, (v_str),		      \
     0, 0, 0, (notify), 0, 0, 0 }
@@ -389,7 +450,7 @@ static struct FeatureDesc {
   F_S(PROVIDER, FEAT_NULL, 0, 0),
   F_B(KILL_IPMISMATCH, FEAT_OPER, 0, 0),
   F_B(IDLE_FROM_MSG, 0, 1, 0),
-  F_B(HUB, 0, 0, 0),
+  F_B(HUB, 0, 0, feature_notify_hub),
   F_B(WALLOPS_OPER_ONLY, 0, 0, 0),
   F_B(NODNS, 0, 0, 0),
   F_N(RANDOM_SEED, FEAT_NODISP, random_seed_set, 0, 0, 0, 0, 0, 0),
@@ -707,7 +768,11 @@ static struct FeatureDesc {
   { FEAT_LAST_F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 
-/* Given a feature's identifier, look up the feature descriptor */
+/** Given a feature's identifier, look up the feature descriptor.
+ * @param[in] from Client looking up feature, or NULL.
+ * @param[in] feature Feature name to find.
+ * @return Pointer to a FeatureDesc, or NULL if none was found.
+ */
 static struct FeatureDesc *
 feature_desc(struct Client* from, const char *feature)
 {
@@ -750,7 +815,12 @@ feature_desc(struct Client* from, const char *feature)
   return 0; /* not found */
 }
 
-/* Given a feature vector string, set the value of a feature */
+/** Given a feature vector string, set the value of a feature.
+ * @param[in] from Client trying to set the feature, or NULL.
+ * @param[in] fields Parameters to set, starting with feature name.
+ * @param[in] count Number of fields in \a fields.
+ * @return Zero (or, theoretically, CPTR_KILLED).
+ */
 int
 feature_set(struct Client* from, const char* const* fields, int count)
 {
@@ -929,7 +999,12 @@ feature_set(struct Client* from, const char* const* fields, int count)
   return 0;
 }
 
-/* reset a feature to its default values */
+/** Reset a feature to its default values.
+ * @param[in] from Client trying to reset the feature, or NULL.
+ * @param[in] fields Parameters to set, starting with feature name.
+ * @param[in] count Number of fields in \a fields.
+ * @return Zero (or, theoretically, CPTR_KILLED).
+ */
 int
 feature_reset(struct Client* from, const char* const* fields, int count)
 {
@@ -996,7 +1071,12 @@ feature_reset(struct Client* from, const char* const* fields, int count)
   return 0;
 }
 
-/* Gets the value of a specific feature and reports it to the user */
+/** Gets the value of a specific feature and reports it to the user.
+ * @param[in] from Client trying to get the feature.
+ * @param[in] fields Parameters to set, starting with feature name.
+ * @param[in] count Number of fields in \a fields.
+ * @return Zero (or, theoretically, CPTR_KILLED).
+ */
 int
 feature_get(struct Client* from, const char* const* fields, int count)
 {
@@ -1048,7 +1128,7 @@ feature_get(struct Client* from, const char* const* fields, int count)
   return 0;
 }
 
-/* called before reading the .conf to clear all marks */
+/** called before reading the .conf to clear all marks */
 void
 feature_unmark(void)
 {
@@ -1061,7 +1141,7 @@ feature_unmark(void)
   }
 }
 
-/* Called after reading the .conf to reset unmodified values to defaults */
+/** Called after reading the .conf to reset unmodified values to defaults */
 void
 feature_mark(void)
 {
@@ -1104,7 +1184,7 @@ feature_mark(void)
   }
 }
 
-/* used to initialize the features subsystem */
+/** used to initialize the features subsystem */
 void
 feature_init(void)
 {
@@ -1137,7 +1217,11 @@ feature_init(void)
   cli_status(&his) = STAT_SERVER;
 }
 
-/* report all F-lines */
+/** Report all F-lines to a user.
+ * @param[in] to Client requesting statistics.
+ * @param[in] sd Stats descriptor for request (ignored).
+ * @param[in] param Extra parameter from user (ignored).
+ */
 void
 feature_report(struct Client* to, const struct StatDesc* sd, char* param)
 {
@@ -1192,7 +1276,10 @@ feature_report(struct Client* to, const struct StatDesc* sd, char* param)
   }
 }
 
-/* return a feature's integer value */
+/** Return a feature's integer value.
+ * @param[in] feat &Feature identifier.
+ * @return Integer value of feature.
+ */
 int
 feature_int(enum Feature feat)
 {
@@ -1215,7 +1302,10 @@ feature_uint(enum Feature feat)
   return features[feat].v_int;
 }
 
-/* return a feature's boolean value */
+/** Return a feature's boolean value.
+ * @param[in] feat &Feature identifier.
+ * @return Boolean value of feature.
+ */
 int
 feature_bool(enum Feature feat)
 {
@@ -1225,7 +1315,10 @@ feature_bool(enum Feature feat)
   return features[feat].v_int;
 }
 
-/* return a feature's string value */
+/** Return a feature's string value.
+ * @param[in] feat &Feature identifier.
+ * @return String value of feature.
+ */
 const char *
 feature_str(enum Feature feat)
 {

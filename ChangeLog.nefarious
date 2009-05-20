@@ -1,6 +1,251 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-05-20  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Doxyfile: A few tweaks.
+	
+	* include/channel.h: Doxyfication of comments.
+
+	* include/check.h: Doxyfication of comments.
+
+	* include/client.h: Code cleanup.
+
+	* include/cloak.h: Doxyfication of comments.
+
+	* include/fda.h: Removed.
+
+	* include/fileio.h: Doxyfication of comments.
+
+	* include/gline.h: Doxyfication of comments.
+
+	* include/handlers.h: Doxyfication of comments.
+
+	* include/hash.h: Code cleanup and doxyfication of comments.
+
+	* include/iauth.h: Removed.
+
+	* include/ircd.h: Doxyfication of comments.
+
+	* include/ircd_alloc.h: Code cleanup and doxyfication of comments.
+
+	* include/ircd_chattr.h: Doxyfication of comments.
+
+	* include/ircd_crypt.h: GPL 3 tweaks.
+
+	* include/ircd_crypt_plain.h: GPL 3 tweaks.
+
+	* include/ircd_crypt_smd5.h: GPL 3 tweaks.
+
+	* include/ircd_defs.h: Doxyfication of comments.
+
+	* include/ircd_events.h: Doxyfication of comments.
+
+	* include/ircd_features.h: Doxyfication of comments.
+
+	* include/ircd_handler.h: Code cleanup and doxyfication of comments.
+
+	* include/ircd_log.h: Doxyfication of comments.
+
+	* include/ircd_osdep.h: Doxyfication of comments.
+
+	* include/ircd_relay.h: Doxyfication of comments.
+
+	* include/ircd_reply.h: Doxyfication of comments.
+
+	* include/ircd_signal.h: Code cleanup and doxyfication of comments.
+
+	* include/ircd_snprintf.h: Doxyfication of comments.
+
+	* include/ircd_struct.h: Doxyfication of comments.
+
+	* include/jupe.h: Doxyfication of comments.
+
+	* include/list.h: Doxyfication of comments.
+
+	* include/listener.h: Doxyfication of comments.
+
+	* include/mark.h: Doxyfication of comments.
+
+	* include/match.h: Doxyfication of comments.
+
+	* include/memdebug.h: Replacement for the fda memory debugging functions.
+
+	* include/motd.h: Code cleanup and doxyfication of comments.
+
+	* include/msg.h: Doxyfication of comments.
+
+	* include/msgq.h: Doxyfication of comments.
+
+	* include/numeric.h: Doxyfication of comments.
+
+	* include/numnicks.h: Doxyfication of comments.
+
+	* include/opercmds.h: Doxyfication of comments.
+
+	* include/packet.h: Doxyfication of comments.
+
+	* include/parse.h: Doxyfication of comments.
+
+	* include/querycmds.h: Doxyfication of comments.
+
+	* include/random.h: Doxyfication of comments.
+
+	* include/s_auth.h: Code cleanup and doxyfication of comments.
+
+	* include/s_bsd.h: Doxyfication of comments.
+
+	* include/s_debug.h: Doxyfication of comments.
+
+	* include/s_misc.h: Doxyfication of comments.
+
+	* include/s_numeric.h: Doxyfication of comments.
+
+	* include/s_serv.h: Doxyfication of comments.
+
+	* include/s_stats.h: Doxyfication of comments.
+
+	* include/s_user.h: Doxyfication of comments.
+
+	* include/send.h: Doxyfication of comments.
+
+	* include/umkpasswd.h: GPL 3 tweak.
+
+	* include/uping.h: Doxyfication of comments.
+
+	* include/userload.h: Doxyfication of comments.
+
+	* include/watch.h: Doxyfication of comments.
+
+	* include/whocmds.h: Doxyfication of comments.
+
+	* include/whowas.h: Doxyfication of comments.
+
+	* ircd/IPcheck.c: GPL 3 tweak.
+
+	* ircd/Makefile.in: Removed fda*.c and added memdebug.c
+
+	* ircd/client.c: Warning fixes.
+
+	* ircd/cloak.c: Doxyfication of comments.
+
+	* ircd/convert-conf.c: GPL 3 tweak.
+
+	* ircd/engine_devpoll.c: Doxyfication of comments.
+
+	* ircd/engine_epoll.c: Doxyfication of comments.
+
+	* ircd/engine_kqueue.c: Doxyfication of comments.
+
+	* ircd/engine_poll.c: Doxyfication of comments.
+
+	* ircd/engine_select.c: Doxyfication of comments.
+
+	* ircd/fda.c: Removed.
+
+	* ircd/fda_t.c: Removed.
+
+	* ircd/fileio.c: Doxyfication of comments.
+
+	* ircd/hash.c: Code cleanup and doxyfication of comments.
+
+	* ircd/iauth.c: Removed.
+
+	* ircd/ircd.c: Code cleanup.
+
+	* ircd/ircd_alloc.c: Code cleanup and doxyfication of comments.
+
+	* ircd/ircd_crypt.c: GPL 3 tweak.
+
+	* ircd/ircd_crypt_native.c: GPL 3 tweak.
+
+	* ircd/ircd_crypt_plain.c: GPL 3 tweak.
+
+	* ircd/ircd_crypt_smd5.c: GPL 3 tweak.
+
+	* ircd/ircd_events.c: Code cleanup and doxyfication of comments.
+
+	* ircd/ircd_features.c: Code cleanup and doxyfication of comments.
+
+	* ircd/ircd_log.c: Code cleanup and doxyfication of comments.
+
+	* ircd/ircd_parser.y: Code cleanup.
+
+	* ircd/ircd_relay.c: Doxyfication of comments.
+
+	* ircd/ircd_reply.c: Doxyfication of comments.
+
+	* ircd/ircd_signal.c: Code cleanup and doxyfication of comments.
+
+	* ircd/ircd_snprintf.c: Code cleanup and doxyfication of comments.
+
+	* ircd/ircd_string.c: Code cleanup and doxyfication of comments.
+
+	* ircd/jupe.c: Code cleanup and doxyfication of comments.
+
+	* ircd/list.c: Code cleanup and doxyfication of comments.
+
+	* ircd/listener.c: Doxyfication of comments.
+
+	* ircd/m_globops.c: GPL 3 tweak.
+
+	* ircd/m_reburst.c: GPL 3 tweak.
+
+	* ircd/m_server.c: Bug fix with infinite loops with exit_downlinks.
+
+	* ircd/m_smo.c: GPL 3 tweak.
+
+	* ircd/m_sno.c: GPL 3 tweak.
+
+	* ircd/m_svsident.c: GPL 3 tweak.
+
+	* ircd/m_svsmode.c: GPL 3 tweak.
+
+	* ircd/match.c: Doxyfication of comments.
+
+	* ircd/md5.c: Doxyfication of comments.
+
+	* ircd/memdebug.c: New memory debugger. Replacement for fda.c and
+	fda_t.c.
+
+	* ircd/motd.c: Code cleanup and doxyfication of comments. Also a GPL
+	3 tweak.
+
+	* ircd/msgq.c: Code cleanup and doxyfication of comments.
+
+	* ircd/numnicks.c: Code cleanup and doxyfication of comments.
+
+	* ircd/opercmds.c: Code cleanup and doxyfication of comments.
+
+	* ircd/packet.c: Code cleanup and doxyfication of comments.
+
+	* ircd/parse.c: Doxyfication of comments.
+
+	* ircd/querycmds.c: Doxyfication of comments.
+
+	* ircd/random.c: Doxyfication of comments. Also adapted random.c to
+	use ircd_md5 interface and keep a larger pool.
+
+	* ircd/s_auth.c: Doxyfication of comments.
+
+	* ircd/s_conf.c: Code cleanup.
+
+	* ircd/s_misc.c: Removed a line.
+
+	* ircd/s_stats.c: Code cleanup.
+
+	* ircd/umkpasswd.c: GPL 3 tweak.
+
+	* ircd/uping.c: Doxyfication of comments.
+
+	* ircd/userload.c: Doxyfication of comments.
+
+	* ircd/watch.c: Doxyfication of comments.
+
+	* ircd/whocmds.c: Code cleanup and doxyfication of comments.
+
+	* ircd/whowas.c: Code cleanup and doxyfication of comments.
+
 2009-05-13  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_notice.c: Fix for MARK CVERSION being sent more then

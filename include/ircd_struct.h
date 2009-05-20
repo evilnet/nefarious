@@ -17,8 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file ircd_struct.h
+ * @brief Structure definitions for users and servers.
+ * @version $Id$
  */
 #ifndef INCLUDED_ircd_struct_h
 #define INCLUDED_ircd_struct_h
@@ -39,47 +41,49 @@ struct User;
 struct Membership;
 struct SLink;
 
+/** Describes a server on the network. */
 struct Server {
   struct Server*  nexts;
-  struct Client*  up;           /* Server one closer to me */
-  struct DLink*   down;         /* List with downlink servers */
-  struct DLink*   updown;       /* own Dlink in up->serv->down struct */
-  struct Client** client_list;  /* List with client pointers on this server */
-  struct User*    user;         /* who activated this connection */
-  time_t          timestamp;    /* Remotely determined connect try time */
-  time_t          ghost;        /* Local time at which a new server
+  struct Client*  up;           /**< Server one closer to me */
+  struct DLink*   down;         /**< List with downlink servers */
+  struct DLink*   updown;       /**< own Dlink in up->serv->down struct */
+  struct Client** client_list;  /**< List with client pointers on this server */
+  struct User*    user;         /**< who activated this connection */
+  time_t          timestamp;    /**< Remotely determined connect try time */
+  time_t          ghost;        /**< Local time at which a new server
                                    caused a Ghost */
-  int             lag;          /* Approximation of the amount of lag to this server */                          
-  unsigned int    clients;      /* Number of clients on the network */
-  unsigned short  prot;         /* Major protocol */
-  unsigned short  nn_last;      /* Last numeric nick for p9 servers only */
-  unsigned int    nn_mask;      /* [Remote] FD_SETSIZE - 1 */
-  char          nn_capacity[4]; /* numeric representation of server capacity */
+  int             lag;          /**< Approximation of the amount of lag to this server */
+  unsigned int    clients;      /**< Number of clients on the server */
+  unsigned short  prot;         /**< Major protocol */
+  unsigned int    nn_mask;      /**< Number of clients supported by server, minus 1 */
+  char          nn_capacity[4]; /**< Numeric representation of server capacity */
   int             flags;        /**< Server flags (SFLAG_*) */
-  
-  int		  asll_rtt;	/* AsLL round-trip time */
-  int		  asll_to;	/* AsLL upstream lag */
-  int		  asll_from;	/* AsLL downstream lag */
 
-  char *last_error_msg;         /* Allocated memory with last message receive with an ERROR */
-  char by[NICKLEN + 1];
+  int            asll_rtt;      /**< AsLL round-trip time */
+  int            asll_to;       /**< AsLL upstream lag */
+  int            asll_from;     /**< AsLL downstream lag */
+  time_t         asll_last;     /**< Last time we sent or received an AsLL ping */
+
+  char *last_error_msg;         /**< Allocated memory with last message receive with an ERROR */
+  char by[NICKLEN + 1];         /**< Numnick of client who requested the link */
 };
 
 #define SFLAG_UWORLD         0x0001  /**< Server has UWorld privileges */
 
+/** Describes a user on the network. */
 struct User {
   struct User*       nextu;
-  struct Client*     server;         /* client structure of server */
-  struct Membership* channel;        /* chain of channel pointer blocks */
-  struct SLink*      invited;        /* chain of invite pointer blocks */
-  struct SLink*      silence;        /* chain of silence pointer blocks */
+  struct Client*     server;         /**< client structure of server */
+  struct Membership* channel;        /**< chain of channel pointer blocks */
+  struct SLink*      invited;        /**< chain of invite pointer blocks */
+  struct SLink*      silence;        /**< chain of silence pointer blocks */
   struct SLink*      watch;          /**< chain of watch pointer blocks */
-  char*              away;           /* pointer to away message */
-  time_t             last;
-  unsigned int       refcnt;          /* Number of times this block is referenced */
-  unsigned int       joined;          /* number of channels joined */
+  char*              away;           /**< pointer to away message */
+  time_t             last;           /**< last time user sent a message */
+  unsigned int       refcnt;         /**< Number of times this block is referenced */
+  unsigned int       joined;         /**< number of channels joined */
   unsigned int       watches;        /**< Number of entrances in the watch list */
-  unsigned int       invites;         /* Number of channels we've been invited to */
+  unsigned int       invites;        /**< Number of channels we've been invited to */
   char               username[USERLEN + 1];
   char               host[HOSTLEN + 1];
   char               realusername[USERLEN + 1];
@@ -91,24 +95,26 @@ struct User {
   char               virthost[HOSTLEN + 1];
   char               dnsblhost[HOSTLEN + 40];
   char               shunreason[BUFSIZE + 1];
-  char*              swhois;         /* pointer to swhois message */
+  char*              swhois;         /**< pointer to swhois message */
   char               response[BUFSIZE + 1];
   char               auth_oper[NICKLEN + 1 ];
 };
 
+/** Describes a Login on connect session on the network. */
 struct LOCInfo {
-  unsigned int       cookie;
-  char               service[NICKLEN + 1];
-  char               account[ACCOUNTLEN + 1];
-  char               password[ACCPASSWDLEN + 1];
+  unsigned int       cookie;                      /**< Cookie sent to services */
+  char               service[NICKLEN + 1];        /**< Service that we are querying */
+  char               account[ACCOUNTLEN + 1];     /**< Account name we are trying to auth as */
+  char               password[ACCPASSWDLEN + 1];  /**< Password we are using */
 };
 
+/** Describes a dnsbl exemption */
 struct dnsblexempts {
-  struct dnsblexempts *next;
-  struct dnsblexempts **prev;
+  struct dnsblexempts *next;    /**< Next exempt */
+  struct dnsblexempts **prev;   /**< Previous exempt */
 
-  char                *host;
-  time_t              lastseen;
+  char                *host;    /**< Hostname */
+  time_t              lastseen; /**< Last seen */
 };
 
 extern struct dnsblexempts*    DNSBLExemptList;

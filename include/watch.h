@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
-
+/** @file
+ * @brief Structures and functions for handling watches.
+ * @version $Id$
+ */
 #ifndef INCLUDED_watch_h
 #define INCLUDED_watch_h
 
@@ -40,11 +41,12 @@ struct Client;
  * Structures
  */
 
+/** Watch list structure */
 struct Watch {
   struct Watch *wt_next;
-  struct SLink *wt_watch;	/* Pointer to watch list */
-  char         *wt_nick;	/* Nick */
-  time_t        wt_lasttime;	/* last time status change */
+  struct SLink *wt_watch;	/**< Pointer to watch list */
+  char         *wt_nick;	/**< Nick */
+  time_t        wt_lasttime;	/**< last time status change */
 };
 
 
@@ -56,7 +58,6 @@ struct Watch {
 #define wt_watch(wt)		((wt)->wt_watch)
 #define wt_nick(wt)		((wt)->wt_nick)
 #define wt_lasttime(wt)		((wt)->wt_lasttime)
-
 
 /*
  * Proto types

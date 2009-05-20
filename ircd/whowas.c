@@ -60,24 +60,30 @@
 #include <string.h>
 
 
+/** Keeps track of whowas least-recently-used list. */
 static struct {
-  struct Whowas *ww_list;	/* list of whowas structures */
-  struct Whowas *ww_tail;	/* tail of list for getting structures */
-  unsigned int	 ww_alloc;	/* alloc count */
+  struct Whowas *ww_list;	/**< list of whowas structures */
+  struct Whowas *ww_tail;	/**< tail of list for getting structures */
+  unsigned int	 ww_alloc;	/**< alloc count */
 } wwList = { 0, 0, 0 };
 
+/** Hash table of Whowas entries by nickname. */
 struct Whowas* whowashash[WW_MAX];
 
-/*
+/** @file
+ * @brief Manipulation functions for the whowas list.
+ * @version $Id$
+ *
  * Since the introduction of numeric nicks (at least for upstream messages,
- * like MODE +o <nick>, KICK #chan <nick>, KILL <nick> etc), there is no
+ * like MODE +o &lt;nick>, KICK #chan &lt;nick>, KILL &lt;nick> etc), there is no
  * real important reason for a nick history anymore.
  * Nevertheless, there are two reason why we might want to keep it:
- * 1) The /WHOWAS command, which is often usefull to catch harrashing
+ * @li The /WHOWAS command, which is often useful to catch harassing
  *    users or abusers in general.
- * 2) Clients still use the normal nicks in the client-server protocol,
+ * @li Clients still use the normal nicks in the client-server protocol,
  *    and it might be considered a nice feature that here we still have
  *    nick chasing.
+ *
  * Note however that BOTH reasons make it redundant to keep a whowas history
  * for users that split off.
  *
@@ -100,35 +106,35 @@ struct Whowas* whowashash[WW_MAX];
  * is not anymore maintained (and hopefully not used anymore either ;).
  *
  * So now we have two ways of accessing this database:
- * 1) Given a <nick> we can calculate a hashv and then whowashash[hashv] will
+ * @li Given a &lt;nick> we can calculate a hashv and then whowashash[hashv] will
  *    point to the start of the 'hash list': all entries with the same hashv.
- *    We'll have to search this list to find the entry with the correct <nick>.
+ *    We'll have to search this list to find the entry with the correct &lt;nick>.
  *    Once we found the correct whowas entry, we have a pointer to the
- *    corresponding client - if still online - for nich chasing purposes.
+ *    corresponding client - if still online - for nick chasing purposes.
  *    Note that the same nick can occur multiple times in the whowas history,
  *    each of these having the same hash value of course.  While a /WHOWAS on
  *    just a nick will return all entries, nick chasing will only find the
  *    first in the list.  Because new entries are added at the start of the
  *    'hash list' we will always find the youngest entry, which is what we want.
- * 2) Given an online client we have a pointer to the first whowas entry
+ * @li Given an online client we have a pointer to the first whowas entry
  *    of the linked list of whowas entries that all belong to this client.
  *    We ONLY need this to reset all `online' pointers when this client
  *    signs off.
  *
- * 27/8/79:
+ * 27/8/97:
  *
  * Note that following:
  *
- * a) We *only* (need to) change the 'hash list' and the 'online' list
+ * @li We *only* (need to) change the 'hash list' and the 'online' list
  *    in add_history().
- * b) There we always ADD an entry to the BEGINNING of the 'hash list'
+ * @li There we always ADD an entry to the BEGINNING of the 'hash list'
  *    and the 'online list': *new* entries are at the start of the lists.
  *    The oldest entries are at the end of the lists.
- * c) We always REMOVE the oldest entry we have (whowas_next), this means
+ * @li We always REMOVE the oldest entry we have (whowas_next), this means
  *    that this is always an entry that is at the *end* of the 'hash list'
  *    and 'online list' that it is a part of: the next pointer will
  *    always be NULL.
- * d) The previous pointer is *only* used to update the next pointer of the
+ * @li The previous pointer is *only* used to update the next pointer of the
  *    previous entry, therefore we could better use a pointer to this
  *    next pointer: That is faster - saves us a 'if' test (it will never be
  *    NULL because the last added entry will point to the pointer that
@@ -140,9 +146,9 @@ struct Whowas* whowashash[WW_MAX];
  * --Run
  */
 
-/* whowas_clean()
- *
- * Clean up a whowas structure
+/** Unlink a Whowas structure and free everything inside it.
+ * @param[in,out] ww The whowas record to free.
+ * @return The pointer \a ww.
  */
 static struct Whowas *
 whowas_clean(struct Whowas *ww)
@@ -189,9 +195,8 @@ whowas_clean(struct Whowas *ww)
   return ww;
 }
 
-/* whowas_free()
- *
- * Free a struct Whowas...
+/** Clean and free a whowas record.
+ * @param[in] ww Whowas record to free.
  */
 static void
 whowas_free(struct Whowas *ww)
@@ -207,9 +212,8 @@ whowas_free(struct Whowas *ww)
   wwList.ww_alloc--;
 }
 
-/* whowas_init()
- *
- * Initializes a given whowas structure
+/** Initializes a given whowas structure.
+ * @return A pointer to a clean Whowas.
  */
 static struct Whowas *
 whowas_init(struct Whowas *ww)
@@ -237,9 +241,11 @@ whowas_init(struct Whowas *ww)
   return ww;
 }
 
-/* whowas_alloc()
- *
- * Returns a whowas structure to use
+/** Return a fresh Whowas record.
+ * If the total number of records is smaller than determined by
+ * FEAT_NICKNAMEHISTORYLENGTH, allocate a new one.  Otherwise,
+ * reuse the oldest record in use.
+ * @return A pointer to a clean Whowas.
  */
 static struct Whowas *
 whowas_alloc(void)
@@ -251,9 +257,9 @@ whowas_alloc(void)
   return whowas_init((struct Whowas *) MyMalloc(sizeof(struct Whowas)));
 }
 
-/* whowas_realloc()
- *
- * Prune whowas list
+/** If necessary, trim the whowas list.
+ * This function trims the whowas list until it contains no more than
+ * FEAT_NICKNAMEHISTORYLENGTH records.
  */
 void
 whowas_realloc(void)
@@ -273,14 +279,9 @@ whowas_realloc(void)
   }
 }
 
-/*
- * add_history
- *
- * Add a client (cptr) that just changed nick (still_on == true), or
- * just signed off (still_on == false) to the `whowas' table.
- *
- * If the entry used was already in use, then this entry is
- * freed (lost).
+/** Add a client to the whowas list.
+ * @param[in] cptr Client to add.
+ * @param[in] still_on If non-zero, link the record to the client's personal history.
  */
 void add_history(struct Client *cptr, int still_on)
 {
@@ -327,11 +328,8 @@ void add_history(struct Client *cptr, int still_on)
   whowashash[ww->hashv] = ww;
 }
 
-/*
- * off_history
- *
- * Client `cptr' signed off: Set all `online' pointers
- * corresponding to this client to NULL.
+/** Clear all Whowas::online pointers that point to a client.
+ * @param[in] cptr Client who is going offline.
  */
 void off_history(const struct Client *cptr)
 {
@@ -341,15 +339,10 @@ void off_history(const struct Client *cptr)
     temp->online = NULL;
 }
 
-/*
- * get_history
- *
- * Return a pointer to a client that had nick `nick' not more then
- * `timelimit' seconds ago, if still on line.  Otherwise return NULL.
- *
- * This function is used for "nick chasing"; since the use of numeric
- * nicks for "upstream" messages in ircu2.10, this is only used for
- * looking up non-existing nicks in client->server messages.
+/** Find a client who has recently used a particular nickname.
+ * @param[in] nick Nickname to find.
+ * @param[in] timelimit Maximum age for entry.
+ * @return User's online client, or NULL if none is found.
  */
 struct Client *get_history(const char *nick, time_t timelimit)
 {
@@ -363,6 +356,13 @@ struct Client *get_history(const char *nick, time_t timelimit)
   return NULL;
 }
 
+/** Count memory used by whowas list.
+ * @param[out] wwu Number of entries in whowas list.
+ * @param[out] wwum Total number of bytes used by nickname, username,
+ * hostname and servername fields.
+ * @param[out] wwa Number of away strings in whowas list.
+ * @param[out] wwam Total number of bytes used by away strings.
+ */
 void count_whowas_memory(int *wwu, size_t *wwum, int *wwa, size_t *wwam)
 {
   struct Whowas *tmp;
@@ -392,7 +392,7 @@ void count_whowas_memory(int *wwu, size_t *wwum, int *wwa, size_t *wwam)
   *wwam = am;
 }
 
-
+/** Initialize whowas table. */
 void initwhowas(void)
 {
   int i;
@@ -401,6 +401,10 @@ void initwhowas(void)
     whowashash[i] = 0;
 }
 
+/** Calculate a hash value for a string.
+ * @param[in] name Nickname to calculate hash over.
+ * @return Calculated hash value.
+ */
 unsigned int hash_whowas_name(const char *name)
 {
   unsigned int hash = 0;

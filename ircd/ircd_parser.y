@@ -78,7 +78,7 @@
   char* GlobalForwards[256];
   static int tping, tconn, maxlinks, sendq, port, stringno, flags;
   static int is_ssl, is_server, is_hidden, is_exempt, i_class;
-  static int is_leaf, is_hub, invert, length;
+  static int invert, length;
   static char *name, *pass, *host, *vhost, *username, *hub_limit;
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *oflags, *ip;
@@ -389,7 +389,6 @@ extrastring: QSTRING
 
 connectblock: CONNECT
 {
- maxlinks = 65535;
  flags = CONF_AUTOCONNECT;
 } '{' connectitems '}' ';'
 {
@@ -398,28 +397,26 @@ connectblock: CONNECT
  if (name == NULL)
   parse_error("Missing name in connect block");
  else if (pass == NULL)
-  parse_error("Missing password in connect block");
+   parse_error("Missing password in connect block");
  else if (strlen(pass) > PASSWDLEN)
-  parse_error("Password too long in connect block");
+   parse_error("Password too long in connect block");
  else if (host == NULL)
-  parse_error("Missing host in connect block");
+   parse_error("Missing host in connect block");
  else if (strchr(host, '*') || strchr(host, '?'))
-  parse_error("Invalid host '%s' in connect block", host);
- else if (!c_class)
-  parse_error("Missing or non-existent class in connect block");
+   parse_error("Invalid host '%s' in connect block", host);
+ else if (c_class == NULL)
+   parse_error("Missing or non-existent class in connect block");
  else {
-   aconf = make_conf();
-   aconf->status = CONF_SERVER;	
-
+   aconf = make_conf(CONF_SERVER);
    aconf->name = name;
+ 
    aconf->passwd = pass;
-
    aconf->conn_class = c_class;
    aconf->port = port;
    aconf->host = host;
    aconf->flags = flags;
 
-   aconf->maximum = maxlinks;
+   aconf->maximum = (hub_limit != NULL && maxlinks == 0) ? 65535 : maxlinks;
    aconf->hub_limit = hub_limit;
 
    lookup_confhost(aconf);
@@ -429,13 +426,11 @@ connectblock: CONNECT
    MyFree(pass);
    MyFree(host);
    MyFree(hub_limit);
- } else {
-   aconf->next = GlobalConfList;
-   GlobalConfList = aconf;
-   aconf = NULL;
  }
+
  name = pass = host = hub_limit = NULL;
- is_hub = is_leaf = port = flags = 0;
+ c_class = NULL;
+ port = flags = maxlinks = 0;
 }
 connectitems: connectitem connectitems | connectitem;
 connectitem: connectname | connectpass | connectclass | connecthost
@@ -468,18 +463,15 @@ connectport: PORT '=' NUMBER ';'
 };
 connectleaf: LEAF ';'
 {
- is_leaf = 1;
  maxlinks = 0;
 };
 connecthub: HUB ';'
 {
- is_hub = 1;
  MyFree(hub_limit);
  DupString(hub_limit, "*");
 };
 connecthublimit: HUB '=' QSTRING ';'
 {
- is_hub = 1;
  MyFree(hub_limit);
  hub_limit = $3;
 };
@@ -538,8 +530,7 @@ clientblock: CLIENT
   else if (!g && ip && !check_if_ipmask(ip))
     parse_error("Invalid IP address %s in Client block", ip);
   else {
-    aconf = make_conf();
-    aconf->status = CONF_CLIENT;
+    aconf = make_conf(CONF_CLIENT);
 
     if (ip) {
       int  c_class;
@@ -576,15 +567,12 @@ clientblock: CLIENT
     MyFree(host);
     MyFree(ip);
     MyFree(pass);
-  } else {
-    aconf->next = GlobalConfList;
-    GlobalConfList = aconf;
-    aconf = NULL;
   }
 
   host = NULL;
   username = NULL;
   c_class = NULL;
+  maxlinks = 0;
   ip = NULL;
   pass = NULL;
   port = 0;
@@ -719,14 +707,13 @@ operblock: OPER '{' operitems '}' ';'
            && !FlagHas(&c_class->privs_dirty, PRIV_PROPAGATE))
     parse_error("Operator block for %s and class %s have no LOCAL setting", name, c_class->cc_name);
   else for (link = hosts; link != NULL; link = link->next) {
-    aconf = make_conf();
 
     if (FlagHas(&privs, PRIV_PROPAGATE)) {
       m = "O";
-      aconf->status = CONF_OPERATOR;
+      aconf = make_conf(CONF_OPERATOR);
     } else {
       m = "o";
-      aconf->status = CONF_LOCOP;
+      aconf = make_conf(CONF_LOCOP);
     }
     DupString(aconf->name, name);
     DupString(aconf->passwd, pass);
@@ -761,11 +748,7 @@ operblock: OPER '{' operitems '}' ';'
     }
     memcpy(&aconf->privs, &privs, sizeof(aconf->privs));
     memcpy(&aconf->privs_dirty, &privs_dirty, sizeof(aconf->privs_dirty));
-
-    aconf->next = GlobalConfList;
-    GlobalConfList = aconf;
-    aconf = NULL;
- }
+  }
   MyFree(oflags);
   MyFree(name);
   MyFree(pass);

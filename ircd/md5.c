@@ -290,10 +290,10 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 #endif
 
 /** Generates an MD5 checksum.
- * @param mdout[out] Buffer to store result in, the result will be 16 bytes in binary
+ * @param[out] mdout Buffer to store result in, the result will be 16 bytes in binary
  *                   (not ascii printable!).
- * @param src[in]    The input data used to generate the checksum.
- * @param n[in]      Length of data.
+ * @param[in] src    The input data used to generate the checksum.
+ * @param[in] n      Length of data.
  */
 void DoMD5(unsigned char *mdout, unsigned char *src, unsigned long n)
 {

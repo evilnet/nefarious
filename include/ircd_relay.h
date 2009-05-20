@@ -21,8 +21,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Interface to functions for relaying messages.
+ * @version $Id$
  */
 
 struct Client;
@@ -44,3 +46,4 @@ extern void server_relay_private_message(struct Client* sptr, const char* name, 
 extern void server_relay_private_notice(struct Client* sptr, const char* name, const char* text);
 
 #endif /* INCLUDED_IRCD_RELAY_H */
+

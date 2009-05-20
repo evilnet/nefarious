@@ -19,8 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Implementation of client counting functions.
+ * @version $Id$
  */
 #include "config.h"
 
@@ -35,18 +37,18 @@
 #include <string.h>
 #include <unistd.h>
 
-/* Counters of client/servers etc. */
+/** Counters of client/servers etc. */
 struct UserStatistics UserStats;
 
+/** Initialize global #UserStats variable. */
 void init_counters(void)
 {
   memset(&UserStats, 0, sizeof(UserStats));
   UserStats.servers = 1;
 }
 
-/*
- * save_tunefile()
- *  - Ported From UnrealIRCd
+/** Saves the tunefile which keeps the current local and global
+ * max user counts.
  */
 void save_tunefile(void)
 {
@@ -65,9 +67,8 @@ void save_tunefile(void)
   fclose(tunefile);
 }
 
-/*
- * load_tunefile()
- *  - Ported From UnrealIRCd
+/** Loads the tunefile which keeps the current local and global
+ * max user counts.
  */
 void load_tunefile(void)
 {

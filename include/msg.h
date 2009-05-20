@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Command and token declarations and structures.
+ * @version $Id$
  */
 #ifndef INCLUDED_msg_h
 #define INCLUDED_msg_h
@@ -498,25 +500,23 @@ struct Client;
 /*
  * Constants
  */
-#define   MFLG_SLOW              0x01   /* Command can be executed roughly    *
+#define   MFLG_SLOW              0x01   /** Command can be executed roughly    *
                                          * once per 2 seconds.                */
-#define   MFLG_UNREG             0x02   /* Command available to unregistered  *
+#define   MFLG_UNREG             0x02   /** Command available to unregistered  *
                                          * clients.                           */
-#define   MFLG_IGNORE            0x04   /* silently ignore command from
+#define   MFLG_IGNORE            0x04   /** silently ignore command from
                                          * unregistered clients */
 
-/*
- * Structures
- */
+/** Information on how to parse a message. */
 struct Message {
-  char *cmd;                  /* command string */
-  char *tok;                  /* token (shorter command string) */
-  unsigned int count;         /* number of times message used */
-  unsigned int parameters;
-  unsigned int flags;           /* bit 0 set means that this command is allowed
+  char *cmd;                  /**< command string */
+  char *tok;                  /**< token (shorter command string) */
+  unsigned int count;         /**< number of times message used */
+  unsigned int parameters;    /**<  minimum number of parameters */
+  unsigned int flags;         /**< bit 0 set means that this command is allowed
                                    to be used only on the average of once per 2
                                    seconds -SRB */
-  unsigned int bytes;         /* bytes received for this message */
+  unsigned int bytes;         /**< bytes received for this message */
   /*
    * cptr = Connected client ptr
    * sptr = Source client ptr

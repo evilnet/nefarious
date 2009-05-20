@@ -15,23 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Hash table management APIs.
+ * @version $Id$
  */
 
 #ifndef INCLUDED_hash_h
 #define INCLUDED_hash_h
 
-struct StatDesc;
 struct Client;
 struct Channel;
+struct StatDesc;
 struct Watch;
 
 /*
  * general defines
  */
 
-/* Now client and channel hash table must be of the same size */
+/** Size of client and channel hash tables.
+ * Both must be of the same size.
+ */
 #define HASHSIZE                32000
 
 /*
@@ -47,20 +51,28 @@ struct Watch;
  */
 
 /* Raw calls, expect a core if you pass a NULL or zero-length name */
+/** Search for a channel by name. */
 #define SeekChannel(name)       hSeekChannel((name))
+/** Search for any client by name. */
 #define SeekClient(name)        hSeekClient((name), ~0)
+/** Search for a registered user by name. */
 #define SeekUser(name)          hSeekClient((name), (STAT_USER))
+/** Search for a server by name. */
 #define SeekServer(name)        hSeekClient((name), (STAT_ME | STAT_SERVER))
 /** Search for a watch by name. */
 #define SeekWatch(name)         hSeekWatch((name))
 
 /* Safer macros with sanity check on name, WARNING: these are _macros_,
    no side effects allowed on <name> ! */
+/** Search for a channel by name. */
 #define FindChannel(name)       (BadPtr((name)) ? 0 : SeekChannel(name))
+/** Search for any client by name. */
 #define FindClient(name)        (BadPtr((name)) ? 0 : SeekClient(name))
+/** Search for a registered user by name. */
 #define FindUser(name)          (BadPtr((name)) ? 0 : SeekUser(name))
+/** Search for a server by name. */
 #define FindServer(name)        (BadPtr((name)) ? 0 : SeekServer(name))
-/** Search for a wach by name. */
+/** Search for a watch by name. */
 #define FindWatch(name)         (BadPtr((name)) ? 0 : SeekWatch(name))
 
 /*
@@ -72,9 +84,9 @@ extern int hAddClient(struct Client *cptr);
 extern int hAddChannel(struct Channel *chptr);
 extern int hAddWatch(struct Watch *wptr);
 extern int hRemClient(struct Client *cptr);
-extern int hRemWatch(struct Watch *wptr);
 extern int hChangeClient(struct Client *cptr, const char *newname);
 extern int hRemChannel(struct Channel *chptr);
+extern int hRemWatch(struct Watch *wptr);
 extern struct Client *hSeekClient(const char *name, int TMask);
 extern struct Channel *hSeekChannel(const char *name);
 extern struct Watch *hSeekWatch(const char *name);
@@ -84,8 +96,9 @@ extern int m_hash(struct Client *cptr, struct Client *sptr, int parc, char *parv
 extern int isNickJuped(const char *nick);
 extern int addNickJupes(const char *nicks);
 extern void clearNickJupes(void);
+extern void stats_nickjupes(struct Client* to, const struct StatDesc* sd,
+			    char* param);
 extern void list_next_channels(struct Client *cptr);
-extern void stats_nickjupes(struct Client* to, const struct StatDesc *sd, char* param);
 extern void list_set_default(void);
 
 #endif /* INCLUDED_hash_h */

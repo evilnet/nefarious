@@ -1,7 +1,6 @@
-/*
- * ircd.h
- *
- * $Id$
+/** @file ircd.h
+ * @brief Global data for the daemon.
+ * @version $Id$
  */
 #ifndef INCLUDED_ircd_h
 #define INCLUDED_ircd_h
@@ -12,19 +11,17 @@
 #include <sys/types.h>        /* size_t, time_t */
 #endif
 
+/** Describes status for a daemon. */
 struct Daemon
 {
-  int          argc;
-  char**       argv;
-  pid_t        pid;
-  uid_t        uid;
-  uid_t        euid;
-  unsigned int bootopt;
-  int          running;
-  int          pid_fd;
-  const char*  server_bin;
-  const char*  server_root;
-  const char*  server_log;
+  int          argc;        /**< Number of command-line arguments. */
+  char**       argv;        /**< Array of command-line arguments. */
+  pid_t        pid;         /**< %Daemon's process id. */
+  uid_t        uid;         /**< %Daemon's user id. */
+  uid_t        euid;        /**< %Daemon's effective user id. */
+  unsigned int bootopt;     /**< Boot option flags. */
+  int          running;     /**< 1 for is the server is running. */
+  int          pid_fd;      /**< File descriptor for process id file. */
 };
 
 /** Describes pending exit. */
@@ -43,12 +40,12 @@ struct PendingExit
 #define OLDEST_TS 780000000	/* Any TS older than this is bogus */
 #define BadPtr(x) (!(x) || (*(x) == '\0'))
 
-/* Miscellaneous defines */
 
-#define UDP_PORT        "7007"
-#define MINOR_PROTOCOL  "09"
-#define MAJOR_PROTOCOL  "10"
-#define BASE_VERSION    "u2.10"
+/* Miscellaneous defines */
+#define UDP_PORT        "7007"  /**< Default port for server-to-server pings. */
+#define MINOR_PROTOCOL  "10"    /**< Minimum protocol version supported. */
+#define MAJOR_PROTOCOL  "10"    /**< Current protocol version. */
+#define BASE_VERSION    "u2.10" /**< Base name of IRC daemon version. */
 
 #define PEND_INT_LONG   300     /**< Length of long message interval. */
 #define PEND_INT_MEDIUM  60     /**< Length of medium message interval. */

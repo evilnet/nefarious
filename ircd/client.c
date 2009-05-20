@@ -289,8 +289,6 @@ client_report_privs(struct Client *to, struct Client *client)
 int
 client_debug_privs(struct Client *client)
 {
-  struct MsgBuf *mb;
-  int found1 = 0;
   int i;
   for (i = 0; privtab[i].name; i++) {
     if (HasPriv(client, privtab[i].priv))

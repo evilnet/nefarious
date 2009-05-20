@@ -16,13 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Declarations for all protocol message handler functions.
+ * @version $Id$
  */
 #ifndef INCLUDED_handlers_h
 #define INCLUDED_handlers_h
 
-/*
+/** @page m_functions Protocol Message Handlers
+ *
  * m_functions execute protocol messages on this server:
  * int m_func(struct Client* cptr, struct Client* sptr, int parc, char* parv[]);
  *

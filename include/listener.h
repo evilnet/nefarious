@@ -14,9 +14,10 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *
- * $Id$
+ */
+/** @file
+ * @brief Interface and declarations for handling listening sockets.
+ * @version $Id$
  */
 #ifndef INCLUDED_listener_h
 #define INCLUDED_listener_h
@@ -38,26 +39,27 @@
 struct Client;
 struct StatDesc;
 
+/** Describes a single listening port. */
 struct Listener {
-  struct Listener* next;               /* list node pointer */
-  int              fd;                 /* file descriptor */
-  int              port;               /* listener IP port */
-  int              ref_count;          /* number of connection references */
-  unsigned char    active;             /* current state of listener */
-  unsigned char    hidden;             /* hidden in stats output for clients */
-  unsigned char    server;             /* 1 if port is a server listener */
+  struct Listener* next;               /**< list node pointer */
+  int              fd;                 /**< file descriptor */
+  int              port;               /**< listener IP port */
+  int              ref_count;          /**< number of connection references */
+  unsigned char    active;             /**< current state of listener */
+  unsigned char    hidden;             /**< hidden in stats output for clients */
+  unsigned char    server;             /**< 1 if port is a server listener */
   unsigned char    exempt;
 #ifdef USE_SSL
-  unsigned char    ssl;                /* 1 if we're using SSL */
+  unsigned char    ssl;                /**< 1 if we're using SSL */
 #endif /* USE_SSL */
-  int              index;              /* index into poll array */
-  time_t           last_accept;        /* last time listener accepted */
-  struct in_addr   addr;               /* virtual address or INADDR_ANY */
-  struct in_addr   mask;               /* listener hostmask */
-  struct Socket    socket;             /* describe socket to event system */
+  int              index;              /**< index into poll array */
+  time_t           last_accept;        /**< last time listener accepted */
+  struct in_addr   addr;               /**< virtual address or INADDR_ANY */
+  struct in_addr   mask;               /**< listener hostmask */
+  struct Socket    socket;             /**< describe socket to event system */
 };
 
-extern struct Listener* ListenerPollList; /* GLOBAL - listener list */
+extern struct Listener* ListenerPollList; /**< GLOBAL - listener list */
 
 #ifdef USE_SSL
 extern void        add_listener(int port, const char* vaddr_ip, 

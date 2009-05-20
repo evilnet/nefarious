@@ -1,7 +1,6 @@
-/*
- * s_user.h
- *
- * $Id$
+/** @file s_user.h
+ * @brief Miscellaneous user-related helper functions.
+ * @version $Id$
  */
 #ifndef INCLUDED_s_user_h
 #define INCLUDED_s_user_h
@@ -22,14 +21,14 @@ struct Flags;
  * Macros
  */
 
-/*
+/**
  * Nick flood limit
  * Minimum time between nick changes.
  * (The first two changes are allowed quickly after another however).
  */
 #define NICK_DELAY 30
 
-/*
+/**
  * Target flood time.
  * Minimum time between target changes.
  * (MAXTARGETS are allowed simultaneously however).
@@ -39,19 +38,19 @@ struct Flags;
 
 /* return values for hunt_server() */
 
-#define HUNTED_NOSUCH   (-1)    /* if the hunted server is not found */
-#define HUNTED_ISME     0       /* if this server should execute the command */
-#define HUNTED_PASS     1       /* if message passed onwards successfully */
+#define HUNTED_NOSUCH   (-1)    /**< if the hunted server is not found */
+#define HUNTED_ISME     0       /**< if this server should execute the command */
+#define HUNTED_PASS     1       /**< if message passed onwards successfully */
 
 /* send sets for send_umode() */
-#define ALL_UMODES           0  /* both local and global user modes */
-#define SEND_UMODES          1  /* global user modes only */
-#define SEND_UMODES_BUT_OPER 2  /* global user modes except for FLAG_OPER */
+#define ALL_UMODES           0  /**< both local and global user modes */
+#define SEND_UMODES          1  /**< global user modes only */
+#define SEND_UMODES_BUT_OPER 2  /**< global user modes except for FLAG_OPER */
 
 /* used when sending to #mask or $mask */
 
-#define MATCH_SERVER  1
-#define MATCH_HOST    2
+#define MATCH_SERVER  1 /**< flag for relay_masked_message (etc) to indicate the mask matches a server name */
+#define MATCH_HOST    2 /**< flag for relay_masked_message (etc) to indicate the mask matches host name */
 
 #define SILENCE_IPMASK 0x01
 #define SILENCE_EXEMPT 0x02
@@ -60,6 +59,11 @@ struct Flags;
 
 extern struct SLink *opsarray[];
 
+/** Formatter function for send_user_info().
+ * @param who Client being displayed.
+ * @param sptr Client requesting information.
+ * @param buf Message buffer that should receive the response text.
+ */
 typedef void (*InfoFormatter)(struct Client* who, struct Client *sptr, struct MsgBuf* buf);
 
 /*
@@ -119,9 +123,9 @@ extern int lsc(struct Client *cptr, char *target, const char *prepend,
 	       const char *servicename, int parc, char* parv[]);
 extern int do_nick_name(char* nick);
 
-#define NAMES_ALL 1 /* List all users in channel */
-#define NAMES_VIS 2 /* List only visible users in non-secret channels */
-#define NAMES_EON 4 /* Add an 'End Of Names' reply to the end */
+#define NAMES_ALL 1 /**< List all users in channel */
+#define NAMES_VIS 2 /**< List only visible users in non-secret channels */
+#define NAMES_EON 4 /**< Add an 'End Of Names' reply to the end */
 
 void do_names(struct Client* sptr, struct Channel* chptr, int filter);
 

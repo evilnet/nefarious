@@ -525,7 +525,6 @@ int exit_client(struct Client *cptr,    /* Connection being handled by
     sendto_opmask_butone(0, SNO_NETWORK, "Net break: %C %C (%s)",
 			 cli_serv(victim)->up, victim, comment);
     map_dump(victim, "*", 0, report_lost_links, 0);
-
   }
 
   /*

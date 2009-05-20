@@ -95,11 +95,15 @@ int string_has_wildcards(const char* str)
   return 0;
 }
 
-/*
- * strtoken.c
- *
- * Walk through a string of tokens, using a set of separators.
- * -argv 9/90
+/** Split a string on certain delimiters.
+ * This is a reentrant version of normal strtok().  The first call for
+ * a particular input string must use a non-NULL \a str; *save will be
+ * initialized based on that.  Later calls must use a NULL \a str;
+ * *save will be updated.
+ * @param[in,out] save Pointer to a position indicator.
+ * @param[in] str Pointer to the input string, or NULL to continue.
+ * @param[in] fs String that lists token delimiters.
+ * @return Next token in input string, or NULL if no tokens remain.
  */
 char* ircd_strtok(char **save, char *str, char *fs)
 {
@@ -129,11 +133,9 @@ char* ircd_strtok(char **save, char *str, char *fs)
   return (tmp);
 }
 
-/*
- * canonize
- *
- * reduce a string of duplicate list entries to contain only the unique
- * items.  Unavoidably O(n^2).
+/** Rewrite a comma-delimited list of items to remove duplicates.
+ * @param[in,out] buffer Comma-delimited list.
+ * @return The input buffer \a buffer.
  */
 char* canonize(char* buffer)
 {
@@ -176,12 +178,11 @@ char* canonize(char* buffer)
   return cbuf;
 }
 
-/*
- * ircd_strncpy - optimized strncpy
- * This may not look like it would be the fastest possible way to do it,
- * but it generally outperforms everything else on many platforms,
- * including asm library versions and memcpy, if compiled with the
- * optimizer on. (-O2 for gcc) --Bleep
+/** Copy one string to another, not to exceed a certain length.
+ * @param[in] s1 Output buffer.
+ * @param[in] s2 Source buffer.
+ * @param[in] n Maximum number of bytes to write, plus one.
+ * @return The original input buffer \a s1.
  */
 char* ircd_strncpy(char* s1, const char* s2, size_t n)
 {
@@ -208,19 +209,10 @@ NTL_HDR_strCasediff { NTL_SRC_strCasediff }
  * Other functions visible externally
  */
 
-int strnChattr(const char *s, size_t n)
-{
-  const char *rs = s;
-  unsigned int x = ~0;
-  int r = n;
-  while (*rs && r--)
-    x &= IRCD_CharAttrTab[*rs++ - CHAR_MIN];
-  return x;
-}
-
-/*
- * ircd_strcmp - case insensitive comparison of 2 strings
- * NOTE: see ircd_chattr.h for notes on case mapping.
+/** Case insensitive string comparison.
+ * @param[in] a First string to compare.
+ * @param[in] b Second string to compare.
+ * @return Less than, equal to, or greater than zero if \a a is lexicographically less than, equal to, or greater than \a b.
  */
 int ircd_strcmp(const char *a, const char *b)
 {
@@ -235,26 +227,12 @@ int ircd_strcmp(const char *a, const char *b)
   return (*ra - *rb);
 }
 
-/*
- * ircd_strrcmp - case insensitive reverse comparison of 2 strings
- * NOTE: see ircd_chattr.h for notes on case mapping.
- */
-int ircd_strrcmp(const char *a, const char *b)
-{
-  const char* ra = a + strlen(a) - strlen(b);
-  const char* rb = b;
-  while (ToLower(*ra) == ToLower(*rb)) {
-    if (!*ra++)
-      return 0;
-    else
-      ++rb;
-  }
-  return (*ra - *rb);
-}
-
-/*
- * ircd_strncmp - counted case insensitive comparison of 2 strings
- * NOTE: see ircd_chattr.h for notes on case mapping.
+/** Case insensitive comparison of the starts of two strings.
+ * @param[in] a First string to compare.
+ * @param[in] b Second string to compare.
+ * @param[in] n Maximum number of characters to compare.
+ * @return Less than, equal to, or greater than zero if \a a is
+ * lexicographically less than, equal to, or greater than \a b.
  */
 int ircd_strncmp(const char *a, const char *b, size_t n)
 {
@@ -272,21 +250,18 @@ int ircd_strncmp(const char *a, const char *b, size_t n)
   return (*ra - *rb);
 }
 
-/*
- * unique_name_vector - create a unique vector of names from
- * a token separated list
- * list   - [in]  a token delimited null terminated character array
- * token  - [in]  the token to replace 
- * vector - [out] vector of strings to be returned
- * size   - [in]  maximum number of elements to place in vector
- * Returns count of elements placed into the vector, if the list
- * is an empty string { '\0' } 0 is returned.
- * list, and vector must be non-null and size must be > 0 
- * Empty strings <token><token> are not placed in the vector or counted.
- * This function ignores all subsequent tokens when count == size
- *
- * NOTE: this function destroys it's input, do not use list after it
- * is passed to this function
+/** Fill a vector of distinct names from a delimited input list.
+ * Empty tokens (when \a token occurs at the start or end of \a list,
+ * or when \a token occurs adjacent to itself) are ignored.  When
+ * \a size tokens have been written to \a vector, the rest of the
+ * string is ignored.
+ * Unlike token_vector(), if a token repeats an earlier token, it is
+ * skipped.
+ * @param[in,out] list Input buffer.
+ * @param[in] token Delimiter used to split \a list.
+ * @param[out] vector Output vector.
+ * @param[in] size Maximum number of elements to put in \a vector.
+ * @return Number of elements written to \a vector.
  */
 int unique_name_vector(char* list, char token, char** vector, int size)
 {
@@ -332,20 +307,16 @@ int unique_name_vector(char* list, char token, char** vector, int size)
   return count;
 }
 
-/*
- * token_vector - create a vector of tokens from
- * a token separated list
- * list   - [in]  a token delimited null terminated character array
- * token  - [in]  the token to replace 
- * vector - [out] vector of strings to be returned
- * size   - [in]  maximum number of elements to place in vector
- * returns count of elements placed into the vector, if the list
- * is an empty string { '\0' } 0 is returned.
- * list, and vector must be non-null and size must be > 1 
- * Empty tokens are counted and placed in the list
- *
- * NOTE: this function destroys it's input, do not use list after it
- * is passed to this function
+/** Fill a vector of tokens from a delimited input list.
+ * Empty tokens (when \a token occurs at the start or end of \a list,
+ * or when \a token occurs adjacent to itself) are ignored.  When
+ * \a size tokens have been written to \a vector, the rest of the
+ * string is ignored.
+ * @param[in,out] list Input buffer.
+ * @param[in] token Delimiter used to split \a list.
+ * @param[out] vector Output vector.
+ * @param[in] size Maximum number of elements to put in \a vector.
+ * @return Number of elements written to \a vector.
  */
 int token_vector(char* list, char token, char** vector, int size)
 {
@@ -371,9 +342,13 @@ int token_vector(char* list, char token, char** vector, int size)
   return count;
 } 
 
-/*
- * host_from_uh - get the host.domain part of a user@host.domain string
- * ripped from get_sockhost
+/** Copy all or part of the hostname in a string to another string.
+ * If \a userhost contains an '\@', the remaining portion is used;
+ * otherwise, the whole \a userhost is used.
+ * @param[out] host Output buffer.
+ * @param[in] userhost user\@hostname or hostname string.
+ * @param[in] n Maximum number of bytes to write to \a host.
+ * @return The output buffer \a buf.
  */
 char* host_from_uh(char* host, const char* userhost, size_t n)
 {
@@ -395,6 +370,7 @@ char* host_from_uh(char* host, const char* userhost, size_t n)
  * this new faster inet_ntoa was ripped from:
  * From: Thomas Helvey <tomh@inxpress.net>
  */
+/** Array of text strings for dotted quads. */
 static const char* IpQuadTab[] =
 {
     "0",   "1",   "2",   "3",   "4",   "5",   "6",   "7",   "8",   "9",
@@ -425,16 +401,10 @@ static const char* IpQuadTab[] =
   "250", "251", "252", "253", "254", "255"
 };
 
-/*
- * ircd_ntoa - rewrote and renamed yet again :) --Bleep
- * inetntoa - in_addr to string
- *      changed name to remove collision possibility and
- *      so behaviour is guaranteed to take a pointer arg.
- *      -avalon 23/11/92
- *  inet_ntoa --  returned the dotted notation of a given
- *      internet number
- *      argv 11/90).
- *  inet_ntoa --  its broken on some Ultrix/Dynix too. -avalon
+/** Convert an IP address to printable ASCII form.
+ * This is generally deprecated in favor of ircd_ntoa_r().
+ * @param[in] in Address to convert.
+ * @return Pointer to a static buffer containing the readable form.
  */
 const char* ircd_ntoa(const char* in)
 {
@@ -442,8 +412,10 @@ const char* ircd_ntoa(const char* in)
   return ircd_ntoa_r(buf, in);
 }
 
-/*
- * reentrant version of above
+/** Convert an IP address to printable ASCII form.
+ * @param[out] buf Output buffer to write to.
+ * @param[in] in Address to format.
+ * @return Pointer to the output buffer \a buf.
  */
 const char* ircd_ntoa_r(char* buf, const char* in)
 {
@@ -472,6 +444,10 @@ const char* ircd_ntoa_r(char* buf, const char* in)
   return buf;
 }
 
+/** Normalize buffer stripping control characters and colors
+ * @param[in] buf A string to be parsed for control and color codes
+ * @return A string stripped of control and color codes
+ */
 char *normalizeBuffer(char *buf)
 {
     char *newbuf;
@@ -553,6 +529,10 @@ char *normalizeBuffer(char *buf)
     return (newbuf);
 }
 
+/** Clean up the buffer for extra spaces
+ * @param[in] str to clean up
+ * @return void
+ */
 void doCleanBuffer(char *str)
 {
     char *in, *out;
@@ -582,6 +562,12 @@ void doCleanBuffer(char *str)
     *out = ch;                  /* == '\0' */
 }
 
+/** Pull a string out from inside of a given string.
+ * @param[in] pstr String that contains the text that will be pulled out.
+ * @param[in] start Starting character number.
+ * @param[in] numchars Number of characters from start that will be pulled.
+ * return substr'ed string
+ */
 char *substr(const char *pstr, int start, int numchars)
 {
   char *pnew = malloc(numchars+1);

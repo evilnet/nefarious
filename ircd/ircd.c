@@ -120,7 +120,7 @@ static struct Timer ping_timer; /* timer structure for check_pings() */
 static struct Timer alist_timer;
 static struct Timer countdown_timer; /**< timer structure for exit_countdown() */
 
-static struct Daemon thisServer  = { 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0 };
+static struct Daemon thisServer  = { 0, 0, 0, 0, 0, 0, 0, -1 };
 
 int running = 1;
 
@@ -177,7 +177,7 @@ static void pending_exit(struct PendingExit *pe)
   }
 
   /* OK, so we're restarting... */
-  /* reap_children(); */
+  reap_children();
 
   execv(SPATH, thisServer.argv); /* restart the server */
 
@@ -220,7 +220,8 @@ static void exit_countdown(struct Event *ev);
 /**
  * Performs a delayed pending exit, issuing server notices as appropriate.
  * Reschedules exit_countdown() as needed.
- * @param[in] ev Timer event.
+ * @param[in] pe Pending exit.
+ * @param[in] do_notice If 1 then send notices.
  */
 static void _exit_countdown(struct PendingExit *pe, int do_notice)
 {

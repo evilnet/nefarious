@@ -19,8 +19,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+/** @file
+ * @brief Helper functions to relay various types of messages.
+ * @version $Id$
  *
- * $Id$
+ * There are four basic types of messages, each with four subtypes.
+ *
+ * The basic types are: channel, directed, masked, and private.
+ * Channel messages are (perhaps obviously) sent directly to a
+ * channel.  Directed messages are sent to "NICK[%host]@server", but
+ * only allowed if the server is a services server (to avoid
+ * information leaks for normal clients).  Masked messages are sent to
+ * either *@*host.mask or *.server.mask.  Private messages are sent to
+ * NICK.
+ *
+ * The subtypes for each type are: client message, client notice,
+ * server message, and server notice.  Client subtypes are sent by a
+ * local user, and server subtypes are given to us by a server.
+ * Notice subtypes correspond to the NOTICE command, and message
+ * subtypes correspond to the PRIVMSG command.
+ *
+ * As a special note, directed messages do not have server subtypes,
+ * since there is no difference in handling them based on origin.
  */
 #include "config.h"
 
@@ -55,7 +76,16 @@
  * to be cleaned up a bit. The idea is to factor out the common checks
  * but not introduce any IsOper/IsUser/MyUser/IsServer etc. stuff.
  */
-void relay_channel_message(struct Client* sptr, const char* name, const char* text, int total)
+
+/** Relay a local user's message to a channel.
+ * Generates an error if the client cannot send to the channel.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Name of target channel.
+ * @param[in] text %Message to relay.
+ * @param[in] total Total channels the message is being relayed to.
+ */
+void relay_channel_message(struct Client* sptr, const char* name, const char* 
+text, int total)
 {
   struct Channel* chptr;
   const char *ch;
@@ -119,6 +149,13 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
 			   SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);
 }
 
+/** Relay a local user's notice to a channel.
+ * Silently exits if the client cannot send to the channel.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Name of target channel.
+ * @param[in] text %Message to relay.
+ * @param[in] total Total channels the message is being relayed to.
+ */
 void relay_channel_notice(struct Client* sptr, const char* name, const char* text, int total)
 {
   struct Channel* chptr;
@@ -184,6 +221,13 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
 			   SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
 }
 
+/** Relay a message to a channel.
+ * Generates an error if the client cannot send to the channel,
+ * or if the channel is a local channel
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Name of target channel.
+ * @param[in] text %Message to relay.
+ */
 void server_relay_channel_message(struct Client* sptr, const char* name, const char* text)
 {
   struct Channel* chptr;
@@ -211,6 +255,13 @@ void server_relay_channel_message(struct Client* sptr, const char* name, const c
     send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
 }
 
+/** Relay a notice to a channel.
+ * Generates an error if the client cannot send to the channel,
+ * or if the channel is a local channel
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Name of target channel.
+ * @param[in] text %Message to relay.
+ */
 void server_relay_channel_notice(struct Client* sptr, const char* name, const char* text)
 {
   struct Channel* chptr;
@@ -230,8 +281,15 @@ void server_relay_channel_notice(struct Client* sptr, const char* name, const ch
 			     SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, text);
   }
 }
-
-
+/** Relay a directed message.
+ * Generates an error if the named server does not exist, if it is not
+ * a services server, or if \a name names a local user and a hostmask
+ * is specified but does not match.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Target nickname, with optional "%hostname" suffix.
+ * @param[in] server Name of target server.
+ * @param[in] text %Message to relay.
+ */
 void relay_directed_message(struct Client* sptr, char* name, char* server, const char* text)
 {
   struct Client* acptr;
@@ -318,6 +376,15 @@ void relay_directed_message(struct Client* sptr, char* name, char* server, const
     sendcmdto_one(sptr, CMD_PRIVATE, acptr, "%s :%s", name, text);
 }
 
+/** Relay a directed notice.
+ * Generates an error if the named server does not exist, if it is not
+ * a services server, or if \a name names a local user and a hostmask
+ * is specified but does not match.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Target nickname, with optional "%hostname" suffix.
+ * @param[in] server Name of target server.
+ * @param[in] text %Message to relay.
+ */
 void relay_directed_notice(struct Client* sptr, char* name, char* server, const char* text)
 {
   struct Client* acptr;
@@ -386,6 +453,14 @@ void relay_directed_notice(struct Client* sptr, char* name, char* server, const 
     sendcmdto_one(sptr, CMD_NOTICE, acptr, "%s :%s", name, text);
 }
 
+/** Relay a private message from a local user.
+ * Returns an error if the user does not exist or sending to him would
+ * exceed the source's free targets.  Sends an AWAY status message if
+ * the target is marked as away.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Nickname of target user.
+ * @param[in] text %Message to relay.
+ */
 void relay_private_message(struct Client* sptr, const char* name, const char* text)
 {
   struct Client* acptr;
@@ -445,6 +520,14 @@ void relay_private_message(struct Client* sptr, const char* name, const char* te
   sendcmdto_one(sptr, CMD_PRIVATE, acptr, "%C :%s", acptr, text);
 }
 
+/** Relay a private notice from a local user.
+ * Returns an error if the user does not exist or sending to him would
+ * exceed the source's free targets.  Sends an AWAY status message if
+ * the target is marked as away.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Nickname of target user.
+ * @param[in] text %Message to relay.
+ */
 void relay_private_notice(struct Client* sptr, const char* name, const char* text)
 {
   struct Client* acptr;
@@ -496,6 +579,12 @@ void relay_private_notice(struct Client* sptr, const char* name, const char* tex
   sendcmdto_one(sptr, CMD_NOTICE, acptr, "%C :%s", acptr, text);
 }
 
+/** Relay a private message that arrived from a server.
+ * Returns an error if the user does not exist.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Nickname of target user.
+ * @param[in] text %Message to relay.
+ */
 void server_relay_private_message(struct Client* sptr, const char* name, const char* text)
 {
   struct Client* acptr;
@@ -519,7 +608,12 @@ void server_relay_private_message(struct Client* sptr, const char* name, const c
   sendcmdto_one(sptr, CMD_PRIVATE, acptr, "%C :%s", acptr, text);
 }
 
-
+/** Relay a private notice that arrived from a server.
+ * Returns an error if the user does not exist.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] name Nickname of target user.
+ * @param[in] text %Message to relay.
+ */
 void server_relay_private_notice(struct Client* sptr, const char* name, const char* text)
 {
   struct Client* acptr;
@@ -541,6 +635,13 @@ void server_relay_private_notice(struct Client* sptr, const char* name, const ch
   sendcmdto_one(sptr, CMD_NOTICE, acptr, "%C :%s", acptr, text);
 }
 
+/** Relay a masked message from a local user.
+ * Sends an error response if there is no top-level domain label in \a
+ * mask, or if that TLD contains a wildcard.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] mask Target mask for the message.
+ * @param[in] text %Message to relay.
+ */
 void relay_masked_message(struct Client* sptr, const char* mask, const char* text)
 {
   const char* s;
@@ -576,6 +677,13 @@ void relay_masked_message(struct Client* sptr, const char* mask, const char* tex
 			 "%s :%s", mask, text);
 }
 
+/** Relay a masked notice from a local user.
+ * Sends an error response if there is no top-level domain label in \a
+ * mask, or if that TLD contains a wildcard.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] mask Target mask for the message.
+ * @param[in] text %Message to relay.
+ */
 void relay_masked_notice(struct Client* sptr, const char* mask, const char* text)
 {
   const char* s;
@@ -611,6 +719,11 @@ void relay_masked_notice(struct Client* sptr, const char* mask, const char* text
 			 "%s :%s", mask, text);
 }
 
+/** Relay a masked message that arrived from a server.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] mask Target mask for the message.
+ * @param[in] text %Message to relay.
+ */
 void server_relay_masked_message(struct Client* sptr, const char* mask, const char* text)
 {
   const char* s = mask;
@@ -629,6 +742,11 @@ void server_relay_masked_message(struct Client* sptr, const char* mask, const ch
 			 "%s :%s", mask, text);
 }
 
+/** Relay a masked notice that arrived from a server.
+ * @param[in] sptr Client that originated the message.
+ * @param[in] mask Target mask for the message.
+ * @param[in] text %Message to relay.
+ */
 void server_relay_masked_notice(struct Client* sptr, const char* mask, const char* text)
 {
   const char* s = mask;

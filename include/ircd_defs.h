@@ -18,36 +18,34 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Commentary by Bleep (Thomas Helvey)
- *
- * $Id$
  */
 #ifndef INCLUDED_ircd_defs_h
 #define INCLUDED_ircd_defs_h
-/*
- * Definitions used everywhere in the server
- * NOTE: Changing any of these definitions is equivalent to a protocol
- * revision. Every server on a given network must also use the same sizes.
+/** @file
+ * @brief Definitions used everywhere in the server.
+ *
+ * NOTE: Changing any of these definitions (except for the
+ * target-related ones at the bottom) is equivalent to a protocol
+ * revision. Every server on a given network must use the same values.
+ * @version $Id$
  */
 
-/*
- * NICKLEN is the maximum length allowed for a nickname
- *
+/** Maximum length allowed for a nickname.
  * Because certain networks are very helpful in finding bugs, the below
- * is a default that can easily be overridden in CFLAGS.  Just add 
- * -DNICKLEN=15 to CFLAGS and save your config in .., and you can forget about
+ * is a default that can easily be overridden in CFLAGS.  Just add
+ * -DNICKLEN=15 to CFLAGS during configure, and you can forget about
  * it.  Thanks for helping debug guys.
+ * See also F:NICKLEN in ircd.conf.
  */
 #ifndef NICKLEN
-#define NICKLEN		30
+#define NICKLEN         30
 #endif
-/*
- * USERLEN is the maximum length allowed of a user name including an optional
+/** Maximum length allowed of a user name, including an optional
  * leading '~' if the user name has not been authenticated by an auth (RFC 931)
  * server query.
  */
-#define USERLEN		10
-/*
- * HOSTLEN is exactly long enough to hold one (1) segment of FQDN or hostname.
+#define USERLEN         10
+/** Exactly long enough to hold one (1) segment of FQDN or hostname.
  * This is due to an historical misinterpretation of RFC 1034.
  * 3.1. Name space specifications and terminology
  *
@@ -65,56 +63,49 @@
  * of greater than 63 characters are rejected by the server, and most FQDN's
  * are shorter. It is possible to have a valid FQDN longer than 63 characters.
  */
-#define HOSTLEN		75
-/*
- * ACCOUNTLEN is the maximum length for the account name, which can be set
+#define HOSTLEN         75
+/** Maximum length for the account name, which can be set
  * with the ACCOUNT (AC) command.  This is used for keeping track of who's
  * logged into which account, for the benefit of irc services.
  */
-#define ACCOUNTLEN	15
-/*
- * REALLEN is the maximum length for user supplied information about a client
+#define ACCOUNTLEN      15
+/** Maximum length for user supplied information about a client
  * connection (gcos). This information is set at client/server registration
  * time.
  */
-#define REALLEN		50
-/*
- * VERSIONLEN is the maximum length for user supplied information about a clients
- * version. This information is set at client/server after a reply to CTCP VERSION.
+#define REALLEN         50
+/** Maximum length for user supplied information about a clients  version. This
+ * information is set at client/server after a reply to CTCP VERSION.
  * added by Vadtec 02/26/2008
  */
 #define VERSIONLEN	75 
-/*
- * PASSWDLEN is the maximum length for a password used for connecting servers
- * and clients.
+/** Maximum length for a password used for connecting servers and clients.
  */
-#define PASSWDLEN	20
-/*
- * ACCPASSWDLEN is the maximum length for a password used with the
- * login-on-connect feature, and it should match the length used by
- * your service bot (e.g. gnuworld)
+#define PASSWDLEN       20
+/** Maximum length for a password used with the login-on-connect feature, and
+ * it should match the length used by your service bot (e.g. gnuworld)
  */
 #define ACCPASSWDLEN	40
-/*
- * SOCKIPLEN is the length of a dotted quad ip address "XXX.XXX.XXX.XXX"
+/** Maximum length of a numeric IP (v4) address.
  */
-#define SOCKIPLEN	15
-/*
- * TOPICLEN is the maximum length for channel topics and kill comments
+#define SOCKIPLEN       15
+/** Maximum length for channel topics and kill comments.
  */
-#define TOPICLEN	250
-/*
- * AWAYLEN is the maximum length for away messages
+#define TOPICLEN        250
+/** Maximum length for away messages.
  */
 #define AWAYLEN		250
-/*
- * BUFSIZE is exactly long enough to hold one protocol message (RFC 1459)
- * including the line termination (\r\n).
+/** Exactly long enough to hold one protocol message (RFC 1459)
+ * including the line termination (\\r\\n).  DO NOT CHANGE THIS!!!!
  */
-#define BUFSIZE		512     /* WARNING: *DONT* CHANGE THIS!!!! */
+#define BUFSIZE         512
 
-#define MAXTARGETS	20
-#define STARTTARGETS	10
-#define RESERVEDTARGETS	12
+/** Maximum available targets for a user. */
+#define MAXTARGETS      20
+/** Starting free targets for a user. */
+#define STARTTARGETS    10
+/** Target number to start assigning new targets. */
+#define RESERVEDTARGETS 12
 
-#endif
+#endif /* INCLUDED_ircd_defs_h */
+

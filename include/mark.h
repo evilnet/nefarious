@@ -19,17 +19,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file mark.h
+ * @brief Mark define's.
+ * @version $Id$
  */
 
-#define MARK_DNSBL		"DNSBL"
-#define MARK_DNSBL_DATA		"DNSBL_DATA"
-#define MARK_EXEMPT_UPDATE	"EXEMPT"
-#define MARK_CVERSION		"CVERSION"
-#define MARK_WEBIRC		"WEBIRC"
-#define MARK_SFILTER            "SFILTER"
-#define MARK_KILL               "KILL"
+#define MARK_DNSBL		"DNSBL"           /**< DNSBL mark */
+#define MARK_DNSBL_DATA		"DNSBL_DATA"      /**< DNSBL data mark */
+#define MARK_EXEMPT_UPDATE	"EXEMPT"          /**< DNSBL Exempt mark */
+#define MARK_CVERSION		"CVERSION"        /**< Client Version mark */
+#define MARK_WEBIRC		"WEBIRC"          /**< WEBIRC mark */
+#define MARK_SFILTER            "SFILTER"         /**< Spam filter mark */
+#define MARK_KILL               "KILL"            /**< KILL mark */
 
 #endif /* INCLUDED_mark_h */
 

@@ -370,33 +370,23 @@ int promptcomment(struct Client* sptr, const char* filename)
   return 0;
 }
 
-struct ConfItem* make_conf(void)
+struct ConfItem* make_conf(int type)
 {
   struct ConfItem* aconf;
 
   aconf = (struct ConfItem*) MyMalloc(sizeof(struct ConfItem));
   assert(0 != aconf);
+
 #ifdef        DEBUGMODE
   ++GlobalConfCount;
 #endif
+
   memset(aconf, 0, sizeof(struct ConfItem));
-  aconf->status       = CONF_ILLEGAL;
+  aconf->status       = type;
   aconf->ipnum.s_addr = INADDR_NONE;
+  aconf->next    = GlobalConfList;
+  GlobalConfList = aconf;
   return aconf;
-}
-
-void delist_conf(struct ConfItem *aconf)
-{
-  if (aconf == GlobalConfList)
-    GlobalConfList = GlobalConfList->next;
-  else {
-    struct ConfItem *bconf;
-
-    for (bconf = GlobalConfList; aconf != bconf->next; bconf = bconf->next)
-      ;
-    bconf->next = aconf->next;
-  }
-  aconf->next = 0;
 }
 
 void free_conf(struct ConfItem *aconf)
@@ -407,12 +397,15 @@ void free_conf(struct ConfItem *aconf)
          aconf->port));
   if (aconf->dns_pending)
     delete_resolver_queries(aconf);
+  MyFree(aconf->username);
   MyFree(aconf->host);
   if (aconf->passwd)
     memset(aconf->passwd, 0, strlen(aconf->passwd));
   MyFree(aconf->passwd);
   MyFree(aconf->name);
+  MyFree(aconf->hub_limit);
   MyFree(aconf);
+
 #ifdef        DEBUGMODE
   --GlobalConfCount;
 #endif
@@ -910,46 +903,6 @@ struct ConfItem* find_conf_byip(struct SLink* lp, const char* ip,
     }
   }
   return 0;
-}
-
-/*
- * find_conf_entry
- *
- * - looks for a match on all given fields.
- */
-struct ConfItem* find_conf_entry(struct ConfItem *aconf,
-                                        unsigned int mask)
-{
-  struct ConfItem *bconf;
-  assert(0 != aconf);
-
-  mask &= ~CONF_ILLEGAL;
-
-  for (bconf = GlobalConfList; bconf; bconf = bconf->next) {
-    if (!(bconf->status & mask) || (bconf->port != aconf->port))
-      continue;
-
-    if ((EmptyString(bconf->host) && !EmptyString(aconf->host)) ||
-        (EmptyString(aconf->host) && !EmptyString(bconf->host)))
-      continue;
-    if (!EmptyString(bconf->host) && 0 != ircd_strcmp(bconf->host, aconf->host))
-      continue;
-
-    if ((EmptyString(bconf->passwd) && !EmptyString(aconf->passwd)) ||
-        (EmptyString(aconf->passwd) && !EmptyString(bconf->passwd)))
-      continue;
-    if (!EmptyString(bconf->passwd) && (!IsDigit(*bconf->passwd) || bconf->passwd[1])
-        && 0 != ircd_strcmp(bconf->passwd, aconf->passwd))
-      continue;
-
-    if ((EmptyString(bconf->name) && !EmptyString(aconf->name)) ||
-        (EmptyString(aconf->name) && !EmptyString(bconf->name)))
-      continue;
-    if (!EmptyString(bconf->name) && 0 != ircd_strcmp(bconf->name, aconf->name))
-      continue;
-    break;
-  }
-  return bconf;
 }
 
 void clear_lblines(void)

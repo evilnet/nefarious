@@ -107,7 +107,7 @@ stats_configured_links(struct Client *sptr, const struct StatDesc* sd,
       host = BadPtr(tmp->host) ? null : tmp->host;
       pass = BadPtr(tmp->passwd) ? null : tmp->passwd;
       name = BadPtr(tmp->name) ? null : tmp->name;
-      hub_limit = BadPtr(tmp->hub_limit) ? null : tmp->hub_limit;
+      hub_limit = BadPtr(tmp->hub_limit) ? "" : tmp->hub_limit;
       maximum = tmp->maximum;
       port = tmp->port;
 
@@ -116,7 +116,7 @@ stats_configured_links(struct Client *sptr, const struct StatDesc* sd,
   	  send_reply(sptr, RPL_STATSCLINE, "*", name, port, maximum, hub_limit, get_conf_class(tmp));
         else
   	  send_reply(sptr, RPL_STATSCLINE, host, name, port, maximum, hub_limit, get_conf_class(tmp));
-        if (hub_limit)
+        if (*hub_limit && hub_limit)
           send_reply(sptr, RPL_STATSHLINE, hub_limit, name, maximum);
       } else if (tmp->status & CONF_CLIENT)
         send_reply(sptr, RPL_STATSILINE,
@@ -561,14 +561,12 @@ stats_servers_verbose(struct Client* sptr, const struct StatDesc *sd, char* para
   }
 }
 
-#ifdef DEBUGMODE
 static void
 stats_meminfo(struct Client* to, const struct StatDesc *sd, char* param)
 {
   class_send_meminfo(to);
   send_listinfo(to, 0);
 }
-#endif
 
 static void
 stats_help(struct Client* to, const struct StatDesc *sd, char* param)
@@ -685,11 +683,9 @@ struct StatDesc statsinfo[] = {
   { 'w', "userload", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_USERLOAD,
     calc_load, 0,
     "Userload statistics." },
-#ifdef DEBUGMODE
   { 'x', "memusage", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_MEMUSAGE,
     stats_meminfo, 0,
-    "List usage information (Debug only)." },
-#endif
+    "List usage information." },
   { 'X', "dnsbls", (STAT_FLAG_OPERFEAT | STAT_FLAG_CASESENS), FEAT_HIS_STATS_DNSBLS,
     stats_dnsbl, 0,
     "Configured DNSBL hosts." },

@@ -19,8 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Support functions for /WHO-like commands.
+ * @version $Id$
  */
 #include "config.h"
 
@@ -61,8 +63,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-/*
- * The function that actually prints out the WHO reply for a client found
+/** Send a WHO reply to a client who asked.
+ * @param[in] sptr Client who is searching for other users.
+ * @param[in] acptr Client who may be shown to \a sptr.
+ * @param[in] repchan Shared channel that provides visibility.
+ * @param[in] fields Bitmask of WHO_FIELD_* values, indicating what to show.
+ * @param[in] qrt Query type string (ignored unless \a fields & WHO_FIELD_QTY).
  */
 void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
             int fields, char* qrt)
@@ -261,6 +267,10 @@ void do_who(struct Client* sptr, struct Client* acptr, struct Channel* repchan,
   send_reply(sptr, fields ? RPL_WHOSPCRPL : RPL_WHOREPLY, ++p1);
 }
 
+/** Count the amount of users online for the given mask.
+ * @param[in] mask Mask that needs to be counted.
+ * @return Calculated amount of users.
+ */
 int
 count_users(char *mask)
 {

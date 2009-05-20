@@ -19,11 +19,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
-
-
+/** @file
+ * @brief Implementation of style 2 host hiding
+ * @version $Id$
+ */
 #include "client.h"
 #include "ircd.h"
 #include "ircd_alloc.h"
@@ -44,10 +44,15 @@
 #include <string.h>
 #include <fcntl.h>
 
-#define KEY1 feature_str(FEAT_HOST_HIDING_KEY1)
-#define KEY2 feature_str(FEAT_HOST_HIDING_KEY2)
-#define KEY3 feature_str(FEAT_HOST_HIDING_KEY3)
+#define KEY1 feature_str(FEAT_HOST_HIDING_KEY1) /**< Cloak key 1 */
+#define KEY2 feature_str(FEAT_HOST_HIDING_KEY2) /**< Cloak key 2 */
+#define KEY3 feature_str(FEAT_HOST_HIDING_KEY3) /**< Cloak key 3 */
 
+
+/** Downsamples a 128bit result to 32bits (md5 -> unsigned int).
+ * @param[in] i 128bit result to downsample.
+ * @return downsampled result.
+ */
 static inline unsigned int downsample(unsigned char *i)
 {
 char r[4];
@@ -63,6 +68,10 @@ char r[4];
 	         (unsigned int)r[3]);
 }
 
+/** Cloak an IPv4 IP
+ * @param[in] host IP to cloak.
+ * @return result Cloaked IP.
+ */
 char *hidehost_ipv4(char *host)
 {
 unsigned int a, b, c, d;
@@ -113,6 +122,10 @@ unsigned int alpha, beta, gamma;
 }
 
 
+/** Cloak a hostname
+ * @param[in] host to cloak.
+ * @return result Cloaked host.
+ */
 char *hidehost_normalhost(char *host)
 {
 char *p;

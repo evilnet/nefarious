@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Implementation of event loop mid-layer.
+ * @version $Id$
  */
 #include "config.h"
 
@@ -33,13 +35,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define SIGS_PER_SOCK	10	/* number of signals to process per socket
+#define SIGS_PER_SOCK	10	/**< number of signals to process per socket
 				   readable event */
 
 #ifdef USE_KQUEUE
 extern struct Engine engine_kqueue;
 #define ENGINE_KQUEUE	&engine_kqueue,
 #else
+/** Address of kqueue engine (if used). */
 #define ENGINE_KQUEUE
 #endif /* USE_KQUEUE */
 
@@ -47,6 +50,7 @@ extern struct Engine engine_kqueue;
 extern struct Engine engine_devpoll;
 #define ENGINE_DEVPOLL	&engine_devpoll,
 #else
+/** Address of /dev/poll engine (if used). */
 #define ENGINE_DEVPOLL
 #endif /* USE_DEVPOLL */
 
@@ -54,18 +58,21 @@ extern struct Engine engine_devpoll;
 extern struct Engine engine_epoll;
 #define ENGINE_EPOLL &engine_epoll,
 #else
+/** Address of epoll engine (if used). */
 #define ENGINE_EPOLL
 #endif /* USE_EPOLL */
 
 #ifdef USE_POLL
 extern struct Engine engine_poll;
+/** Address of fallback (poll) engine. */
 #define ENGINE_FALLBACK	&engine_poll,
 #else
 extern struct Engine engine_select;
+/** Address of fallback (select) engine. */
 #define ENGINE_FALLBACK	&engine_select,
 #endif /* USE_POLL */
 
-/* list of engines to try */
+/** list of engines to try */
 static const struct Engine *evEngines[] = {
   ENGINE_KQUEUE
   ENGINE_EPOLL
@@ -74,22 +81,25 @@ static const struct Engine *evEngines[] = {
   0
 };
 
-/* signal routines pipe data */
+/** Signal routines pipe data.
+ * This is used if an engine does not implement signal handling itself
+ * (when Engine::eng_signal is NULL).
+ */
 static struct {
-  int		fd;	/* signal routine's fd */
-  struct Socket	sock;	/* and its struct Socket */
+  int		fd;	/**< signal routine's fd */
+  struct Socket	sock;	/**< and its struct Socket */
 } sigInfo = { -1 };
 
-/* All the thread info */
+/** All the thread info */
 static struct {
-  struct Generators    gens;		/* List of all generators */
-  struct Event*	       events_free;	/* struct Event free list */
-  unsigned int	       events_alloc;	/* count of allocated struct Events */
-  const struct Engine* engine;		/* core engine being used */
+  struct Generators    gens;		/**< List of all generators */
+  struct Event*	       events_free;	/**< struct Event free list */
+  unsigned int	       events_alloc;	/**< count of allocated struct Events */
+  const struct Engine* engine;		/**< core engine being used */
 #ifdef IRCD_THREADED
-  struct GenHeader*    genq_head;	/* head of generator event queue */
-  struct GenHeader*    genq_tail;	/* tail of generator event queue */
-  unsigned int	       genq_count;	/* count of generators on queue */
+  struct GenHeader*    genq_head;	/**< head of generator event queue */
+  struct GenHeader*    genq_tail;	/**< tail of generator event queue */
+  unsigned int	       genq_count;	/**< count of generators on queue */
 #endif
 } evInfo = {
   { 0, 0, 0 },
@@ -99,7 +109,13 @@ static struct {
 #endif
 };
 
-/* Initialize a struct GenHeader */
+/** Initialize a struct GenHeader.
+ * @param[in,out] gen GenHeader to initialize.
+ * @param[in] call Callback for generated events.
+ * @param[in] data User data pointer.
+ * @param[in] next Pointer to next generator.
+ * @param[in,out] prev_p Pointer to previous pointer for this list.
+ */
 static void
 gen_init(struct GenHeader* gen, EventCallBack call, void* data,
 	 struct GenHeader* next, struct GenHeader** prev_p)
@@ -127,7 +143,10 @@ gen_init(struct GenHeader* gen, EventCallBack call, void* data,
   }
 }
 
-/* Execute an event; optimizations should inline this */
+/** Execute an event.
+ * Optimizations should inline this.
+ * @param[in] event Event to execute.
+ */
 static void
 event_execute(struct Event* event)
 {
@@ -159,7 +178,7 @@ event_execute(struct Event* event)
 }
 
 #ifndef IRCD_THREADED
-/* we synchronously execute the event when not threaded */
+/** we synchronously execute the event when not threaded */
 #define event_add(event)	\
 do {									      \
   struct Event* _ev = (event);						      \
@@ -169,7 +188,9 @@ do {									      \
 } while (0)
 
 #else
-/* add an event to the work queue */
+/** Add an event to the work queue.
+ * @param[in] event Event to enqueue.
+ */
 /* This is just a placeholder; don't expect ircd to be threaded soon */
 /* There should be locks all over the place in here */
 static void
@@ -219,11 +240,13 @@ event_add(struct Event* event)
 }
 #endif /* IRCD_THREADED */
 
-/* Place a timer in the correct spot on the queue */
+/** Place a timer in the correct spot on the queue.
+ * @param[in] timer Timer to enqueue.
+ */
 static void
 timer_enqueue(struct Timer* timer)
 {
-  struct Timer** ptr_p;
+  struct GenHeader** ptr_p;
 
   assert(0 != timer);
   assert(0 == timer->t_header.gh_prev_p); /* not already on queue */
@@ -242,38 +265,43 @@ timer_enqueue(struct Timer* timer)
 
   /* Find a slot to insert timer */
   for (ptr_p = &evInfo.gens.g_timer; ;
-       ptr_p = (struct Timer**) &(*ptr_p)->t_header.gh_next)
-    if (!*ptr_p || timer->t_expire < (*ptr_p)->t_expire)
+       ptr_p = &(*ptr_p)->gh_next)
+    if (!*ptr_p || timer->t_expire < ((struct Timer*)*ptr_p)->t_expire)
       break;
 
   /* link it in the right place */
-  timer->t_header.gh_next = (struct GenHeader*) *ptr_p;
-  timer->t_header.gh_prev_p = (struct GenHeader**) ptr_p;
+  timer->t_header.gh_next = *ptr_p;
+  timer->t_header.gh_prev_p = ptr_p;
   if (*ptr_p)
-    (*ptr_p)->t_header.gh_prev_p = &timer->t_header.gh_next;
-  *ptr_p = timer;
+    (*ptr_p)->gh_prev_p = &timer->t_header.gh_next;
+  *ptr_p = &timer->t_header;
 }
 
-/* signal handler for writing signal notification to pipe */
+/** &Signal handler for writing signal notification to pipe.
+ * @param[in] sig Signal number that just happened.
+ */
 static void
 signal_handler(int sig)
 {
   unsigned char c;
+  unsigned int r;
 
   assert(sigInfo.fd >= 0);
 
   c = (unsigned char) sig; /* only write 1 byte to identify sig */
 
-  write(sigInfo.fd, &c, 1);
+  r = write(sigInfo.fd, &c, 1);
 }
 
-/* callback for signal "socket" events */
+/** Callback for signal "socket" (really pipe) events.
+ * @param[in] event Event activity descriptor.
+ */
 static void
 signal_callback(struct Event* event)
 {
   unsigned char sigstr[SIGS_PER_SOCK];
   int sig, n_sigs, i;
-  struct Signal* ptr;
+  struct GenHeader* ptr;
 
   assert(event->ev_type == ET_READ); /* readable events only */
 
@@ -283,8 +311,8 @@ signal_callback(struct Event* event)
     sig = (int) sigstr[i]; /* get signal */
 
     for (ptr = evInfo.gens.g_signal; ptr;
-	 ptr = (struct Signal*) ptr->sig_header.gh_next)
-      if (ptr->sig_signal == sig) /* find its descriptor... */
+	 ptr = ptr->gh_next)
+      if (((struct Signal*)ptr)->sig_signal == sig) /* find its descriptor... */
 	break;
 
     if (ptr)
@@ -292,7 +320,9 @@ signal_callback(struct Event* event)
   }
 }
 
-/* Remove something from its queue */
+/** Remove a generator from its queue.
+ * @param[in] arg Pointer to a GenHeader to dequeue.
+ */
 void
 gen_dequeue(void* arg)
 {
@@ -307,7 +337,9 @@ gen_dequeue(void* arg)
   gen->gh_prev_p = 0;
 }
 
-/* Initializes the event system */
+/** Initializes the event system.
+ * @param[in] max_sockets Maximum number of sockets to support.
+ */
 void
 event_init(int max_sockets)
 {
@@ -337,7 +369,7 @@ event_init(int max_sockets)
   }
 }
 
-/* Do the event loop */
+/** Do the event loop. */
 void
 event_loop(void)
 {
@@ -347,7 +379,11 @@ event_loop(void)
   (*evInfo.engine->eng_loop)(&evInfo.gens);
 }
 
-/* Generate an event and add it to the queue (or execute it) */
+/** Generate an event and add it to the queue (or execute it).
+ * @param[in] type Type of event to generate.
+ * @param[in] arg Pointer to an event generator (GenHeader).
+ * @param[in] data Extra data for event.
+ */
 void
 event_generate(enum EventType type, void* arg, int data)
 {
@@ -405,18 +441,27 @@ timer_verify(void)
 }
 #endif
 
-/* Initialize a timer structure */
+/** Initialize a timer structure.
+ * @param[in,out] timer Timer to initialize.
+ * @return The pointer \a timer.
+ */
 struct Timer*
 timer_init(struct Timer* timer)
 {
-  gen_init((struct GenHeader*) timer, 0, 0, 0, 0);
+  gen_init(&timer->t_header, 0, 0, 0, 0);
 
   timer->t_header.gh_flags = 0; /* turn off active flag */
 
   return timer; /* convenience return */
 }
 
-/* Add a timer to be processed */
+/** Add a timer to be processed.
+ * @param[in] timer Timer to add.
+ * @param[in] call Callback for when the timer expires or is removed.
+ * @param[in] data User data pointer for the timer.
+ * @param[in] type Timer type.
+ * @param[in] value Timer expiration, duration or interval (per \a type).
+ */
 void
 timer_add(struct Timer* timer, EventCallBack call, void* data,
 	  enum TimerType type, time_t value)
@@ -444,7 +489,9 @@ timer_add(struct Timer* timer, EventCallBack call, void* data,
     timer_enqueue(timer); /* and enqueue it */
 }
 
-/* Remove a timer from the processing queue */
+/** Remove a timer from the processing queue.
+ * @param[in] timer Timer to remove.
+ */
 void
 timer_del(struct Timer* timer)
 {
@@ -462,7 +509,11 @@ timer_del(struct Timer* timer)
   event_generate(ET_DESTROY, timer, 0);
 }
 
-/* Change the time a timer expires */
+/** Change the time a timer expires.
+ * @param[in] timer Timer to update.
+ * @param[in] type New timer type.
+ * @param[in] value New timer expiration value.
+ */
 void
 timer_chg(struct Timer* timer, enum TimerType type, time_t value)
 {
@@ -475,23 +526,30 @@ timer_chg(struct Timer* timer, enum TimerType type, time_t value)
 	 "timeout %Tu", timer, timer_to_name(timer->t_type), timer->t_value,
 	 timer_to_name(type), value));
 
-  gen_dequeue(timer); /* remove the timer from the queue */
-
   timer->t_type = type; /* Set the new type and value */
   timer->t_value = value;
   timer->t_expire = 0;
 
+  /* If the timer expiration callback tries to change the timer
+   * expiration, flag the timer but do not dequeue it yet.
+   */
+  if (timer->t_header.gh_flags & GEN_MARKED)
+  {
+    timer->t_header.gh_flags |= GEN_READD;
+    return;
+  }
+  gen_dequeue(timer); /* remove the timer from the queue */
   timer_enqueue(timer); /* re-queue the timer */
 }
 
-/* Execute all expired timers */
+/** Execute all expired timers. */
 void
 timer_run(void)
 {
   struct Timer* ptr;
 
   /* go through queue... */
-  while ((ptr = evInfo.gens.g_timer)) {
+  while ((ptr = (struct Timer*)evInfo.gens.g_timer)) {
     if (CurrentTime < ptr->t_expire)
       break; /* processed all pending timers */
 
@@ -514,25 +572,30 @@ timer_run(void)
   }
 }
 
-/* Adds a signal to the event callback system */
+/** Adds a signal to the event callback system.
+ * @param[in] signal Signal event generator to use.
+ * @param[in] call Callback function to use.
+ * @param[in] data User data pointer for generator.
+ * @param[in] sig Signal number to hook.
+ */
 void
-signal_add(struct Signal* signalh, EventCallBack call, void* data, int sig)
+signal_add(struct Signal* signal, EventCallBack call, void* data, int sig)
 {
   struct sigaction act;
 
-  assert(0 != signalh);
+  assert(0 != signal);
   assert(0 != call);
   assert(0 != evInfo.engine);
 
   /* set up struct */
-  gen_init((struct GenHeader*) signalh, call, data,
-	   (struct GenHeader*) evInfo.gens.g_signal,
-	   (struct GenHeader**) &evInfo.gens.g_signal);
+  gen_init(&signal->sig_header, call, data,
+	   evInfo.gens.g_signal,
+	   &evInfo.gens.g_signal);
 
-  signalh->sig_signal = sig;
+  signal->sig_signal = sig;
 
   if (evInfo.engine->eng_signal)
-    (*evInfo.engine->eng_signal)(signalh); /* tell engine */
+    (*evInfo.engine->eng_signal)(signal); /* tell engine */
   else {
     act.sa_handler = signal_handler; /* set up signal handler */
     act.sa_flags = 0;
@@ -541,7 +604,15 @@ signal_add(struct Signal* signalh, EventCallBack call, void* data, int sig)
   }
 }
 
-/* Adds a socket to the event system */
+/** Adds a socket to the event system.
+ * @param[in] sock Socket event generator to use.
+ * @param[in] call Callback function to use.
+ * @param[in] data User data pointer for the generator.
+ * @param[in] state Current socket state.
+ * @param[in] events Event interest mask for connected or connectionless sockets.
+ * @param[in] fd &Socket file descriptor.
+ * @return Zero on error, non-zero on success.
+ */
 int
 socket_add(struct Socket* sock, EventCallBack call, void* data,
 	   enum SocketState state, unsigned int events, int fd)
@@ -553,9 +624,9 @@ socket_add(struct Socket* sock, EventCallBack call, void* data,
   assert(0 != evInfo.engine->eng_add);
 
   /* set up struct */
-  gen_init((struct GenHeader*) sock, call, data,
-	   (struct GenHeader*) evInfo.gens.g_socket,
-	   (struct GenHeader**) &evInfo.gens.g_socket);
+  gen_init(&sock->s_header, call, data,
+	   evInfo.gens.g_socket,
+	   &evInfo.gens.g_socket);
 
   sock->s_state = state;
   sock->s_events = events & SOCK_EVENT_MASK;
@@ -564,7 +635,9 @@ socket_add(struct Socket* sock, EventCallBack call, void* data,
   return (*evInfo.engine->eng_add)(sock); /* tell engine about it */
 }
 
-/* deletes (or marks for deletion) a socket */
+/** Deletes (or marks for deletion) a socket generator.
+ * @param[in] sock Event generator to clear.
+ */
 void
 socket_del(struct Socket* sock)
 {
@@ -584,7 +657,10 @@ socket_del(struct Socket* sock)
   }
 }
 
-/* Sets the socket state to something else */
+/** Sets the socket state to something else.
+ * @param[in] sock Socket generator to update.
+ * @param[in] state New socket state.
+ */
 void
 socket_state(struct Socket* sock, enum SocketState state)
 {
@@ -613,7 +689,10 @@ socket_state(struct Socket* sock, enum SocketState state)
   sock->s_state = state; /* set new state */
 }
 
-/* sets the events a socket's interested in */
+/** Sets the events a socket's interested in.
+ * @param[in] sock Socket generator to update.
+ * @param[in] events New event interest mask.
+ */
 void
 socket_events(struct Socket* sock, unsigned int events)
 {
@@ -650,7 +729,9 @@ socket_events(struct Socket* sock, unsigned int events)
   sock->s_events = new_events; /* set new events */
 }
 
-/* Returns an engine's name for informational purposes */
+/** Returns the current engine's name for informational purposes.
+ * @return Pointer to a static buffer containing the engine name.
+ */
 const char*
 engine_name(void)
 {
@@ -663,16 +744,23 @@ engine_name(void)
 #ifdef DEBUGMODE
 /* These routines pretty-print names for states and types for debug printing */
 
+/** Declares a struct variable containing name(s) and value(s) of \a TYPE. */
 #define NS(TYPE) \
 struct {	\
   char *name;	\
   TYPE value;	\
 }
 
+/** Declares an element initialize for an NS() struct. */
 #define NM(name)	{ #name, name }
 
-#define NE		{ 0, 0 }
+/** Declares end of an NS() struct array. */
+#define NE		{ 0 }
 
+/** Looks up name for a socket state.
+ * @param[in] state &Socket state to look up.
+ * @return Pointer to a static buffer containing the name, or "Undefined socket state".
+ */
 const char*
 state_to_name(enum SocketState state)
 {
@@ -694,6 +782,10 @@ state_to_name(enum SocketState state)
   return "Undefined socket state";
 }
 
+/** Looks up name for a timer type.
+ * @param[in] type &Timer type to look up.
+ * @return Pointer to a static buffer containing the name, or "Undefined timer type".
+ */
 const char*
 timer_to_name(enum TimerType type)
 {
@@ -712,6 +804,10 @@ timer_to_name(enum TimerType type)
   return "Undefined timer type";
 }
 
+/** Looks up name for an event type.
+ * @param[in] type &Event type to look up.
+ * @return Pointer to a static buffer containing the name, or "Undefined event type".
+ */
 const char*
 event_to_name(enum EventType type)
 {
@@ -736,6 +832,10 @@ event_to_name(enum EventType type)
   return "Undefined event type";
 }
 
+/** Constructs a string describing certain generator flags.
+ * @param[in] flags Bitwise combination of generator flags.
+ * @return Pointer to a static buffer containing the names of flags set in \a flags.
+ */
 const char*
 gen_flags(unsigned int flags)
 {
@@ -764,6 +864,10 @@ gen_flags(unsigned int flags)
   return buf;
 }
 
+/** Constructs a string describing certain socket flags.
+ * @param[in] flags Bitwise combination of socket flags.
+ * @return Pointer to a static buffer containing the names of flags set in \a flags.
+ */
 const char*
 sock_flags(unsigned int flags)
 {
@@ -793,3 +897,4 @@ sock_flags(unsigned int flags)
 }
 
 #endif /* DEBUGMODE */
+

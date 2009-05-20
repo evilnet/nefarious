@@ -140,7 +140,6 @@ enum Flag {
     FLAG_CHKACCESS,                 /**< ok to check clients access if set */
     FLAG_HUB,                       /**< server is a hub */
     FLAG_SERVICE,                   /**< server is a service */
-    FLAG_LOCAL,                     /**< set for local clients */
     FLAG_GOTID,                     /**< successful ident lookup achieved */
     FLAG_DOID,                      /**< I-lines say must use ident return */
     FLAG_NONL,                      /**< No \n in buffer */
@@ -291,7 +290,6 @@ struct Client {
   unsigned int   cli_dnsblcount; /**< number of dnsbls left to check */
   struct in_addr cli_ip;        /**< Real ip# NOT defined for remote servers! */
   short          cli_status;    /**< Client type */
-  unsigned char  cli_local;     /**< local or remote client */
   char cli_name[HOSTLEN + 1];   /**< Unique name of the client, nick or host */
   char cli_username[USERLEN + 1];    /**< username here now for auth stuff */
   char cli_info[REALLEN + 1];        /**< Free form additional client information */
@@ -353,7 +351,7 @@ struct Client {
 /** Get status bitmask for client. */
 #define cli_status(cli)		((cli)->cli_status)
 /** Return non-zero if the client is local. */
-#define cli_local(cli)		((cli)->cli_local)
+#define cli_local(cli)          (cli_from(cli) == cli)
 /** Get client name. */
 #define cli_name(cli)		((cli)->cli_name)
 /** Get client username (ident). */
@@ -646,8 +644,6 @@ struct Client {
 #define IsJunction(x)           HasFlag(x, FLAG_JUNCTION)
 /** Return non-zero if the client has set mode +O (local operator). */
 #define IsLocOp(x)              HasFlag(x, FLAG_LOCOP)
-/** Return non-zero if the client is local. */
-#define IsLocal(x)              HasFlag(x, FLAG_LOCAL)
 /** Return non-zero if the client has set mode +o (global operator). */
 #define IsOper(x)               HasFlag(x, FLAG_OPER)
 /** Return non-zero if the client has an active UDP ping request. */
@@ -896,6 +892,8 @@ struct Client {
 #define ClearHideOper(x)        ClrFlag(x, FLAG_DISPLAY_MODE)
 /** Remove mode +q (common chans only) from a client */
 #define ClearCommonChansOnly(x) ClrFlag(x, FLAG_COMMONCHANSONLY)
+/** Clear the client's HUB flag. */
+#define ClearHub(x)             ClrFlag(x, FLAG_HUB)
 
 /** Client can see oper. */
 #define SeeOper(sptr, acptr) (IsAnOper(acptr) \
@@ -1120,5 +1118,6 @@ extern int client_modify_priv_by_name(struct Client *who, char *priv, int what);
 extern void DoMD5(unsigned char *mdout, unsigned char *src, unsigned long n);
 
 extern unsigned int get_client_marker(void);
+extern int clear_privs(struct Client *who);
 
 #endif /* INCLUDED_client_h */

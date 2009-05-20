@@ -18,30 +18,40 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+/** @file
+ * @brief ANSI FILE* clone API implementation.
+ * @version $Id$
+ */
 #include "config.h"
 
 #include "fileio.h"
 #include "ircd_alloc.h"         /* MyMalloc, MyFree */
-#include "ircd_log.h"
+#include "ircd_log.h"           /* assert */
 
-/* #include <assert.h> -- Now using assert in ircd_log.h */             /* assert */
+/* #include <assert.h> -- Now using assert in ircd_log.h */       /* assert */
 #include <fcntl.h>              /* O_RDONLY, O_WRONLY, ... */
 #include <stdio.h>              /* BUFSIZ, EOF */
 #include <sys/stat.h>           /* struct stat */
 #include <unistd.h>             /* read, write, open, close */
 #include <string.h>
 
-#define FB_EOF  0x01
-#define FB_FAIL 0x02
+#define FB_EOF  0x01            /**< File has reached EOF. */
+#define FB_FAIL 0x02            /**< File operation failed. */
 
+/** Tracks status and buffer for a file on disk. */
 struct FileBuf {
-  int fd;                       /* file descriptor */
-  char *endp;                   /* one past the end */
-  char *ptr;                    /* current read pos */
-  int flags;                    /* file state */
-  char buf[BUFSIZ];             /* buffer */
+  int fd;                       /**< file descriptor */
+  char *endp;                   /**< one past the end */
+  char *ptr;                    /**< current read pos */
+  int flags;                    /**< file state */
+  char buf[BUFSIZ];             /**< buffer */
 };
 
+/** Open a new FBFILE.
+ * @param[in] filename Name of file to open.
+ * @param[in] mode fopen()-style mode string.
+ * @return Pointer to newly allocated FBFILE.
+ */
 FBFILE* fbopen(const char *filename, const char *mode)
 {
   int openmode = 0;
@@ -75,7 +85,7 @@ FBFILE* fbopen(const char *filename, const char *mode)
   }
   /*
    * stop NFS hangs...most systems should be able to open a file in
-   * 3 seconds. -avalon (curtesy of wumpus)
+   * 3 seconds. -avalon (courtesy of wumpus)
    */
   alarm(3);
   if ((fd = open(filename, openmode, pmode)) == -1) {
@@ -89,6 +99,10 @@ FBFILE* fbopen(const char *filename, const char *mode)
   return fb;
 }
 
+/** Open a FBFILE from a file descriptor.
+ * @param[in] fd File descriptor to use.
+ * @param[in] mode fopen()-style mode string (ignored).
+ */
 FBFILE* fdbopen(int fd, const char *mode)
 {
   /*
@@ -104,6 +118,9 @@ FBFILE* fdbopen(int fd, const char *mode)
   return fb;
 }
 
+/** Close a FBFILE.
+ * @param[in] fb File buffer to close.
+ */
 void fbclose(FBFILE* fb)
 {
   assert(fb);
@@ -111,6 +128,10 @@ void fbclose(FBFILE* fb)
   MyFree(fb);
 }
 
+/** Attempt to fill a file's buffer.
+ * @param[in] fb File to operate on.
+ * @return Number of bytes read into buffer, or a negative number on error.
+ */
 static int fbfill(FBFILE * fb)
 {
   int n;
@@ -130,6 +151,10 @@ static int fbfill(FBFILE * fb)
   return n;
 }
 
+/** Get a single character from a file.
+ * @param[in] fb File to fetch from.
+ * @return Character value read, or EOF on error or end-of-file.
+ */
 int fbgetc(FBFILE * fb)
 {
   assert(fb);
@@ -138,6 +163,12 @@ int fbgetc(FBFILE * fb)
   return EOF;
 }
 
+/** Get a line of input from a file.
+ * @param[out] buf Output buffer to read to.
+ * @param[in] len Maximum number of bytes to write to buffer
+ * (including terminating NUL).
+ * @param[in] fb File to read from.
+ */
 char *fbgets(char *buf, size_t len, FBFILE * fb)
 {
   char *p = buf;
@@ -174,6 +205,11 @@ char *fbgets(char *buf, size_t len, FBFILE * fb)
   return buf;
 }
 
+/** Write a string to a file.
+ * @param[in] str String to write to file.
+ * @param[in] fb File to write to.
+ * @return Number of bytes written, or -1 on error.
+ */
 int fbputs(const char *str, FBFILE * fb)
 {
   int n = -1;
@@ -188,9 +224,16 @@ int fbputs(const char *str, FBFILE * fb)
   return n;
 }
 
+/** Get file status.
+ * @param[out] sb Receives file status.
+ * @param[in] fb File to get status for.
+ * @return Zero on success, -1 on error.
+ */
 int fbstat(struct stat *sb, FBFILE * fb)
 {
   assert(sb);
   assert(fb);
   return fstat(fb->fd, sb);
 }
+
+

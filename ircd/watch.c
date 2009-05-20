@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
  */
-
+/** @file
+ * @brief Implementation of watches.
+ * @version $Id$
+ */
 #include "config.h"
 
 #include "watch.h"
@@ -41,7 +42,8 @@
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
 
-/*
+/** @page watch watches.
+ *
  * WATCH FUNCTIONS
  *
  * WATCH_LIST
@@ -67,10 +69,9 @@
 /** Count of allocated Watch structures. */
 static int watchCount = 0;
 
-/*
- * make_watch()
- *
- * Reserve an entrance in the Watch list.
+/** Reserve an entrance in the Watch list.
+ * @param[in] nick Nickname that needs to be reserved.
+ * @return wptr clean watch pointer.
  */
 struct Watch *make_watch(const char *nick)
 {
@@ -94,10 +95,8 @@ struct Watch *make_watch(const char *nick)
 
 }
 
-/*
- * free_watch()
- *
- * Release an entrace of the Watch list.
+/** Release an entrace of the Watch list.
+ * @param[in] wptr Valid watch pointer.
  */
 void free_watch(struct Watch *wptr)
 {
@@ -110,8 +109,8 @@ void free_watch(struct Watch *wptr)
 }
 
 /** Find number of Watch structs allocated and memory used by them.
- * @param[out] count_out Receives number of Watch structs allocated.
- * @param[out] bytes_out Receives number of bytes used by Watch structs.
+ * @param[in,out] count_out Receives number of Watch structs allocated.
+ * @param[in,out] bytes_out Receives number of bytes used by Watch structs.
  */
 void watch_count_memory(size_t* count_out, size_t* bytes_out)
 {
@@ -121,10 +120,9 @@ void watch_count_memory(size_t* count_out, size_t* bytes_out)
   *bytes_out = watchCount * sizeof(struct Watch);
 }
 
-/*
- * check_status_watch()
- *
- * Notify the users the input/output of nick.
+/** Notify the users the input/output of nick.
+ * @param[in] cptr Client pointer.
+ * @param[in] raw Raw reply code.
  */
 void check_status_watch(struct Client *cptr, int raw)
 {
@@ -155,10 +153,11 @@ void check_status_watch(struct Client *cptr, int raw)
 
 }
 
-/*
- * show_status_watch()
- *
- * Show the state of an user.
+/** Show the state of an user.
+ * @param[in] cptr Client pointer of who is doing the watch.
+ * @param[in] nick The nickname that the watch is being done on.
+ * @param[in] raw1 Raw code for the reply.
+ * @param[in] raw2 Raw code for the reply.
  */
 void show_status_watch(struct Client *cptr, char *nick, int raw1, int raw2)
 {
@@ -176,10 +175,10 @@ void show_status_watch(struct Client *cptr, char *nick, int raw1, int raw2)
 }
 
 
-/*
- * add_nick_watch()
- *
- * Add nick to the user watch list.
+/** Add nick to the user watch list.
+ * @param[in] cptr Client pointer of who is doing the watch.
+ * @param[in] nick The nickname that the watch is being done on.
+ * @return 0
  */
 int add_nick_watch(struct Client *cptr, char *nick)
 {
@@ -234,11 +233,10 @@ int add_nick_watch(struct Client *cptr, char *nick)
   return 0;
 }
 
-
-/*
- * del_nick_watch()
- *
- * Delete a nick of the user watch list.
+/** Delete a nick of the user watch list.
+ * @param[in] cptr Client pointer of who is doing the watch removal.
+ * @param[in] nick The nickname that the watch that needs to be removed.
+ * @return 0
  */
 int del_nick_watch(struct Client *cptr, char *nick)
 {
@@ -307,13 +305,10 @@ int del_nick_watch(struct Client *cptr, char *nick)
 
 }
 
-
-/*
- * del_list_watch()
- *
- * Delete all the watch list.
- * When it execute a /WATCH C or it leaves the IRC.
-*/
+/** Delete all the watch list when the client execute's /WATCH C or they leave IRC.
+ * @param[in] cptr Client that needs to have their watch list cleared.
+ * @return 0
+ */
 int del_list_watch(struct Client *cptr)
 {
   struct SLink *lp, *lp2, *lptmp;

@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Interfaces for sending common replies to users.
+ * @version $Id$
  */
 #ifndef INCLUDED_ircd_reply_h
 #define INCLUDED_ircd_reply_h
@@ -48,7 +50,7 @@ extern int need_more_params(struct Client* cptr, const char* cmd);
 extern int send_error_to_client(struct Client* cptr, int error, ...);
 extern int send_reply(struct Client* to, int reply, ...);
 
-#define SND_EXPLICIT	0x40000000	/* first arg is a pattern to use */
+#define SND_EXPLICIT	0x40000000	/**< first arg is a pattern to use */
 #define FORMATTYPE_STRING 1
 
 #endif /* INCLUDED_ircd_reply_h */

@@ -17,8 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * $Id$
+ */
+/** @file
+ * @brief Outbound message queue interface and declarations.
+ * @version $Id$
  */
 #ifndef INCLUDED_ircd_defs_h
 #include "ircd_defs.h"	/* BUFSIZE */
@@ -40,30 +42,27 @@ struct StatDesc;
 struct Msg;
 struct MsgBuf;
 
+/** Queue of individual messages. */
 struct MsgQList {
-  struct Msg *head;		/* First Msg in queue list */
-  struct Msg *tail;		/* Last Msg in queue list */
+  struct Msg *head;		/**< First Msg in queue list */
+  struct Msg *tail;		/**< Last Msg in queue list */
 };
 
+/** Entire two-priority message queue for a destination. */
 struct MsgQ {
-  unsigned int length;		/* Current number of bytes stored */
-  unsigned int count;		/* Current number of messages stored */
-  struct MsgQList queue;	/* Normal Msg queue */
-  struct MsgQList prio;		/* Priority Msg queue */
+  unsigned int length;		/**< Current number of bytes stored */
+  unsigned int count;		/**< Current number of messages stored */
+  struct MsgQList queue;	/**< Normal Msg queue */
+  struct MsgQList prio;		/**< Priority Msg queue */
 };
 
-/*
- * MsgQLength - Returns the current number of bytes stored in the buffer.
- */
+/** Returns the current number of bytes stored in \a mq. */
 #define MsgQLength(mq) ((mq)->length)
 
-/*
- * MsgQCount - Returns the current number of messages stored in the buffer
- */
+/** Returns the current number of messages stored in \a mq. */
 #define MsgQCount(mq) ((mq)->count)
 
-/*
- * MsgQClear - Scratch the current content of the buffer.
+/** Scratch the current content of the buffer.
  * Release all allocated buffers and make it empty.
  */
 #define MsgQClear(mq) msgq_delete((mq), MsgQLength(mq))
@@ -82,10 +81,10 @@ extern void msgq_append(struct Client *dest, struct MsgBuf *mb,
 			const char *format, ...);
 extern void msgq_clean(struct MsgBuf *mb);
 extern void msgq_add(struct MsgQ *mq, struct MsgBuf *mb, int prio);
-extern void msgq_count_memory(struct Client *cptr, size_t *msg_alloc,
-			      size_t *msgbuf_alloc);
-extern unsigned int msgq_bufleft(struct MsgBuf *mb);
+extern void msgq_count_memory(struct Client *cptr,
+                              size_t *msg_alloc, size_t *msg_used);
 extern void msgq_histogram(struct Client *cptr, const struct StatDesc *sd,
-			   char *param);
+                           char *param);
+extern unsigned int msgq_bufleft(struct MsgBuf *mb);
 
 #endif /* INCLUDED_msgq_h */
