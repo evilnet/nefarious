@@ -410,6 +410,7 @@ check_loop_and_lh(struct Client* cptr, struct Client *sptr, time_t *ghost, const
       return exit_new_server(cptr, sptr, host, timestamp,
                              "Leaf-only link %s <- %s, check L:",
                              cli_name(cptr), host);
+    }
     else if (active_lh_line == 2)
     {
       sendto_opmask_butone(&me, SNO_OLDSNO,
