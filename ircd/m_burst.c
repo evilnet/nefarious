@@ -479,6 +479,7 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
                  startarg = typepos + 2;
 
                  extended = 1;
+                 except = strdup(ban);
                  excepted = substr(except, startarg, strlen(except)-1);
                  switch (ban[typepos]) {
                    case 'q':
