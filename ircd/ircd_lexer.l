@@ -196,6 +196,7 @@ static struct lexer_token {
   { "wide_gline", TPRIV_WIDE_GLINE },
   { "whox", TPRIV_WHOX },
   { "display_mode", TPRIV_DISPLAY_MODE },
+  { "remove", TPRIV_REMOVE },
   { NULL, 0 }
 };
 static int ntokens;

@@ -724,3 +724,31 @@ zline_memory_count(size_t *zl_size)
   }
   return gl;
 }
+
+int
+zline_remove(struct Client* sptr, char *userhost, char *reason)
+{
+  struct Zline *zline, *szline;
+  char *host = userhost;
+
+  for (zline = GlobalZlineList; zline; zline = szline) {
+    szline = zline->zl_next;
+
+    if (zline->zl_expire <= CurrentTime)
+      zline_free(zline);
+    else if (!mmatch(zline->zl_host, host)) {
+      sendto_opmask_butone(0, SNO_GLINE, "%s force removing ZLINE for %s (%s)",
+		           feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
+		           cli_name(sptr) : cli_name((cli_user(sptr))->server),
+		           zline->zl_host ? zline->zl_host : "", reason);
+
+      log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
+	        "%#C force removing ZLINE for %s (%s)", sptr, zline->zl_host ?
+		zline->zl_host : "", reason);
+
+      zline_free(zline);
+    }
+  }
+
+  return 0;
+}

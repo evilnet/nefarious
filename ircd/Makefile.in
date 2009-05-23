@@ -184,6 +184,7 @@ IRCD_SRC = \
 	m_quit.c \
 	m_reburst.c \
 	m_rehash.c \
+	m_remove.c \
 	m_reset.c \
 	m_restart.c \
 	m_rping.c \

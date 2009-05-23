@@ -497,6 +497,10 @@ struct Client;
 #define TOK_GLOBOPS             "GLOBOPS"
 #define CMD_GLOBOPS             MSG_GLOBOPS, TOK_GLOBOPS
 
+#define MSG_REMOVE             "REMOVE"         /* REMO */
+#define TOK_REMOVE             "RM"
+#define CMD_REMOVE		MSG_REMOVE, TOK_REMOVE
+
 /*
  * Constants
  */

@@ -1,6 +1,43 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-05-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added REMOVE priv.
+
+	* include/client.h: Added PRIV_REMOVE.
+
+	* include/gline.h: Added gline_remove function.
+
+	* include/handlers.h: Added ms_ and mo_ remove.
+
+	* include/msg.h: Added REMOVE command (RM).
+
+	* include/shun.h: Added shun_remove function.
+
+	* include/zline.h: Added zline_remove function.
+
+	* ircd/client.c: Added PRIV_REMOVE.
+
+	* ircd/ircd_lexer.l: Added TPRIV_REMOVE.
+
+	* ircd/ircd_parser.y: Added TPRIV_REMOVE.
+
+	* ircd/gline.c: Added gline_remove function.
+
+	* ircd/Makefile.in: Added m_remove.c.
+
+	* ircd/m_remove.c: New command that will force remove gline's, zline's
+	and shuns even if deactivated. It requires the REMOVE priv. Be very very
+	careful using this command as if there are split servers the removed
+	gline, zline, or shun will be re added when the server rejoins the network.
+
+	* ircd/parse.c: Added REMOVE command.
+
+	* ircd/shun.c: Added shun_remove function.
+
+	* ircd/zline.c: Added zline_remove function.
+
 2009-05-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Doh, Previous commit was SF Bug #2794245.

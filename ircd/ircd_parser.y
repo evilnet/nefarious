@@ -283,6 +283,7 @@ static void free_slist(struct SLink **link) {
 %token TPRIV_XTRAOP
 %token TPRIV_HIDE_CHANNELS
 %token TPRIV_DISPLAY_MODE
+%token TPRIV_REMOVE
 /* and some types... */
 %type <num> sizespec
 %type <num> timespec timefactor factoredtimes factoredtime
@@ -853,6 +854,7 @@ privtype:  TPRIV_DISPLAY_MODE { $$ = PRIV_DISPLAY_MODE; } |
            TPRIV_XTRAOP { $$ = PRIV_XTRAOP; } |
            TPRIV_HIDE_CHANNELS { $$ = PRIV_HIDE_CHANNELS; } |
            TPRIV_FREEFORM { $$ = PRIV_FREEFORM; } |
+           TPRIV_REMOVE { $$ = PRIV_REMOVE; } |
            LOCAL { $$ = PRIV_PROPAGATE; invert = 1; } ;
 
 yesorno: YES { $$ = 1; } | NO { $$ = 0; };

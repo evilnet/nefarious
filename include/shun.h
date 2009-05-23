@@ -99,6 +99,7 @@ extern void shun_stats(struct Client *sptr, const struct StatDesc *sd,
 extern int shun_memory_count(size_t *sh_size);
 extern int expire_shuns();
 extern int count_affected(char* mask);
+extern int shun_remove(struct Client* sptr, char *userhost, char *reason);
 
 #endif /* INCLUDED_shun_h */
 

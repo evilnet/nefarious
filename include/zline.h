@@ -94,5 +94,6 @@ extern int zline_list(struct Client *sptr, char *userhost);
 extern void zline_stats(struct Client *sptr, const struct StatDesc *sd,
 			char *param);
 extern int zline_memory_count(size_t *zl_size);
+extern int zline_remove(struct Client* sptr, char *userhost, char *reason);
 
 #endif /* INCLUDED_zline_h */

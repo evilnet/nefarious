@@ -790,3 +790,46 @@ int expire_shuns()
   return 0;
 }
 
+int
+shun_remove(struct Client* sptr, char *userhost, char *reason)
+{
+  char uhmask[USERLEN + HOSTLEN + 2];
+  struct Shun *shun, *sshun;
+  char *user, *host, *t_uh;
+
+  DupString(t_uh, userhost);
+  canon_userhost(t_uh, &user, &host, 0);
+
+  if(BadPtr(user))
+    return 0;
+
+  if (sizeof(uhmask) <
+      ircd_snprintf(0, uhmask, sizeof(uhmask), "%s@%s", user, host))
+    return send_reply(sptr, ERR_LONGMASK);
+
+  for (shun = GlobalShunList; shun; shun = sshun) {
+    sshun = shun->sh_next;
+
+    if (shun->sh_expire <= CurrentTime)
+      shun_free(shun);
+    else if (((shun->sh_host && host && ircd_strcmp(shun->sh_host,host) == 0)
+            ||(!shun->sh_host && !host)) && ((!user && ircd_strcmp(shun->sh_user, "*") == 0) ||
+               ircd_strcmp(shun->sh_user, user) == 0)) {
+      sendto_opmask_butone(0, SNO_GLINE, "%s force removing SHUN for %s (%s)",
+                           feature_bool(FEAT_HIS_SNOTICES) || IsServer(sptr) ?
+                           cli_name(sptr) : cli_name((cli_user(sptr))->server),
+                           uhmask, reason);
+
+      log_write(LS_GLINE, L_INFO, LOG_NOSNOTICE,
+                "%#C force removing SHUN for %s (%s)", sptr, uhmask, reason);
+
+      shun_free(shun);
+    }
+  }
+
+  if (!BadPtr(t_uh))
+    MyFree(t_uh);
+
+  return 0;
+}
+

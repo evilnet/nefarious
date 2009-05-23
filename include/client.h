@@ -121,6 +121,8 @@ enum Priv {
   PRIV_HIDE_CHANNELS,   /**< oper can set/unset user mode +n */
   PRIV_FREEFORM,        /**< oper can set any host on themseves using set host
                               as long as its a valid host */
+  PRIV_REMOVE,          /**< oper can force remove deactivated glines,
+                             shuns and zlines. */
   PRIV_LAST_PRIV        /**< number of privileges */
 };
 
