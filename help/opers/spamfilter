@@ -1,0 +1,50 @@
+/SPAMFILTER [+/-] [watch flags] [reaction flags] [length] [reason] :[regular expression]
+
+This will add a spam filter into the network. Only one reaction
+flag can be specified. Please use _ instead of spaces in the reason.
+They will be decoded when actually used. The regular expression
+needs to be in PCRE format.
+
+Available Watch Flags
+n - Notices.
+N - Channel Notices.
+p - Privmsgs.
+C - Channel Privmsgs.
+q - Quits.
+P - Parts.
+d - DCCs.
+a - Away messages.
+t - Topics.
+u - Connects (nick!user@host:gecos).
+i - Nickname changes.
+
+Available Action Flags
+a - Auth, if added logged in clients will be exempt from the filter.
+C - Channel Alert, if added filter matches will be sent to what is set in the
+    SFilter channel setting. If the channel setting is missing then the setting
+    for the Feature FILTER_DEFAULT_CHANNAME will be used.
+S - Server Alert
+k - Kill, will kill anyone who matches the filter line.
+g - Gline, will gline anyone who matches the filter line. The length can be set
+    in seconds via the length.
+z - Zline, will zline anyone who matches the filter line. The length can be set
+    in seconds via the length setting. This zlines *@ip. You do not need the i
+    action flag.
+s - Shun, will shun anyone who matches the filter line. The length can be set
+    in seconds via the length setting.
+i - Uses the clients IP to in a G/Zline or shun.
+b - Block, will stop the PRIVMSG/NOTICE/TOPIC/AWAY from going through.
+n - Notify, will notify the person matching the filter line saying they have
+    matched a filter line and the message has been denied.
+m - Mark, will mark the client as being a spam source.
+K - Kick, will kick the user triggering the Spam Filter. The kick reason given
+    will be the reason set in the Spam Filter. This Flag will only work with the
+    N and C watch flags.
+o - Ops/Halfops, if added it will exempt halfops and ops from being any checks
+    which have a channel target. They of course need to be an op or halfop to be
+    exempt from the check. Be careful with this flag.
+v - Voice, if added it will exempt voiced users from any checks which have a
+    channel target. If channels have auto voice enabled then this will mean
+    spammers can still spam the channel.
+
+This command requires the SPAMFILTER priv.

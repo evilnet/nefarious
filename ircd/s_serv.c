@@ -56,6 +56,7 @@
 #include "s_user.h"
 #include "send.h"
 #include "shun.h"
+#include "spamfilter.h"
 #include "ircd_struct.h"
 #include "support.h"
 #include "sys.h"
@@ -191,6 +192,7 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
    * be removed from the network while the remote server is still chewing
    * our burst.
    */
+  spamfilter_burst(cptr);
   gline_burst(cptr);
   zline_burst(cptr);
   shun_burst(cptr);

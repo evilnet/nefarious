@@ -521,6 +521,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_INVALIDMASK      550
 #define ERR_LINKCHAN         551
 #define ERR_LINKSELF         552
+#define ERR_INVALIDREGEX     553
+#define ERR_SPAMREACT        554
+#define ERR_BADFLAGS         555
 
 #define RPL_LOGON            600        /* Dalnet extension */
 #define RPL_LOGOFF           601        /* Dalnet extension */

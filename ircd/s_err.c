@@ -507,7 +507,7 @@ static Numeric replyTable[] = {
 /* 238 */
   { RPL_STATSFLINE, "%c %s %s", "238" },
 /* 239 */
-  { RPL_STATSFILTERLINE, "C %s %s %s %d %s :%s", "239" },
+  { RPL_STATSFILTERLINE, "C %s %s %s %d %s %d :%s", "239" },
 /* 240 */
   { RPL_STATSXLINE, "X %s %s %s %s %s :%s", "240" },
 /* 241 */
@@ -1135,11 +1135,11 @@ static Numeric replyTable[] = {
 /* 552 */
   { ERR_LINKSELF, ":%s cannot be redirected to itself", "552" },
 /* 553 */
-  { 0 },
+  { ERR_INVALIDREGEX, ":Cannot add Spam Filter (%s). An error has occured: %s", "553" },
 /* 554 */
-  { 0 },
+  { ERR_SPAMREACT, ":You can only specify one react flag", "554" },
 /* 555 */
-  { 0 },
+  { ERR_BADFLAGS, ":Bad %s flags specified", "555" },
 /* 556 */
   { 0 },
 /* 557 */

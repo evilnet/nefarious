@@ -55,6 +55,7 @@
 #include "s_misc.h"
 #include "s_stats.h"
 #include "send.h"
+#include "spamfilter.h"
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
@@ -105,6 +106,7 @@ struct wline*    GlobalWList;
 struct fline*    GlobalFList;
 struct blline*   GlobalBLList;
 struct qline*    GlobalQuarantineList;
+struct SpamFilter* GlobalSpamFilterList;
 
 struct LocalConf   localConf;
 struct DenyConf*   denyConfList;
@@ -253,6 +255,53 @@ int reactfflagstr(const char* fflags)
   }
 
   return x_flag;
+}
+
+int react_check(const char* fflags)
+{
+  unsigned int *flag_p;
+  const char *flagstr;
+  int bad = 1;
+
+  flagstr = fflags;
+
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)fline_rflags; flag_p[0]; flag_p += 2) {
+      if (flag_p[1] == *flagstr) {
+        bad = 0;
+        break;
+      }
+    }
+  }
+
+  return bad;
+}
+
+int watch_check(const char* fflags)
+{
+  unsigned int *flag_p;
+  const char *flagstr;
+  int bad = 1;
+
+  flagstr = fflags;
+
+  /* This should never happen... */
+  assert(flagstr != 0);
+
+  for (; *flagstr; flagstr++) {
+    for (flag_p = (unsigned int*)fline_wflags; flag_p[0]; flag_p += 2) {
+
+      if (flag_p[1] == *flagstr) {
+        bad = 0;
+        break;
+      }
+    }
+  }
+
+  return bad;
 }
 
 char oflagbuf[128];
@@ -1673,24 +1722,19 @@ char* get_type(unsigned int flag)
 */
 int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned int flags, char *target)
 {
-  int rf_flag = 0;
-  int wf_flag = 0;
   struct fline *fline;
   struct Channel *chptr;
   struct Membership *member,*nmember;
   struct rusage rnow, rprev;
+  struct SpamFilter *spamfilter;
+  struct SpamFilter *sspamfilter;
   long ms_past;
-  int regmatch = 0;
-  int ret = 0;
-  int brk = 0;
-  int ovector[186];
-  char temp1[BUFSIZE]; 
-  char temp2[BUFSIZE]; 
-  char temphost[HOSTLEN +3]; 
-  char reason[BUFSIZE];
-  char* gline[5];
-  char* zline[5];
-  char* shun[5];
+  int rf_flag = 0, wf_flag = 0, regmatch = 0;
+  int ret = 0, brk = 0, ovector[186];
+  char temp1[BUFSIZE], temp2[BUFSIZE], temphost[HOSTLEN +3], reason[BUFSIZE];
+  char* gline[6];
+  char* zline[6];
+  char* shun[6];
 
   for (fline = GlobalFList; fline; fline = fline->next) {
     regmatch = 0;
@@ -1860,6 +1904,198 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
               shun[3] = iitoa(fline->length);
               shun[4] = iitoa(CurrentTime);
               ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", fline->reason);
+              shun[5] = strdup(reason);
+              ms_shun(&me, &me, 6, shun);
+            }
+          }
+        }
+        if ((rf_flag & RFFLAG_BLOCK) && (ret != 2)) {
+           ret = 1;
+        }
+        if (ret)
+          return ret;
+      }
+    }
+  }
+
+  for (spamfilter = GlobalSpamFilterList; spamfilter; spamfilter = sspamfilter) {
+    sspamfilter = spamfilter->sf_next;
+
+    if (spamfilter->sf_expire <= CurrentTime)
+      spamfilter_free(spamfilter);
+
+    regmatch = 0;
+    rf_flag = reactfflagstr(spamfilter->sf_rflags);
+    wf_flag = watchfflagstr(spamfilter->sf_wflags);
+
+    if (IsAnOper(sptr))
+      break;
+
+    if (!SpamFilterIsActive(spamfilter)) {
+      Debug((DEBUG_DEBUG, "filter has been disabled"));
+      break;
+    }
+
+    if (rf_flag & RFFLAG_AUTH && IsAccount(sptr)) {
+      Debug((DEBUG_DEBUG, "regexec IsAccount and FFLAG_AUTH yes, breaking"));
+      break;
+    }
+
+    if (find_eline(sptr, EFLAG_SFILTER)) {
+      Debug((DEBUG_DEBUG, "Exempt from spam filter, breaking"));
+      break;
+    }
+
+    if (target && *target) {
+      if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_OPS)) {
+        chptr = FindChannel(target);
+
+        if (chptr) {
+          for (member=chptr->members;member;member=nmember) {
+            nmember=member->next_member;
+            if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
+              brk = 1;
+          }
+        }
+        if (brk == 1)
+          break;
+      }
+      brk = 0;
+
+      if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_VOICE)) {
+        chptr = FindChannel(target);
+
+        if (chptr) {
+          for (member=chptr->members;member;member=nmember) {
+            nmember=member->next_member;
+            if ((member->user == sptr) && (IsVoicedOrOpped(member)))
+              brk = 1;
+          }
+        }
+        if (brk == 1)
+          break;
+      }
+      brk = 0;
+    }
+
+    if (wf_flag & flags) {
+      memset(&rnow, 0, sizeof(rnow));
+      memset(&rprev, 0, sizeof(rnow));
+
+      getrusage(RUSAGE_SELF, &rprev);
+      regmatch = pcre_exec(spamfilter->sf_filter, NULL, string, strlen(string), 0, 0, ovector, 186);
+      getrusage(RUSAGE_SELF, &rnow);
+
+
+      ms_past = ((rnow.ru_utime.tv_sec - rprev.ru_utime.tv_sec) * 1000) +
+                ((rnow.ru_utime.tv_usec - rprev.ru_utime.tv_usec) / 1000);
+
+      if ((feature_int(FEAT_FILTER_FATAL_TIME) > 0) && (ms_past > feature_int(FEAT_FILTER_FATAL_TIME))) {
+        sendto_allops(&me, SNO_OLDSNO, "Warning: Very slow spam filter detected (%s) - (took %ld msec to execute). Filter has been disabled",
+                      spamfilter->sf_rawfilter, ms_past);
+        spamfilter->sf_flags &= ~SPAMFILTER_ACTIVE;
+        sendcmdto_serv_butone(&me, CMD_SPAMFILTER, cptr, "* - %s %s %Tu %s :%s",
+                              spamfilter->sf_wflags, spamfilter->sf_rflags,
+                              spamfilter->sf_expire - CurrentTime,
+                              spamfilter->sf_reason, spamfilter->sf_rawfilter);
+
+        break;
+      } else if ((feature_int(FEAT_FILTER_WARN_TIME) > 0) && (ms_past > feature_int(FEAT_FILTER_WARN_TIME))) {
+        sendto_allops(&me, SNO_OLDSNO, "Warning: Slow spam filter detected (%s) - (took %ld msec to execute).",
+                      spamfilter->sf_rawfilter, ms_past);
+      }
+
+      if (regmatch > 0) {
+        Debug((DEBUG_DEBUG, "regexec match"));
+        if (rf_flag & RFFLAG_CALERT) {
+          chptr = FindChannel(spamfilter->sf_nchan);
+          if (chptr) {
+            ircd_snprintf(0, temp1, sizeof(temp1), "%s has triggered a filter the following %s%s%s%s", cli_name(sptr), get_type(flags),
+                          !EmptyString(target) ? " (Targets: " : "", !EmptyString(target) ? target : "", !EmptyString(target) ? ")" : "");
+            ircd_snprintf(0, temp2, sizeof(temp2), "%s", string);
+            if (feature_bool(FEAT_FILTER_ALERT_USEMSG)) {
+              sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp1);
+              sendcmdto_channel_butone(&me, CMD_PRIVATE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp2);
+            } else {
+              sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp1);
+              sendcmdto_channel_butone(&me, CMD_NOTICE, chptr, cptr, SKIP_DEAF | SKIP_BURST, '\0', "%H :%s", chptr, temp2);
+            }
+          }
+        }
+        if (rf_flag & RFFLAG_MARK) {
+          SetSpam(sptr);
+          sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s +", cli_name(sptr), MARK_SFILTER);
+        }
+        if (rf_flag & RFFLAG_SALERT) {
+          sendto_allops(&me, SNO_OLDSNO, "%s has triggered a filter line for the following %s%s%s%s", cli_name(sptr),
+          get_type(flags), !EmptyString(target) ? " (Targets: " : "", !EmptyString(target) ? target : "",
+          !EmptyString(target) ? ")" : "");
+          sendto_allops(&me, SNO_OLDSNO, "%s", string);
+        }
+        if (rf_flag & RFFLAG_NOTIFY) {
+          sendcmdto_one(&me, CMD_NOTICE, sptr, "%C :Your last %s was blocked as it matched a spam filter.", sptr, get_type(flags));
+        }
+        if (rf_flag & RFFLAG_KICK) {
+          if (((WFFLAG_CHANNOTICE & flags) || (WFFLAG_CHANMSG & flags)) && (target && *target)) {
+            chptr = FindChannel(target);
+
+            if (chptr) {
+              for (member=chptr->members;member;member=nmember) {
+                nmember=member->next_member;
+                if (member->user == sptr) {
+                  if (!MyUser(member->user) || IsZombie(member))
+                    continue;
+
+                  sendcmdto_serv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_KICK, NULL, "%H %C :%s", chptr, member->user, decodespace(spamfilter->sf_reason));
+                  sendcmdto_channel_butserv_butone(&me, CMD_KICK, chptr, NULL, 0, "%H %C :%s", chptr, member->user, decodespace(spamfilter->sf_reason));
+                  make_zombie(member, member->user, &me, &me, chptr);
+                }
+              }
+            }
+          }
+        }
+        if (rf_flag & RFFLAG_GLINE) {
+          gline[0] = strdup(NumServ(&me));
+          gline[1] = strdup(NumServ(&me));
+          if (rf_flag & RFFLAG_IP)
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+          else
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+          gline[2] = strdup(temphost);
+          gline[3] = iitoa(spamfilter->sf_length);
+          gline[4] = iitoa(CurrentTime);
+          ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", decodespace(spamfilter->sf_reason));
+          gline[5] = strdup(reason);
+          ms_gline(&me, &me, 6, gline);
+          ret = 2;
+        } else {
+          if (rf_flag & RFFLAG_ZLINE) {
+            zline[0] = strdup(NumServ(&me));
+            zline[1] = strdup(NumServ(&me));
+            ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+            zline[2] = strdup(temphost);
+            zline[3] = iitoa(spamfilter->sf_length);
+            zline[4] = iitoa(CurrentTime);
+            ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", decodespace(spamfilter->sf_reason));
+            zline[5] = strdup(reason);
+            ms_zline(&me, &me, 6, zline);
+            ret = 2;
+          } else {
+            if (rf_flag & RFFLAG_KILL) {
+               exit_client_msg(cptr, sptr, &me, "Filter Match (%s)", decodespace(spamfilter->sf_reason));
+               ret = 2;
+            }
+            if (rf_flag & RFFLAG_SHUN) {
+              shun[0] = strdup(NumServ(&me));
+              shun[1] = strdup(NumServ(&me));
+              if (rf_flag & RFFLAG_IP)
+                ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+              else
+                ircd_snprintf(0, temphost, sizeof(temphost), "*@%s", cli_user(cptr)->realhost);
+              shun[2] = strdup(temphost);
+              shun[3] = iitoa(spamfilter->sf_length);
+              shun[4] = iitoa(CurrentTime);
+              ircd_snprintf(0, reason, sizeof(reason), "Filter Match (%s)", decodespace(spamfilter->sf_reason));
               shun[5] = strdup(reason);
               ms_shun(&me, &me, 6, shun);
             }

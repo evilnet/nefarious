@@ -96,6 +96,7 @@
 #include "s_user.h"
 #include "send.h"
 #include "shun.h"
+#include "spamfilter.h"
 #include "zline.h"
 
 #include <stdlib.h>
@@ -104,8 +105,8 @@
 /** Handle a REMOVE message from an operator.
  *
  * \a parv has the following elements:
- * \li \a parv[1] is the target server, or "*" for all.
- * \li \a parv[2] is either "cancel" or a time interval in seconds
+ * \li \a parv[1] is the type- gline, zline or shun.
+ * \li \a parv[2] is mask that needs to be cancelled.
  * \li \a parv[\a parc - 1] is the reason
  *
  * All fields must be present.  Additionally, the time interval should
@@ -127,8 +128,14 @@ int mo_remove(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     return send_reply(sptr, ERR_NOPRIVILEGES);
 
   type = parc > 1 ? parv[1] : 0;
-  mask = parc > 2 ? parv[2] : 0;
-  reason = parc > 3 ? parv[parc - 1] : 0;
+
+  if (!ircd_strcmp(type, "spamfilter")) {
+    reason = parc > 2 ? parv[2] : 0;
+    mask = parc > 3 ? parv[parc - 1] : 0;
+  } else {
+    mask = parc > 2 ? parv[2] : 0;
+    reason = parc > 3 ? parv[parc - 1] : 0;
+  }
 
   if (EmptyString(type) || EmptyString(mask) || EmptyString(reason))
     return need_more_params(sptr, "REMOVE");
@@ -139,16 +146,21 @@ int mo_remove(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     r = zline_remove(sptr, mask, reason);
   else if (!ircd_strcmp(type, "shun"))
     r = shun_remove(sptr, mask, reason);
+  else if (!ircd_strcmp(type, "spamfilter"))
+    r = spamfilter_remove(sptr, mask, reason);
 
-  sendcmdto_serv_butone(sptr, CMD_REMOVE, cptr, "%C %s %s :%s", sptr, type, mask, reason);
+  if (!ircd_strcmp(type, "spamfilter"))
+    sendcmdto_serv_butone(sptr, CMD_REMOVE, cptr, "%C %s %s :%s", sptr, type, reason, mask);
+  else
+    sendcmdto_serv_butone(sptr, CMD_REMOVE, cptr, "%C %s %s :%s", sptr, type, mask, reason);
   return 0;
 }
 
 /** Handle a REMOVE message from a server connection.
  *
  * \a parv has the following elements:
- * \li \a parv[1] is the target server, or "*" for all.
- * \li \a parv[2] is either "cancel" or a time interval in seconds
+ * \li \a parv[1] is the type- gline, zline or shun.
+ * \li \a parv[2] is mask that needs to be cancelled.
  * \li \a parv[\a parc - 1] is the reason
  *
  * All fields must be present.  Additionally, the time interval should
@@ -166,9 +178,15 @@ int ms_remove(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   char *type, *mask, *reason;
   int r;
 
-  type = parc > 1 ? parv[2] : 0;
-  mask = parc > 2 ? parv[3] : 0;
-  reason = parc > 3 ? parv[parc - 1] : 0;
+  type = parc > 2 ? parv[2] : 0;
+
+  if (!ircd_strcmp(type, "spamfilter")) {
+    reason = parc > 3 ? parv[3] : 0;
+    mask = parc > 4 ? parv[parc - 1] : 0;
+  } else {
+    mask = parc > 3 ? parv[3] : 0;
+    reason = parc > 4 ? parv[parc - 1] : 0;
+  }
 
   /* should never happen */
   if (EmptyString(type) || EmptyString(mask) || EmptyString(reason))
@@ -180,7 +198,12 @@ int ms_remove(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     r = zline_remove(sptr, mask, reason);
   else if (!ircd_strcmp(type, "shun"))
     r = shun_remove(sptr, mask, reason);
+  else if (!ircd_strcmp(type, "spamfilter"))
+    r = spamfilter_remove(sptr, mask, reason);
 
-  sendcmdto_serv_butone(sptr, CMD_REMOVE, cptr, "%C %s %s :%s", sptr, type, mask, reason);
+  if (!ircd_strcmp(type, "spamfilter"))
+    sendcmdto_serv_butone(sptr, CMD_REMOVE, cptr, "%C %s %s :%s", sptr, type, reason, mask);
+  else
+    sendcmdto_serv_butone(sptr, CMD_REMOVE, cptr, "%C %s %s :%s", sptr, type, mask, reason);
   return 0;
 }

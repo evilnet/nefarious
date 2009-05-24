@@ -501,6 +501,10 @@ struct Client;
 #define TOK_REMOVE             "RM"
 #define CMD_REMOVE		MSG_REMOVE, TOK_REMOVE
 
+#define MSG_SPAMFILTER         "SPAMFILTER"     /* SPAM */
+#define TOK_SPAMFILTER         "SF"
+#define CMD_SPAMFILTER		MSG_SPAMFILTER, TOK_SPAMFILTER
+
 /*
  * Constants
  */

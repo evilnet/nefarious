@@ -52,6 +52,7 @@
 #include "s_user.h"
 #include "send.h"
 #include "shun.h"
+#include "spamfilter.h"
 #ifdef USE_SSL
 #include "ssl.h"
 #endif /* USE_SSL */
@@ -244,12 +245,14 @@ stats_flines(struct Client* to, const struct StatDesc *sd, char* param)
 
   /* send header so the client knows what we are showing */
   send_reply(to, SND_EXPLICIT | RPL_STATSHEADER,
-            "C Match \"Watch Flags\" \"React Flags\" Length Status :Reason");
+            "C Match \"Watch Flags\" \"React Flags\" Length Status Expires :Reason");
 
   for (fline = GlobalFList; fline; fline = fline->next)
     send_reply(to, RPL_STATSFILTERLINE, fline->rawfilter, fline->wflags ? fline->wflags : "",
                fline->rflags ? fline->rflags : "", fline->length, fline->active ? "active" : "disabled",
-               fline->reason);
+               0, fline->reason);
+
+  spamfilter_stats(to, sd, param);
 }
 
 static void

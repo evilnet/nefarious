@@ -1,0 +1,18 @@
+If you are removing a spamfilter then:
+/REMOVE [spamfilter] [reason] :[mask]
+Otherwise:
+/REMOVE [gline|zline|shun] [mask] :[reason]
+
+Removes the given gline, shun or shun from the network weather
+its deactivated or activated. This command should be used VERY
+carefully. If a gline, shun, spamfilter or zline is removed while
+a server is split then it will be reinstated when the split server
+rejoins the network.
+
+If you are removing a spamfilter then use _'s instead of spaces
+in the reason. These will be decoded when the reason is displayed.
+
+You need to have the REMOVE priv to use this command.
+
+See Also GLINE, SHUN, ZLINE
+

@@ -832,6 +832,13 @@ struct Message msgtab[] = {
     { m_unregistered, m_ignore, ms_mark, m_ignore, m_ignore }
   },
   {
+    MSG_SPAMFILTER,
+    TOK_SPAMFILTER,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_unregistered, m_not_oper, ms_spamfilter, mo_spamfilter, m_ignore }
+  },
+  {
     MSG_WATCH,
     TOK_WATCH,
     0, MAXPARA, MFLG_SLOW, 0,

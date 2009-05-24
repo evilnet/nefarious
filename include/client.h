@@ -123,6 +123,7 @@ enum Priv {
                               as long as its a valid host */
   PRIV_REMOVE,          /**< oper can force remove deactivated glines,
                              shuns and zlines. */
+  PRIV_SPAMFILTER,      /**< oper can set spamfilters via SPAMFILTER */
   PRIV_LAST_PRIV        /**< number of privileges */
 };
 

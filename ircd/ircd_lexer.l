@@ -197,6 +197,7 @@ static struct lexer_token {
   { "whox", TPRIV_WHOX },
   { "display_mode", TPRIV_DISPLAY_MODE },
   { "remove", TPRIV_REMOVE },
+  { "spamfilter", TPRIV_SPAMFILTER },
   { NULL, 0 }
 };
 static int ntokens;

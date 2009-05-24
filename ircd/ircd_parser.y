@@ -284,6 +284,7 @@ static void free_slist(struct SLink **link) {
 %token TPRIV_HIDE_CHANNELS
 %token TPRIV_DISPLAY_MODE
 %token TPRIV_REMOVE
+%token TPRIV_SPAMFILTER
 /* and some types... */
 %type <num> sizespec
 %type <num> timespec timefactor factoredtimes factoredtime
@@ -855,6 +856,7 @@ privtype:  TPRIV_DISPLAY_MODE { $$ = PRIV_DISPLAY_MODE; } |
            TPRIV_HIDE_CHANNELS { $$ = PRIV_HIDE_CHANNELS; } |
            TPRIV_FREEFORM { $$ = PRIV_FREEFORM; } |
            TPRIV_REMOVE { $$ = PRIV_REMOVE; } |
+           TPRIV_SPAMFILTER { $$ = PRIV_SPAMFILTER; } |
            LOCAL { $$ = PRIV_PROPAGATE; invert = 1; } ;
 
 yesorno: YES { $$ = 1; } | NO { $$ = 0; };
@@ -1600,6 +1602,10 @@ sfilterblock: SFILTER {
     parse_error("Your Filter block must contain a action.");
   else if (!reason)
     parse_error("Your Filter block must contain a reason.");
+  else if (react_check(action) == 1)
+    parse_error("Your Filter block contains invalid action flags.");
+  else if (watch_check(rtype) == 1)
+    parse_error("Your Filter block contains invalid watch flags.");
   else {
     if ((errbuf = checkregex(regex,0))) {
       parse_error("SFilter block (%s) contains an invalid regex: %s", regex, errbuf);

@@ -339,6 +339,8 @@ extern int add_dnsbl(struct Client* sptr, const char* dnsbl);
 extern int del_dnsbl(struct Client* sptr, char* dnsbl);
 extern int watchfflagstr(const char* fflags);
 extern int reactfflagstr(const char* fflags);
+extern int react_check(const char* fflags);
+extern int watch_check(const char* fflags);
 extern int promptcomment(struct Client* sptr, const char* filename);
 
 extern void yyerror(const char *msg);

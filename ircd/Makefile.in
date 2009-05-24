@@ -198,6 +198,7 @@ IRCD_SRC = \
 	m_silence.c \
 	m_smo.c \
 	m_sno.c \
+	m_spamfilter.c \
 	m_squit.c \
 	m_stats.c \
 	m_svsident.c \

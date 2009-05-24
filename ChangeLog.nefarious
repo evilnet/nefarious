@@ -1,6 +1,56 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-05-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added SPAMFILTER priv.
+
+	* help/opers/remove: Added help doc for remove command.
+	
+	* help/opers/spamfilter: Added help doc for spamfilter command.
+
+	* include/client.h: Added PRIV_SPAMFILTER.
+
+	* include/handlers.h: Added mo_ and ms_ spamfilter.
+
+	* include/msg.h: Added SPAMFILTER command.
+
+	* include/numeric.h: New numerics: ERR_INVALIDREGEX (553),
+	ERR_SPAMREACT (554), ERR_BADFLAGS (556).
+
+	* include/s_conf.h: Added flag checking functions.
+
+	* include/spamfilter.h: Spam filter struct and function declerations.
+
+	* ircd/client.c: Added PRIV_SPAMFILTER.
+
+	* ircd/ircd_lexer.l: Added TPRIV_SPAMFILTER.
+
+	* ircd/ircd_parser.y: Added TPRIV_SPAMFILTER. Also made use of
+	the flag checking code.
+
+	* ircd/Makefile.in: Added m_spamfilter.c.
+
+	* ircd/m_remove.c: Added spamfilter remove functionality.
+
+	* ircd/m_spamfilter.c: New spam filter command. The spam filters
+	that are added are stored in a seperate struct. You cannot use
+	this command to remove/disable/edit conf based spamfilters.
+
+	* ircd/parse.c: Added SPAMFILTER command.
+
+	* ircd/s_conf.c: Added flag check code. Also updated find_fline
+	so that it also checks the spamfilter struct.
+
+	* ircd/s_err.c: Added field to RPL_STATSFILTERLINE for expires.
+	New numerics: ERR_INVALIDREGEX (553), ERR_SPAMREACT (554),
+	ERR_BADFLAGS (556).
+
+	* ircd/s_serv.c: Burst spamfilters on links.
+
+	* ircd/s_stats.c: Send spamfilter stats after the conf based stats
+	have been sent.
+
 2009-05-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added REMOVE priv.
