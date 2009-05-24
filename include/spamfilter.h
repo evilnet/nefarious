@@ -22,7 +22,7 @@
  */
 /** @file
  * @brief Structures and APIs for G-line manipulation.
- * @version $Id: spamfilter.h 2486 2009-05-23 03:54:52Z sirvulcan $
+ * @version $Id$
  */
 #ifndef INCLUDED_config_h
 #include "config.h"

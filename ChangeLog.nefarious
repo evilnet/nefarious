@@ -3,6 +3,14 @@
 
 2009-05-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/opers/*: Misc svn propset changes.
+
+	* include/*.h: Misc svn propset changes.
+
+	* ircd/*.c: Misc svn propset changes.
+
+2009-05-24  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added SPAMFILTER priv.
 
 	* help/opers/remove: Added help doc for remove command.
