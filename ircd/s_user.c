@@ -1659,9 +1659,10 @@ int hide_hostmask(struct Client *cptr)
   if (feature_bool(FEAT_HIDDEN_HOST_QUIT))
     sendcmdto_common_channels_butone(cptr, CMD_QUIT, cptr, ":%s", feature_str(FEAT_HIDDEN_HOST_SET_MESSAGE));
 
-  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1)
+  if (HasFakeHost(cptr) || IsAccount(cptr))
     make_hidden_hostmask(cli_user(cptr)->host, cptr);
-  else
+
+  if ((feature_int(FEAT_HOST_HIDING_STYLE) == 2) && !HasFakeHost(cptr))
     ircd_snprintf(0, cli_user(cptr)->host, HOSTLEN, "%s", cli_user(cptr)->virthost);
 
   /* ok, the client is now fully hidden, so let them know -- hikari */
