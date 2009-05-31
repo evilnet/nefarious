@@ -226,16 +226,16 @@ static void do_whois(struct Client* sptr, struct Client *acptr, int parc)
     if (user->away)
       send_reply(sptr, RPL_AWAY, name, user->away);
 
-    if (SeeOper(sptr, acptr)) {
+    if (SeeOper(sptr, acptr))
       send_reply(sptr, RPL_WHOISOPERATOR, name, IsAdmin(acptr) ?
 		 feature_str(FEAT_WHOIS_ADMIN) :
 		 feature_str(FEAT_WHOIS_OPER));
-      if (IsWhois(acptr) && (sptr != acptr))
-	sendcmdto_one(&me, CMD_NOTICE, acptr,
-		      "%C :*** Notice -- %s (%s@%s) did a /whois on you.",
-		      acptr, cli_name(sptr), cli_user(sptr)->username,
-		      cli_user(sptr)->host);
-    }
+
+    if ((IsOper(acptr) || IsAdmin(acptr)) && IsWhois(acptr) && (sptr != acptr))
+      sendcmdto_one(&me, CMD_NOTICE, acptr,
+                    "%C :*** Notice -- %s (%s@%s) did a /whois on you.",
+                    acptr, cli_name(sptr), cli_user(sptr)->username,
+                    cli_user(sptr)->host);
 
     if (IsAccount(acptr))
       send_reply(sptr, RPL_WHOISACCOUNT, name, user->account);
