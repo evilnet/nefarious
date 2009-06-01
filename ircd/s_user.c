@@ -2463,8 +2463,10 @@ char *umode_str(struct Client *cptr)
   int i;
   struct Flags c_flags = cli_flags(cptr);
 
-  if (!HasPriv(cptr, PRIV_PROPAGATE))
-    FlagClr(&c_flags, FLAG_OPER);
+/*
+ * if (!HasPriv(cptr, PRIV_PROPAGATE))
+ *   FlagClr(&c_flags, FLAG_OPER);
+ */
 
   for (i = 0; i < USERMODELIST_SIZE; ++i)
   {
