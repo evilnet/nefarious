@@ -3,6 +3,11 @@
 
 2009-06-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/hash.c: SF Feature Req #2710717. LIST will now show channels
+	that you have been invited to if they have +s or +p.
+
+2009-06-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/channel.c: Debugging line added for extended bans.
 
 2009-05-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>

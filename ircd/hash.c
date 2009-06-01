@@ -462,7 +462,7 @@ void list_next_channels(struct Client *cptr)
                   && chptr->topic_time > args->min_topic_time
                   && chptr->topic_time < args->max_topic_time))
           && ((args->flags & LISTARG_SHOWSECRET)
-              || ShowChannel(cptr, chptr)))
+              || (ShowChannel(cptr, chptr) || IsInvited(cptr, chptr))))
       {
         modebuf[0] = parabuf[0] = modestuff[0] = 0;
         channel_modes(cptr, modebuf, parabuf, sizeof(modebuf), chptr);
