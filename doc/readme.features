@@ -962,7 +962,10 @@ RESTARTPASS
 
 This is the password required for a server to actually restart when
 the RESTART command is used. The if the password is empty then no
-password is required.
+password is required. If you do not specify an encryption type it is
+assumed that the given password is in crypt format. See the Operator
+block section in example.conf for more information on password encryption
+types.
 
 DIEPASS
  * Type: string
@@ -970,7 +973,10 @@ DIEPASS
 
 This is the password required for a server to actually die when
 the DIE command is used. The if the password is empty then no
-password is required.
+password is required. If you do not specify an encryption type it is
+assumed that the given password is in crypt format. See the Operator
+block section in example.conf for more information on password encryption
+types.
 
 TARGET_LIMITING
  * Type: boolean
