@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-06-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/channel.c: Debugging line added for extended bans.
+
 2009-05-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_whois.c: Added a patch by Julien Chalhoub which will allow

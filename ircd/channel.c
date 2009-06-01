@@ -748,6 +748,8 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
         chptr = lp->channel;
         cmatch = 0;
 
+        Debug((DEBUG_DEBUG, "ch: %s", chptr->chname));
+
         if (*tmpe->value.except.extstr == '#') {
           if (!mmatch(tmpe->value.except.extstr, chptr->chname)) {
             cmatch = 1;
