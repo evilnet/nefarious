@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-06-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_privs.c: Fix for crash on PRIVS for non-existant user.
+
 2009-06-02  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Rework of bug fix for SF Bug #2799686.

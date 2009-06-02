@@ -135,6 +135,9 @@ int ms_privs(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (IsServer(sptr)) {
     acptr = parc > 1 ? findNUser(parv[1]) : NULL;
 
+    if (!acptr)
+      return 0;
+
     if (parc < 3) {
       if (acptr) { 
         memset(&cli_privs(acptr), 0, sizeof(struct Privs));
