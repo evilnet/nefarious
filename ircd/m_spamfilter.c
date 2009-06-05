@@ -492,6 +492,9 @@ int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv
   if (!HasPriv(sptr, PRIV_SPAMFILTER))
     return send_reply(sptr, ERR_NOPRIVILEGES);
 
+  if (parc <= 1)
+    return need_more_params(sptr, "SPAMFILTER");
+
   ar = parv[1];
   if (*ar == '+')
     add = 1;
