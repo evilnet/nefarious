@@ -72,7 +72,7 @@ struct Motd {
 /** Maximum number of lines for local MOTD */
 #define MOTD_MAXLINES	100
 /** Maximum number of lines for remote MOTD */
-#define MOTD_MAXREMOTE	3
+#define MOTD_MAXREMOTE	100
 
 /** Cache entry for the contents of a MOTD file. */
 struct MotdCache {
