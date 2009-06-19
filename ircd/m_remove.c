@@ -129,6 +129,9 @@ int mo_remove(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
   type = parc > 1 ? parv[1] : 0;
 
+  if (EmptyString(type))
+    return need_more_params(sptr, "REMOVE");
+
   if (!ircd_strcmp(type, "spamfilter")) {
     reason = parc > 2 ? parv[2] : 0;
     mask = parc > 3 ? parv[parc - 1] : 0;
@@ -137,7 +140,7 @@ int mo_remove(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     reason = parc > 3 ? parv[parc - 1] : 0;
   }
 
-  if (EmptyString(type) || EmptyString(mask) || EmptyString(reason))
+  if (EmptyString(mask) || EmptyString(reason))
     return need_more_params(sptr, "REMOVE");
 
   if (!ircd_strcmp(type, "gline"))

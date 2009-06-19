@@ -507,6 +507,9 @@ int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv
   if ((parc < 4) && (remove))
     return need_more_params(sptr, "SPAMFILTER");
 
+  if (!add && !remove)
+    return need_more_params(sptr, "SPAMFILTER");
+
   wflags = parv[2];
   rflags = parv[3];
 

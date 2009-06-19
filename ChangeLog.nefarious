@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_remove.c: Couple of bug fixes.
+
+	* ircd/m_spamfilter.c: Couple of bug fixes.
+
 2009-06-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/motd.h: Changed the line limit for remote motd's from 3 to
