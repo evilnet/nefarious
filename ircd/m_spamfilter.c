@@ -128,15 +128,41 @@ spamfilter_find(char *regex, char *rflags, char *wflags)
 {
   struct SpamFilter *spamfilter;
   struct SpamFilter *sspamfilter;
+  char *tmprflags, tmpr[4] = "";
+  char *tmpwflags, tmpw[4] = "";
+  int rtotal = 0, wtotal = 0, urtotal = 0, uwtotal = 0;
+
+  tmprflags = strdup(rflags);
+  for (; *tmprflags; tmprflags++) {
+    sprintf(tmpr, "%d", *tmprflags);
+    urtotal = urtotal + atoi(tmpr);
+  }
+  tmpwflags = strdup(wflags);
+  for (; *tmpwflags; tmpwflags++) {
+    sprintf(tmpw, "%d", *tmpwflags);
+    uwtotal = uwtotal + atoi(tmpw);
+  }
 
   for (spamfilter = GlobalSpamFilterList; spamfilter; spamfilter = sspamfilter) {
     sspamfilter = spamfilter->sf_next;
     if (spamfilter->sf_expire <= CurrentTime) /* expire any that need expiring */
       spamfilter_free(spamfilter);
     else {
+      rtotal = 0;
+      wtotal = 0;
+      tmprflags = strdup(spamfilter->sf_rflags);
+      for (; *tmprflags; tmprflags++) {
+        sprintf(tmpr, "%d", *tmprflags);
+        rtotal = rtotal + atoi(tmpr);
+      }
+      tmpwflags = strdup(spamfilter->sf_wflags);
+      for (; *tmpwflags; tmpwflags++) {
+        sprintf(tmpw, "%d", *tmpwflags);
+        wtotal = wtotal + atoi(tmpw);
+      }
+
       if ((ircd_strcmp(spamfilter->sf_rawfilter, regex) == 0) &&
-          (ircd_strcmp(spamfilter->sf_rflags, rflags) == 0) &&
-          (ircd_strcmp(spamfilter->sf_wflags, wflags) == 0))
+          (rtotal == urtotal) && (wtotal == uwtotal))
         break;
     }
   }
@@ -491,11 +517,11 @@ spamfilter_remove(struct Client* sptr, char *mask, char *reason)
  */
 int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  int add = 0, remove = 0, exp = 0;
-  char *wflags, *rflags, *reason, *regex, *ar;
+  int add = 0, remove = 0, exp = 0, gotreact = 0, gotmulti = 0;
+  char *wflags, *rflags, *reason, *regex, *ar, *tmprflags;
+  char *multi_react = "aCSinmov", *tmpmulti = NULL;
   struct SpamFilter* spamfilter = NULL;
   time_t expire;
-
   if (!HasPriv(sptr, PRIV_SPAMFILTER))
     return send_reply(sptr, ERR_NOPRIVILEGES);
 
@@ -520,8 +546,26 @@ int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv
   wflags = parv[2];
   rflags = parv[3];
 
-  if (strlen(rflags) > 1)
+  if (strlen(rflags) > 1) {
+    tmprflags = strdup(rflags);
+
+    for (; *tmprflags; tmprflags++) {
+      tmpmulti = strdup(multi_react);
+      gotmulti = 0;
+
+      for (; *tmpmulti; tmpmulti++) {
+        if (*tmprflags == *tmpmulti)
+           gotmulti = 1;
+      }
+
+      if (!gotmulti)
+        gotreact++;
+    }
+  }      
+
+  if (gotreact > 1)
     return send_reply(sptr, ERR_SPAMREACT);
+
   if (react_check(rflags) == 1)
     return send_reply(sptr, ERR_BADFLAGS, "react");
   if (watch_check(wflags) == 1)

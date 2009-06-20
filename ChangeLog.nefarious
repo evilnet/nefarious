@@ -3,7 +3,15 @@
 
 2009-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
-	* ircd/m_spamfilter.c: Added in some more expire checks..
+	* ircd/m_spamfilter.c: Allow more than one react flag to be
+	specified as long as it matches a few that can be specified along
+	others. Also fixed a bug where you could add 2 spamfilters with
+	the same flags and regex but specify the flags given differently,
+	eg one with CN aCK and one with CN CaK.
+
+2009-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_spamfilter.c: Added in some more expire checks.
 
 	* ircd/s_conf.c: If a spamfilter expires dont try and check it
 	afterwards.
