@@ -3,6 +3,13 @@
 
 2009-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_spamfilter.c: Added in some more expire checks..
+
+	* ircd/s_conf.c: If a spamfilter expires dont try and check it
+	afterwards.
+
+2009-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_remove.c: Couple of bug fixes.
 
 	* ircd/m_spamfilter.c: Couple of bug fixes.

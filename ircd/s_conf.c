@@ -1921,8 +1921,10 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   for (spamfilter = GlobalSpamFilterList; spamfilter; spamfilter = sspamfilter) {
     sspamfilter = spamfilter->sf_next;
 
-    if (spamfilter->sf_expire <= CurrentTime)
+    if (spamfilter->sf_expire <= CurrentTime) {
       spamfilter_free(spamfilter);
+      continue;
+    }
 
     regmatch = 0;
     rf_flag = reactfflagstr(spamfilter->sf_rflags);

@@ -131,10 +131,14 @@ spamfilter_find(char *regex, char *rflags, char *wflags)
 
   for (spamfilter = GlobalSpamFilterList; spamfilter; spamfilter = sspamfilter) {
     sspamfilter = spamfilter->sf_next;
-    if ((ircd_strcmp(spamfilter->sf_rawfilter, regex) == 0) &&
-        (ircd_strcmp(spamfilter->sf_rflags, rflags) == 0) &&
-        (ircd_strcmp(spamfilter->sf_wflags, wflags) == 0))
-      break;
+    if (spamfilter->sf_expire <= CurrentTime) /* expire any that need expiring */
+      spamfilter_free(spamfilter);
+    else {
+      if ((ircd_strcmp(spamfilter->sf_rawfilter, regex) == 0) &&
+          (ircd_strcmp(spamfilter->sf_rflags, rflags) == 0) &&
+          (ircd_strcmp(spamfilter->sf_wflags, wflags) == 0))
+        break;
+    }
   }
 
   return spamfilter;
@@ -191,10 +195,13 @@ spamfilter_stats(struct Client* to, const struct StatDesc *sd, char* param)
    * Spam Filters have been reported. */
   for (spamfilter = GlobalSpamFilterList; spamfilter; spamfilter = sspamfilter) {
     sspamfilter = spamfilter->sf_next;
-    send_reply(to, RPL_STATSFILTERLINE, spamfilter->sf_rawfilter, spamfilter->sf_wflags ?
-               spamfilter->sf_wflags : "", spamfilter->sf_rflags ? spamfilter->sf_rflags : "",
-               spamfilter->sf_length, SpamFilterIsActive(spamfilter) ? "active" : "deactivated",
-               spamfilter->sf_expire, spamfilter->sf_reason);
+    if (spamfilter->sf_expire <= CurrentTime) /* expire any that need expiring */
+      spamfilter_free(spamfilter);
+    else
+      send_reply(to, RPL_STATSFILTERLINE, spamfilter->sf_rawfilter, spamfilter->sf_wflags ?
+                 spamfilter->sf_wflags : "", spamfilter->sf_rflags ? spamfilter->sf_rflags : "",
+                 spamfilter->sf_length, SpamFilterIsActive(spamfilter) ? "active" : "deactivated",
+                 spamfilter->sf_expire, spamfilter->sf_reason);
   }
 }
 
