@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-07-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/configure: Regenerated.
+
+	* ircd/configure.in: Removed unsigned char check.
+
 2009-06-19  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_spamfilter.c: Allow more than one react flag to be
