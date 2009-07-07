@@ -19,6 +19,7 @@
 #### Start of system configuration section. ####
 
 prefix = @prefix@
+datarootdir = @datarootdir@
 top_srcdir = @top_srcdir@
 srcdir = @srcdir@
 VPATH = @srcdir@
