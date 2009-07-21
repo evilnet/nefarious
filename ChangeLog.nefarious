@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-07-21  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/example.conf: Fixed URL feature examples
+
 2009-07-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Small tweak.
