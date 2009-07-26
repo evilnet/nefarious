@@ -257,7 +257,7 @@ set_isupport_excepts(void)
     strcat(imaxlist, "b:");
     strcat(imaxlist, itoa(feature_int(FEAT_MAXBANS)));
     if (feature_bool(FEAT_EXCEPTS)) {
-      strcat(imaxlist, "e:");
+      strcat(imaxlist, ",e:");
       strcat(imaxlist, itoa(feature_int(FEAT_MAXEXCEPTS)));
     }
 
