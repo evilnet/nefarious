@@ -892,7 +892,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
     parv[2] = (char*)client_get_default_umode(sptr);
     parv[3] = NULL; /* needed in case of +s */
     set_user_mode(sptr, sptr, 3, parv);
-    ClearHiddenHost(sptr); /* just in case somebody stuck +x in there */
   }
   else
   {

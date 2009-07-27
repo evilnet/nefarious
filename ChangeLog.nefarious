@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-07-28  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_user.c: Bug fix for +x not working with login on connect.
+	And on a different note.. its my birthday tomorrow.
+
 2009-07-26  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ircd_features.c: Fix for a minor syntax error in MAXLIST
