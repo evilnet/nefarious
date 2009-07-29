@@ -180,8 +180,8 @@ struct FieldData {
 #define CONV_VARARGS	0x05000000	/**< convert a %v */
 #define CONV_CLIENT	0x06000000	/**< convert a struct Client */
 #define CONV_CHANNEL	0x07000000	/**< convert a struct Channel */
+#define CONV_REAL	0x08000000      /**< convert a struct Client and show realhost */
 
-#define CONV_RESERVED7	0x08000000	/**< reserved for future expansion */
 #define CONV_RESERVED6	0x09000000	/**< reserved for future expansion */
 #define CONV_RESERVED5	0x0a000000	/**< reserved for future expansion */
 #define CONV_RESERVED4	0x0b000000	/**< reserved for future expansion */
@@ -1778,6 +1778,11 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	fld_s.flags |= ARG_PTR | CONV_CLIENT;
 	break;
 
+      case 'R': /* convert a client name... */
+        fld_s.flags &= ~(FLAG_PLUS | FLAG_SPACE | FLAG_ZERO | TYPE_MASK);
+        fld_s.flags |= ARG_PTR | CONV_REAL;
+        break;
+
       case 'H': /* convert a channel name... */
 	fld_s.flags &= ~(FLAG_PLUS | FLAG_SPACE | FLAG_ALT | FLAG_ZERO |
 			 FLAG_COLON | TYPE_MASK);
@@ -2038,7 +2043,8 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 
       vdata->vd_chars = buf_s.buf_loc; /* return relevant data */
       vdata->vd_overflow = SNP_MAX(buf_s.buf_overflow, buf_s.overflow);
-    } else if ((fld_s.flags & CONV_MASK) == CONV_CLIENT) {
+    } else if (((fld_s.flags & CONV_MASK) == CONV_CLIENT) ||
+              ((fld_s.flags & CONV_MASK) == CONV_REAL)) {
       struct Client *cptr = (struct Client*) fld_s.value.v_ptr;
       const char *str1 = 0, *str2 = 0, *str3 = 0;
       int slen1 = 0, slen2 = 0, slen3 = 0, elen = 0, plen = 0;
@@ -2057,6 +2063,13 @@ doprintf(struct Client *dest, struct BufData *buf_p, const char *fmt,
 	if (!IsServer(cptr) && !IsMe(cptr) && fld_s.flags & FLAG_ALT) {
 	  assert(0 != cli_user(cptr));
 	  assert(0 != *(cli_name(cptr)));
+          if ((fld_s.flags & CONV_MASK) == CONV_REAL) {
+            str2 = cli_user(cptr)->realusername;
+            str3 = cli_user(cptr)->realhost;
+          } else {
+            str2 = cli_user(cptr)->username;
+            str3 = cli_user(cptr)->host;
+          }
 	  str2 = cli_user(cptr)->username;
 	  str3 = cli_user(cptr)->host;
 	} else
