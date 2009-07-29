@@ -132,7 +132,7 @@ fi
 # Not all versions of date support %s, work around it
 TS=`date +%Y%m%d%H%M%S`
 TMPFILE="$tmp_path/linesync.$TS"
-LSFILE="$LINE_SERVER""linesync"
+LSFILE="$LINE_SERVER""linesync.data13"
 # Attempt to download our .conf update
 wget --cache=off --quiet --output-document=$TMPFILE $LSFILE > /dev/null 2>&1
 if [ ! -s "$TMPFILE" ]; then
@@ -193,7 +193,7 @@ CKSUM=`$md5_cmd $TMPFILE|cut -d' ' -f1`
 
 check_file="$tmp_path/linesync.sum.$TS"
 for ck_server in $LINE_CHECK; do
-	sumfile="$ck_server""linesync.sum"
+	sumfile="$ck_server""linesync.sum13"
 	wget --cache=off --quiet --output-document=$check_file $sumfile > /dev/null 2>&1
 	if [ ! -s "$check_file" ]; then
 		echo "Unable to retrieve checksum from $sumfile"
