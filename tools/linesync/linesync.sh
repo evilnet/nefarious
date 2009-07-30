@@ -2,6 +2,7 @@
 # linesync.sh, Copyright (c) 2002 Arjen Wolfs
 # 20020604, sengaia@undernet.org
 # 20050417, daniel@undernet.org  - modified for u2.10.12
+# 20090730, sirvulcan@sirvulcan.co.nz - modified for nefarious
 # $Id$
 #
 # The code contained is in this file is licenced under the terms
@@ -53,6 +54,9 @@
 #	Arjen Wolfs (sengaia@undernet.org), June 9 2002.
 #
 
+ltrim() { echo "$1" | sed -e "s/^ *//"; }
+rtrim() { echo "$1" | sed -e "s/ *$//"; }
+
 # This checks for the presence of an executable file in $PATH
 locate_program() {
         if [ ! -x "`which $1 2>&1`" ]; then
@@ -70,13 +74,7 @@ check_file() {
 }
 
 # Try to find programs we will need
-locate_program wget && locate_program egrep && locate_program diff
-
-# try to find GNU awk
-awk_cmd=`which gawk`
-if [ $? -ne 0 ]; then
-        awk_cmd=""
-fi
+locate_program wget && locate_program egrep && locate_program diff && locate_program cut
 
 # try to find an appropriate md5 program
 # BSD md5 capability courtesy of spale
@@ -91,6 +89,12 @@ if [ -z "$md5_cmd" ]; then
 	fi
 fi
 
+# try to find GNU awk
+awk_cmd=`which gawk`
+if [ $? -ne 0 ]; then
+        awk_cmd=""
+fi
+
 if [ -z "$awk_cmd" ]; then
 	locate_program awk
 	is_gawk=`echo | awk --version | head -1 | egrep '^GNU.+$'`
@@ -98,7 +102,7 @@ if [ -z "$awk_cmd" ]; then
 		echo "Your version of awk is not GNU awk. Sorry."
 		exit 1
 	fi
-	awk_cmd="awk"	
+	awk_cmd="awk"
 fi
 
 # Check for required command line parameters
@@ -148,21 +152,53 @@ if [ ! -s "$TMPFILE" ]; then
         exit 1
 fi
 
-# Check whether the file contains any disallowed .conf lines
-#bad_lines=`egrep '^[^'$ALLOWED_LINES'|#]+' $TMPFILE`
-#if [ ! -z "$bad_lines" ]; then
-#        echo "The file downloaded in $TMPFILE contains the following disallowed line(s):"
-#        echo $bad_lines
-#        exit 1
-#fi
 
-# Check whether somebody tried to sneak a second block onto some line
-#bad_lines=`egrep -i '}[ 	]*;[ 	]*[a-z]+[ 	]*{' $TMPFILE`
-#if [ ! -z "$bad_lines" ] ; then
-#	echo "The file downloaded in $TMPFILE contains the following multi-block line(s):"
-#        echo $bad_lines
-#        exit 1
-#fi
+IFS="
+"
+# temp conf file
+TMPCFILE="$tmp_path/conf.tmp1.$TS"
+# temp formatted conf file
+TMPFFILE="$tmp_path/conf.tmp2.$TS"
+
+# get rid of all comments including blocks with comments at the end
+for line in `cat $TMPFILE | grep -ve '^#' $TMPFILE | grep -v '^$'`; do
+	line="$(ltrim "$line")"
+	line=`echo "$line" | grep -ve '^#' | grep -v '^$'`
+
+	hasComment=`echo "$line" | grep "#"`
+	if [ -n "$hasComment" ]; then
+		line=`echo "$line" | cut -d'#' -f1`
+		line="$(rtrim "$line")"
+		echo "$line" >> $TMPCFILE
+	else
+		echo "$line" >> $TMPCFILE
+	fi
+
+done
+
+# replace line breaks with spaces and then look for }; and replace with };\n
+cat $TMPCFILE | tr '\n' ' ' | sed -e 's/\}[[:space:]]*\;/\}\;\n/g' > $TMPFFILE
+
+# Check each block against ALLOWED_LINES
+disallowed=0
+for line in `cat $TMPFFILE`; do
+	line="$(ltrim "$line")"
+	block=`echo "$line" | $awk_cmd '{ print $1 }'`
+
+	allowed=`echo "$ALLOWED_LINES" | grep -i "$block"`
+	if [ ! -n "$allowed" ]; then
+		if [ $disallowed -eq 0 ]; then
+			echo "The following disallowed blocks have been found: "
+			disallowed=1
+		fi
+		echo $line
+	fi
+done
+
+if [ $disallowed -eq 1 ]; then
+	echo "Aborting linesync"
+	exit 1
+fi
 
 # check our ircd.conf
 ircd_setup=`egrep '^# (BEGIN|END) LINESYNC$' $cpath|wc -l`

@@ -3,8 +3,16 @@
 
 2009-07-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
-	* ircd/linesync.sh: Changed sum and sync files to have 13 on the end
-	of their filenames.
+	* tools/linesync/linesync.conf: Fixed up issues with ALLOWED_LINES
+	and blocks.
+
+	* tools/linesync/linesync.sh: Fixed up issues with ALLOWED_LINES and
+	blocks.
+
+2009-07-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* tools/linesync/linesync.sh: Changed sum and sync files to have 13 on
+	the end	of their filenames.
 
 2009-07-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
