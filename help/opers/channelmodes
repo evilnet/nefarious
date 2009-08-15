@@ -24,7 +24,7 @@ L <channel>	Redirect users to <channel> when they attempt to join
 Q		Strip quit/part message reasons
 T		Attempt to prevent amsg's
 Z		Only SSL users may join
-z		Persistent channel (retains modes and topic even when empty)
+z		Persistent channel (retains modes and topic even when empty) (Settable by services only)
 
 Operator Only Modes:
 

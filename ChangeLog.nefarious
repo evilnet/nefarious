@@ -3,6 +3,15 @@
 
 2009-08-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* help/opers/channelmodes: Small tweak to +z text.
+
+	* help/users/channelmodes: Small tweak to +z text.
+
+	* ircd/s_user.c: Require the F:line for +W to be TRUE even if a
+	person has the priv set.
+
+2009-08-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_webirc.c: Clear IPChecked status before its re done with
 	the host from WEBIRC. Then re set it afterwards.
 

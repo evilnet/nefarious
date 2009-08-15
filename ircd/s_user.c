@@ -2382,7 +2382,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearDebug(acptr);
 
     if (!FlagHas(&setflags, FLAG_WHOIS) &&
-	!((feature_bool(FEAT_OPER_WHOIS_PARANOIA) ||
+	!((feature_bool(FEAT_OPER_WHOIS_PARANOIA) &&
         HasPriv(acptr, PRIV_WHOIS_NOTICE)) && IsOper(acptr)))
       ClearWhois(acptr);
 
