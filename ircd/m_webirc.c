@@ -223,8 +223,10 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   inet_aton(ipaddr, &webirc_addr);
 
-  if (feature_bool(FEAT_IPCHECK))
+  if (feature_bool(FEAT_IPCHECK)) {
     IPcheck_disconnect(cptr);
+    ClearIPChecked(cptr);
+  }
 
   cli_ip(cptr).s_addr = webirc_addr.s_addr;
 
@@ -234,6 +236,7 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       return exit_client(cptr, sptr, &me, "Too many connections from your host");
     }
 
+    SetIPChecked(cptr);
     if (next_target)
       cli_nexttarget(cptr) = next_target;
   }

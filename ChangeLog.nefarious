@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-08-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_webirc.c: Clear IPChecked status before its re done with
+	the host from WEBIRC. Then re set it afterwards.
+
 2009-07-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* tools/linesync/linesync.conf: Fixed up issues with ALLOWED_LINES
