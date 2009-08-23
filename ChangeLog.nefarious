@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-08-24  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ircd_features.c: Set F:STRICTUSERNAME default to false
+	as per readme.features
+
 2009-08-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* help/opers/channelmodes: Small tweak to +z text.

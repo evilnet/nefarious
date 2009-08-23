@@ -718,7 +718,7 @@ static struct FeatureDesc {
   F_S(ERR_OPERONLYCHAN, 0, "Cannot join channel (+O)", 0),
   F_I(EXEMPT_EXPIRE, 0, 172800, 0),
   F_B(HIS_HIDEWHO, 0, 1, 0),
-  F_B(STRICTUSERNAME, 0, 1, 0),
+  F_B(STRICTUSERNAME, 0, 0, 0),
   F_B(SET_ACTIVE_ON_CREATE, 0, 1, 0),
   F_I(DEF_ALIST_LIMIT, 0, 30, 0),
   F_I(ALIST_SEND_FREQ, 0, 300, 0),
