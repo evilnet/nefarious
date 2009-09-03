@@ -20,18 +20,124 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Port Bouncer.
+ * IPv6 Gateway (based off of Port Bouncer).
  *
- * This tool is designed to set up a number of local listening ports, and
- * then forward any data recived on those ports, to another host/port combo.
- * Each listening port can bounce to a different host/port defined in the
- * config file. --Gte 
+ * This tool is designed to listen on an IPv6 address and forward
+ * connections to an IPv4 address, injecting a WEBIRC message into
+ * the connection spoof virtual IP and host for compatibility.
  *
  * $Id$ 
  *
  */
 
-#include "Bounce.h"
+
+#include "ipv6gw.h"
+
+using namespace std;
+
+vector<string> explode( const string &delimiter, const string &explodeme);
+
+vector<string> explode( const string &delimiter, const string &str)
+{
+    vector<string> arr;
+
+    int strleng = str.length();
+    int delleng = delimiter.length();
+    if (delleng==0)
+        return arr;//no change
+
+    int i=0;
+    int k=0;
+    while( i<strleng )
+    {
+        int j=0;
+        while (i+j<strleng && j<delleng && str[i+j]==delimiter[j])
+            j++;
+        if (j==delleng)//found delimiter
+        {
+            arr.push_back(  str.substr(k, i-k) );
+            i+=delleng;
+            k=i;
+        }
+        else
+        {
+            i++;
+        }
+    }
+    arr.push_back(  str.substr(k, i-k) );
+    return arr;
+}
+
+char *encodehost(char *ipbuf) {
+  int lparts, rparts, w, i;
+  char *formattedhost = NULL;
+  char tmphost[255] = "";
+  string left;
+  string right;
+
+  vector<string> v = explode("::", ipbuf);
+
+  if (v.size() > 0) {
+    left = v[0];
+    right = v[1];
+  }
+
+  v = explode(":", left);
+  lparts = v.size();
+  v = explode(":", right);
+  rparts = v.size();
+
+  w = 8 - (lparts + rparts);
+
+  v = explode(":", left);
+  for(int i=0; (unsigned int)i<v.size(); i++) {
+    if (strlen(v[i].c_str()) == 4) {
+      sprintf(tmphost, "%s%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else if (strlen(v[i].c_str()) == 3) {
+      sprintf(tmphost, "%s0%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else if (strlen(v[i].c_str()) == 2) {
+      sprintf(tmphost, "%s00%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else if (strlen(v[i].c_str()) == 1) {
+      sprintf(tmphost, "%s000%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else {
+
+      sprintf(tmphost, "%s0000", formattedhost ? formattedhost : "");
+      formattedhost = strdup(tmphost);
+    }
+  }
+
+  i = 0;
+  for (i = 1; i <= w; i++) {
+    sprintf(tmphost, "%s0000", formattedhost);
+    formattedhost = strdup(tmphost);
+  }
+
+  v = explode(":", right);
+  for(int i=0; (unsigned int)i<v.size(); i++) {
+    if (strlen(v[i].c_str()) == 4) {
+      sprintf(tmphost, "%s%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else if (strlen(v[i].c_str()) == 3) {
+      sprintf(tmphost, "%s0%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else if (strlen(v[i].c_str()) == 2) {
+      sprintf(tmphost, "%s00%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+    } else if (strlen(v[i].c_str()) == 1) {
+      sprintf(tmphost, "%s000%s", formattedhost ? formattedhost : "", v[i].c_str());
+      formattedhost = strdup(tmphost);
+   } else {
+      sprintf(tmphost, "%s0000", formattedhost ? formattedhost : "");
+      formattedhost = strdup(tmphost);
+    }
+  }
+
+  return formattedhost;
+}
 
 int main() {
   Bounce* application = new Bounce();
@@ -99,44 +205,55 @@ void Bounce::bindListeners() {
   int localPort = 0;
   int remotePort = 0;
   char* remoteServer;
-  char* vHost; 
+  char* vHost;
+  char* wpass;
+  char* wsuff;
  
   /*
    *  Open config File.
    */
   
-  if(!(configFd = fopen("bounce.conf", "r")))
+  if(!(configFd = fopen("ipv6gw.conf", "r")))
   {
     printf("Error, unable to open config file!\n");
     exit(0);
   } 
 
   while (fgets(tempBuf, 256, configFd) != NULL) { 
-    if((tempBuf[0] != '#') && (tempBuf[0] != '\r') && (strlen(tempBuf) > 2)) {
+    if((tempBuf[0] != '#') && (tempBuf[0] != '\r')) {
+    switch(tempBuf[0])
+    {
+      case 'P': { /* Add new port listener */ 
+        strtok(tempBuf, CONF_SEP);
+        vHost = strtok(NULL, CONF_SEP);
+        localPort = atoi(strtok(NULL, CONF_SEP));
+        remoteServer = strtok(NULL, CONF_SEP);
+        remotePort = atoi(strtok(NULL, CONF_SEP)); 
+        wpass = strtok(NULL, CONF_SEP);
+        wsuff = strtok(NULL, CONF_SEP);
 
-      switch(tempBuf[0])
-      {
-        case 'P': { /* Add new port listener */ 
-          strtok(tempBuf, "|");
-          vHost = strtok(NULL, "|");
-          localPort = atoi(strtok(NULL, "|"));
-          remoteServer = strtok(NULL, "|");
-          remotePort = atoi(strtok(NULL, "|")); 
+        for (int i = strlen(wsuff)-1; i >= 0; i--) {
+          if ((wsuff[i] == 10) || (wsuff[i] == 13)) {
+             wsuff[i] = '\0';
+          }
+        }
 
-          Listener* newListener = new Listener();
-          strcpy(newListener->myVhost, vHost); 
-          strcpy(newListener->remoteServer, remoteServer);
-          newListener->remotePort = remotePort;
-          newListener->localPort = localPort;
+        Listener* newListener = new Listener();
+        strcpy(newListener->myVhost, vHost); 
+        strcpy(newListener->remoteServer, remoteServer);
+        newListener->remotePort = remotePort;
+        newListener->localPort = localPort;
+        strcpy(newListener->wircpass, wpass);
+        strcpy(newListener->wircsuff, wsuff);
 #ifdef DEBUG
-          printf("Adding new Listener: Local: %s (%i), Remote: %s (%i)\n", vHost, localPort, remoteServer, remotePort);
+        printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i\n", vHost, localPort, remoteServer, remotePort);
 #endif
 
-          newListener->beginListening();
-          listenerList.insert(listenerList.begin(), newListener); 
-          break;
-        }
+        newListener->beginListening();
+        listenerList.insert(listenerList.begin(), newListener); 
+        break;
       }
+    }
     } 
   } 
 }
@@ -202,8 +319,7 @@ void Bounce::checkSockets() {
   select(highestFd+1, &readfds, NULL, NULL, &tv); 
 
   /*
-   *  Check all connections for readability.
-   *  First check Local FD's.
+   *  Check all connections for readability.   *  First check Local FD's.
    *  If the connection is closed on either side,
    *  shutdown both sockets, and clean up.
    *  Otherwise, send the data from local->remote, or
@@ -223,14 +339,62 @@ void Bounce::checkSockets() {
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
 #ifdef DEBUG
-        printf("Closing FD: %i\n", (*b)->localSocket->fd);
-        printf("Closing FD: %i\n", (*b)->remoteSocket->fd); 
+        printf("Closing L FD: %i\n", (*b)->localSocket->fd);
+        printf("Closing R FD: %i\n", (*b)->remoteSocket->fd); 
 #endif
         delete(*b);
         delCheck = 1;
         b = connectionsList.erase(b); 
       } else {
-        (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
+         if (strstr(tempBuf, "NICK ")) {
+           char *ipbuf = new char;
+           char *ipbuff = new char;
+           char *ipbufr = new char;
+           static char result[64];
+           MD5state_st ctx1, ctx2, ctx3;
+           unsigned char hash1[16], hash2[16], hash3[16];
+           char *webirc = new char;
+           char *formattedhost = NULL;
+
+
+#ifdef DEBUG
+           printf("Debug write local fd %s\n", tempBuf);
+#endif
+          (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
+
+           ipbuf = (char *)inet_ntop(AF_INET6, &(*b)->localSocket->address6.sin6_addr, result, 64);
+
+           formattedhost = encodehost(ipbuf);
+
+           ipbuff = strdup(formattedhost);
+           string revtmp = ipbuff;
+
+           MD5_Init(&ctx1);
+           MD5_Update(&ctx1,(unsigned const char *)revtmp.substr(0,16).c_str(), 8);
+           MD5_Final(hash1,&ctx1);
+           MD5_Init(&ctx2);
+           MD5_Update(&ctx2,(unsigned const char *)revtmp.substr(16,8).c_str(), 4);
+           MD5_Final(hash2,&ctx2);
+           MD5_Init(&ctx3);
+           MD5_Update(&ctx3,(unsigned const char *)revtmp.substr(24).c_str(), 4);
+           MD5_Final(hash3,&ctx3);
+
+           string reversehost(revtmp.begin(),revtmp.end());
+           reverse (reversehost.begin(), reversehost.end());
+           ipbufr = (char *)reversehost.c_str();
+
+           sprintf(webirc, "WEBIRC %s ipv6gw %s.%s 0.%d.%d.%d\r\n", (*b)->wircpass, ipbufr, (*b)->wircsuff, hash1[3], hash2[7], hash3[11]);
+           int l = strlen(webirc);
+#ifdef DEBUG
+           printf("Debug write local fd %s\n", webirc);
+#endif
+           (*b)->remoteSocket->write(webirc, l);
+         } else {
+#ifdef DEBUG
+           printf("Debug write local fd %s\n", tempBuf);
+#endif
+          (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
+        }
       }
     } 
  
@@ -253,13 +417,16 @@ void Bounce::checkSockets() {
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
 #ifdef DEBUG
-        printf("Closing FD: %i\n", (*b)->localSocket->fd);
-        printf("Closing FD: %i\n", (*b)->remoteSocket->fd);
+        printf("Closing L FD: %i\n", (*b)->localSocket->fd);
+        printf("Closing R FD: %i\n", (*b)->remoteSocket->fd);
 #endif
         delete(*b);
         delCheck = 1;
         b = connectionsList.erase(b); 
       } else {
+#ifdef DEBUG
+         printf("Debug write remote fd %s\n", tempBuf);
+#endif
         (*b)->localSocket->write(tempBuf, (*b)->remoteSocket->lastReadSize);
       }
     }
@@ -299,17 +466,18 @@ void Bounce::recieveNewConnection(Listener* listener) {
  *              connections list.
  *
  */
-
-  Connection* newConnection = new Connection(); 
+  Connection* newConnection = new Connection();
   newConnection->localSocket = listener->handleAccept();
 
   Socket* remoteSocket = new Socket();
   newConnection->remoteSocket = remoteSocket; 
-  if(remoteSocket->connectTo(listener->remoteServer, listener->remotePort)) { 
+  if(remoteSocket->connectTo(listener->remoteServer, listener->remotePort)) {
     connectionsList.insert(connectionsList.begin(), newConnection);
+    strcpy(newConnection->wircpass, listener->wircpass);
+    strcpy(newConnection->wircsuff, listener->wircsuff);
   } else {
 #ifdef DEBUG
-    newConnection->localSocket->write("Unable to connect to remote host.\n");
+    newConnection->localSocket->write((char *)"ERROR: Unable to connect to remote host.\n");
 #endif
     close(newConnection->localSocket->fd);
     delete(newConnection);
@@ -340,7 +508,8 @@ Socket* Listener::handleAccept() {
   int sin_size = sizeof(struct sockaddr_in6);
 
   Socket* newSocket = new Socket();
-  new_fd = accept(fd, (struct sockaddr*)&newSocket->address, (socklen_t*)&sin_size);
+  new_fd = accept(fd, (struct sockaddr*)&newSocket->address6, (socklen_t*)&sin_size);
+
   newSocket->fd = new_fd; 
   return newSocket;
 }
@@ -355,29 +524,39 @@ void Listener::beginListening() {
  *
  */
 
-  struct sockaddr_in6 my_addr;
   int bindRes;
   int optval;
   optval = 1;
 
-  fd = socket(AF_INET6, SOCK_STREAM, 0); /* Check for no FD's left?! */
+  struct sockaddr_in6 servaddr;
+  in6_addr addy;
+  int size;
 
-  my_addr.sin_family = AF_INET6;
-  my_addr.sin_port = htons(localPort);
-  my_addr.sin_addr.s_addr = inet_addr(myVhost);
-  bzero(&(my_addr.sin_zero), 8);
+  memset(&servaddr, 0, sizeof(servaddr));
+
+  if (inet_pton(AF_INET6, myVhost, &addy) < 0) {
+    printf("Invalid IP address %s\n", myVhost);
+    exit(0);
+  }
+
+  fd = socket(AF_INET6, SOCK_STREAM, 0); /* Check for no FD's left?! */
 
   setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
-  bindRes = bind(fd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
-  if(bindRes == 0)
+  servaddr.sin6_family = AF_INET6;
+  memcpy(&(servaddr.sin6_addr), &addy, sizeof(in6_addr));
+  servaddr.sin6_port = htons(localPort);
+  size = sizeof(sockaddr_in6);
+
+  bindRes = bind(fd, (struct sockaddr *)&servaddr, size);
+  if(bindRes >= 0)
   {
     listen(fd, 10);
   } else { 
      /*
       *  If we can't bind a listening port, we might aswell drop out.
       */
-     printf("Unable to bind to %s (%i)!\n", myVhost, localPort);
+     printf("Unable to bind to [%s]:%i: %s (%d)\n", myVhost, localPort, strerror(errno), errno);
      exit(0);
    } 
 }
@@ -493,9 +672,9 @@ char* Socket::read() {
   buffer[amountRead] = '\0';
 
 #ifdef DEBUG
-  printf("Read %i Bytes.\n", amountRead);
+   printf("Read %s (%i Bytes).\n", buffer, amountRead);
 #endif
- 
+
   /* 
    * Record this just incase we're dealing with binary data with 0's in it.
    */

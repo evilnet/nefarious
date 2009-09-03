@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* tools/ipv6gw/ipv6gw.conf: Configuration file.
+
+	* tools/ipv6gw/ipv6gw.cpp: Tool that will forward ipv6 connections
+	to nefarious with a rewritten host via WEBIRC.
+
+	* tools/ipv6gw/ipv6gw.h: Declerations etc.
+
+	* tools/ipv6gw/Makefile: Very basic make file for compiling.
+
 2009-08-24  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ircd_features.c: Set F:STRICTUSERNAME default to false
