@@ -3,6 +3,16 @@
 
 2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* tools/ipv6gw/ipv6gw.cpp: Fixed bug causing WEBIRC message to
+	be sent more then once
+
+	* tools/ipv6gw/ipv6gw.h: Fixed bug causing WEBIRC message to
+	be sent more then once
+
+	* tools/ipv6gw/Makefile: Tweaked make clean
+
+2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* tools/ipv6gw/ipv6gw.cpp: Fixed a few typos in vIP generation
 
 2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>

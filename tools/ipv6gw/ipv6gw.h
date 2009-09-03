@@ -63,6 +63,8 @@ using namespace std;
 
 #define CONF_SEP "|"
 
+#define FLAG_SENTWEBIRC 0x0001
+
 /*
  *  "Bounce" Class.
  */
@@ -132,5 +134,7 @@ public:
 
   char wircpass[255];
   char wircsuff[255];
+
+  int flags;
 };
 

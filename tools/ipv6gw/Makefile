@@ -11,7 +11,7 @@ all: ipv6
 ipv6:
 	g++ -O3 -ggdb -Wall -lssl -o $(BINFILE) ipv6gw.cpp
 clean:
-	rm -f $(BINFILE);
+	rm -f $(BINFILE) *.orig;
 
 install:
 	@if test ! -f $(BINFILE); then \

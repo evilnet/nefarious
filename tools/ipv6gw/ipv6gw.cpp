@@ -346,7 +346,7 @@ void Bounce::checkSockets() {
         delCheck = 1;
         b = connectionsList.erase(b); 
       } else {
-         if (strstr(tempBuf, "NICK ")) {
+         if (strstr(tempBuf, "NICK ") && !((*b)->flags & FLAG_SENTWEBIRC)) {
            char *ipbuf = new char;
            char *ipbuff = new char;
            char *ipbufr = new char;
@@ -356,11 +356,7 @@ void Bounce::checkSockets() {
            char *webirc = new char;
            char *formattedhost = NULL;
 
-
-#ifdef DEBUG
-           printf("Debug write local fd %s\n", tempBuf);
-#endif
-          (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
+           (*b)->flags |= FLAG_SENTWEBIRC;
 
            ipbuf = (char *)inet_ntop(AF_INET6, &(*b)->localSocket->address6.sin6_addr, result, 64);
 
@@ -389,12 +385,11 @@ void Bounce::checkSockets() {
            printf("Debug write local fd %s\n", webirc);
 #endif
            (*b)->remoteSocket->write(webirc, l);
-         } else {
+         }
 #ifdef DEBUG
-           printf("Debug write local fd %s\n", tempBuf);
+         printf("Debug write local fd %s\n", tempBuf);
 #endif
-          (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
-        }
+        (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
       }
     } 
  
