@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* tools/ipv6gw/Makefile: Added "install" target with optional
+	command line param DEST=<installdir> (defaults to $HOME/ipv6gw)
+
 2009-09-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* tools/Bounce/bounce.conf: Crap wasnt supposed to change this,
