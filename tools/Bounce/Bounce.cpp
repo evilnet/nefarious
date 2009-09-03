@@ -32,7 +32,7 @@
  */
 
 #include "Bounce.h"
-
+ 
 int main() {
   Bounce* application = new Bounce();
 
@@ -112,31 +112,30 @@ void Bounce::bindListeners() {
   } 
 
   while (fgets(tempBuf, 256, configFd) != NULL) { 
-    if((tempBuf[0] != '#') && (tempBuf[0] != '\r') && (strlen(tempBuf) > 2)) {
+    if((tempBuf[0] != '#') && (tempBuf[0] != '\r')) {
+    switch(tempBuf[0])
+    {
+      case 'P': { /* Add new port listener */ 
+        strtok(tempBuf, ":");
+        vHost = strtok(NULL, ":");
+        localPort = atoi(strtok(NULL, ":"));
+        remoteServer = strtok(NULL, ":");
+        remotePort = atoi(strtok(NULL, ":")); 
 
-      switch(tempBuf[0])
-      {
-        case 'P': { /* Add new port listener */ 
-          strtok(tempBuf, "|");
-          vHost = strtok(NULL, "|");
-          localPort = atoi(strtok(NULL, "|"));
-          remoteServer = strtok(NULL, "|");
-          remotePort = atoi(strtok(NULL, "|")); 
-
-          Listener* newListener = new Listener();
-          strcpy(newListener->myVhost, vHost); 
-          strcpy(newListener->remoteServer, remoteServer);
-          newListener->remotePort = remotePort;
-          newListener->localPort = localPort;
+        Listener* newListener = new Listener();
+        strcpy(newListener->myVhost, vHost); 
+        strcpy(newListener->remoteServer, remoteServer);
+        newListener->remotePort = remotePort;
+        newListener->localPort = localPort;
 #ifdef DEBUG
-          printf("Adding new Listener: Local: %s (%i), Remote: %s (%i)\n", vHost, localPort, remoteServer, remotePort);
+        printf("Adding new Listener: Local: %s:%i, Remote: %s:%i\n", vHost, localPort, remoteServer, remotePort);
 #endif
 
-          newListener->beginListening();
-          listenerList.insert(listenerList.begin(), newListener); 
-          break;
-        }
+        newListener->beginListening();
+        listenerList.insert(listenerList.begin(), newListener); 
+        break;
       }
+    }
     } 
   } 
 }
@@ -337,7 +336,7 @@ Socket* Listener::handleAccept() {
  */
 
   int new_fd = 0;
-  int sin_size = sizeof(struct sockaddr_in6);
+  int sin_size = sizeof(struct sockaddr_in);
 
   Socket* newSocket = new Socket();
   new_fd = accept(fd, (struct sockaddr*)&newSocket->address, (socklen_t*)&sin_size);
@@ -355,14 +354,14 @@ void Listener::beginListening() {
  *
  */
 
-  struct sockaddr_in6 my_addr;
+  struct sockaddr_in my_addr;
   int bindRes;
   int optval;
   optval = 1;
 
-  fd = socket(AF_INET6, SOCK_STREAM, 0); /* Check for no FD's left?! */
+  fd = socket(AF_INET, SOCK_STREAM, 0); /* Check for no FD's left?! */
 
-  my_addr.sin_family = AF_INET6;
+  my_addr.sin_family = AF_INET;
   my_addr.sin_port = htons(localPort);
   my_addr.sin_addr.s_addr = inet_addr(myVhost);
   bzero(&(my_addr.sin_zero), 8);
@@ -377,7 +376,7 @@ void Listener::beginListening() {
      /*
       *  If we can't bind a listening port, we might aswell drop out.
       */
-     printf("Unable to bind to %s (%i)!\n", myVhost, localPort);
+     printf("Unable to bind to %s:%i!\n", myVhost, localPort);
      exit(0);
    } 
 }

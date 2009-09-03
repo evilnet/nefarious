@@ -3,6 +3,14 @@
 
 2009-09-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* tools/Bounce/bounce.conf: Crap wasnt supposed to change this,
+	reverting.
+
+	* tools/Bounce/Bounce.cpp: Crap wasnt supposed to change this,
+	reverting.
+
+2009-09-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* tools/ipv6gw/ipv6gw.conf: Configuration file.
 
 	* tools/ipv6gw/ipv6gw.cpp: Tool that will forward ipv6 connections
