@@ -80,7 +80,7 @@ char *encodehost(char *ipbuf) {
 
   vector<string> v = explode("::", ipbuf);
 
-  if (v.size() > 0) {
+  if (v.size() > 1) {
     left = v[0];
     right = v[1];
   }
