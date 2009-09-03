@@ -3,6 +3,10 @@
 
 2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* tools/ipv6gw/ipv6gw.cpp: Fixed a few typos in vIP generation
+
+2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* tools/ipv6gw/Makefile: Added "install" target with optional
 	command line param DEST=<installdir> (defaults to $HOME/ipv6gw)
 

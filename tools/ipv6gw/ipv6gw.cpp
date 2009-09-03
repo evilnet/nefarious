@@ -370,13 +370,13 @@ void Bounce::checkSockets() {
            string revtmp = ipbuff;
 
            MD5_Init(&ctx1);
-           MD5_Update(&ctx1,(unsigned const char *)revtmp.substr(0,16).c_str(), 8);
+           MD5_Update(&ctx1,(unsigned const char *)revtmp.substr(0,16).c_str(), 16);
            MD5_Final(hash1,&ctx1);
            MD5_Init(&ctx2);
-           MD5_Update(&ctx2,(unsigned const char *)revtmp.substr(16,8).c_str(), 4);
+           MD5_Update(&ctx2,(unsigned const char *)revtmp.substr(16,8).c_str(), 8);
            MD5_Final(hash2,&ctx2);
            MD5_Init(&ctx3);
-           MD5_Update(&ctx3,(unsigned const char *)revtmp.substr(24).c_str(), 4);
+           MD5_Update(&ctx3,(unsigned const char *)revtmp.substr(24).c_str(), 8);
            MD5_Final(hash3,&ctx3);
 
            string reversehost(revtmp.begin(),revtmp.end());
