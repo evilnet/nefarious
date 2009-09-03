@@ -2,6 +2,9 @@ prefix = ${HOME}/ipv6gw
 DEST = ${prefix}
 BINFILE = ipv6gw
 CONFFILE = ipv6gw.conf
+KEYFILE = ipv6gw.key
+CERTFILE = ipv6gw.cer
+REQFILE = ipv6gw.req
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -46,6 +49,14 @@ install:
 	fi
 	@$(INSTALL_PROGRAM) $(BINFILE) $(DEST)/$(BINFILE)
 	@if test ! -f $(DEST)/$(CONFFILE); then \
-		$(INSTALL_PROGRAM) $(CONFFILE) $(DEST)/$(CONFFILE); \
+		$(INSTALL_PROGRAM) -m 0600 $(CONFFILE) $(DEST)/$(CONFFILE); \
+	fi
+	@if test ! -f $(DEST)/$(CERTFILE); then \
+		echo "SSL key and certificate not found."; \
+		echo "Generating SSL key and certificate."; \
+		openssl genrsa -out $(DEST)/$(KEYFILE) 1024; \
+		openssl req -new -key $(DEST)/$(KEYFILE) -out $(DEST)/$(REQFILE); \
+		openssl x509 -req -days 365 -in $(DEST)/$(REQFILE) -signkey $(DEST)/$(KEYFILE) -out $(DEST)/$(CERTFILE); \
+                chmod 0600 $(DEST)/$(REQFILE) $(DEST)/$(KEYFILE) $(DEST)/$(CERTFILE); \
 	fi
 

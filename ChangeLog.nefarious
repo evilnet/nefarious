@@ -3,6 +3,16 @@
 
 2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* tools/ipv6gw/ipv6gw.cpp: Added SSL support
+
+	* tools/ipv6gw/ipv6gw.conf: Added SSL support
+
+	* tools/ipv6gw/ipv6gw.h: Added SSL support
+
+	* tools/ipv6gw/Makefile: Added SSL support
+
+2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* tools/ipv6gw/ipv6gw.cpp: Added command line flags -d/-debug
 	to replace #define DEBUG
 

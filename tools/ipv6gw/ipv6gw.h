@@ -31,6 +31,7 @@
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <openssl/md5.h>
+#include <openssl/ssl.h>
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <ctype.h>
@@ -90,10 +91,11 @@ class Socket
 {
 public:
   int fd;                               // File descriptor.
+  SSL *ssl;                             // SSL Socket.
   int lastReadSize;                     // Size of last read buffer.
   struct sockaddr_in address;           // Socket addr_in struct.
   struct sockaddr_in6 address6;
-  int connectTo(char*, unsigned short); // Connects the socket.
+  int connectTo(char*, unsigned short, int); // Connects the socket.
   int write(char*, int);                // Writes 'int' bytes from message.
   int write(char*);                     // Writes strlen(message).
   char* read();                         // Reads as much as possible into a 4k buffer.
@@ -116,6 +118,7 @@ public:
 
   char wircpass[255];
   char wircsuff[255];
+  int isssl;
 
   void beginListening();  // Bind listening ports.
   Socket* handleAccept(); // Accept a new connection.
@@ -148,3 +151,17 @@ public:
   int debug;
 };
 
+/*
+ *  "SSL" Class.
+ *  Simple SSL global storage
+ */
+class Ssl
+{
+public:
+  SSL_CTX *ctx;
+
+  void init_ctx();
+  void destroy_ctx();
+  SSL* connect(int);
+  SSL* accept(int);
+};

@@ -36,6 +36,7 @@
 using namespace std;
 
 Config* conf = new Config();
+Ssl* sslglobal = new Ssl();
 
 vector<string> explode( const string &delimiter, const string &explodeme);
 
@@ -141,6 +142,9 @@ char *encodehost(char *ipbuf) {
   return formattedhost;
 }
 
+static void sigpipe_handle(int x){
+}
+
 int main(int argc, char* argv[]) {
   Bounce* application = new Bounce();
 
@@ -189,6 +193,14 @@ int main(int argc, char* argv[]) {
     } 
   }
 
+  /* Set up a SIGPIPE handler */
+  signal(SIGPIPE,sigpipe_handle);
+
+  /*
+   * Initialize SSL
+   */
+  sslglobal->init_ctx();
+
   /*
    *  Create new application object, bind listeners and begin
    *  polling them.
@@ -197,7 +209,9 @@ int main(int argc, char* argv[]) {
 
   while (1) {
     application->checkSockets();
-  } 
+  }
+
+  sslglobal->destroy_ctx();
 }
 
 /*
@@ -226,6 +240,7 @@ void Bounce::bindListeners() {
   char* vHost;
   char* wpass;
   char* wsuff;
+  int isssl = 0;
  
   /*
    *  Open config File.
@@ -249,12 +264,7 @@ void Bounce::bindListeners() {
         remotePort = atoi(strtok(NULL, CONF_SEP)); 
         wpass = strtok(NULL, CONF_SEP);
         wsuff = strtok(NULL, CONF_SEP);
-
-        for (int i = strlen(wsuff)-1; i >= 0; i--) {
-          if ((wsuff[i] == 10) || (wsuff[i] == 13)) {
-             wsuff[i] = '\0';
-          }
-        }
+        isssl = atoi(strtok(NULL, CONF_SEP));
 
         Listener* newListener = new Listener();
         strcpy(newListener->myVhost, vHost); 
@@ -263,6 +273,7 @@ void Bounce::bindListeners() {
         newListener->localPort = localPort;
         strcpy(newListener->wircpass, wpass);
         strcpy(newListener->wircsuff, wsuff);
+        newListener->isssl = isssl;
         if (conf->debug)
           printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i\n", vHost, localPort, remoteServer, remotePort);
 
@@ -353,11 +364,15 @@ void Bounce::checkSockets() {
       tempBuf = (*b)->localSocket->read();
       if ((tempBuf[0] == 0)) // Connection closed.
       {
+        if ((*b)->localSocket->ssl)
+          SSL_free((*b)->localSocket->ssl);
+        if ((*b)->remoteSocket->ssl)
+          SSL_free((*b)->remoteSocket->ssl);
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
         if (conf->debug) {
-          printf("Closing L FD: %i\n", (*b)->localSocket->fd);
-          printf("Closing R FD: %i\n", (*b)->remoteSocket->fd); 
+          printf("Closing (closed loc) L FD: %i\n", (*b)->localSocket->fd);
+          printf("Closing (closed loc) R FD: %i\n", (*b)->remoteSocket->fd); 
         }
         delete(*b);
         delCheck = 1;
@@ -424,11 +439,15 @@ void Bounce::checkSockets() {
       tempBuf = (*b)->remoteSocket->read();
       if ((tempBuf[0] == 0)) // Connection closed.
       {
+        if ((*b)->localSocket->ssl)
+          SSL_free((*b)->localSocket->ssl);
+        if ((*b)->remoteSocket->ssl)
+          SSL_free((*b)->remoteSocket->ssl);
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
         if (conf->debug) {
-          printf("Closing L FD: %i\n", (*b)->localSocket->fd);
-          printf("Closing R FD: %i\n", (*b)->remoteSocket->fd);
+          printf("Closing (closed rem) L FD: %i\n", (*b)->localSocket->fd);
+          printf("Closing (closed rem) R FD: %i\n", (*b)->remoteSocket->fd);
         }
         delete(*b);
         delCheck = 1;
@@ -480,13 +499,18 @@ void Bounce::recieveNewConnection(Listener* listener) {
 
   Socket* remoteSocket = new Socket();
   newConnection->remoteSocket = remoteSocket; 
-  if(remoteSocket->connectTo(listener->remoteServer, listener->remotePort)) {
+  if(remoteSocket->connectTo(listener->remoteServer, listener->remotePort, 0)) {
+    if (listener->isssl) {
+      newConnection->remoteSocket->ssl = sslglobal->connect(remoteSocket->fd);
+    }
     connectionsList.insert(connectionsList.begin(), newConnection);
     strcpy(newConnection->wircpass, listener->wircpass);
     strcpy(newConnection->wircsuff, listener->wircsuff);
   } else {
-    if (conf->debug)
-      newConnection->localSocket->write((char *)"ERROR: Unable to connect to remote host.\n");
+    newConnection->localSocket->write((char *)"ERROR: Unable to connect to remote host.\n");
+    printf("Unable to connect to remote host [%s]:%d.\n", listener->remoteServer, listener->remotePort);
+    if (newConnection->localSocket->ssl)
+      SSL_free(newConnection->localSocket->ssl);
     close(newConnection->localSocket->fd);
     delete(newConnection);
     delete(remoteSocket);
@@ -517,6 +541,10 @@ Socket* Listener::handleAccept() {
 
   Socket* newSocket = new Socket();
   new_fd = accept(fd, (struct sockaddr*)&newSocket->address6, (socklen_t*)&sin_size);
+
+  if (this->isssl) {
+    newSocket->ssl = sslglobal->accept(new_fd);
+  }
 
   newSocket->fd = new_fd; 
   return newSocket;
@@ -601,9 +629,15 @@ int Socket::write(char *message, int len) {
  *
  */
 
+   int amount = 0;
+
    if (fd == -1) return 0; 
  
-   int amount = ::write(fd, message, len); 
+   if (ssl) {
+     amount=SSL_write(ssl, message, len);
+   } else {
+     amount = ::write(fd, message, len); 
+   }
    if (conf->debug)
      printf("Wrote %i Bytes.\n", amount);
    return amount; 
@@ -627,7 +661,7 @@ int Socket::write(char *message) {
 }
 
 
-int Socket::connectTo(char *hostname, unsigned short portnum) { 
+int Socket::connectTo(char *hostname, unsigned short portnum, int isssl) { 
 /*
  *  connectTo.
  *  Inputs: Hostname and port.
@@ -672,7 +706,11 @@ char* Socket::read() {
   int amountRead = 0;
   static char buffer[4096];
 
-  amountRead = ::read(fd, &buffer, 4096);
+  if (ssl) {
+    amountRead = SSL_read(ssl, buffer, 4096);
+  } else {
+    amountRead = ::read(fd, &buffer, 4096);
+  }
 
   if ((amountRead == -1)) buffer[0] = '\0';
   buffer[amountRead] = '\0';
@@ -687,3 +725,58 @@ char* Socket::read() {
   return (char *)&buffer;
 }
 
+void Ssl::init_ctx() {
+  SSL_METHOD *meth;
+
+  SSL_library_init();
+  SSL_load_error_strings();
+
+  meth=SSLv23_method();
+  this->ctx=SSL_CTX_new(meth);
+
+  if(!(SSL_CTX_use_certificate_chain_file(this->ctx, "ipv6gw.cer"))) {
+    if (conf->debug)
+      printf("Unable to load SSL certificate file\n");
+    exit(1);
+  }
+
+  if(!(SSL_CTX_use_PrivateKey_file(this->ctx, "ipv6gw.key", SSL_FILETYPE_PEM))) {
+    if (conf->debug)
+      printf("Unable to load SSL key file\n");
+    exit(1);
+  }
+}
+
+void Ssl::destroy_ctx() {
+  SSL_CTX_free(this->ctx);
+}
+
+SSL* Ssl::connect(int fd) {
+  SSL *ssl;
+  BIO *sbio;
+
+  ssl=SSL_new(ctx);
+  sbio=BIO_new_socket(fd,BIO_NOCLOSE);
+  SSL_set_bio(ssl,sbio,sbio);
+  if (SSL_connect(ssl)<=0) {
+    if (conf->debug)
+      printf("SSL Connect error\n");
+    return 0;
+  }
+  return ssl;
+}
+
+SSL* Ssl::accept(int fd) {
+  SSL *ssl;
+  BIO *sbio;
+
+  ssl=SSL_new(ctx);
+  sbio=BIO_new_socket(fd,BIO_NOCLOSE);
+  SSL_set_bio(ssl,sbio,sbio);
+  if (SSL_accept(ssl)<=0) {
+    if (conf->debug)
+      printf("SSL Accept error\n");
+    return 0;
+  }
+  return ssl;
+}
