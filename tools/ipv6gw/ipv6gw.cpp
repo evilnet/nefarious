@@ -35,6 +35,8 @@
 
 using namespace std;
 
+Config* conf = new Config();
+
 vector<string> explode( const string &delimiter, const string &explodeme);
 
 vector<string> explode( const string &delimiter, const string &str)
@@ -139,37 +141,53 @@ char *encodehost(char *ipbuf) {
   return formattedhost;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
   Bounce* application = new Bounce();
 
   /*
    *  Ignore SIGPIPE.
    */
 
-  struct sigaction act; 
-  act.sa_handler = SIG_IGN;
-  act.sa_flags = 0;
-  sigemptyset(&act.sa_mask);
-  sigaction(SIGPIPE, &act, 0);
- 
-#ifndef DEBUG
-  /*
-   *  If we aren't debugging, we might as well
-   *  detach from the console.
-   */
-
-  pid_t forkResult = fork() ;
-  if(forkResult < 0)
-  { 
-    printf("Unable to fork new process.\n");
-    return -1 ;
-  } 
-  else if(forkResult != 0)
-  {
-    printf("Successfully Forked, New process ID is %i.\n", forkResult);
-    return 0;
-  } 
+  conf->debug = 0;
+#ifdef DEBUG
+  conf->debug = 1;
 #endif
+
+  for (int i = 1; i < argc; i++) {
+    if ((strcmp(argv[i], "-d") == 0) && (!conf->debug)) {
+      conf->debug = 1;
+      printf("Enabling debug mode\n");
+    }
+    if ((strcmp(argv[i], "-debug") == 0) && (!conf->debug)) {
+      conf->debug = 1;
+      printf("Enabling debug mode\n");
+    }
+  }
+
+   struct sigaction act; 
+   act.sa_handler = SIG_IGN;
+   act.sa_flags = 0;
+   sigemptyset(&act.sa_mask);
+   sigaction(SIGPIPE, &act, 0);
+
+   if (!conf->debug) {
+     /*
+      *  If we aren't debugging, we might as well
+      *  detach from the console.
+      */
+
+    pid_t forkResult = fork() ;
+    if(forkResult < 0)
+    { 
+      printf("Unable to fork new process.\n");
+      return -1 ;
+    } 
+    else if(forkResult != 0)
+    {
+     printf("Successfully Forked, New process ID is %i.\n", forkResult);
+      return 0;
+    } 
+  }
 
   /*
    *  Create new application object, bind listeners and begin
@@ -245,9 +263,8 @@ void Bounce::bindListeners() {
         newListener->localPort = localPort;
         strcpy(newListener->wircpass, wpass);
         strcpy(newListener->wircsuff, wsuff);
-#ifdef DEBUG
-        printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i\n", vHost, localPort, remoteServer, remotePort);
-#endif
+        if (conf->debug)
+          printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i\n", vHost, localPort, remoteServer, remotePort);
 
         newListener->beginListening();
         listenerList.insert(listenerList.begin(), newListener); 
@@ -338,10 +355,10 @@ void Bounce::checkSockets() {
       {
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
-#ifdef DEBUG
-        printf("Closing L FD: %i\n", (*b)->localSocket->fd);
-        printf("Closing R FD: %i\n", (*b)->remoteSocket->fd); 
-#endif
+        if (conf->debug) {
+          printf("Closing L FD: %i\n", (*b)->localSocket->fd);
+          printf("Closing R FD: %i\n", (*b)->remoteSocket->fd); 
+        }
         delete(*b);
         delCheck = 1;
         b = connectionsList.erase(b); 
@@ -381,14 +398,12 @@ void Bounce::checkSockets() {
 
            sprintf(webirc, "WEBIRC %s ipv6gw %s.%s 0.%d.%d.%d\r\n", (*b)->wircpass, ipbufr, (*b)->wircsuff, hash1[3], hash2[7], hash3[11]);
            int l = strlen(webirc);
-#ifdef DEBUG
-           printf("Debug write local fd %s\n", webirc);
-#endif
+           if (conf->debug)
+             printf("Debug write local fd %s\n", webirc);
            (*b)->remoteSocket->write(webirc, l);
          }
-#ifdef DEBUG
-         printf("Debug write local fd %s\n", tempBuf);
-#endif
+         if (conf->debug)
+           printf("Debug write local fd %s\n", tempBuf);
         (*b)->remoteSocket->write(tempBuf, (*b)->localSocket->lastReadSize); 
       }
     } 
@@ -411,17 +426,16 @@ void Bounce::checkSockets() {
       {
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
-#ifdef DEBUG
-        printf("Closing L FD: %i\n", (*b)->localSocket->fd);
-        printf("Closing R FD: %i\n", (*b)->remoteSocket->fd);
-#endif
+        if (conf->debug) {
+          printf("Closing L FD: %i\n", (*b)->localSocket->fd);
+          printf("Closing R FD: %i\n", (*b)->remoteSocket->fd);
+        }
         delete(*b);
         delCheck = 1;
         b = connectionsList.erase(b); 
       } else {
-#ifdef DEBUG
-         printf("Debug write remote fd %s\n", tempBuf);
-#endif
+         if (conf->debug)
+           printf("Debug write remote fd %s\n", tempBuf);
         (*b)->localSocket->write(tempBuf, (*b)->remoteSocket->lastReadSize);
       }
     }
@@ -471,9 +485,8 @@ void Bounce::recieveNewConnection(Listener* listener) {
     strcpy(newConnection->wircpass, listener->wircpass);
     strcpy(newConnection->wircsuff, listener->wircsuff);
   } else {
-#ifdef DEBUG
-    newConnection->localSocket->write((char *)"ERROR: Unable to connect to remote host.\n");
-#endif
+    if (conf->debug)
+      newConnection->localSocket->write((char *)"ERROR: Unable to connect to remote host.\n");
     close(newConnection->localSocket->fd);
     delete(newConnection);
     delete(remoteSocket);
@@ -591,9 +604,8 @@ int Socket::write(char *message, int len) {
    if (fd == -1) return 0; 
  
    int amount = ::write(fd, message, len); 
-#ifdef DEBUG
-   printf("Wrote %i Bytes.\n", amount);
-#endif
+   if (conf->debug)
+     printf("Wrote %i Bytes.\n", amount);
    return amount; 
 }
 
@@ -609,9 +621,8 @@ int Socket::write(char *message) {
    if (fd == -1) return 0; 
  
    int amount = ::write(fd, message, strlen(message)); 
-#ifdef DEBUG
-   printf("Wrote %i Bytes.\n", amount);
-#endif
+   if (conf->debug)
+     printf("Wrote %i Bytes.\n", amount);
    return amount; 
 }
 
@@ -666,9 +677,8 @@ char* Socket::read() {
   if ((amountRead == -1)) buffer[0] = '\0';
   buffer[amountRead] = '\0';
 
-#ifdef DEBUG
-   printf("Read %s (%i Bytes).\n", buffer, amountRead);
-#endif
+  if (conf->debug)
+    printf("Read %s (%i Bytes).\n", buffer, amountRead);
 
   /* 
    * Record this just incase we're dealing with binary data with 0's in it.

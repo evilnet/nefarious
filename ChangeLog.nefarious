@@ -3,6 +3,14 @@
 
 2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* tools/ipv6gw/ipv6gw.cpp: Added command line flags -d/-debug
+	to replace #define DEBUG
+
+	* tools/ipv6gw/ipv6gw.h: Added command line flags -d/-debug
+	to replace #define DEBUG
+
+2009-09-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* tools/ipv6gw/ipv6gw.cpp: Fixed bug causing WEBIRC message to
 	be sent more then once
 

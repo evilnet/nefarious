@@ -138,3 +138,13 @@ public:
   int flags;
 };
 
+/*
+ *  "Config" Class.
+ *  Simple config storage
+ */
+class Config
+{
+public:
+  int debug;
+};
+
