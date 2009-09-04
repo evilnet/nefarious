@@ -288,7 +288,7 @@ int ip_registry_check_local(unsigned int addr, time_t* next_target_out)
     if (next_target_out)
       *next_target_out = CurrentTime - (TARGET_DELAY * free_targets - 1);
   }
-  else if ((CurrentTime - cli_since(&me)) > IPCHECK_CLONE_DELAY) {
+  else if ((CurrentTime - cli_since(&me)) < IPCHECK_CLONE_DELAY) {
     /*
      * Don't refuse connection when we just rebooted the server
      */

@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-04  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_webirc.c: Minor bug where WEBIRC users were getting
+	by the WEBIRC server's IP not their own.
+
+	* ircd/IPcheck.c: Fixed connection throttling so it now does
+	what it says on the tin.
+
 2009-09-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* tools/ipv6gw/ipv6gw.cpp: Fix for a crash on connection to a

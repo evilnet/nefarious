@@ -224,6 +224,7 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   inet_aton(ipaddr, &webirc_addr);
 
   if (feature_bool(FEAT_IPCHECK)) {
+    IPcheck_connect_fail(cptr);
     IPcheck_disconnect(cptr);
     ClearIPChecked(cptr);
   }
@@ -232,8 +233,7 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   if (feature_bool(FEAT_IPCHECK)) {
     if (!IPcheck_local_connect(cli_ip(cptr), &next_target)) {
-      IPcheck_connect_fail(cptr);
-      return exit_client(cptr, sptr, &me, "Too many connections from your host");
+      return exit_client(cptr, sptr, &me, "Your host is trying to (re)connect too fast -- throttled");
     }
 
     SetIPChecked(cptr);
