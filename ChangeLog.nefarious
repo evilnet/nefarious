@@ -1,9 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* tools/ipv6gw/ipv6gw.cpp: Fix for a crash on connection to a
+	non ssl port with a non ssl connection.
+
 2009-09-04  Matthew Beeching  <jobe@mdbnet.co.uk>
 
-	* tools/ipv6gw/ipv6gw.cpp: Fix for a crash on disconnection
+	* tools/ipv6gw/ipv6gw.cpp: Fix for a crash on disconnection.
 
 2009-09-04  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 

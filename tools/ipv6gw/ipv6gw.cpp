@@ -275,7 +275,7 @@ void Bounce::bindListeners() {
         strcpy(newListener->wircsuff, wsuff);
         newListener->isssl = isssl;
         if (conf->debug)
-          printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i\n", vHost, localPort, remoteServer, remotePort);
+          printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i [%s]\n", vHost, localPort, remoteServer, remotePort, isssl ? "SSL" : "Non SSL");
 
         newListener->beginListening();
         listenerList.insert(listenerList.begin(), newListener); 
@@ -504,7 +504,8 @@ void Bounce::recieveNewConnection(Listener* listener) {
   if(remoteSocket->connectTo(listener->remoteServer, listener->remotePort, 0)) {
     if (listener->isssl) {
       newConnection->remoteSocket->ssl = sslglobal->connect(remoteSocket->fd);
-    }
+    } else
+      newConnection->remoteSocket->ssl = NULL;
     connectionsList.insert(connectionsList.begin(), newConnection);
     strcpy(newConnection->wircpass, listener->wircpass);
     strcpy(newConnection->wircsuff, listener->wircsuff);
@@ -546,7 +547,8 @@ Socket* Listener::handleAccept() {
 
   if (this->isssl) {
     newSocket->ssl = sslglobal->accept(new_fd);
-  }
+  } else
+   newSocket->ssl = NULL;
 
   newSocket->fd = new_fd; 
   return newSocket;
