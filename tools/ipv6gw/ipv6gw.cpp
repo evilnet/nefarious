@@ -366,8 +366,10 @@ void Bounce::checkSockets() {
       {
         if ((*b)->localSocket->ssl)
           SSL_free((*b)->localSocket->ssl);
+/* Causes crash
         if ((*b)->remoteSocket->ssl)
           SSL_free((*b)->remoteSocket->ssl);
+*/
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
         if (conf->debug) {
