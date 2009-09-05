@@ -85,6 +85,7 @@
 #include "client.h"
 #include "hash.h"
 #include "ircd.h"
+#include "ircd_features.h"
 #include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
@@ -201,7 +202,7 @@ void do_names(struct Client* sptr, struct Channel* chptr, int filter)
     }
     strcat(buf, cli_name(c2ptr));
 
-    if (IsUHNames(sptr)) {
+    if (feature_bool(FEAT_UHNAMES) && IsUHNames(sptr)) {
       strcat(buf, "!");
       strcat(buf, cli_user(c2ptr)->username);
       strcat(buf, "@");

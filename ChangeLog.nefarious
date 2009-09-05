@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_names.c: Added F:UHNAMES
+
+	* ircd/ircd_features.c: Added F:UHNAMES
+
+	* include/ircd_features.h: Added F:UHNAMES
+
 2009-09-04  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_webirc.c: Minor bug where WEBIRC users were getting

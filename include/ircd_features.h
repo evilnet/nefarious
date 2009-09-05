@@ -351,6 +351,9 @@ enum Feature {
   /* Added to allow configuring sending host with LOC */
   FEAT_LOC_SENDHOST,
 
+  /* Added to allow disabling UHNAMES */
+  FEAT_UHNAMES,
+
   /* Really special features (tm) */
   FEAT_NETWORK_REHASH,
   FEAT_NETWORK_RESTART,
