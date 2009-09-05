@@ -3,6 +3,10 @@
 
 2009-09-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* tools/ipv6gw/ipv6gw.cpp: Another fix for SSL related crash bug.
+
+2009-09-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/m_names.c: Added F:UHNAMES
 
 	* ircd/ircd_features.c: Added F:UHNAMES

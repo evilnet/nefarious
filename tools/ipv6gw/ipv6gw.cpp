@@ -443,8 +443,10 @@ void Bounce::checkSockets() {
       {
         if ((*b)->localSocket->ssl)
           SSL_free((*b)->localSocket->ssl);
+/* Causes crash
         if ((*b)->remoteSocket->ssl)
           SSL_free((*b)->remoteSocket->ssl);
+*/
         close((*b)->localSocket->fd);
         close((*b)->remoteSocket->fd); 
         if (conf->debug) {
@@ -621,6 +623,7 @@ Socket::Socket() {
 
   fd = -1;
   lastReadSize = 0;
+  ssl = NULL;
 }
 
 int Socket::write(char *message, int len) { 
@@ -757,30 +760,26 @@ void Ssl::destroy_ctx() {
 
 SSL* Ssl::connect(int fd) {
   SSL *ssl;
-  BIO *sbio;
 
   ssl=SSL_new(ctx);
-  sbio=BIO_new_socket(fd,BIO_NOCLOSE);
-  SSL_set_bio(ssl,sbio,sbio);
+  SSL_set_fd(ssl, fd);
   if (SSL_connect(ssl)<=0) {
     if (conf->debug)
       printf("SSL Connect error\n");
-    return 0;
+    return NULL;
   }
   return ssl;
 }
 
 SSL* Ssl::accept(int fd) {
   SSL *ssl;
-  BIO *sbio;
 
   ssl=SSL_new(ctx);
-  sbio=BIO_new_socket(fd,BIO_NOCLOSE);
-  SSL_set_bio(ssl,sbio,sbio);
+  SSL_set_fd(ssl, fd);
   if (SSL_accept(ssl)<=0) {
     if (conf->debug)
       printf("SSL Accept error\n");
-    return 0;
+    return NULL;
   }
   return ssl;
 }
