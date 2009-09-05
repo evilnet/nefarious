@@ -377,6 +377,7 @@ void Bounce::checkSockets() {
           printf("Closing (closed loc) R FD: %i\n", (*b)->remoteSocket->fd); 
         }
         delete(*b);
+        *b = NULL;
         delCheck = 1;
         b = connectionsList.erase(b); 
       } else {
@@ -454,6 +455,7 @@ void Bounce::checkSockets() {
           printf("Closing (closed rem) R FD: %i\n", (*b)->remoteSocket->fd);
         }
         delete(*b);
+        *b = NULL;
         delCheck = 1;
         b = connectionsList.erase(b); 
       } else {
@@ -509,8 +511,8 @@ void Bounce::recieveNewConnection(Listener* listener) {
     } else
       newConnection->remoteSocket->ssl = NULL;
     connectionsList.insert(connectionsList.begin(), newConnection);
-    strcpy(newConnection->wircpass, listener->wircpass);
-    strcpy(newConnection->wircsuff, listener->wircsuff);
+    newConnection->wircpass = strdup(listener->wircpass);
+    newConnection->wircsuff = strdup(listener->wircsuff);
   } else {
     newConnection->localSocket->write((char *)"ERROR: Unable to connect to remote host.\n");
     printf("Unable to connect to remote host [%s]:%d.\n", listener->remoteServer, listener->remotePort);
@@ -612,6 +614,15 @@ void Listener::beginListening() {
  */
 
 
+Connection::Connection() {
+  localSocket = NULL;
+  remoteSocket = NULL;
+  wircpass = NULL;
+  wircsuff = NULL;
+  flags = 0;
+
+}
+
 Socket::Socket() {
 /*
  *  Socket Constructor.
@@ -678,12 +689,15 @@ int Socket::connectTo(char *hostname, unsigned short portnum, int isssl) {
  *
  */
 
-  struct hostent     *hp;
- 
-  if ((hp = gethostbyname(hostname)) == NULL) { 
+  struct hostent     *hp = NULL;
+  struct in_addr ipv4addr;
+
+  inet_pton(AF_INET, hostname, &ipv4addr);
+
+  if ((hp = gethostbyaddr(&ipv4addr, sizeof(ipv4addr), AF_INET)) == NULL) { 
+     cout << "no addr " << hostname << " " << strlen(hostname) << endl;
      return 0; 
   }          
-
   memset(&address,0,sizeof(address));
   memcpy((char *)&address.sin_addr,hp->h_addr,hp->h_length);
   address.sin_family= hp->h_addrtype;

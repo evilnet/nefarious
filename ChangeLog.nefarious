@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* tools/ipv6gw/ipv6gw.cpp: Fixed a crash when reconnecting on
+	Linux systems.
+
+	* tools/ipv6gw/ipv6gw.h: Fixed a crash when reconnecting on
+	Linux systems.
+
 2009-09-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* tools/ipv6gw/ipv6gw.cpp: Another fix for SSL related crash bug.

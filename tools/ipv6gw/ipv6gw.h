@@ -135,10 +135,11 @@ public:
   Socket* localSocket;
   Socket* remoteSocket;
 
-  char wircpass[255];
-  char wircsuff[255];
+  char *wircpass;
+  char *wircsuff;
 
   int flags;
+  Connection();
 };
 
 /*
