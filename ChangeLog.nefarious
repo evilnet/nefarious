@@ -3,6 +3,14 @@
 
 2009-09-06  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* tools/ipv6gw/ipv6gw.cpp: Changed command line param handling
+	and added better handling for a couple of SSL errors
+
+	* tools/ipv6gw/ipv6gw.h: Added better handling for a couple of
+	SSL errors
+
+2009-09-06  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* tools/ipv6gw/ipv6gw.cpp: Added rDNS support
 
 	* tools/ipv6gw/ipv6gw.h: Removed some duplicate #include's

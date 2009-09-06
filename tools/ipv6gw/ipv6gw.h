@@ -154,9 +154,11 @@ class Ssl
 {
 public:
   SSL_CTX *ctx;
+  int enabled;
 
   void init_ctx();
   void destroy_ctx();
   SSL* connect(int);
   SSL* accept(int);
+  Ssl();
 };

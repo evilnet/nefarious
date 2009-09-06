@@ -190,27 +190,30 @@ int main(int argc, char* argv[]) {
 
   conf->debug = 0;
 #ifdef DEBUG
-  conf->debug = 1;
+  conf->debug++;
 #endif
 
-  for (int i = 1; i < argc; i++) {
-    if ((strcmp(argv[i], "-d") == 0) && (!conf->debug)) {
-      conf->debug = 1;
-      printf("Enabling debug mode\n");
-    }
-    if ((strcmp(argv[i], "-debug") == 0) && (!conf->debug)) {
-      conf->debug = 1;
-      printf("Enabling debug mode\n");
+  int ch;
+
+  while ((ch = getopt(argc, argv, "d")) != -1) {
+    switch (ch) {
+      case 'd': {
+        conf->debug++;
+        break;
+      }
     }
   }
 
-   struct sigaction act; 
-   act.sa_handler = SIG_IGN;
-   act.sa_flags = 0;
-   sigemptyset(&act.sa_mask);
-   sigaction(SIGPIPE, &act, 0);
+  if (conf->debug)
+    printf("Enabling debug mode at level %d\n", conf->debug);
 
-   if (!conf->debug) {
+  struct sigaction act; 
+  act.sa_handler = SIG_IGN;
+  act.sa_flags = 0;
+  sigemptyset(&act.sa_mask);
+  sigaction(SIGPIPE, &act, 0);
+
+  if (!conf->debug) {
      /*
       *  If we aren't debugging, we might as well
       *  detach from the console.
@@ -302,6 +305,12 @@ void Bounce::bindListeners() {
         wsuff = strtok(NULL, CONF_SEP);
         isssl = atoi(strtok(NULL, CONF_SEP));
 
+        if (!(sslglobal->enabled) && isssl) {
+          isssl = 0;
+          if (conf->debug)
+            printf("Cannot enable SSL on [%s]:%i, SSL is disabled!\n", vHost, localPort);
+        }
+
         Listener* newListener = new Listener();
         strcpy(newListener->myVhost, vHost); 
         strcpy(newListener->remoteServer, remoteServer);
@@ -311,7 +320,7 @@ void Bounce::bindListeners() {
         strcpy(newListener->wircsuff, wsuff);
         newListener->isssl = isssl;
         if (conf->debug)
-          printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i [%s]\n", vHost, localPort, remoteServer, remotePort, isssl ? "SSL" : "Non SSL");
+          printf("Adding new Listener: Local: [%s]:%i, Remote: [%s]:%i [%sSSL]\n", vHost, localPort, remoteServer, remotePort, (isssl ? "" : "Non "));
 
         newListener->beginListening();
         listenerList.insert(listenerList.begin(), newListener); 
@@ -788,8 +797,15 @@ char* Socket::read() {
   return (char *)&buffer;
 }
 
+Ssl::Ssl() {
+  this->ctx = NULL;
+  this->enabled = 0;
+}
+
 void Ssl::init_ctx() {
   SSL_METHOD *meth;
+
+  this->enabled = 1;
 
   SSL_library_init();
   SSL_load_error_strings();
@@ -799,43 +815,52 @@ void Ssl::init_ctx() {
 
   if(!(SSL_CTX_use_certificate_chain_file(this->ctx, "ipv6gw.cer"))) {
     if (conf->debug)
-      printf("Unable to load SSL certificate file\n");
-    exit(1);
+      printf("Unable to load SSL certificate file, disabling SSL\n");
+    this->enabled = 0;
   }
 
-  if(!(SSL_CTX_use_PrivateKey_file(this->ctx, "ipv6gw.key", SSL_FILETYPE_PEM))) {
+  if(this->enabled && !(SSL_CTX_use_PrivateKey_file(this->ctx, "ipv6gw.key", SSL_FILETYPE_PEM))) {
     if (conf->debug)
-      printf("Unable to load SSL key file\n");
-    exit(1);
+      printf("Unable to load SSL key file, disabling SSL\n");
+    this->enabled = 0;
   }
 }
 
 void Ssl::destroy_ctx() {
-  SSL_CTX_free(this->ctx);
+  if (this->enabled)
+    SSL_CTX_free(this->ctx);
 }
 
 SSL* Ssl::connect(int fd) {
   SSL *ssl;
 
-  ssl=SSL_new(ctx);
-  SSL_set_fd(ssl, fd);
-  if (SSL_connect(ssl)<=0) {
-    if (conf->debug)
-      printf("SSL Connect error\n");
+  if (this->enabled) {
+    ssl=SSL_new(ctx);
+    SSL_set_fd(ssl, fd);
+    if (SSL_connect(ssl)<=0) {
+      if (conf->debug)
+        printf("SSL Connect error\n");
+      return NULL;
+    }
+    return ssl;
+  } else {
     return NULL;
   }
-  return ssl;
 }
 
 SSL* Ssl::accept(int fd) {
   SSL *ssl;
 
-  ssl=SSL_new(ctx);
-  SSL_set_fd(ssl, fd);
-  if (SSL_accept(ssl)<=0) {
-    if (conf->debug)
-      printf("SSL Accept error\n");
+  if (this->enabled) {
+    ssl=SSL_new(ctx);
+    SSL_set_fd(ssl, fd);
+    if (SSL_accept(ssl)<=0) {
+      if (conf->debug)
+        printf("SSL Accept error\n");
+      return NULL;
+    }
+    return ssl;
+  } else {
     return NULL;
   }
-  return ssl;
 }
