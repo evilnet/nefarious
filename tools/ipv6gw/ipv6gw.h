@@ -24,36 +24,30 @@
  *
  */
 
-#include <sys/types.h> 
-#include <sys/time.h>
-#include <sys/wait.h> 
-#include <sys/socket.h>
-#include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <openssl/md5.h>
 #include <openssl/ssl.h>
 #include <netinet/in.h>
-#include <netdb.h> 
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <ctype.h>
-#include <time.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <stdarg.h>
-#include <signal.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <errno.h> 
-#include <string.h> 
-#include <netdb.h> 
-#include <ctype.h>
-#include <time.h>
+#include <netdb.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
 #include <algorithm>
-#include <list>
-#include <list>
 #include <iostream>
 #include <iterator>
+#include <list>
 #include <vector>
 using std::list; 
 using namespace std;

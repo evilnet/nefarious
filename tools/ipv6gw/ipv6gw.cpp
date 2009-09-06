@@ -145,6 +145,42 @@ char *encodehost(char *ipbuf) {
 static void sigpipe_handle(int x){
 }
 
+char* get_rdns6(char *ipin) {
+  struct in6_addr ipaddr;
+  struct hostent *her;
+  struct hostent *hef;
+  static char result[64];
+  char *ipbuf;
+  int i = 0;
+  int valid = 0;
+  
+  if (!(ipin))
+    return NULL;
+  
+  if (inet_pton(AF_INET6, ipin, &ipaddr) < 0)
+    return NULL;
+  
+  her = gethostbyaddr((const void *)&ipaddr, sizeof ipaddr, AF_INET6);
+  
+  if (her) {
+    hef = gethostbyname2(her->h_name, AF_INET6);
+    if (hef) {
+      while ((hef->h_addr_list[i] != NULL) && !valid) {
+        ipbuf = (char *)inet_ntop(AF_INET6, hef->h_addr_list[i], result, 64);
+        if (strcmp(ipbuf, ipin) == 0) {
+          valid = 1;
+        }
+        i++;
+      }
+    }
+  }
+  
+  if (valid && her)
+    return her->h_name;
+  else
+    return NULL;
+}
+
 int main(int argc, char* argv[]) {
   Bounce* application = new Bounce();
 
@@ -385,6 +421,7 @@ void Bounce::checkSockets() {
            char *ipbuf = new char;
            char *ipbuff = new char;
            char *ipbufr = new char;
+           char *hostbuf = new char;
            static char result[64];
            MD5state_st ctx1, ctx2, ctx3;
            unsigned char hash1[16], hash2[16], hash3[16];
@@ -394,6 +431,8 @@ void Bounce::checkSockets() {
            (*b)->flags |= FLAG_SENTWEBIRC;
 
            ipbuf = (char *)inet_ntop(AF_INET6, &(*b)->localSocket->address6.sin6_addr, result, 64);
+
+           hostbuf = get_rdns6(ipbuf);
 
            formattedhost = encodehost(ipbuf);
 
@@ -414,7 +453,10 @@ void Bounce::checkSockets() {
            reverse (reversehost.begin(), reversehost.end());
            ipbufr = (char *)reversehost.c_str();
 
-           sprintf(webirc, "WEBIRC %s ipv6gw %s.%s 0.%d.%d.%d\r\n", (*b)->wircpass, ipbufr, (*b)->wircsuff, hash1[3], hash2[7], hash3[11]);
+           if (!hostbuf)
+             sprintf(hostbuf, "%s.%s", ipbufr, (*b)->wircsuff);
+
+           sprintf(webirc, "WEBIRC %s ipv6gw %s 0.%d.%d.%d :IPv6 Address: %s\r\n", (*b)->wircpass, hostbuf, hash1[3], hash2[7], hash3[11], ipbuf);
            int l = strlen(webirc);
            if (conf->debug)
              printf("Debug write local fd %s\n", webirc);

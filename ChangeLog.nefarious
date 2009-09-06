@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-06  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* tools/ipv6gw/ipv6gw.cpp: Added rDNS support
+
+	* tools/ipv6gw/ipv6gw.h: Removed some duplicate #include's
+
 2009-09-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* tools/ipv6gw/ipv6gw.cpp: Fixed a crash when reconnecting on
