@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-21  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* tools/ipv6gw: Removed IPv6GW from tools now IRCGW is in trunk
+
 2009-09-08  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_quit.c: Fix for bug allowing users to bypass channel
