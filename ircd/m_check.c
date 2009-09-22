@@ -41,6 +41,7 @@
 #include "numnicks.h"
 #include "querycmds.h"
 #include "send.h"
+#include "s_conf.h"
 #include "s_debug.h"
 #include "s_misc.h"
 #include "s_user.h"
@@ -417,6 +418,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
      }
    }
 
+   get_eflags(acptr);
 
    /* +s (SERV_NOTICE) is not relayed to us from remote servers,
     * so we cannot tell if a remote client has that mode set.
@@ -760,4 +762,114 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int flags) {
   }
 
   return count;
+}
+
+int get_eflags(struct Client *cptr) {
+  struct eline *eline;
+  unsigned int e_flag = 0;
+  int found = 0;
+  char outbuf[BUFSIZE];
+  char i_host[SOCKIPLEN + USERLEN + 2];
+  char s_host[HOSTLEN + USERLEN + 2];
+
+  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(cptr), ircd_ntoa((const char*) &(cli_ip(cptr))));
+  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(cptr), cli_sockhost(cptr));
+
+  for (eline = GlobalEList; eline; eline = eline->next) {
+    char* ip_start;
+    char* cidr_start;
+    in_addr_t cli_addr = 0;
+    *outbuf = '\0';
+
+    e_flag = eflagstr(eline->flags);
+
+    if (s_host) {
+      if ((match(eline->mask, s_host) == 0) || (match(eline->mask, i_host) == 0)) {
+        found = 1;
+      }
+    }
+
+    if ((ip_start = strrchr(i_host, '@')))
+      cli_addr = inet_addr(ip_start + 1);
+
+    if ((ip_start = strrchr(eline->mask, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+      int bits = atoi(cidr_start + 1);
+      char* p = strchr(i_host, '@');
+
+      if (p) {
+        *p = *ip_start = 0;
+        if (match(eline->mask, i_host) == 0) {
+          if ((bits > 0) && (bits < 33)) {
+            in_addr_t ban_addr;
+            *cidr_start = 0;
+            ban_addr = inet_addr(ip_start + 1);
+            *cidr_start = '/';
+            if ((NETMASK(bits) & cli_addr) == ban_addr) {
+              *p = *ip_start = '@';
+              found = 1;
+            }
+          }
+        }
+        *p = *ip_start = '@';
+      }
+    }
+
+    if (found) {
+      strcat(outbuf, "     Exemptions:: ");
+
+      if (e_flag & EFLAG_KLINE) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "K:Lines");
+      }
+
+      if (e_flag & EFLAG_GLINE) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "G:Lines");
+      }
+
+      if (e_flag & EFLAG_SHUN) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "Shuns");
+      }
+
+      if (e_flag & EFLAG_ZLINE) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "Z:Lines");
+      }
+
+      if (e_flag & EFLAG_SFILTER) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "Spamfilters");
+      }
+
+      if (e_flag & EFLAG_LIST) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "List Delays");
+      }
+
+      if (e_flag & EFLAG_IDENT) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "Ident Prompts");
+      }
+
+      if ((e_flag & EFLAG_IPCHECK) && IsIPCheckExempted(cptr)) {
+        if (strlen(outbuf) > 21)
+          strcat(outbuf, ", ");
+        strcat(outbuf, "IPCheck");
+      }
+
+      if (strlen(outbuf) > 18)
+        send_reply(cptr, RPL_DATASTR, outbuf);
+    }
+    found = 0;
+  }
+
+  return 0;
 }

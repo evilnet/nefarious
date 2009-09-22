@@ -124,7 +124,8 @@ static int eline_flags[] = {
   EFLAG_SHUN,     's',
   EFLAG_SFILTER,  'S',
   EFLAG_LIST,     'L',
-  EFLAG_IDENT,    'i'
+  EFLAG_IDENT,    'i',
+  EFLAG_IPCHECK,  'I'
 };
 
 static int fline_rflags[] = {
@@ -683,7 +684,7 @@ enum AuthorizationCheckResult attach_iline(struct Client*  cptr)
     if ((aconf->bits >= 0) && ((cli_ip(cptr).s_addr & NETMASK(aconf->bits)) != aconf->ipnum.s_addr))
         continue;
 
-    if (feature_bool(FEAT_IPCHECK)) {
+    if (feature_bool(FEAT_IPCHECK) && !find_eline(cptr, EFLAG_IPCHECK)) {
       if (IPcheck_nr(cptr) > aconf->maximum)
         return ACR_TOO_MANY_FROM_IP;
     }
@@ -2132,8 +2133,18 @@ int find_eline(struct Client *cptr, unsigned int flags)
   unsigned int e_flag = 0;
   struct eline *eline;
 
-  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(cptr), ircd_ntoa((const char*) &(cli_ip(cptr))));
-  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(cptr), cli_sockhost(cptr));
+  if (flags & EFLAG_IPCHECK) {
+    if (IsIPCheckExempted(cptr))
+      return -1;
+
+    if (IsNotIPCheckExempted(cptr))
+      return 0;
+
+    ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "nobody@%s", ircd_ntoa((const char*) &(cli_ip(cptr))));
+  } else {
+    ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(cptr), ircd_ntoa((const char*) &(cli_ip(cptr))));
+    ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(cptr), cli_sockhost(cptr));
+  }
 
   for (eline = GlobalEList; eline; eline = eline->next) {
     char* ip_start;
@@ -2142,11 +2153,79 @@ int find_eline(struct Client *cptr, unsigned int flags)
 
     e_flag = eflagstr(eline->flags);
 
-    if ((match(eline->mask, s_host) == 0) || (match(eline->mask, i_host) == 0)) {
-      if (e_flag & flags) {
-        found = 1;
+    if (s_host) {
+      if ((match(eline->mask, s_host) == 0) || (match(eline->mask, i_host) == 0)) {
+        if (e_flag & flags) {
+          found = 1;
+        }
       }
     }
+
+    if ((ip_start = strrchr(i_host, '@')))
+      cli_addr = inet_addr(ip_start + 1);
+
+    if ((ip_start = strrchr(eline->mask, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+      int bits = atoi(cidr_start + 1);
+      char* p = strchr(i_host, '@');
+
+      if (p) {
+        *p = *ip_start = 0;
+        if (match(eline->mask, i_host) == 0) {
+          if ((bits > 0) && (bits < 33)) {
+            in_addr_t ban_addr;
+            *cidr_start = 0;
+            ban_addr = inet_addr(ip_start + 1);
+            *cidr_start = '/';
+            if ((NETMASK(bits) & cli_addr) == ban_addr) {
+              *p = *ip_start = '@';
+              if (e_flag & flags) {
+                found = 1;
+              }
+            }
+          }
+        }
+        *p = *ip_start = '@';
+      }
+    }
+
+  }
+
+  if (found)
+      return -1;
+
+  if (flags & EFLAG_IPCHECK)
+    SetNotIPCheckExempted(cptr);
+
+  return 0;
+}
+
+/*
+ * find_eline_from_ip
+ * input:
+ *  client ip address
+ *  combination of EFLAG_*'s
+ * returns:
+ *  0: Client does not have an E:Line.
+ * -1: Client has an E:Line with 1 or more of the supplied flags.
+*/
+int find_eline_from_ip(char *sockip, unsigned int flags)
+{
+  char i_host[SOCKIPLEN + USERLEN + 2];
+  int found = 0;
+  unsigned int e_flag = 0;
+  struct eline *eline;
+
+  if (flags & EFLAG_IPCHECK)
+    ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "nobody@%s", sockip);
+  else
+    return 0;
+
+  for (eline = GlobalEList; eline; eline = eline->next) {
+    char* ip_start;
+    char* cidr_start;
+    in_addr_t cli_addr = 0;
+
+    e_flag = eflagstr(eline->flags);
 
     if ((ip_start = strrchr(i_host, '@')))
       cli_addr = inet_addr(ip_start + 1);

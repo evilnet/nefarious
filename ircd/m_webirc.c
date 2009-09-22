@@ -223,15 +223,21 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   inet_aton(ipaddr, &webirc_addr);
 
-  if (feature_bool(FEAT_IPCHECK)) {
+  if (feature_bool(FEAT_IPCHECK) && !find_eline(cptr, EFLAG_IPCHECK)) {
     IPcheck_connect_fail(cptr);
     IPcheck_disconnect(cptr);
     ClearIPChecked(cptr);
   }
 
+  if (IsIPCheckExempted(cptr))
+    ClearIPCheckExempted(cptr);
+
+  if (IsNotIPCheckExempted(cptr))
+    ClearNotIPCheckExempted(cptr);
+
   cli_ip(cptr).s_addr = webirc_addr.s_addr;
 
-  if (feature_bool(FEAT_IPCHECK)) {
+  if (feature_bool(FEAT_IPCHECK) && !find_eline(cptr, EFLAG_IPCHECK)) {
     if (!IPcheck_local_connect(cli_ip(cptr), &next_target)) {
       return exit_client(cptr, sptr, &me, "Your host is trying to (re)connect too fast -- throttled");
     }
@@ -240,6 +246,9 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     if (next_target)
       cli_nexttarget(cptr) = next_target;
   }
+
+  if (find_eline(cptr, EFLAG_IPCHECK))
+    SetIPCheckExempted(cptr);
 
   ircd_strncpy(cli_sock_ip(cptr), ipaddr, SOCKIPLEN);
   ircd_strncpy(cli_sockhost(cptr), hostname, HOSTLEN);

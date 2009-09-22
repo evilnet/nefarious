@@ -402,6 +402,9 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     ++UserStats.conncount;
 
+    if (find_eline(cptr, EFLAG_IPCHECK))
+      SetIPCheckExempted(sptr);
+
     assert(cptr == sptr);
     switch (conf_check_client(sptr))
     {
@@ -440,7 +443,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         /* Can this ever happen? */
       case ACR_BAD_SOCKET:
         ServerStats->is_ref++;
-        if (feature_bool(FEAT_IPCHECK))
+        if (feature_bool(FEAT_IPCHECK) && !find_eline(cptr, EFLAG_IPCHECK))
           IPcheck_connect_fail(cptr);
         return exit_client(cptr, sptr, &me, "Unknown error -- Try again");
     }
@@ -882,7 +885,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 			  NumNick(cptr) /* Two %'s */
 
 			  );
-    if (feature_bool(FEAT_IPCHECK))
+    if (feature_bool(FEAT_IPCHECK) && !find_eline(sptr, EFLAG_IPCHECK))
       IPcheck_connect_succeeded(sptr);
     /*
      * Set user's initial modes
@@ -918,7 +921,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
       if (IsBurst(acptr) || Protocol(acptr) < 10)
         break;
     }
-    if (feature_bool(FEAT_IPCHECK)) {
+    if (feature_bool(FEAT_IPCHECK) && !find_eline(sptr, EFLAG_IPCHECK)) {
       if (!IPcheck_remote_connect(sptr, (acptr != &me))) {
         /*
          * We ran out of bits to count this

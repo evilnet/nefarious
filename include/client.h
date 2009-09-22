@@ -196,6 +196,8 @@ enum Flag {
                                          common channels (with +ok exceptions) */
 
     FLAG_PRIVDEAF,                  /**< Client is deaf to all private messages */
+    FLAG_IPCHECKEXEMPTED,           /**< Client is IPCheck exempted via an Except block */
+    FLAG_NOTIPCHECKEXEMPTED,	    /**< Client is not IPCheck exempted via an Except block */
 
     FLAG_LAST_FLAG,
 
@@ -721,6 +723,10 @@ struct Client {
 #define IsPropagated(x)         HasFlag(x, FLAG_PROPAGATED)
 /** Return non-zero if the client is private deaf */
 #define IsPrivDeaf(x)           HasFlag(x, FLAG_PRIVDEAF)
+/** Return non-zero if the client is IPCheck exempted */
+#define IsIPCheckExempted(x)    HasFlag(x, FLAG_IPCHECKEXEMPTED)
+/** Return non-zero if the client is not IPCheck exempted */
+#define IsNotIPCheckExempted(x)    HasFlag(x, FLAG_NOTIPCHECKEXEMPTED)
 /** Return non-zero if the client doesnt follow +L */
 #define IsNoLink(x)             HasFlag(x, FLAG_NOLINK)
 /** Return non-zero if the oper has +H set */
@@ -812,6 +818,10 @@ struct Client {
 #define SetUHNames(x)            SetFlag(x, FLAG_UHNAMES)
 /** Mark a client as having been propagated. */
 #define SetPropagated(x)        SetFlag(x, FLAG_PROPAGATED)
+/** Mark a client as being IPCheck exempted. */
+#define SetIPCheckExempted(x)    SetFlag(x, FLAG_IPCHECKEXEMPTED)
+/** Mark a client as being not IPCheck exempted. */
+#define SetNotIPCheckExempted(x) SetFlag(x, FLAG_NOTIPCHECKEXEMPTED)
 /** Mark a client as being private deaf. */
 #define SetPrivDeaf(x)          SetFlag(x, FLAG_PRIVDEAF)
 /** Mark a client as being not following +L */
@@ -889,6 +899,10 @@ struct Client {
 #define ClearPropagated(x)      ClrFlag(x, FLAG_PROPAGATED)
 /** Client is no longer private deaf. */
 #define ClearPrivDeaf(x)        ClrFlag(x, FLAG_PRIVDEAF)
+/** Client is no longer IPCheck exempted */
+#define ClearIPCheckExempted(x) ClrFlag(x, FLAG_IPCHECKEXEMPTED)
+/** Client is no longer not IPCheck exempted */
+#define ClearNotIPCheckExempted(x) ClrFlag(x, FLAG_NOTIPCHECKEXEMPTED)
 /** Client is no longer not following +L */
 #define ClearNoLink(x)          ClrFlag(x, FLAG_NOLINK)
 /** Oper is no longer hiding their status */
@@ -1010,6 +1024,8 @@ struct Client {
 #define EFLAG_LIST      0x020
 /** Exception for ident prompt checks */
 #define EFLAG_IDENT     0x040
+/** Exception for IPCheck */
+#define EFLAG_IPCHECK   0x080
 
 #define RFFLAG_AUTH     0x001
 #define RFFLAG_KILL     0x002

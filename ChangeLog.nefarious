@@ -1,6 +1,31 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added I flag for IPCheck excepts.
+
+	* include/check.h: Declare get_eflags function.
+
+	* include/client.h: Added IPCheck except flags.
+
+	* include/s_conf.h: Declare get_eline_from_ip.
+
+	* ircd/m_check.c: Show exemption status for clients.
+
+	* ircd/m_nick.c: Tweak for IPCheck excepts.
+
+	* ircd/m_webirc.c: Tweak for IPCheck excepts.
+
+	* ircd/s_auth.c: Tweak for IPCheck excepts.
+
+	* ircd/s_conf.c: Tweak for IPCheck excepts. Also added function for
+	checking eline's based on a IP rather than a client pointer.
+
+	* ircd/s_misc.c: Tweak for IPCheck excepts.
+
+	* ircd/s_user.c: Tweak for IPCheck excepts.
+
 2009-09-21  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* tools/ipv6gw: Removed IPv6GW from tools now IRCGW is in trunk

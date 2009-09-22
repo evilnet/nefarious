@@ -303,7 +303,7 @@ static void exit_one_client(struct Client* bcptr, const char* comment)
   /*
    * Update IPregistry
    */
-  if (feature_bool(FEAT_IPCHECK)) {
+  if (feature_bool(FEAT_IPCHECK) && !find_eline(bcptr, EFLAG_IPCHECK)) {
     if (IsIPChecked(bcptr))
       IPcheck_disconnect(bcptr);
   }

@@ -462,7 +462,7 @@ static void auth_kill_client(struct AuthRequest* auth)
 
   if (IsDNSPending(auth) || (IsDNSBLPending(auth) && feature_bool(FEAT_DNSBL_CHECKS)))
     delete_resolver_queries(auth);
-  if (feature_bool(FEAT_IPCHECK))
+  if (feature_bool(FEAT_IPCHECK) && !find_eline(auth->client, EFLAG_IPCHECK))
     IPcheck_disconnect(auth->client);
   Count_unknowndisconnects(UserStats);
   cli_auth(auth->client) = 0;

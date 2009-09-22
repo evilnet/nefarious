@@ -689,7 +689,7 @@ void add_connection(struct Listener* listener, int fd) {
      *
      * If they're throttled, murder them, but tell them why first.
      */
-    if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK)) {
+    if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK) && !find_eline_from_ip(ircd_ntoa_r(cli_sock_ip(new_client), (const char*) &addr.sin_addr), EFLAG_IPCHECK)) {
       ServerStats->is_ref++;
 #ifdef USE_SSL
       ssl_murder(ssl, fd, throttle_message);
@@ -701,7 +701,7 @@ void add_connection(struct Listener* listener, int fd) {
     }
 
     new_client = make_client(0, STAT_UNKNOWN_USER);
-    if (feature_bool(FEAT_IPCHECK))
+    if (feature_bool(FEAT_IPCHECK)) /* exemption status is checked few lines down */
       SetIPChecked(new_client);
   }
   /*
@@ -713,6 +713,11 @@ void add_connection(struct Listener* listener, int fd) {
   strcpy(cli_sockhost(new_client), cli_sock_ip(new_client));
   (cli_ip(new_client)).s_addr = addr.sin_addr.s_addr;
   cli_port(new_client)        = ntohs(addr.sin_port);
+
+  if (find_eline(new_client, EFLAG_IPCHECK)) {
+    ClearIPChecked(new_client);
+    SetIPCheckExempted(new_client);
+  }
 
   if (next_target)
     cli_nexttarget(new_client) = next_target;
