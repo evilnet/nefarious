@@ -689,7 +689,8 @@ void add_connection(struct Listener* listener, int fd) {
      *
      * If they're throttled, murder them, but tell them why first.
      */
-    if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK) && !find_eline_from_ip(ircd_ntoa_r(cli_sock_ip(new_client), (const char*) &addr.sin_addr), EFLAG_IPCHECK)) {
+    if (!IPcheck_local_connect(addr.sin_addr, &next_target) && feature_bool(FEAT_IPCHECK) && !find_eline_from_ip(addr.sin_addr, EFLAG_IPCHECK)) {
+
       ServerStats->is_ref++;
 #ifdef USE_SSL
       ssl_murder(ssl, fd, throttle_message);

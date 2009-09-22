@@ -2208,7 +2208,7 @@ int find_eline(struct Client *cptr, unsigned int flags)
  *  0: Client does not have an E:Line.
  * -1: Client has an E:Line with 1 or more of the supplied flags.
 */
-int find_eline_from_ip(char *sockip, unsigned int flags)
+int find_eline_from_ip(struct in_addr addr, unsigned int flags)
 {
   char i_host[SOCKIPLEN + USERLEN + 2];
   int found = 0;
@@ -2216,7 +2216,7 @@ int find_eline_from_ip(char *sockip, unsigned int flags)
   struct eline *eline;
 
   if (flags & EFLAG_IPCHECK)
-    ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "nobody@%s", sockip);
+    ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "nobody@%s", ircd_ntoa((const char*) &addr.s_addr));
   else
     return 0;
 

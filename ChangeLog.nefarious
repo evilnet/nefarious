@@ -3,6 +3,15 @@
 
 2009-09-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* include/s_conf.h: Use in_addr rather than char in find_eline_from_ip.
+	Also declare eflagstr.
+
+	* ircd/s_bsd.c: Use in_addr rather than char in find_eline_from_ip.
+
+	* ircd/s_conf.c: Use in_addr rather than char in find_eline_from_ip.
+
+2009-09-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* include/check.h: Send both acptr and sptr in get_eflags. (SF 2864430)
 
 	* ircd/m_check.c: Send both acptr and sptr in get_eflags so we get the

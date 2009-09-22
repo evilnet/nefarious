@@ -310,7 +310,7 @@ extern int rehash(struct Client *cptr, int sig);
 extern void read_tlines(void);
 extern int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned int flags, char *target);
 extern int find_eline(struct Client *cptr, unsigned int flags);
-extern int find_eline_from_ip(char *sockip, unsigned int flags);
+extern int find_eline_from_ip(struct in_addr addr, unsigned int flags);
 extern int find_kill(struct Client *cptr);
 extern struct DenyConf *find_prompt(struct Client *cptr);
 
@@ -343,6 +343,7 @@ extern int reactfflagstr(const char* fflags);
 extern int react_check(const char* fflags);
 extern int watch_check(const char* fflags);
 extern int promptcomment(struct Client* sptr, const char* filename);
+extern char eflagstr(const char* eflags);
 
 extern void yyerror(const char *msg);
 extern void yyserror(const char *fmt, ...);
