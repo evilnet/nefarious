@@ -418,7 +418,7 @@ void checkClient(struct Client *sptr, struct Client *acptr)
      }
    }
 
-   get_eflags(acptr);
+   get_eflags(sptr, acptr);
 
    /* +s (SERV_NOTICE) is not relayed to us from remote servers,
     * so we cannot tell if a remote client has that mode set.
@@ -764,7 +764,7 @@ signed int checkHostmask(struct Client *sptr, char *hoststr, int flags) {
   return count;
 }
 
-int get_eflags(struct Client *cptr) {
+int get_eflags(struct Client *sptr, struct Client *acptr) {
   struct eline *eline;
   unsigned int e_flag = 0;
   int found = 0;
@@ -772,8 +772,8 @@ int get_eflags(struct Client *cptr) {
   char i_host[SOCKIPLEN + USERLEN + 2];
   char s_host[HOSTLEN + USERLEN + 2];
 
-  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(cptr), ircd_ntoa((const char*) &(cli_ip(cptr))));
-  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(cptr), cli_sockhost(cptr));
+  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(acptr), ircd_ntoa((const char*) &(cli_ip(acptr))));
+  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(acptr), cli_sockhost(acptr));
 
   for (eline = GlobalEList; eline; eline = eline->next) {
     char* ip_start;
@@ -859,14 +859,14 @@ int get_eflags(struct Client *cptr) {
         strcat(outbuf, "Ident Prompts");
       }
 
-      if ((e_flag & EFLAG_IPCHECK) && IsIPCheckExempted(cptr)) {
+      if ((e_flag & EFLAG_IPCHECK) && IsIPCheckExempted(acptr)) {
         if (strlen(outbuf) > 21)
           strcat(outbuf, ", ");
         strcat(outbuf, "IPCheck");
       }
 
       if (strlen(outbuf) > 18)
-        send_reply(cptr, RPL_DATASTR, outbuf);
+        send_reply(sptr, RPL_DATASTR, outbuf);
     }
     found = 0;
   }

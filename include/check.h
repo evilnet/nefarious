@@ -42,6 +42,6 @@ extern void checkUsers(struct Client *sptr, struct Channel *chptr, int flags);
 extern void checkClient(struct Client *sptr, struct Client *acptr);
 extern void checkServer(struct Client *sptr, struct Client *acptr);
 extern signed int checkHostmask(struct Client *sptr, char *hoststr, int flags);
-extern int get_eflags(struct Client *cptr);
+extern int get_eflags(struct Client *sptr, struct Client *acptr);
 
 #endif /* INCLUDED_check_h */

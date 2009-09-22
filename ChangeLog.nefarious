@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/check.h: Send both acptr and sptr in get_eflags. (SF 2864430)
+
+	* ircd/m_check.c: Send both acptr and sptr in get_eflags so we get the
+	flags for the right person and give the response to the right person.
+	(SF 2864430)
+
 2009-09-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added I flag for IPCheck excepts.
