@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-23  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_webirc.c: Fix for minor bug caused by USER before WEBIRC
+
 2009-09-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/s_conf.h: Use in_addr rather than char in find_eline_from_ip.

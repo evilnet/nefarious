@@ -253,6 +253,10 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   ircd_strncpy(cli_sock_ip(cptr), ipaddr, SOCKIPLEN);
   ircd_strncpy(cli_sockhost(cptr), hostname, HOSTLEN);
 
+  if (!HasHiddenHost(sptr) && (feature_int(FEAT_HOST_HIDING_STYLE) == 1))
+    ircd_strncpy(cli_user(sptr)->host, cli_sockhost(sptr), HOSTLEN);
+  ircd_strncpy(cli_user(sptr)->realhost, cli_sockhost(sptr), HOSTLEN);
+
   SetWebIRC(cptr);
 
   if (w_flag & WFLAG_UIDENT)
