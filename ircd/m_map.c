@@ -133,12 +133,12 @@ int m_map(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   if (parc < 2)
     parv[1] = "*";
 
+  args[0] = sptr;
+
   if (feature_bool(FEAT_HIS_MAP_SCRAMBLED) && !IsAnOper(sptr))
-    map_dump_head_in_sand(sptr);
-  else {
-    args[0] = sptr;
+    map_dump_head_in_sand(sptr, map_reply, args);
+  else
     map_dump(&me, parv[1], 0, map_reply, args);
-  }
 
   send_reply(sptr, RPL_MAPEND);
 

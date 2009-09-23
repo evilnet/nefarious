@@ -48,7 +48,7 @@ struct Map {
 
 extern void map_update(struct Client *server);
 extern void map_dump_links_head_in_sand(struct Client *sptr, char *mask);
-extern void map_dump_head_in_sand(struct Client *cptr);
+extern void map_dump_head_in_sand(struct Client *cptr, void (*reply_function)(void **, const char *, int), void **args);
 extern void map_dump(struct Client *server, char *mask, int prompt_length, void (*reply_function)(void **, const char *, int), void **args);
 
 #endif /* INCLUDED_map_h */

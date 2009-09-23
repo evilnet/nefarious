@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-23  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/map.h: Fixes for scrambled maps.
+
+	* ircd/m_map.c: Fixes for scrambled maps.
+
+	* ircd/map.c: Fixes for scrambled maps.
+
 2009-09-23  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_webirc.c: Fix for minor bug caused by USER before WEBIRC

@@ -126,23 +126,27 @@ void map_update(struct Client *cptr)
   {
     if(map)
       map_remove(map);
+
     return;
   }
 
   /* If we haven't seen it before, add it to the list. */
   if(!map)
     map_add(cptr);
+
 }
 
 
-void map_dump_head_in_sand(struct Client *cptr)
+void map_dump_head_in_sand(struct Client *cptr, void (*reply_function)(void **, const char *, int), void **args)
 {
   struct Map *map = 0;
   struct Map *smap = 0;
   struct Client *acptr = 0;
+  static char buf[512];
 
   /* Send me first */
-  send_reply(cptr, RPL_MAP, "", "", cli_name(&me), "", UserStats.local_clients);
+  ircd_snprintf(0, buf, sizeof(buf), "%s [%u clients]", cli_name(&me), UserStats.local_clients);
+  reply_function(args, buf, 0);
 
   for(map = MapList; map; map = smap)
   {
@@ -160,7 +164,8 @@ void map_dump_head_in_sand(struct Client *cptr)
       else
         map_update(acptr);
     }
-    send_reply(cptr, RPL_MAP, smap ? "|" : "`", "-", map->name, "", map->maxclients);
+    ircd_snprintf(0, buf, sizeof(buf), "%s%s%s [%u clients]", smap ? "|" : "`", "-", map->name, map->maxclients);
+    reply_function(args, buf, 0);
   }
 }
 
