@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-09-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_webirc.c: Crash fix for WEBIRC if its recieved before
+	USER.
+
 2009-09-25  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_conf.c: Fix where you couldnt oper if you didnt specify
