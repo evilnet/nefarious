@@ -819,16 +819,15 @@ struct ConfItem* find_conf_exact(const char* name, const char* user,
      * of the configuration.
      */
 
-   if (match(tmp->host, userhost))
+    if (match(tmp->host, userhost))
       continue;
-    if (tmp->status & (CONF_OPERATOR | CONF_LOCOP)) {
-      if (tmp->clients < MaxLinks(tmp->conn_class))
-        return tmp;
-      else
-        continue;
-    }
-    else
-      return tmp;
+
+    if ((tmp->status & (CONF_OPERATOR | CONF_LOCOP))
+      && (MaxLinks(tmp->conn_class) > 0)
+      && (tmp->clients >= MaxLinks(tmp->conn_class)))
+      continue;
+
+    return tmp;
   }
   return 0;
 }
@@ -878,15 +877,13 @@ struct ConfItem* find_conf_cidr(const char* name, const char* user,
     
     if ((cli_addr.s_addr & NETMASK(bits)) != conf_addr.s_addr)
       continue;
-    
-    if (tmp->status & (CONF_OPERATOR | CONF_LOCOP)) {
-      if (tmp->clients < MaxLinks(tmp->conn_class))
-        return tmp;
-      else
-        continue;
-    }
-    else
-      return tmp;
+
+    if ((tmp->status & (CONF_OPERATOR | CONF_LOCOP))
+      && (MaxLinks(tmp->conn_class) > 0)
+      && (tmp->clients >= MaxLinks(tmp->conn_class)))
+      continue;
+
+    return tmp;
   }
   return 0;
 }
