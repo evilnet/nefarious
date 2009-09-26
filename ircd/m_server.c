@@ -405,19 +405,19 @@ check_loop_and_lh(struct Client* cptr, struct Client *sptr, time_t *ghost, const
     if (active_lh_line == 1)
     {
       sendto_opmask_butone(&me, SNO_OLDSNO,
-                           "%s SQUIT by %s [Leaf-only link %s <- %s, check L:]",
+                           "%s SQUIT by %s [Too many hops at %s <- %s, check MaxLinks and Leaf]",
                            host, cli_name(&me), cli_name(cptr), host);
       return exit_new_server(cptr, sptr, host, timestamp,
-                             "Leaf-only link %s <- %s, check L:",
+                             "Too many hops at %s <- %s, check MaxLinks and Leaf",
                              cli_name(cptr), host);
     }
     else if (active_lh_line == 2)
     {
       sendto_opmask_butone(&me, SNO_OLDSNO,
-                           "%s SQUIT by %s [Non-Hub link %s <- %s, check H:]",
+                           "%s SQUIT by %s [Non-Hub link %s <- %s, check Hub mask]",
                            host, cli_name(&me), cli_name(cptr), host);      
       return exit_new_server(cptr, sptr, host, timestamp,
-                             "Non-Hub link %s <- %s, check H:",
+                             "Non-Hub link %s <- %s, check Hub mask",
                              cli_name(cptr), host);
     }
     /*

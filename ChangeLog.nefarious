@@ -3,6 +3,11 @@
 
 2009-09-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_server.c: Slight wording change for rejected hub/leaf
+	links.
+
+2009-09-26  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_webirc.c: Crash fix for WEBIRC if its recieved before
 	USER.
 
