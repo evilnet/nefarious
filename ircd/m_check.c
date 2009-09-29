@@ -418,7 +418,8 @@ void checkClient(struct Client *sptr, struct Client *acptr)
      }
    }
 
-   get_eflags(sptr, acptr);
+   if (MyUser(acptr))
+     get_eflags(sptr, acptr);
 
    /* +s (SERV_NOTICE) is not relayed to us from remote servers,
     * so we cannot tell if a remote client has that mode set.

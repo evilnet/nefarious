@@ -3,6 +3,11 @@
 
 2009-09-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_check.c: Small tweak to prevent exemptions being shown for
+	remote users. If you need them for a remote user do /CHECK NICK NICK.
+
+2009-09-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* configure: Regenerated.
 
 	* configure.in: Check /usr/local for pcre.
