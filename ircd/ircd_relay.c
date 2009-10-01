@@ -55,6 +55,7 @@
 #include "ircd_log.h"
 #include "ircd_reply.h"
 #include "ircd_string.h"
+#include "list.h"
 #include "match.h"
 #include "msg.h"
 #include "numeric.h"
@@ -68,6 +69,169 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define TEXTBAN_WORD_LEFT       0x1
+#define TEXTBAN_WORD_RIGHT      0x2
+
+static char *my_strcasestr(char *haystack, char *needle) {
+  int i;
+  int nlength = strlen (needle);
+  int hlength = strlen (haystack);
+
+  if (nlength > hlength) return NULL;
+  if (hlength <= 0) return NULL;
+  if (nlength <= 0) return haystack;
+  for (i = 0; i <= (hlength - nlength); i++) {
+    if (strncasecmp (haystack + i, needle, nlength) == 0)
+      return haystack + i;
+  }
+  return NULL; /* not found */
+}
+
+void parse_word(const char *s, char **word, int *type)
+{
+  static char buf[512];
+  const char *tmp;
+  int len;
+  int tpe = 0;
+  char *o = buf;
+
+  for (tmp = s; *tmp; tmp++)
+  {
+    if (*tmp != '*')
+      *o++ = *tmp;
+    else
+    {
+      if (s == tmp)
+        tpe |= TEXTBAN_WORD_LEFT;
+      if (*(tmp + 1) == '\0')
+        tpe |= TEXTBAN_WORD_RIGHT;
+    }
+  }
+  *o = '\0';
+
+  *word = buf;
+  *type = tpe;
+}
+
+inline int textban_replace(int type, char *badword, char *replace, char *line, char *buf)
+{
+  char *replacew;
+  char *pold = line, *pnew = buf; /* Pointers to old string and new string */
+  char *poldx = line;
+  int replacen;
+  int searchn = -1;
+  char *startw, *endw;
+  char *c_eol = buf + 510 - 1; /* Cached end of (new) line */
+  int cleaned = 0;
+
+  replacew = strdup(replace);
+  replacen = strlen(replacew);
+
+  while (1) {
+    pold = my_strcasestr(pold, badword);
+    if (!pold)
+      break;
+    if (searchn == -1)
+      searchn = strlen(badword);
+    /* Hunt for start of word */
+    if (pold > line) {
+      for (startw = pold; (!iswseperator(*startw) && (startw != line)); startw--);
+        if (iswseperator(*startw))
+          startw++; /* Don't point at the space/seperator but at the word! */
+    } else {
+      startw = pold;
+    }
+
+    if (!(type & TEXTBAN_WORD_LEFT) && (pold != startw)) {
+      /* not matched */
+      pold++;
+      continue;
+    }
+
+    /* Hunt for end of word */
+    for (endw = pold; ((*endw != '\0') && (!iswseperator(*endw))); endw++);
+
+    if (!(type & TEXTBAN_WORD_RIGHT) && (pold+searchn != endw)) {
+      /* not matched */
+      pold++;
+      continue;
+    }
+
+    cleaned = 1; /* still too soon? Syzop/20050227 */
+
+    if (poldx != startw) {
+      int tmp_n = startw - poldx;
+      if (pnew + tmp_n >= c_eol) {
+        /* Partial copy and return... */
+        memcpy(pnew, poldx, c_eol - pnew);
+        *c_eol = '\0';
+        return 1;
+      }
+
+      memcpy(pnew, poldx, tmp_n);
+      pnew += tmp_n;
+    }
+    /* Now update the word in buf (pnew is now something like startw-in-new-buffer */
+
+    if (replacen) {
+       if ((pnew + replacen) >= c_eol) {
+         /* Partial copy and return... */
+         memcpy(pnew, replacew, c_eol - pnew);
+         *c_eol = '\0';
+         return 1;
+       }
+       memcpy(pnew, replacew, replacen);
+       pnew += replacen;
+     }
+     poldx = pold = endw;
+  }
+  /* Copy the last part */
+  if (*poldx) {
+    strncpy(pnew, poldx, c_eol - pnew);
+    *(c_eol) = '\0';
+  } else {
+    *pnew = '\0';
+  }
+  return cleaned;
+}
+
+int split_line(char *input, char **output)
+{
+  char dbuf[512];
+  unsigned int nfields;
+  size_t quoted = 0, jj;
+  char *dest = dbuf, ch, *ch2;
+
+  *dest = '\0';
+  nfields = 1;
+  output[0] = dest;
+  while (*input != '\0' && *input != '#') switch (ch = *input++) {
+    case ':':
+      *dest++ = '\0';
+      if (nfields >= 3)
+        return nfields;
+       output[nfields++] = dest;
+       break;
+    case '\\':
+      switch (ch = *input++) {
+        case ':':
+          *dest++ = ch;
+          break;
+        default:
+          *dest++ = '\\';
+          *dest++ = ch;
+          break;
+      }
+      break;
+  default: *dest++ = ch;  break;
+  }
+
+  *dest = '\0';
+  for (jj = nfields; jj < 3; ++jj)
+      output[jj] = dest;
+  return nfields;
+}
 
 /*
  * This file contains message relaying functions for client and server
@@ -84,11 +248,20 @@
  * @param[in] text %Message to relay.
  * @param[in] total Total channels the message is being relayed to.
  */
-void relay_channel_message(struct Client* sptr, const char* name, const char* 
-text, int total)
+void relay_channel_message(struct Client* sptr, const char* name, const char* text, int total)
 {
   struct Channel* chptr;
   const char *ch;
+  char *textb;
+  char *textc;
+  char *textr;
+  char *word, *badword, *replace, *line;
+  char ftmp[1024];
+  int type;
+  struct SLink* tmp;
+  unsigned int nfields;
+  char *fields[3];
+
   assert(0 != sptr);
   assert(0 != name);
   assert(0 != text);
@@ -144,6 +317,22 @@ text, int total)
 
   if (!IsService(sptr))
     chptr->last_message = CurrentTime;
+
+  for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
+    if (tmp->value.ban.extflag) {
+      if (tmp->value.ban.extflag & EXTBAN_REPLACE) {
+        nfields = split_line(decodespace(tmp->value.ban.extstr), fields);
+
+        if (nfields == 2) {
+          parse_word(fields[0], &word, &type);
+          replace = strdup(fields[1]);
+          line = strdup(text);
+          if (textban_replace(type, word, replace, line, ftmp))
+            text = strdup(ftmp);
+        }
+      }
+    }
+  }
 
   sendcmdto_channel_butone(sptr, CMD_PRIVATE, chptr, cli_from(sptr),
 			   SKIP_DEAF | SKIP_BURST, text[0], "%H :%s", chptr, text);

@@ -1,6 +1,23 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-10-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* include/channel.h: Define extended ban ~R.
+
+	* include/ircd_chattr.h: Added iswseperator
+
+	* include/ircd_relay.h: Declere split_line.
+
+	* ircd/channel.c: Added extended ban ~R for replacing text.
+
+	* ircd/ircd_features.c: Added R to EXTBANS.
+
+	* ircd/ircd_relay.c: Added extended ban ~R for replacing text, eg
+	+b ~R:replace:me would replace the word replace with me. Word replacement 
+	code from Syzop's text replacement module for Unreal IRCd
+	(http://www.vulnscan.org/modules).
+
 2009-09-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_check.c: Small tweak to prevent exemptions being shown for

@@ -123,6 +123,7 @@ extern const unsigned int  IRCD_CharAttrTab[];
 /** Test whether a character is valid in a K: line expiration string. */
 #define IsKTimeChar(c)     (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_KTIME)
 
+#define iswseperator(c) (!IsAlnum(c) && !((u_char)c >= 128))
 
 #endif /* INCLUDED_ircd_chattr_h */
 

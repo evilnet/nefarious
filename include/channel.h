@@ -60,6 +60,7 @@ struct Client;
 #define EXTBAN_SHARE   0x020    /**< Extended shared channel ban list ban */
 #define EXTBAN_ACCOUNT 0x040    /**< Extended account ban */
 #define EXTBAN_TEXT    0x080    /**< Extended text ban */
+#define EXTBAN_REPLACE 0x0100   /**< Extended text replace */
 
 #define EXTEXCEPT_NICK    0x001    /**< Extended nick except */
 #define EXTEXCEPT_CHAN    0x002    /**< Extended channel except */

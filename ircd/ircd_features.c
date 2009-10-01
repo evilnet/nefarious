@@ -269,7 +269,7 @@ static void
 set_isupport_extbans(void)
 {
   if (feature_bool(FEAT_EXTBANS))
-    add_isupport_s("EXTBANS", "~,acjnqtr");
+    add_isupport_s("EXTBANS", "~,acjnqtrR");
 }
 
 /** Set WATCH if they are enabled. */
