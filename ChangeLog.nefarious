@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-10-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_burst.c: Missing prefix bug finally found and fixed.
+
 2009-10-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/channel.h: Define extended ban ~R.
