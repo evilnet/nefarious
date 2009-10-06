@@ -529,7 +529,7 @@ stats_servers_verbose(struct Client* sptr, const struct StatDesc *sd, char* para
    * uppercase 'V' is for machine-readable */
   if (sd->sd_funcdata) {
     send_reply(sptr, SND_EXPLICIT | RPL_STATSVERBOSE,
-	       "%-32s %-32s Flags Hops Numeric   Lag  RTT   Up Down "
+	       "%-20s %-20s Flags Hops Numeric   Lag  RTT   Up Down "
 	       "Clients/Max Proto %-10s :Info", "Servername", "Uplink",
 	       "LinkTS");
     fmt = "%-20s %-20s %c%c%c%c  %4i %s %-4i %5i %4i %4i %4i %5i %5i P%-2i   %Tu :%s";

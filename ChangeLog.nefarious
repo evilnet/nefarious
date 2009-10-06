@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-10-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_stats.c: Fix for /stats v not showing correctly.
+	SF Bug #2873239
+
 2009-10-02  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_burst.c: Missing prefix bug finally found and fixed.
