@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-10-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Reverted my commit from 2009-10-01 (2587).
+
+	* include/client.h: Added client_check_privs.
+
+	* ircd/client.c: Send 10 privs per line.
+
+	* ircd/m_check.c: Use client_check_privs to send privs. (SF Bug #2878801)
+
 2009-10-06  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/s_stats.c: Fix for /stats v not showing correctly.

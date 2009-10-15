@@ -396,10 +396,8 @@ void checkClient(struct Client *sptr, struct Client *acptr)
    }
 
    privs = client_print_privs(acptr);
-   if (strlen(privs) > 1) {
-     ircd_snprintf(0, outbuf, sizeof(outbuf), "     Privileges:: %s", privs);
-     send_reply(sptr, RPL_DATASTR, outbuf);
-   }
+   if (strlen(privs) > 1)
+     client_check_privs(acptr);
 
    ircd_snprintf(0, outbuf, sizeof(outbuf), "   Connected to:: %s", cli_name(acptr->cli_user->server));
    send_reply(sptr, RPL_DATASTR, outbuf);

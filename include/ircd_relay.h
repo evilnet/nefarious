@@ -45,7 +45,5 @@ extern void server_relay_masked_notice(struct Client* sptr, const char* mask, co
 extern void server_relay_private_message(struct Client* sptr, const char* name, const char* text);
 extern void server_relay_private_notice(struct Client* sptr, const char* name, const char* text);
 
-extern int split_line(char *input, char **output);
-
 #endif /* INCLUDED_IRCD_RELAY_H */
 

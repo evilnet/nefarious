@@ -314,6 +314,33 @@ char *client_print_privs(struct Client *client)
   return privbufp;
 }
 
+char *client_check_privs(struct Client *client)
+{
+  char outbuf[BUFSIZE];
+  int i, p = 0;
+
+  privbufp[0] = '\0';
+
+  for (i = 0; privtab[i].name; i++) {
+    if (HasPriv(client, privtab[i].priv)) {
+      p++;
+      if (p > 10) {
+        ircd_snprintf(0, outbuf, sizeof(outbuf), "     Privileges:: %s", privbufp);
+        send_reply(client, RPL_DATASTR, outbuf);
+
+        p = 0;
+        privbufp[strlen(privbufp)] = 0;
+        privbufp[0] = '\0';
+      } else  {
+        strcat(privbufp, privtab[i].name);
+        strcat(privbufp, " ");
+      }
+    }
+  }
+
+  privbufp[strlen(privbufp)] = 0;
+}
+
 int client_modify_priv_by_name(struct Client *who, char *priv, int what) {
   int i = 0;
   assert(0 != priv);

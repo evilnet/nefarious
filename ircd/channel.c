@@ -30,7 +30,6 @@
 #include "ircd_defs.h"
 #include "ircd_features.h"
 #include "ircd_log.h"
-#include "ircd_relay.h"
 #include "ircd_reply.h"
 #include "ircd_snprintf.h"
 #include "ircd_string.h"
@@ -3681,10 +3680,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 {
   struct SLink *ban, *newban = 0;
   char *t_str, *s, *banned = NULL, *p;
-  char *fields[3];
   int typepos = 0, startarg = 0, extended = 0, flags = 0;
   int extmask = 0;
-  unsigned int nfields;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
     if (MyUser(state->sptr) && !(state->done & DONE_BANLIST)) {
@@ -3773,18 +3770,6 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
           flags |= EXTBAN_TEXT;
         else
           flags = EXTBAN_TEXT;
-        break;
-
-      case 'R':
-        if (flags)
-          flags |= EXTBAN_REPLACE;
-        else
-          flags = EXTBAN_REPLACE;
-        nfields = split_line(banned, fields);
-        if (nfields != 2) {
-          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Invalid replace extended ban (~R:badword:replacement)", state->sptr);
-          return;
-        }
         break;
 
       case 'n':
