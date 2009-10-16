@@ -3,6 +3,10 @@
 
 2009-10-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/ircd_string.c: Use IsSpace rather than iswseperator.
+
+2009-10-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added feature ALLOW_TEXT_HOST (default TRUE).
 
 	* doc/readme.features: Added feature ALLOW_TEXT_HOST description.

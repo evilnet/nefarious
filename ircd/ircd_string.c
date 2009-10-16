@@ -645,8 +645,8 @@ int textban_replace(int type, char *badword, char *replace, char *line, char *bu
       searchn = strlen(badword);
     /* Hunt for start of word */
     if (pold > line) {
-      for (startw = pold; (!iswseperator(*startw) && (startw != line)); startw--);
-        if (iswseperator(*startw))
+      for (startw = pold; (!IsSpace(*startw) && (startw != line)); startw--);
+        if (IsSpace(*startw))
           startw++; /* Don't point at the space/seperator but at the word! */
     } else {
       startw = pold;
@@ -659,7 +659,7 @@ int textban_replace(int type, char *badword, char *replace, char *line, char *bu
     }
 
     /* Hunt for end of word */
-    for (endw = pold; ((*endw != '\0') && (!iswseperator(*endw))); endw++);
+    for (endw = pold; ((*endw != '\0') && (!IsSpace(*endw))); endw++);
 
     if (!(type & TEXTBAN_WORD_RIGHT) && (pold+searchn != endw)) {
       /* not matched */
@@ -749,5 +749,3 @@ int explode_line(char *line, int irc_colon, int argv_size, char *argv[])
 
     return argc;
 }
-
-
