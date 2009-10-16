@@ -3312,3 +3312,174 @@ send_supported(struct Client *cptr)
   return 0; /* convenience return, if it's ever needed */
 }
 
+/*
+ * Create a string of form "foo!bar@fubar" given foo, bar and fubar
+ * as the parameters.  If NULL, they become "*".
+ */
+#define NUH_BUFSIZE     (NICKLEN + USERLEN + HOSTLEN + 3)
+static char *make_nick_user_host(char *namebuf, const char *nick,
+                                 const char *name, const char *host)
+{
+  ircd_snprintf(0, namebuf, NUH_BUFSIZE, "%s!%s@%s", nick, name, host);
+  return namebuf;
+}
+
+/*
+ * Create a string of form "foo!bar@123.456.789.123" given foo, bar and the
+ * IP-number as the parameters.  If NULL, they become "*".
+ */
+#define NUI_BUFSIZE     (NICKLEN + USERLEN + 16 + 3)
+static char *make_nick_user_ip(char *ipbuf, char *nick, char *name,
+                               struct in_addr ip)
+{
+  ircd_snprintf(0, ipbuf, NUI_BUFSIZE, "%s!%s@%s", nick, name,
+                ircd_ntoa((const char*) &ip));
+  return ipbuf;
+}
+
+int user_matches_host(struct Client *cptr, char *comparemask, int flags) {
+
+  struct SLink* tmp;
+  char          tmphost[HOSTLEN + 1];
+  char          nu_host[NUH_BUFSIZE];
+  char          nu_accthost[NUH_BUFSIZE];
+  char          nu_dnsblhost[NUH_BUFSIZE];
+  char          nu_realhost[NUH_BUFSIZE];
+  char          nu_fakehost[NUH_BUFSIZE];
+  char          nu_ip[NUI_BUFSIZE];
+  char*         s;
+  char*         sb;
+  char*         sa = NULL;
+  char*         sh = NULL;
+  char*         sf = NULL;
+  char*         sd = NULL;
+  char*         ip_s = NULL;
+  in_addr_t     cli_addr = 0;
+
+  if (!IsUser(cptr))
+    return 0;
+
+  /* eeeek */
+  s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+                         (cli_user(cptr))->realhost);
+
+  if (HasSetHost(cptr))
+    sh = make_nick_user_host(nu_realhost, cli_name(cptr),
+                            cli_user(cptr)->realusername,
+                            cli_user(cptr)->realhost);
+
+  if (HasFakeHost(cptr))
+    sf = make_nick_user_host(nu_fakehost, cli_name(cptr),
+                            cli_user(cptr)->realusername,
+                            cli_user(cptr)->fakehost);
+
+  if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+    if (IsAccount(cptr)) {
+       if (HasHiddenHost(cptr) && !HasSetHost(cptr))
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                  cli_user(cptr)->realusername,
+                                  cli_user(cptr)->realhost);
+       else {
+         make_hidden_hostmask(tmphost, cptr);
+          sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                                   cli_user(cptr)->realusername,
+                                   tmphost);
+       }
+    }
+  } else {
+    if (IsHiddenHost(cptr) && !HasSetHost(cptr))
+      sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               cli_user(cptr)->realhost);
+    else {
+      ircd_snprintf(0, tmphost, HOSTLEN, "%s", cli_user(cptr)->virthost);
+      sa = make_nick_user_host(nu_accthost, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               tmphost);
+    }
+  }
+
+
+  if ((flags & CHFL_BAN_IPMASK)) {
+    char* ip_start;
+    char* cidr_start;
+
+    if (!ip_s) {
+      ip_s = make_nick_user_ip(nu_ip, cli_name(cptr),
+                              (cli_user(cptr))->realusername, cli_ip(cptr));
+      if ((ip_start = strrchr(ip_s, '@')))
+        cli_addr = inet_addr(ip_start + 1);
+    }
+
+    if (match(comparemask, ip_s) == 0)
+      return 1;
+    if ((ip_start = strrchr(comparemask, '@')) && (cidr_start = strchr(ip_start + 1, '/'))) {
+      int bits = atoi(cidr_start + 1);
+      char* p = strchr(ip_s, '@');
+
+      if (p) {
+        *p = *ip_start = 0;
+        if (match(comparemask, ip_s) == 0) {
+          if ((bits > 0) && (bits < 33)) {
+            in_addr_t ban_addr;
+            *cidr_start = 0;
+            ban_addr = inet_addr(ip_start + 1);
+            *cidr_start = '/';
+            if ((NETMASK(bits) & cli_addr) == ban_addr) {
+              *p = *ip_start = '@';
+              return 1;
+            }
+          }
+        }
+        *p = *ip_start = '@';
+      }
+    }
+  }
+
+  if (IsDNSBLMarked(cptr)) {
+    struct SLink* lp;
+    char tmpdhostb[BUFSIZE + 1];
+    int dnsblb = 0;
+
+    for (lp = cli_sdnsbls(cptr); lp; lp = lp->next) {
+      ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", lp->value.cp, cli_user(cptr)->realhost);
+      sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                               cli_user(cptr)->realusername,
+                               tmpdhostb);
+
+      if (sd && match(comparemask, sd) == 0) {
+        dnsblb = 1;
+        return 1;
+      }
+    }
+
+    if (dnsblb == 1)
+      return 1;
+  }
+
+  if (!EmptyString(cli_killmark(cptr))) {
+    char tmpdhostb[BUFSIZE + 1];
+
+    ircd_snprintf(0, tmpdhostb, BUFSIZE, "%s.%s", cli_killmark(cptr), cli_user(cptr)->realhost);
+    sd = make_nick_user_host(nu_dnsblhost, cli_name(cptr),
+                             cli_user(cptr)->realusername,
+                             tmpdhostb);
+
+    if (sd && match(comparemask, sd) == 0)
+      return 1;
+  }
+
+  if (match(comparemask, s) == 0)
+    return 1;
+  else if (sb && match(comparemask, sb) == 0)
+    return 1;
+  else if (sh && match(comparemask, sh) == 0)
+    return 1;
+  else if (sf && match(comparemask, sf) == 0)
+    return 1;
+  else if (sa && match(comparemask, sa) == 0)
+    return 1;
+
+  return 0;
+}
+

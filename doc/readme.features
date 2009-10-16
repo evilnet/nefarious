@@ -1915,3 +1915,10 @@ HIDE_BAN_SETTER
 When enabled the ban setter will be hidden from all non channel ops. Both opers
 and channel ops will be able to see the setter.
 
+ALLOW_TEXT_HOST
+ * Type: boolean
+ * Default: TRUE
+
+When enabled specific hosts can be set in extended text (~t) and replace (~R)
+bans. If disabled then *!*@* will always be set.
+

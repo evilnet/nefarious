@@ -117,11 +117,17 @@ static __inline__ NTL_HDR_strCasediff { NTL_SRC_strCasediff }
  * Proto types of other externally visible functions
  */
 extern int strnChattr(const char *s, const size_t n);
+extern int textban_replace(int type, char *badword, char *replace, char *line, char *buf);
+extern int explode_line(char *line, int irc_colon, int argv_size, char *argv[]);
 extern char *normalizeBuffer(char *);
-extern void doCleanBuffer(char *str);
 extern char *substr(const char *pstr, int start, int numchars);
+extern char *my_strcasestr(char *haystack, char *needle);
+extern void doCleanBuffer(char *str);
+extern void parse_word(const char *s, char **word, int *type);
 
-#define issp(c) ((c) == 32)
+#define issp(c)        ((c) == 32)
+#define ArrayLength(x) (sizeof(x)/sizeof(x[0]))
+
 
 #endif /* INCLUDED_ircd_string_h */
 

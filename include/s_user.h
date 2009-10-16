@@ -134,5 +134,6 @@ extern void add_isupport_i(const char *name, int value);
 extern void add_isupport_s(const char *name, const char *value);
 extern void del_isupport(const char *name);
 extern int send_supported(struct Client *cptr);
+extern int user_matches_host(struct Client *cptr, char *comparemask, int flags);
 
 #endif /* INCLUDED_s_user_h */

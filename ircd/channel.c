@@ -823,13 +823,24 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
 
 int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
   struct SLink* tmp;
-  int excepted = 0, denied = 0;
+  int excepted = 0, denied = 0, flags = 0;
+  unsigned int argc, n;
+  char *argv[MAXNUMPARAMS];
+  char *ban, *except, *extstr;
 
   for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
     if (tmp->value.ban.extflag) {
       if (tmp->value.ban.extflag & EXTBAN_TEXT) {
-        if (!mmatch(decodespace(tmp->value.ban.extstr), text))
-          denied = 1;
+        ban = strdup(tmp->value.ban.banstr);
+        extstr = strdup(tmp->value.ban.extstr);
+        flags = tmp->value.ban.extflag;
+
+        argc = explode_line(decodespace(ban), 1, ArrayLength(argv), argv);
+
+        if (argc == 3) {
+          if (!mmatch(decodespace(argv[2]), text) && (0 != user_matches_host(sptr, extstr, flags)))
+            denied = 1;
+        }
       }
     }
   }
@@ -837,8 +848,16 @@ int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
   for (tmp = chptr->exceptlist; tmp; tmp = tmp->next) {
     if (tmp->value.except.extflag) {
       if (tmp->value.except.extflag & EXTEXCEPT_TEXT) {
-        if (!mmatch(decodespace(tmp->value.except.extstr), text))
-          excepted = 1;
+        except = strdup(tmp->value.except.exceptstr);
+        extstr = strdup(tmp->value.except.extstr);
+        flags = tmp->value.ban.extflag;
+
+        argc = explode_line(decodespace(except), 1, ArrayLength(argv), argv);
+
+        if (argc == 3) {
+          if (!mmatch(decodespace(argv[2]), text) && (0 != user_matches_host(sptr, extstr, flags)))
+            excepted = 1;
+        }
       }
     }
   }
@@ -3451,6 +3470,8 @@ static void
 mode_parse_except(struct ParseState *state, int *flag_p)
 {
   char *t_str, *s, *excepted = NULL, *p;
+  char *argv[MAXNUMPARAMS];
+  unsigned int argc, n;
   int typepos = 0, startarg = 0, extended = 0, flags = 0;
   int extmask = 0;
   struct SLink *except, *newexcept = 0;
@@ -3544,6 +3565,18 @@ mode_parse_except(struct ParseState *state, int *flag_p)
           flags |= EXTEXCEPT_TEXT;
         else
           flags = EXTEXCEPT_TEXT;
+        argc = explode_line(excepted, 1, ArrayLength(argv), argv);
+        if ((argc > 2) || (argc < 1)) {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Invalid text extended except (~t:nick!ident@host:badwords)", state->sptr);
+          return;
+        }
+        extmask = 1;
+        if (argc == 2)
+          excepted = collapse(pretty_mask(argv[0]));
+        else
+          excepted = strdup("*!*@*");
+        ircd_snprintf(0, t_str, BUFSIZE, "~t:%s:%s", feature_bool(FEAT_ALLOW_TEXT_HOST) ? excepted : "*!*@*",
+                      (argc == 2) ? argv[1] : argv[0]);
         break;
 
       case 'a':
@@ -3680,6 +3713,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
 {
   struct SLink *ban, *newban = 0;
   char *t_str, *s, *banned = NULL, *p;
+  char *argv[MAXNUMPARAMS];
+  unsigned int argc;
   int typepos = 0, startarg = 0, extended = 0, flags = 0;
   int extmask = 0;
 
@@ -3770,6 +3805,37 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
           flags |= EXTBAN_TEXT;
         else
           flags = EXTBAN_TEXT;
+        argc = explode_line(banned, 1, ArrayLength(argv), argv);
+        if ((argc > 2) || (argc < 1)) {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Invalid text extended ban (~t:nick!ident@host:badwords)", state->sptr);
+          return;
+        }
+        extmask = 1;
+        if (argc == 2)
+          banned = collapse(pretty_mask(argv[0]));
+        else
+          banned = strdup("*!*@*");
+        ircd_snprintf(0, t_str, BUFSIZE, "~t:%s:%s", feature_bool(FEAT_ALLOW_TEXT_HOST) ? banned : "*!*@*",
+                      (argc == 2) ? argv[1] : argv[0]);
+        break;
+
+      case 'R':
+        if (flags)
+           flags |= EXTBAN_REPLACE;
+         else
+           flags = EXTBAN_REPLACE;
+        argc = explode_line(banned, 1, ArrayLength(argv), argv);
+        if ((argc > 3) || (argc < 2)) {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Invalid replace extended ban (~R:nick!ident@host:badword:replacement)", state->sptr);
+          return;
+        }
+        extmask = 1;
+        if (argc == 3)
+          banned = collapse(pretty_mask(argv[0]));
+        else
+          banned = strdup("*!*@*");
+        ircd_snprintf(0, t_str, BUFSIZE, "~R:%s:%s:%s", feature_bool(FEAT_ALLOW_TEXT_HOST) ? banned : "*!*@*", 
+                      (argc == 3) ? argv[1] : argv[0], (argc == 3) ? argv[2] : argv[1]);
         break;
 
       case 'n':

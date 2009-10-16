@@ -103,6 +103,8 @@ extern const unsigned int  IRCD_CharAttrTab[];
 #define IsUpper(c)         (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_UPPER)
 /** Test whether a character is a control character. */
 #define IsCntrl(c)         (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_CNTRL)
+/** Test whether a character is punctuation. */
+#define IsPunct(c)         (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_PUNCT)
 
 /** Test whether a character is valid in a channel name. */
 #define IsChannelChar(c)   (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_IRCCH)
@@ -122,7 +124,8 @@ extern const unsigned int  IRCD_CharAttrTab[];
 #define IsEol(c)           (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_EOL)
 /** Test whether a character is valid in a K: line expiration string. */
 #define IsKTimeChar(c)     (IRCD_CharAttrTab[(c) - CHAR_MIN] & NTL_KTIME)
-
+/** Test whether a character is a seperator */
+#define iswseperator(c) ((!IsAlnum(c) && !IsPunct(c)) && !((u_char)c >= 128))
 
 #endif /* INCLUDED_ircd_chattr_h */
 

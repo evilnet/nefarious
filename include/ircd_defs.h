@@ -107,5 +107,7 @@
 /** Target number to start assigning new targets. */
 #define RESERVEDTARGETS 12
 
+#define MAXNUMPARAMS    200
+
 #endif /* INCLUDED_ircd_defs_h */
 

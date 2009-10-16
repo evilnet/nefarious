@@ -89,6 +89,12 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
 {
   struct Channel* chptr;
   const char *ch;
+  char *argv[MAXNUMPARAMS];
+  char *word, *badword, *replace, *line;
+  char ftmp[1024];
+  unsigned int argc, n;
+  int type;
+  struct SLink* tmp;
 
   assert(0 != sptr);
   assert(0 != name);
@@ -143,6 +149,28 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
     return;
   }
 
+  for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
+    if (tmp->value.ban.extflag) {
+      if (tmp->value.ban.extflag & EXTBAN_REPLACE) {
+        argc = explode_line(decodespace(strdup(tmp->value.ban.banstr)), 0, ArrayLength(argv), argv);
+
+        if (argc == 4) {
+          if (0 != strcmp(argv[0], "*!*@*")) { /* if its a default then dont bother checking
+                                                    to save a wee bit of cpu  */
+            if (0 == user_matches_host(sptr, strdup(tmp->value.ban.extstr), tmp->value.ban.extflag))
+              continue;
+          }
+          replace = strdup(argv[3]);
+          parse_word(argv[2], &word, &type);
+          line = strdup(text);
+          if (textban_replace(type, word, replace, line, ftmp))
+            text = strdup(ftmp);
+
+        }
+      }
+    }
+  }
+
   if (!IsService(sptr))
     chptr->last_message = CurrentTime;
 
@@ -161,6 +189,13 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
 {
   struct Channel* chptr;
   const char *ch;
+  char *argv[MAXNUMPARAMS];
+  char *word, *badword, *replace, *line;
+  char ftmp[1024];
+  unsigned int argc, n;
+  int type;
+  struct SLink* tmp;
+
   assert(0 != sptr);
   assert(0 != name);
   assert(0 != text);
@@ -213,6 +248,28 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
   if (0 != ext_text_ban(sptr, chptr, text)) {
     send_reply(sptr, ERR_CANNOTSENDTOCHAN, chptr->chname, "");
     return;
+  }
+
+  for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
+    if (tmp->value.ban.extflag) {
+      if (tmp->value.ban.extflag & EXTBAN_REPLACE) {
+        argc = explode_line(decodespace(strdup(tmp->value.ban.banstr)), 0, ArrayLength(argv), argv);
+
+        if (argc == 4) {
+          if (0 != strcmp(argv[0], "*!*@*")) { /* if its a default then dont bother checking
+                                                    to save a wee bit of cpu  */
+            if (0 == user_matches_host(sptr, strdup(tmp->value.ban.extstr), tmp->value.ban.extflag))
+              continue;
+          }
+          replace = strdup(argv[3]);
+          parse_word(argv[2], &word, &type);
+          line = strdup(text);
+          if (textban_replace(type, word, replace, line, ftmp))
+            text = strdup(ftmp);
+
+        }
+      }
+    }
   }
 
   if (!IsService(sptr))

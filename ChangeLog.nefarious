@@ -1,6 +1,39 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-10-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added feature ALLOW_TEXT_HOST (default TRUE).
+
+	* doc/readme.features: Added feature ALLOW_TEXT_HOST description.
+
+	* include/channel.h: Added EXTBAN_REPLACE.
+
+	* include/ircd_chattr.h: Added IsPunct and iswseperator.
+
+	* include/ircd_defs.h: Added MAXNUMPARAMS.
+
+	* include/ircd_features.h: Added FEAT_ALLOW_TEXT_HOST.
+
+	* include/ircd_string.h: Added my_strcasestr, parse_word, textban_replace
+	and explode_line.
+
+	* include/s_user.h: Added user_matches_host.
+
+	* ircd/channel.c: Allow a host to be specified in ~t extended text
+	bans. Also added in ~R extended bans for replacing text. Hosts can
+	also be specified. If no host is given then *!*@* is added.
+
+	* ircd/ircd_features.c: Added R to EXTBANS. Also added ALLOW_TEXT_HOST.
+
+	* ircd/ircd_relay.c: Use +b ~R to filter messages.
+
+	* ircd/ircd_string.c: Added my_strcasestr, parse_word, textban_replace
+	and explode_line.
+
+	* ircd/s_user.c: Added user_matches_host for checking host masks against
+	all possible types (hidden, marked, normal, ip etc).
+
 2009-10-15  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Reverted my commit from 2009-10-01 (2587).

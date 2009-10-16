@@ -30,6 +30,12 @@
 #include <stdlib.h>
 /* #include <assert.h> -- Now using assert in ircd_log.h */
 #include <string.h>
+#include <stdio.h>
+
+
+#define TEXTBAN_WORD_LEFT       0x1
+#define TEXTBAN_WORD_RIGHT      0x2
+#define MAX_FIELDS 6
 
 /*
  * include the character attribute tables here
@@ -575,4 +581,173 @@ char *substr(const char *pstr, int start, int numchars)
   pnew[numchars] = '\0';
   return pnew;
 }
+
+char *my_strcasestr(char *haystack, char *needle) {
+  int i;
+  int nlength = strlen (needle);
+  int hlength = strlen (haystack);
+
+  if (nlength > hlength) return NULL;
+  if (hlength <= 0) return NULL;
+  if (nlength <= 0) return haystack;
+  for (i = 0; i <= (hlength - nlength); i++) {
+    if (strncasecmp (haystack + i, needle, nlength) == 0)
+      return haystack + i;
+  }
+  return NULL; /* not found */
+}
+
+void parse_word(const char *s, char **word, int *type)
+{
+  static char buf[512];
+  const char *tmp;
+  int len;
+  int tpe = 0;
+  char *o = buf;
+
+  for (tmp = s; *tmp; tmp++)
+  {
+    if (*tmp != '*')
+      *o++ = *tmp;
+    else
+    {
+      if (s == tmp)
+        tpe |= TEXTBAN_WORD_LEFT;
+      if (*(tmp + 1) == '\0')
+        tpe |= TEXTBAN_WORD_RIGHT;
+    }
+  }
+  *o = '\0';
+
+  *word = buf;
+  *type = tpe;
+}
+
+int textban_replace(int type, char *badword, char *replace, char *line, char *buf)
+{
+  char *replacew;
+  char *pold = line, *pnew = buf; /* Pointers to old string and new string */
+  char *poldx = line;
+  int replacen;
+  int searchn = -1;
+  char *startw, *endw;
+  char *c_eol = buf + 510 - 1; /* Cached end of (new) line */
+  int cleaned = 0;
+
+  replacew = strdup(replace);
+  replacen = strlen(replacew);
+
+  while (1) {
+    pold = my_strcasestr(pold, badword);
+    if (!pold)
+      break;
+    if (searchn == -1)
+      searchn = strlen(badword);
+    /* Hunt for start of word */
+    if (pold > line) {
+      for (startw = pold; (!iswseperator(*startw) && (startw != line)); startw--);
+        if (iswseperator(*startw))
+          startw++; /* Don't point at the space/seperator but at the word! */
+    } else {
+      startw = pold;
+    }
+
+    if (!(type & TEXTBAN_WORD_LEFT) && (pold != startw)) {
+      /* not matched */
+      pold++;
+      continue;
+    }
+
+    /* Hunt for end of word */
+    for (endw = pold; ((*endw != '\0') && (!iswseperator(*endw))); endw++);
+
+    if (!(type & TEXTBAN_WORD_RIGHT) && (pold+searchn != endw)) {
+      /* not matched */
+      pold++;
+      continue;
+    }
+
+    cleaned = 1; /* still too soon? Syzop/20050227 */
+
+    if (poldx != startw) {
+      int tmp_n = startw - poldx;
+      if (pnew + tmp_n >= c_eol) {
+        /* Partial copy and return... */
+        memcpy(pnew, poldx, c_eol - pnew);
+        *c_eol = '\0';
+        return 1;
+      }
+
+      memcpy(pnew, poldx, tmp_n);
+      pnew += tmp_n;
+    }
+    /* Now update the word in buf (pnew is now something like startw-in-new-buffer */
+
+    if (replacen) {
+       if ((pnew + replacen) >= c_eol) {
+         /* Partial copy and return... */
+         memcpy(pnew, replacew, c_eol - pnew);
+         *c_eol = '\0';
+         return 1;
+       }
+       memcpy(pnew, replacew, replacen);
+       pnew += replacen;
+     }
+     poldx = pold = endw;
+  }
+  /* Copy the last part */
+  if (*poldx) {
+    strncpy(pnew, poldx, c_eol - pnew);
+    *(c_eol) = '\0';
+  } else {
+    *pnew = '\0';
+  }
+  return cleaned;
+}
+
+int explode_line(char *line, int irc_colon, int argv_size, char *argv[])
+{
+    int argc = 0, bail = 0;
+    int n;
+    char ch, *linebkp;
+    char *lineb;
+
+    while (*line && (argc < argv_size)) {
+        while (*line == ':')
+            *line++ = 0;
+        if (!*line)
+            break;
+        argv[argc++] = line;
+
+        if (argc >= argv_size)
+            break;
+
+        while (*line) {
+            bail = 0;
+            switch (*line) {
+                case 58: /* : */
+                    bail = 1;
+                    break;
+                case 92: /* / */
+                    if (irc_colon == 0) {
+                        lineb = strdup(line + 1);
+                        sprintf(line, "%s", lineb);
+                    }
+                    line++;
+                    line++;
+                    break;
+                default:
+                    line++;
+            }
+            if (bail)
+                break;
+        }
+    }
+
+    for (n=argc; n<argv_size; n++)
+        argv[n] = (char*)0xFEEDBEEF;
+
+    return argc;
+}
+
 
