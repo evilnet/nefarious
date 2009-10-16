@@ -375,6 +375,13 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
                       flags = EXTBAN_REAL;
                     break;
 
+                  case 'R':
+                    if (flags)
+                      flags |= EXTBAN_REPLACE;
+                    else
+                      flags = EXTBAN_REPLACE;
+                    break;
+
                   default:
                     break; /* isnt needed but better keep it */
                 }
