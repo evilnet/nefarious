@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-06  Matthew Beeching  <jobe@mndbnet.co.uk>
+
+	* ircd/s_serv.c: Fix for MARK_WEBIRC not being propagated at burst.
+
 2009-10-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_burst.c: Added EXTBAN_REPLACE.

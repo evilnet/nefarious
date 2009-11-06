@@ -281,6 +281,9 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
         sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(acptr), MARK_CVERSION,
                       cli_version(acptr));
 
+      if (cli_webirc(acptr))
+        sendcmdto_serv_butone(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(acptr), MARK_WEBIRC, cli_webirc(acptr));
+
       for (lp = cli_user(acptr)->silence; lp; lp = lp->next)
         sendcmdto_one(cli_user(acptr)->server, CMD_SILENCE, cptr, "%C +%s", acptr, lp->value.cp);
 
