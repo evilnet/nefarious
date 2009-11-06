@@ -331,11 +331,15 @@ char *client_check_privs(struct Client *client)
         p = 0;
         privbufp[strlen(privbufp)] = 0;
         privbufp[0] = '\0';
-      } else  {
-        strcat(privbufp, privtab[i].name);
-        strcat(privbufp, " ");
       }
+      strcat(privbufp, privtab[i].name);
+      strcat(privbufp, " ");
     }
+  }
+
+  if (privbufp[0] != '\0') {
+    ircd_snprintf(0, outbuf, sizeof(outbuf), "     Privileges:: %s", privbufp);
+    send_reply(client, RPL_DATASTR, outbuf);
   }
 
   privbufp[strlen(privbufp)] = 0;
