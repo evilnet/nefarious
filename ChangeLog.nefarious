@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-06  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_serv.c: Fix for a minor mistake in MARK_WEBIRC propagation.
+
 2009-11-06  Matthew Beeching  <jobe@mndbnet.co.uk>
 
 	* ircd/s_serv.c: Fix for MARK_WEBIRC not being propagated at burst.
