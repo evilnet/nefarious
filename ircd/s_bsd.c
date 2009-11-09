@@ -643,6 +643,7 @@ void add_connection(struct Listener* listener, int fd) {
   time_t             next_target = 0;
   struct Zline*    azline = NULL;
   char zreason[256];
+  char *sslfp;
 
   const char* const throttle_message =
          "ERROR :Your host is trying to (re)connect too fast -- throttled\r\n";
@@ -754,7 +755,12 @@ void add_connection(struct Listener* listener, int fd) {
   }
 #ifdef USE_SSL
   if (ssl)
+  {
     cli_socket(new_client).ssl = ssl;
+    sslfp = ssl_get_fingerprint(ssl);
+    if (sslfp)
+      ircd_strncpy(cli_sslclifp(new_client), sslfp, 41);
+  } 
 #endif /* USE_SSL */
   cli_freeflag(new_client) |= FREEFLAG_SOCKET;
   cli_listener(new_client) = listener;

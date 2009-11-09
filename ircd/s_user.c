@@ -1018,6 +1018,8 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
     if (cli_webirc(sptr) && !EmptyString(cli_webirc(sptr)))
       sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(cptr), MARK_WEBIRC, cli_webirc(sptr));
+    if (cli_sslclifp(sptr) && !EmptyString(cli_sslclifp(sptr)))
+      sendcmdto_serv_butone(cli_user(sptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(cptr), MARK_SSLCLIFP, cli_sslclifp(sptr));
 
     /* hack the 'old flags' so we don't send +r */
     if (HasFlag(sptr, FLAG_ACCOUNT))

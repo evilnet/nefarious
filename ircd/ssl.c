@@ -364,6 +364,11 @@ static void info_callback(const SSL *s, int where, int ret)
   else if (where == SSL_CB_HANDSHAKE_DONE)
     Debug((DEBUG_DEBUG, "SSL: handshake done"));
 }
+
+int sslverify_callback(int preverify_ok, X509_STORE_CTX *cert)
+{
+	return 1;
+}
        
 static void sslfail(char *txt)
 {
@@ -397,6 +402,7 @@ void ssl_init(void)
   SSL_CTX_set_session_cache_mode(ctx, SSL_SESS_CACHE_BOTH);
   SSL_CTX_set_timeout(ctx, 300); /* XXX */
   SSL_CTX_set_info_callback(ctx, info_callback);
+  SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER, sslverify_callback);
 
   ircd_snprintf(0, pemfile, sizeof(pemfile), "%s/ircd.pem", DPATH);
   Debug((DEBUG_DEBUG, "SSL: using pem file: %s", pemfile));
@@ -655,6 +661,34 @@ generate_challenge(char **r_challenge, RSA *rsa, struct Client *sptr)
     return -1;
   }
   return 0;
+}
+
+char*
+ssl_get_fingerprint(SSL *ssl)
+{
+	X509* cert;
+	unsigned int n = 0;
+	unsigned char md[EVP_MAX_MD_SIZE];
+	const EVP_MD *digest = EVP_sha1();
+	static char hex[BUFSIZE + 1];
+
+	cert = SSL_get_peer_certificate(ssl);
+
+	if (!(cert))
+	{
+		return NULL;
+	}
+
+	if (!X509_digest(cert, digest, md, &n))
+	{
+		X509_free(cert);
+		return NULL;
+	}
+
+	binary_to_hex(md, hex, n);
+
+	X509_free(cert);
+	return (hex);
 }
 
 #endif /* USE_SSL */

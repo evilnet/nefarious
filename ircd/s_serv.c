@@ -285,6 +285,10 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
         sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(acptr), MARK_WEBIRC,
                       cli_webirc(acptr));
 
+      if (cli_sslclifp(acptr) && !EmptyString(cli_sslclifp(acptr)))
+        sendcmdto_one(cli_user(acptr)->server, CMD_MARK, cptr, "%s %s :%s", cli_name(acptr), MARK_SSLCLIFP,
+                      cli_sslclifp(acptr));
+
       for (lp = cli_user(acptr)->silence; lp; lp = lp->next)
         sendcmdto_one(cli_user(acptr)->server, CMD_SILENCE, cptr, "%C +%s", acptr, lp->value.cp);
 

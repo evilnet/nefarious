@@ -416,6 +416,11 @@ void checkClient(struct Client *sptr, struct Client *acptr)
      }
    }
 
+   if (cli_sslclifp(acptr) && (strlen(cli_sslclifp(acptr)) > 0)) {
+     ircd_snprintf(0, outbuf, sizeof(outbuf), "SSL Fingerprint:: %s", cli_sslclifp(acptr));
+     send_reply(sptr, RPL_DATASTR, outbuf);
+   }
+
    if (MyUser(acptr))
      get_eflags(sptr, acptr);
 

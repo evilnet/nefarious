@@ -30,6 +30,7 @@
 #define MARK_EXEMPT_UPDATE	"EXEMPT"          /**< DNSBL Exempt mark */
 #define MARK_CVERSION		"CVERSION"        /**< Client Version mark */
 #define MARK_WEBIRC		"WEBIRC"          /**< WEBIRC mark */
+#define MARK_SSLCLIFP           "SSLCLIFP"        /**< SSLCLIFP mark */
 #define MARK_SFILTER            "SFILTER"         /**< Spam filter mark */
 #define MARK_KILL               "KILL"            /**< KILL mark */
 

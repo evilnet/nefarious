@@ -303,6 +303,7 @@ struct Client {
   char cli_killmark[BUFSIZE + 1];    /**< Kill block mark */
   char cli_dnsbl[BUFSIZE + 1];       /**< dnsbl hostname identifier */
   char cli_dnsbls[BUFSIZE + 1];      /**< all dnsbls matched identifier */
+  char cli_sslclifp[BUFSIZE + 1];    /**< SSL client certificate fingerprint if available */
   struct SLink*   cli_sdnsbls;       /**< chain of dnsbl pointer blocks */
   char cli_dnsblformat[BUFSIZE + 1]; /**< dnsbl rejection message */
   int  cli_dnsbllastrank;            /**< last rank we got */
@@ -458,6 +459,8 @@ struct Client {
 #define cli_auth(cli)		((cli)->cli_connect->con_auth)
 /** Get login on connect request for client. */
 #define cli_loc(cli)		((cli)->cli_connect->con_loc)
+/** Get SSL client certificate fingerprint */
+#define cli_sslclifp(cli)       ((cli)->cli_sslclifp)
 
 /** Verify that a connection is valid. */
 #define con_verify(con)		((con)->con_magic == CONNECTION_MAGIC)

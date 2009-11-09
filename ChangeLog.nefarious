@@ -1,6 +1,31 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-09  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_bsd.c: Added call to function to get SSL client
+	certificate fingerprint and store it.
+
+	* ircd/ssl.c: Added function to get SSL client certificate
+	fingerprint.
+
+	* ircd/s_serv.c: Added SSLCLIFP mark
+
+	* ircd/m_mark.c: Added SSLCLIFP mark
+
+	* ircd/s_user.c: Added SSLCLIFP mark
+
+	* ircd/m_check.c: Added display of SSL client certificate
+	fingerprint in CHECK response.
+
+	* include/mark.h: Added SSLCLIFP mark
+
+	* include/ssl.h: Added function to get SSL client certificate
+	fingerprint.
+
+	* include/client.h: Added field to client struct to store SSL client
+	certificate fingerprint.
+
 2009-11-06  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/client.c: Fix for CHECK missing off PRIVs.
