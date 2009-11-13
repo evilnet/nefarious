@@ -314,7 +314,7 @@ char *client_print_privs(struct Client *client)
   return privbufp;
 }
 
-char *client_check_privs(struct Client *client)
+char *client_check_privs(struct Client *client, struct Client *replyto)
 {
   char outbuf[BUFSIZE];
   int i, p = 0;
@@ -326,7 +326,7 @@ char *client_check_privs(struct Client *client)
       p++;
       if (p > 10) {
         ircd_snprintf(0, outbuf, sizeof(outbuf), "     Privileges:: %s", privbufp);
-        send_reply(client, RPL_DATASTR, outbuf);
+        send_reply(replyto, RPL_DATASTR, outbuf);
 
         p = 0;
         privbufp[strlen(privbufp)] = 0;
@@ -339,7 +339,7 @@ char *client_check_privs(struct Client *client)
 
   if (privbufp[0] != '\0') {
     ircd_snprintf(0, outbuf, sizeof(outbuf), "     Privileges:: %s", privbufp);
-    send_reply(client, RPL_DATASTR, outbuf);
+    send_reply(replyto, RPL_DATASTR, outbuf);
   }
 
   privbufp[strlen(privbufp)] = 0;
