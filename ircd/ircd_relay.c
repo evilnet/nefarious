@@ -163,6 +163,8 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
           replace = strdup(argv[3]);
           parse_word(argv[2], &word, &type);
           line = strdup(text);
+          if (ircd_strcmp(word, "") == 0)
+            continue;
           if (textban_replace(type, word, replace, line, ftmp))
             text = strdup(ftmp);
 
@@ -264,6 +266,8 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
           replace = strdup(argv[3]);
           parse_word(argv[2], &word, &type);
           line = strdup(text);
+          if (ircd_strcmp(word, "") == 0)
+            continue;
           if (textban_replace(type, word, replace, line, ftmp))
             text = strdup(ftmp);
 

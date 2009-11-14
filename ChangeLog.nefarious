@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/channel.c: Disallow wildcard only extended ~R bans.
+
+	* ircd/ircd_relay.c: Disallow wildcard only extended ~R bans.
+
 2009-11-13  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/client.c: Fix for CHECK privs replies going to wrong user.

@@ -3716,7 +3716,7 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   char *argv[MAXNUMPARAMS];
   unsigned int argc;
   int typepos = 0, startarg = 0, extended = 0, flags = 0;
-  int extmask = 0;
+  int extmask = 0, badword = 0;
 
   if (state->parc <= 0) { /* Not enough args, send ban list */
     if (MyUser(state->sptr) && !(state->done & DONE_BANLIST)) {
@@ -3830,10 +3830,19 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
           return;
         }
         extmask = 1;
-        if (argc == 3)
+        if (argc == 3) {
+          if (ircd_strcmp(argv[1], "*") == 0)
+            badword = 1;
           banned = collapse(pretty_mask(argv[0]));
-        else
+        } else {
+          if (ircd_strcmp(argv[0], "*") == 0)
+            badword = 1;
           banned = strdup("*!*@*");
+        }
+        if (badword) {
+          sendcmdto_one(&me, CMD_NOTICE, state->sptr, "%C :Invalid replace extended ban, wildcard only not allowed", state->sptr);
+          return;
+        }
         ircd_snprintf(0, t_str, BUFSIZE, "~R:%s:%s:%s", feature_bool(FEAT_ALLOW_TEXT_HOST) ? banned : "*!*@*", 
                       (argc == 3) ? argv[1] : argv[0], (argc == 3) ? argv[2] : argv[1]);
         break;
