@@ -462,7 +462,8 @@ static int completed_connection(struct Client* cptr)
   struct ConfItem *aconf;
   time_t newts;
   struct Client *acptr;
-  int i;
+  int i, r;
+  char *sslfp;
 
   assert(0 != cptr);
 
@@ -482,6 +483,21 @@ static int completed_connection(struct Client* cptr)
     sendto_opmask_butone(0, SNO_OLDSNO, "Lost Server Line for %s", cli_name(cptr));
     return 0;
   }
+
+  if (aconf->flags & CONF_SSL) {
+    r = ssl_connect(&(cli_socket(cptr)));
+    if (r == -1) {
+      sendto_opmask_butone(0, SNO_OLDSNO, "Connection failed to %s: SSL error",
+                           cli_name(cptr));
+      return 0;
+    } else if (r == 0)
+      return 1;
+    sslfp = ssl_get_fingerprint(cli_socket(cptr).ssl);
+    if (sslfp)
+      ircd_strncpy(cli_sslclifp(cptr), sslfp, BUFSIZE+1);
+    SetSSL(cptr);
+  }
+
   if (s_state(&(cli_socket(cptr))) == SS_CONNECTING)
     socket_state(&(cli_socket(cptr)), SS_CONNECTED);
 
@@ -759,7 +775,7 @@ void add_connection(struct Listener* listener, int fd) {
     cli_socket(new_client).ssl = ssl;
     sslfp = ssl_get_fingerprint(ssl);
     if (sslfp)
-      ircd_strncpy(cli_sslclifp(new_client), sslfp, 41);
+      ircd_strncpy(cli_sslclifp(new_client), sslfp, BUFSIZE+1);
   } 
 #endif /* USE_SSL */
   cli_freeflag(new_client) |= FREEFLAG_SOCKET;

@@ -1,6 +1,22 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-14  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_bsd.c: Added support for server to server SSL.
+
+	* ircd/ssl.c: Added support for server to server SSL.
+
+	* ircd/ircd_parser.y: Added support for server to server SSL.
+
+	* ircd/m_check.c: Added SSL client certificate fingerprint to server
+	CHECK output.
+	* include/ssl.h: Added support for server to server SSL.
+
+	* include/s_conf.h: Added support for server to server SSL.
+
+	* doc/example.conf: Added support for server to server SSL.
+
 2009-11-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Disallow wildcard only extended ~R bans.

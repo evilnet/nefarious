@@ -52,6 +52,7 @@ struct TRecord;
 #define CONF_LOCOP              0x0010
 #define CONF_OPERATOR           0x0020
 #define CONF_AUTOCONNECT        0x0040
+#define CONF_SSL                0x0080
 
 #define CONF_OPS                (CONF_OPERATOR | CONF_LOCOP)
 #define CONF_CLIENT_MASK        (CONF_CLIENT | CONF_OPS | CONF_SERVER)

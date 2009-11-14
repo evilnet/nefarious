@@ -437,7 +437,8 @@ connectblock: CONNECT
 connectitems: connectitem connectitems | connectitem;
 connectitem: connectname | connectpass | connectclass | connecthost
               | connectport | connectleaf | connecthub
-              | connecthublimit | connectmaxhops | connectauto;
+              | connecthublimit | connectmaxhops | connectauto
+              | connectssl;
 connectname: NAME '=' QSTRING ';'
 {
  MyFree(name);
@@ -483,7 +484,8 @@ connectmaxhops: MAXHOPS '=' expr ';'
 };
 connectauto: AUTOCONNECT '=' YES ';' { flags |= CONF_AUTOCONNECT; }
  | AUTOCONNECT '=' NO ';' { flags &= ~CONF_AUTOCONNECT; };
-
+connectssl: CRYPT '=' YES ';' { flags |= CONF_SSL; }
+ | CRYPT '=' NO ';' { flags &= ~CONF_SSL; };
 
 uworldblock: UWORLD '{' uworlditems '}' ';';
 uworlditems: uworlditem uworlditems | uworlditem;

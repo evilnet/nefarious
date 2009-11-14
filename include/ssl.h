@@ -67,6 +67,7 @@ extern int get_randomness(unsigned char *, int);
 extern int save_spare_fd(const char *);
 
 extern char* ssl_get_fingerprint(SSL *ssl);
+extern int ssl_connect(struct Socket* sock);
 
 #endif /* USE_SSL */
 #endif /* INCLUDED_ssl_h */

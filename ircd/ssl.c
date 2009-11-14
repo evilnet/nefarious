@@ -395,7 +395,7 @@ void ssl_init(void)
 
   Debug((DEBUG_NOTICE, "SSL: read %d bytes of randomness", RAND_load_file("/dev/urandom", 4096)));
 
-  ctx = SSL_CTX_new(SSLv23_server_method());
+  ctx = SSL_CTX_new(SSLv23_method());
   SSL_CTX_set_tmp_rsa_callback(ctx, tmp_rsa_cb);
   SSL_CTX_need_tmp_RSA(ctx);
   SSL_CTX_set_mode(ctx, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
@@ -666,29 +666,47 @@ generate_challenge(char **r_challenge, RSA *rsa, struct Client *sptr)
 char*
 ssl_get_fingerprint(SSL *ssl)
 {
-	X509* cert;
-	unsigned int n = 0;
-	unsigned char md[EVP_MAX_MD_SIZE];
-	const EVP_MD *digest = EVP_sha1();
-	static char hex[BUFSIZE + 1];
+  X509* cert;
+  unsigned int n = 0;
+  unsigned char md[EVP_MAX_MD_SIZE];
+  const EVP_MD *digest = EVP_sha1();
+  static char hex[BUFSIZE + 1];
 
-	cert = SSL_get_peer_certificate(ssl);
+  cert = SSL_get_peer_certificate(ssl);
 
-	if (!(cert))
-	{
-		return NULL;
-	}
+  if (!(cert))
+    return NULL;
 
-	if (!X509_digest(cert, digest, md, &n))
-	{
-		X509_free(cert);
-		return NULL;
-	}
+  if (!X509_digest(cert, digest, md, &n))
+  {
+    X509_free(cert);
+    return NULL;
+  }
 
-	binary_to_hex(md, hex, n);
+  binary_to_hex(md, hex, n);
+  X509_free(cert);
 
-	X509_free(cert);
-	return (hex);
+  return (hex);
+}
+
+int
+ssl_connect(struct Socket* sock)
+{
+  int r = 0;
+
+  if (!sock->ssl) {
+    sock->ssl = SSL_new(ctx);
+    SSL_set_fd(sock->ssl, sock->s_fd);
+  }
+
+  r = SSL_connect(sock->ssl);
+  if (r<=0) {
+    if ((SSL_get_error(sock->ssl, r) == SSL_ERROR_WANT_WRITE) || (SSL_get_error(sock->ssl, r) == SSL_ERROR_WANT_READ))
+      return 0; // Needs to call SSL_connect() again
+    else
+      return -1; // Fatal error
+  }
+  return 1; // Connection complete
 }
 
 #endif /* USE_SSL */
