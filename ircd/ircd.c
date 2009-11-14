@@ -354,7 +354,7 @@ void exit_schedule(int restart, time_t when, struct Client *who,
     if (IsUser(who)) {
       char nuhbuf[NICKLEN + USERLEN + HOSTLEN + 3];
       ircd_snprintf(0, nuhbuf, sizeof(nuhbuf), "%s!%s@%s", cli_name(who),
-		    cli_user(who)->username, cli_sockhost(who));
+		    cli_user(who)->username, cli_user(who)->host);
       DupString(pe->who, nuhbuf);
     } else
       DupString(pe->who, cli_name(who));

@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/ircd.c: Bug fix for SF Bug #2886366 (Delayed restarts/shutdowns
+	 reveal actual host)
+
 2009-11-14  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_bsd.c: Added support for server to server SSL.
