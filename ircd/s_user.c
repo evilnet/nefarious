@@ -489,6 +489,13 @@ int register_user(struct Client *cptr, struct Client *sptr,
         || ((user->username[0] == '~') && (user->username[1] == '\000')))
       return exit_client(cptr, sptr, &me, "USER: Bogus userid.");
 
+    if (!verify_sslclifp(sptr, aconf))
+    {
+      ServerStats->is_ref++;
+      send_reply(sptr, ERR_SSLCLIFP);
+      return exit_client(cptr, sptr, &me, "SSL fingerprint missmatch");
+    }
+
     if (!EmptyString(aconf->passwd) && strcmp(cli_passwd(sptr), aconf->passwd))
     {
       ServerStats->is_ref++;

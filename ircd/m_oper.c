@@ -146,6 +146,9 @@ int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **
   if (aconf->port & OFLAG_RSA)
      return ERR_RSA_LINE;
 
+  if (!verify_sslclifp(sptr, aconf))
+    return ERR_SSLCLIFP;
+
   if (oper_password_match(password, aconf->passwd)) {
     int attach_result = attach_conf(sptr, aconf);
     if ((ACR_OK != attach_result) && (ACR_ALREADY_AUTHORIZED != attach_result)) {
@@ -205,6 +208,13 @@ int m_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     switch (can_oper(sptr, name, password, &aconf)) {
     case ERR_RSA_LINE:
      send_reply(sptr, ERR_RSA_LINE);
+     return 0;
+     break;
+    case ERR_SSLCLIFP:
+     sendto_allops(&me, SNO_OLDREALOP,
+            "Failed OPER attempt by %s (%s@%s) (SSL Fingerprint Missmatch)",
+            parv[0], cli_user(sptr)->realusername, cli_user(sptr)->realhost);
+     send_reply(sptr, ERR_SSLCLIFP);
      return 0;
      break;
     case ERR_NOOPERHOST:
@@ -345,6 +355,14 @@ int ms_oper(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
     switch (can_oper(sptr, parv[2], parv[3], &aconf)) {
         case ERR_RSA_LINE:
          send_reply(sptr, ERR_RSA_LINE);
+         return 0;
+         break;
+        case ERR_SSLCLIFP:
+         sendto_allops(&me, SNO_OLDREALOP,
+                "Failed OPER attempt by %s (%s@%s) (SSL Fingerprint Missmatch)",
+                parv[0], cli_user(sptr)->realusername,
+                cli_user(sptr)->realhost);
+         send_reply(sptr, ERR_SSLCLIFP);
          return 0;
          break;
 	case ERR_NOOPERHOST:

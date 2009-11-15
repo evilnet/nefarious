@@ -83,6 +83,7 @@
   static char *server, *reply, *replies, *rank, *dflags, *mask, *ident, *desc;
   static char *rtype, *action, *reason, *sport, *oflags, *ip;
   static char *prefix, *command, *service, *regex, *channel;
+  static char *sslfp;
 
   struct SLink *hosts;
   static char *stringlist[MAX_STRINGS];
@@ -160,6 +161,7 @@ static void free_slist(struct SLink **link) {
 %token CONTACT
 %token CRULE
 %token CRYPT
+%token CRYPTFP
 %token DAYS
 %token DECADES
 %token DESC
@@ -418,6 +420,11 @@ connectblock: CONNECT
    aconf->host = host;
    aconf->flags = flags;
 
+   if (!sslfp)
+     aconf->sslfp = NULL;
+   else
+     DupString(aconf->sslfp, sslfp);
+
    aconf->maximum = (hub_limit != NULL && maxlinks == 0) ? 65535 : maxlinks;
    aconf->hub_limit = hub_limit;
 
@@ -428,9 +435,11 @@ connectblock: CONNECT
    MyFree(pass);
    MyFree(host);
    MyFree(hub_limit);
+   MyFree(sslfp);
  }
 
  name = pass = host = hub_limit = NULL;
+ sslfp = NULL;
  c_class = NULL;
  port = flags = maxlinks = 0;
 }
@@ -438,7 +447,7 @@ connectitems: connectitem connectitems | connectitem;
 connectitem: connectname | connectpass | connectclass | connecthost
               | connectport | connectleaf | connecthub
               | connecthublimit | connectmaxhops | connectauto
-              | connectssl;
+              | connectssl | connectsslfp;
 connectname: NAME '=' QSTRING ';'
 {
  MyFree(name);
@@ -486,6 +495,11 @@ connectauto: AUTOCONNECT '=' YES ';' { flags |= CONF_AUTOCONNECT; }
  | AUTOCONNECT '=' NO ';' { flags &= ~CONF_AUTOCONNECT; };
 connectssl: CRYPT '=' YES ';' { flags |= CONF_SSL; }
  | CRYPT '=' NO ';' { flags &= ~CONF_SSL; };
+connectsslfp: CRYPTFP '=' QSTRING ';'
+{
+  MyFree(sslfp);
+  sslfp = $3;
+}
 
 uworldblock: UWORLD '{' uworlditems '}' ';';
 uworlditems: uworlditem uworlditems | uworlditem;
@@ -564,6 +578,11 @@ clientblock: CLIENT
     aconf->name = ip;
     aconf->maximum = maxlinks;
     aconf->passwd = pass;
+    if (!sslfp)
+      aconf->sslfp = NULL;
+    else
+      DupString(aconf->sslfp, sslfp);
+
     Debug((DEBUG_DEBUG, "CLIENT: %s %s %d", host, ip ? ip : "", bits));
   }
   if (!aconf) {
@@ -571,6 +590,7 @@ clientblock: CLIENT
     MyFree(host);
     MyFree(ip);
     MyFree(pass);
+    MyFree(sslfp);
   }
 
   host = NULL;
@@ -579,10 +599,11 @@ clientblock: CLIENT
   maxlinks = 0;
   ip = NULL;
   pass = NULL;
+  sslfp = NULL;
   port = 0;
 };
 clientitems: clientitem clientitems | clientitem;
-clientitem: clienthost | clientip | clientusername | clientclass | clientpass | clientmaxlinks | clientport;
+clientitem: clienthost | clientip | clientusername | clientclass | clientpass | clientmaxlinks | clientport | clientsslfp;
 clienthost: HOST '=' QSTRING ';'
 {
   char *sep = strchr($3, '@');
@@ -634,7 +655,11 @@ clientport: PORT '=' expr ';'
 {
   port = $3;
 };
-
+clientsslfp: CRYPTFP '=' QSTRING ';'
+{
+  MyFree(sslfp);
+  sslfp = $3;
+}
 
 classblock: CLASS {
   tping = 90;
@@ -737,6 +762,11 @@ operblock: OPER '{' operitems '}' ';'
 
     aconf->conn_class = c_class;
 
+    if (!sslfp)
+      aconf->sslfp = NULL;
+    else
+      DupString(aconf->sslfp, sslfp);
+
     if (!oflags)
       DupString(oflags, "O");
 
@@ -756,6 +786,7 @@ operblock: OPER '{' operitems '}' ';'
   MyFree(oflags);
   MyFree(name);
   MyFree(pass);
+  MyFree(sslfp);
   free_slist(&hosts);
   name = pass = NULL;
   c_class = NULL;
@@ -763,7 +794,7 @@ operblock: OPER '{' operitems '}' ';'
   memset(&privs_dirty, 0, sizeof(privs_dirty));
 };
 operitems: operitem | operitems operitem;
-operitem: opername | operpass | operhost | operflags | operclass | priv;
+operitem: opername | operpass | operhost | operflags | operclass | opersslfp | priv;
 opername: NAME '=' QSTRING ';'
 {
   MyFree(name);
@@ -801,6 +832,11 @@ operclass: CLASS '=' QSTRING ';'
  if (!c_class)
   parse_error("No such connection class '%s' for Operator block", $3);
 };
+opersslfp: CRYPTFP '=' QSTRING ';'
+{
+  MyFree(sslfp);
+  sslfp = $3;
+}
 
 priv: privtype '=' yesorno ';'
 {

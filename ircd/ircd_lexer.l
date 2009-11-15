@@ -58,6 +58,7 @@ static struct lexer_token {
   TOKEN(CONTACT),
   TOKEN(CRULE),
   TOKEN(CRYPT),
+  TOKEN(CRYPTFP),
   TOKEN(DAYS),
   TOKEN(DECADES),
   TOKEN(DESC),

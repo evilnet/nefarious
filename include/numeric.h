@@ -501,6 +501,7 @@ extern const struct Numeric* get_error_numeric(int err);
 #define ERR_RSA_LINE         529
 #define ERR_BADHOSTMASK      530	/* QuakeNet extension -froo */
 #define ERR_HOSTUNAVAIL      531	/* QuakeNet extension -froo */
+#define ERR_SSLCLIFP         532
 
 #define RPL_OMOTDSTART       535
 #define RPL_OMOTD            536

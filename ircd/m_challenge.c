@@ -278,6 +278,16 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
     return 0;
   }
 
+  if (!verify_sslclifp(sptr, aconf))
+  {
+    sendto_allops(&me, SNO_OLDREALOP,
+           "Failed OPER attempt by %s (%s@%s) (SSL Fingerprint Missmatch)",
+           parv[0], cli_user(sptr)->realusername,
+           cli_user(sptr)->realhost);
+    send_reply(sptr, ERR_SSLCLIFP);
+    return 0;
+  }
+
   if ((file = BIO_new_file(aconf->passwd, "r")) == NULL)
   {
     send_reply(sptr, RPL_NO_KEY);
@@ -515,6 +525,16 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   if (!(aconf->port & OFLAG_RSA))
   {
     send_reply(sptr, RPL_NO_CHALL);
+    return 0;
+  }
+
+  if (!verify_sslclifp(sptr, aconf))
+  {
+    sendto_allops(&me, SNO_OLDREALOP,
+           "Failed OPER attempt by %s (%s@%s) (SSL Fingerprint Missmatch)",
+           parv[0], cli_user(sptr)->realusername,
+           cli_user(sptr)->realhost);
+    send_reply(sptr, ERR_SSLCLIFP);
     return 0;
   }
 

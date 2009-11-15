@@ -1,6 +1,36 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-14  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_challenge.c: Added SSL client certificate fingerprint
+	veirifcation (Operator block).
+
+	* ircd/m_oper.c: Added SSL client certificate fingerprint
+	veirifcation (Operator block).
+
+	* ircd/m_server.c: Added SSL client certificate fingerprint
+	veirifcation (Connect block).
+
+	* ircd/s_user.c: Added SSL client certificate fingerprint
+	veirifcation (Client block).
+
+	* ircd/ircd_parser.y: Added cryptfp field to Operator block.
+
+	* ircd/ircd_lexer.l: Added cryptfp field to Operator block.
+
+	* ircd/s_conf.c: Added verify_sslclifp() to verify SSL client
+	certificate fingerprint.
+
+	* ircd/s_err.c: Added error reply ERR_SSLCLIFP.
+
+	* include/numeric.h: Added error reply ERR_SSLCLIFP.
+
+	* include/s_conf.h: Added verify_sslclifp() to verify SSL client
+	certificate fingerprint.
+
+	* doc/example.conf: Added cryptfp field to Operator block.
+
 2009-11-14  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd.c: Bug fix for SF Bug #2886366 (Delayed restarts/shutdowns

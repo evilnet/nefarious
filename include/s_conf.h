@@ -74,6 +74,7 @@ struct ConfItem {
   char*                    username;
   char*                    host;
   char*                    passwd;
+  char*                    sslfp;       /* SSL certificate fingerprint */
   char*                    name;
   char*                    hub_limit;
   time_t                   hold;        /* Hold until this time (calendar time) */
@@ -349,5 +350,7 @@ extern char eflagstr(const char* eflags);
 extern void yyerror(const char *msg);
 extern void yyserror(const char *fmt, ...);
 extern void yywarning(const char *fmt, ...);
+
+extern int verify_sslclifp(struct Client* cptr, struct ConfItem* aconf);
 
 #endif /* INCLUDED_s_conf_h */
