@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/ircd_relay.c: Potential fix for the ~R crashes.
+
 2009-11-14  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_challenge.c: Added SSL client certificate fingerprint
