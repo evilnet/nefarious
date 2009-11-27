@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-27  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ssl.c: Change SSL fingerprint hash from SHA1 to SHA256.
+
 2009-11-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_relay.c: Potential fix for the ~R crashes.

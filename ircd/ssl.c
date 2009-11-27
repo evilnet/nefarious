@@ -669,7 +669,7 @@ ssl_get_fingerprint(SSL *ssl)
   X509* cert;
   unsigned int n = 0;
   unsigned char md[EVP_MAX_MD_SIZE];
-  const EVP_MD *digest = EVP_sha1();
+  const EVP_MD *digest = EVP_sha256();
   static char hex[BUFSIZE + 1];
 
   cert = SSL_get_peer_certificate(ssl);
