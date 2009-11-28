@@ -702,11 +702,11 @@ ssl_connect(struct Socket* sock)
   r = SSL_connect(sock->ssl);
   if (r<=0) {
     if ((SSL_get_error(sock->ssl, r) == SSL_ERROR_WANT_WRITE) || (SSL_get_error(sock->ssl, r) == SSL_ERROR_WANT_READ))
-      return 0; // Needs to call SSL_connect() again
+      return 0; /* Needs to call SSL_connect() again */
     else
-      return -1; // Fatal error
+      return -1; /* Fatal error */
   }
-  return 1; // Connection complete
+  return 1; /* Connection complete */
 }
 
 #endif /* USE_SSL */

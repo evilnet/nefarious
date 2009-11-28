@@ -191,8 +191,7 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
       locargv[1] = parv[parc - 2];
       locargv[2] = parv[parc - 1];
     }
-    if (locargv[0] && *locargv[0] && locargv[1] && *locargv[1] &&
-	locargv[2] && *locargv[2]) {
+    if (locargv[0] && *locargv[0] && locargv[1] && *locargv[1]) {
       cli_loc(cptr) = MyMalloc(sizeof(struct LOCInfo));
       memset(cli_loc(cptr), 0, sizeof(struct LOCInfo));
 
@@ -200,7 +199,11 @@ int mr_pass(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
       ircd_strncpy(cli_loc(cptr)->service, locargv[0], NICKLEN);
       ircd_strncpy(cli_loc(cptr)->account, locargv[1], ACCOUNTLEN);
-      ircd_strncpy(cli_loc(cptr)->password, locargv[2], ACCPASSWDLEN);
+
+      if (locargv[2] && *locargv[2])
+        ircd_strncpy(cli_loc(cptr)->password, locargv[2], ACCPASSWDLEN);
+      else
+        ircd_strncpy(cli_loc(cptr)->password, "", ACCPASSWDLEN);
     }
     
     /* handle retries */

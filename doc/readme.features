@@ -1782,6 +1782,14 @@ LOC_SENDHOST
 
 If enabled hostnames will be sent in Login on connect messages to servers.
 
+LOC_SENDSSLFP
+ * Type: boolean
+ * Default: FALSE
+
+If enabled and a connecting client is connecting via SSL with a client ssl cert then
+their SSL Fingerprint will be sent in Login on connect messages to servers. You must
+have LOC_SENDHOST enabled for this feature to work.
+
 IPCHECK
  * Type: boolean
  * Default: TRUE

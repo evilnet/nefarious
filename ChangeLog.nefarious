@@ -1,6 +1,25 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Added LOC_SENDHOST and LOC_SENDSSLFP.
+
+	* doc/readme.features: Added LOC_SENDSSLFP.
+
+	* include/ircd_features.h: Added LOC_SENDSSLFP.
+
+	* ircd/ircd_features.c: Added LOC_SENDSSLFP (Default FALSE). This
+	depends on LOC_SENDHOST being set to TRUE.
+
+	* ircd/m_pass.c: Allow a blank password to be sent with LOC.
+
+	* ircd/s_user.c: Added another LOC type (S). If LOC_SENDHOST and
+	LOC_SENDSSLFP are enabled then a connecting client's SSL fingerprint
+	will be sent in the s2s LOC message.
+
+	* ircd/ssl.c: Adjusted some comments.
+
 2009-11-27  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ssl.c: Change SSL fingerprint hash from SHA1 to SHA256.

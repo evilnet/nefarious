@@ -756,6 +756,7 @@ static struct FeatureDesc {
 
   /* Allows configuring sending host in LOC */
   F_B(LOC_SENDHOST, 0, 0, 0),
+  F_B(LOC_SENDSSLFP, 0, 0, 0),
 
   /* Allows disabling UHNAMES */
   F_B(UHNAMES, 0, 1, 0),
