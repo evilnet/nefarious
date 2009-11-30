@@ -761,7 +761,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
     }
   }
 
-  if (MyConnect(sptr) && feature_bool(FEAT_SETHOST_AUTO)) {
+  if (MyConnect(sptr)) {
     if (conf_check_slines(sptr)) {
       send_reply(sptr, RPL_USINGSLINE);
       SetSetHost(sptr);

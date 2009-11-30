@@ -44,6 +44,7 @@ static struct lexer_token {
   TOKEN(ACTION),
   TOKEN(ADMIN),
   TOKEN(ALL),
+  TOKEN(AUTOAPPLY),
   TOKEN(AUTOCONNECT),
   TOKEN(BAN),
   TOKEN(BYTES),

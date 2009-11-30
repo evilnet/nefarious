@@ -2609,10 +2609,13 @@ conf_check_slines(struct Client *cptr)
   char *hostonly;
 
   for (sconf = GlobalSList; sconf; sconf = sconf->next) {
-    if (sconf->flags == SLINE_FLAGS_IP) {
+    if (!(sconf->flags & SLINE_FLAGS_AUTO))
+      continue;
+
+    if (sconf->flags & SLINE_FLAGS_IP) {
       if (((cli_ip(cptr)).s_addr & NETMASK(sconf->bits)) != sconf->address.s_addr)
         continue;
-    } else if (sconf->flags == SLINE_FLAGS_HOSTNAME) {
+    } else if (sconf->flags & SLINE_FLAGS_HOSTNAME) {
         if ((match(sconf->realhost, cli_sockhost(cptr)) != 0) &&
            (match(sconf->realhost, cli_sock_ip(cptr)) != 0))	/* wildcarded IP address */
           continue;

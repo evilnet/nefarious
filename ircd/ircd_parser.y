@@ -147,6 +147,7 @@ static void free_slist(struct SLink **link) {
 %token ACTION
 %token ADMIN
 %token ALL
+%token AUTOAPPLY
 %token AUTOCONNECT
 %token BAN
 %token BYTES
@@ -1448,6 +1449,7 @@ spoofhostblock: SPOOFHOST QSTRING '{'
   spoof->passwd = NULL;
   spoof->realhost = NULL;
   spoof->username = NULL;
+  spoof->flags = 0;
 }
 spoofhostitems '}' ';'
 {
@@ -1469,15 +1471,14 @@ spoofhostitems '}' ';'
         if (str2prefix(spoof->realhost, p) != 0) {
           spoof->address = p->address;
           spoof->bits = p->bits;
-          spoof->flags = SLINE_FLAGS_IP;
+          spoof->flags |= SLINE_FLAGS_IP;
         } else {
-           spoof->flags = SLINE_FLAGS_HOSTNAME;
+           spoof->flags |= SLINE_FLAGS_HOSTNAME;
         }
       } else
-        spoof->flags = SLINE_FLAGS_HOSTNAME;
+        spoof->flags |= SLINE_FLAGS_HOSTNAME;
     } else {
       spoof->realhost = NULL;
-      spoof->flags = 0;
     }
 
     spoof->next = GlobalSList;
@@ -1493,7 +1494,7 @@ spoofhostitems '}' ';'
 };
 
 spoofhostitems: spoofhostitem spoofhostitems | spoofhostitem;
-spoofhostitem: spoofhostpassword | spoofhostrealhost | spoofhostrealident;
+spoofhostitem: spoofhostpassword | spoofhostrealhost | spoofhostrealident | spoofhostauto;
 spoofhostpassword: PASS '=' QSTRING ';'
 {
   MyFree(spoof->passwd);
@@ -1509,6 +1510,13 @@ spoofhostrealident: USERNAME '=' QSTRING ';'
   MyFree(spoof->username);
   spoof->username = $3;
 };
+spoofhostauto: AUTOAPPLY '=' YES ';'
+{
+  spoof->flags |= SLINE_FLAGS_AUTO;
+} | AUTOAPPLY '=' NO ';'
+{
+  spoof->flags &= ~SLINE_FLAGS_AUTO;
+}
 
 
 redirectblock: REDIRECT '{' redirectitems '}' ';'

@@ -628,7 +628,6 @@ static struct FeatureDesc {
   F_B(OPER_SINGLELETTERNICK, 0, 0, 0),
   F_B(SETHOST, 0, 1, 0),
   F_B(SETHOST_USER, 0, 1, 0),
-  F_B(SETHOST_AUTO, 0, 1, 0),
   F_B(FAKEHOST, 0, 1, 0),
   F_S(DEFAULT_FAKEHOST, FEAT_NULL | FEAT_CASE, 0, 0),
   F_B(HIS_GLINE, 0, 1, 0),

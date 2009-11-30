@@ -1,6 +1,30 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-11-30  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ircd_parser.y: Added autoapply option to Spoofhost blocks.
+
+	* ircd/ircd_lexer.l: Added autoapply option to Spoofhost blocks.
+
+	* ircd/s_user.c: Removed SETHOST_AUTO check before calling
+	conf_check_slines().
+
+	* ircd/s_conf.c: Modified conf_check_slines() to use autoapply
+	Spoofhost block option.
+
+	* ircd/ircd_features.c: Removed SETHOST_AUTO.
+
+	* include/s_conf.h: Added SLINE flag for autoapply Spoofhost block
+	option.
+
+	* include/ircd_features.h: Removed SETHOST_AUTO.
+
+	* doc/example.conf: Removed SETHOST_AUTO and added autoapply option
+	to Spoofhost blocks.
+
+	* doc/readme.features: Removed SETHOST_AUTO.
+
 2009-11-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Added LOC_SENDHOST and LOC_SENDSSLFP.

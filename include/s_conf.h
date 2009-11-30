@@ -191,6 +191,7 @@ struct sline {
 
 #define SLINE_FLAGS_HOSTNAME 0x0001 /* S-line by hostname */
 #define SLINE_FLAGS_IP       0x0002 /* S-line by IP address/CIDR */
+#define SLINE_FLAGS_AUTO     0x0004 /* S-line should be automatically applied */
 
 /*
  * str2prefix() - converts a string to in_addr and bits.

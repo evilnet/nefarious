@@ -891,12 +891,6 @@ SETHOST_USER
  This enabled the /sethost command and user mode +h for users activating Sethosts
  with passwords.
 
-SETHOST_AUTO
- * Type: boolean
- * Default: TRUE
-
- This enables the automatic application of Sethosts on matching idents and hosts.
-
 REMOTE_OPER
  * Type: boolean
  * Default: TRUE
