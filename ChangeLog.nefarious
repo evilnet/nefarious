@@ -3,6 +3,10 @@
 
 2009-11-30  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/convert-conf.c: Added SETHOST_AUTO to removed features list.
+
+2009-11-30  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/ircd_parser.y: Added autoapply option to Spoofhost blocks.
 
 	* ircd/ircd_lexer.l: Added autoapply option to Spoofhost blocks.

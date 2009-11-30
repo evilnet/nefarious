@@ -35,7 +35,7 @@ static const char *admin_names[] = { "location", "contact", "contact", 0 },
     *redirect_names[] = { "mask", "server", "port", 0 },
 
     *removed_features[] = { "OPERS_SEE_IN_SECRET_CHANNELS", "LOCOP_SEE_IN_SECRET_CHANNELS", "HIS_STATS_h", "HIS_STATS_M", "WEBIRC_USERIDENT", 
-                            "WEBIRC_SPOOFIDENT", "WEBIRC_FAKEIDENT", "OPER_WHOIS_SECRET", 0 };
+                            "WEBIRC_SPOOFIDENT", "WEBIRC_FAKEIDENT", "OPER_WHOIS_SECRET", "SETHOST_AUTO", 0 };
 static char orig_line[512], line[512], dbuf[512];
 static char *fields[MAX_FIELDS + 1];
 static unsigned int nfields;
