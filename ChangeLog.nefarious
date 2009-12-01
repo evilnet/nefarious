@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-01  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/example.conf: Added example Except block for IRCDriven.
+
 2009-11-30  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/convert-conf.c: Added SETHOST_AUTO to removed features list.
