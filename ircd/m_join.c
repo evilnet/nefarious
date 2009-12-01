@@ -184,7 +184,7 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct JoinBuf create;
   struct Gline *gline;
   unsigned int flags = 0;
-  int i, flex = 0, automodes = 0;
+  int i, flex = 0, automodes = 0, redir = 0;
   char* bjoin[2];
   char *p = 0;
   char *chanlist;
@@ -267,17 +267,28 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     }
 
     if (chptr) {
+      redir = 0;
       if (chptr->mode.redirect && (*chptr->mode.redirect != '\0')) {
         if (IsNoLink(sptr))
           send_reply(sptr, ERR_LINKCHAN, chptr->chname, chptr->mode.redirect);
         else {
-          send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
-          bouncedtimes++;
-          bjoin[0] = cli_name(sptr);
-          bjoin[1] = chptr->mode.redirect;
-          do_join(cptr, sptr, 2, bjoin);
+          if (chptr->mode.limit) {
+            if (chptr->users >= chptr->mode.limit) /* +lL are set so only redirect if the limit has been reached */
+              redir = 1;
+          } else /* no limit but +L is set so redirect anyway */
+            redir = 1;
+
+          if (redir) {
+            send_reply(sptr, ERR_LINKSET, sptr->cli_name, chptr->chname, chptr->mode.redirect);
+            bouncedtimes++;
+            bjoin[0] = cli_name(sptr);
+            bjoin[1] = chptr->mode.redirect;
+            do_join(cptr, sptr, 2, bjoin);
+          }
         }
-        continue;
+
+        if (redir)
+          continue;
       }
 
       if (check_target_limit(sptr, chptr, chptr->chname, 0))
