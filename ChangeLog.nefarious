@@ -3,6 +3,16 @@
 
 2009-12-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/m_challenge.c: Use cli_user(sptr)->username rather than
+	cli_username(sptr). This allows idents to work with oper blocks
+	for clients who dont use identd.
+
+	* ircd/m_oper.c: Use cli_user(sptr)->username rather than
+	cli_username(sptr). This allows idents to work with oper blocks
+	for clients who dont use identd.
+
+2009-12-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/m_join.c: +L will only work if A, +L is set without +l. B,
 	+L is set with +l and the +l limit has been reached.
 

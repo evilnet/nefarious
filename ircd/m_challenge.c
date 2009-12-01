@@ -62,7 +62,7 @@ failed_challenge_notice(struct Client *sptr, char *name, char *reason)
 {
     sendto_allops(&me, SNO_OLDREALOP, "Failed CHALLENGE attempt as %s "
                   "by %s (%s@%s) - %s", name, cli_name(sptr),
-                  cli_username(sptr), cli_user(sptr)->host, reason);
+                  cli_user(sptr)->realusername, cli_user(sptr)->host, reason);
 }
 
 int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
@@ -132,16 +132,16 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
 
     name = strdup(cli_user(sptr)->auth_oper);
      
-    aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_username(sptr),
+    aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_user(sptr)->realusername,
                             MyUser(sptr) ? cli_sockhost(sptr) :
                             cli_user(sptr)->realhost, CONF_OPS);
 
     if (!aconf)
-      aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_username(sptr),
+      aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_user(sptr)->realusername,
                               ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
 
     if (!aconf)
-      aconf = find_conf_cidr(cli_user(sptr)->auth_oper, cli_username(sptr),
+      aconf = find_conf_cidr(cli_user(sptr)->auth_oper, cli_user(sptr)->realusername,
                               cli_ip(sptr), CONF_OPS);
 
     if (!aconf)
@@ -252,15 +252,15 @@ int m_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[]
   ircd_snprintf(0, cli_user(sptr)->response, BUFSIZE+1, "%s", "");
   ircd_snprintf(0, cli_user(sptr)->auth_oper, NICKLEN+1, "%s", "");
 
-  aconf = find_conf_exact(parv[1], cli_username(sptr),
+  aconf = find_conf_exact(parv[1], cli_user(sptr)->realusername,
                           cli_user(sptr)->realhost, CONF_OPS);
 
   if (!aconf)
-    aconf = find_conf_exact(parv[1], cli_username(sptr),
+    aconf = find_conf_exact(parv[1], cli_user(sptr)->realusername,
                             ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
 
   if (!aconf)
-    aconf = find_conf_cidr(parv[1], cli_username(sptr),
+    aconf = find_conf_cidr(parv[1], cli_user(sptr)->realusername,
                             cli_ip(sptr), CONF_OPS);
 
   if (aconf == NULL)
@@ -370,16 +370,16 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
 
     name = strdup(cli_user(sptr)->auth_oper);
      
-    aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_username(sptr),
+    aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_user(sptr)->realusername,
                             MyUser(sptr) ? cli_sockhost(sptr) :
                             cli_user(sptr)->realhost, CONF_OPS);
 
     if (!aconf)
-      aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_username(sptr),
+      aconf = find_conf_exact(cli_user(sptr)->auth_oper, cli_user(sptr)->realusername,
                               ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
 
     if (!aconf)
-      aconf = find_conf_cidr(cli_user(sptr)->auth_oper, cli_username(sptr),
+      aconf = find_conf_cidr(cli_user(sptr)->auth_oper, cli_user(sptr)->realusername,
                               cli_ip(sptr), CONF_OPS);
 
     if (!aconf)
@@ -494,15 +494,15 @@ int ms_challenge(struct Client *cptr, struct Client *sptr, int parc, char *parv[
   ircd_snprintf(0, cli_user(sptr)->response, BUFSIZE+1, "%s", "");
   ircd_snprintf(0, cli_user(sptr)->auth_oper, NICKLEN+1, "%s", "");
 
-  aconf = find_conf_exact(parv[2], cli_username(sptr),
+  aconf = find_conf_exact(parv[2], cli_user(sptr)->realusername,
                           cli_user(sptr)->realhost, CONF_OPS);
 
   if (!aconf)
-    aconf = find_conf_exact(parv[2], cli_username(sptr),
+    aconf = find_conf_exact(parv[2], cli_user(sptr)->realusername,
                             ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
 
   if (!aconf)
-    aconf = find_conf_cidr(parv[2], cli_username(sptr),
+    aconf = find_conf_cidr(parv[2], cli_user(sptr)->realusername,
                             cli_ip(sptr), CONF_OPS);
 
   if (aconf == NULL)

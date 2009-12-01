@@ -128,15 +128,15 @@ int oper_password_match(const char* to_match, const char* passwd)
 int can_oper(struct Client *sptr, char *name, char *password, struct ConfItem **_aconf) {
   struct ConfItem *aconf;
 
-  aconf = find_conf_exact(name, cli_username(sptr),
+  aconf = find_conf_exact(name, cli_user(sptr)->realusername,
 			  MyUser(sptr) ? cli_sockhost(sptr) :
 			  cli_user(sptr)->realhost, CONF_OPS);
   if (!aconf)
-    aconf = find_conf_exact(name, cli_username(sptr),
+    aconf = find_conf_exact(name, cli_user(sptr)->realusername,
                             ircd_ntoa((const char*) &(cli_ip(sptr))), CONF_OPS);
 
   if (!aconf)
-    aconf = find_conf_cidr(name, cli_username(sptr), 
+    aconf = find_conf_cidr(name, cli_user(sptr)->realusername, 
                             cli_ip(sptr), CONF_OPS);
 
   if (!aconf || IsIllegal(aconf))
