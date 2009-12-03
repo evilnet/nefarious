@@ -833,7 +833,7 @@ int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
       if (tmp->value.ban.extflag & EXTBAN_TEXT) {
         ban = strdup(tmp->value.ban.banstr);
         extstr = strdup(tmp->value.ban.extstr);
-        flags = tmp->value.ban.extflag;
+        flags = tmp->flags;
 
         argc = explode_line(decodespace(ban), 1, ArrayLength(argv), argv);
 
@@ -850,7 +850,7 @@ int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
       if (tmp->value.except.extflag & EXTEXCEPT_TEXT) {
         except = strdup(tmp->value.except.exceptstr);
         extstr = strdup(tmp->value.except.extstr);
-        flags = tmp->value.ban.extflag;
+        flags = tmp->flags;
 
         argc = explode_line(decodespace(except), 1, ArrayLength(argv), argv);
 
