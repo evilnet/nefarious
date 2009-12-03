@@ -157,7 +157,7 @@ void relay_channel_message(struct Client* sptr, const char* name, const char* te
         if (argc == 4) {
           if (0 != strcmp(argv[1], "*!*@*")) { /* if its a default then dont bother checking
                                                     to save a wee bit of cpu  */
-            if (0 == user_matches_host(sptr, strdup(argv[1]), tmp->value.ban.extflag))
+            if (0 == user_matches_host(sptr, strdup(argv[1]), tmp->flags))
               continue;
           }
           replace = strdup(argv[3]);
@@ -260,7 +260,7 @@ void relay_channel_notice(struct Client* sptr, const char* name, const char* tex
         if (argc == 4) {
           if (0 != strcmp(argv[1], "*!*@*")) { /* if its a default then dont bother checking
                                                     to save a wee bit of cpu  */
-            if (0 == user_matches_host(sptr, strdup(argv[1]), tmp->value.ban.extflag))
+            if (0 == user_matches_host(sptr, strdup(argv[1]), tmp->flags))
               continue;
           }
           replace = strdup(argv[3]);

@@ -3380,6 +3380,9 @@ int user_matches_host(struct Client *cptr, char *comparemask, int flags) {
   s = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
                          (cli_user(cptr))->realhost);
 
+  sb = make_nick_user_host(nu_host, cli_name(cptr), (cli_user(cptr))->realusername,
+                          (cli_user(cptr))->host);
+
   if (HasSetHost(cptr))
     sh = make_nick_user_host(nu_realhost, cli_name(cptr),
                             cli_user(cptr)->realusername,

@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/ircd_relay.c: Use flags not extflags.
+
+	* ircd/s_user.c: Added a missing check in which was causing a
+	crash.
+
 2009-12-01  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_challenge.c: Use cli_user(sptr)->username rather than
