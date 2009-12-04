@@ -104,6 +104,8 @@ extern int m_invite(struct Client*, struct Client*, int, char*[]);
 extern int m_ircops(struct Client*, struct Client*, int, char*[]);
 extern int m_isnef(struct Client*, struct Client*, int, char*[]);
 extern int m_ison(struct Client*, struct Client*, int, char*[]);
+extern int m_fingerprint(struct Client*, struct Client*, int, char*[]);
+extern int mo_fingerprint(struct Client*, struct Client*, int, char*[]);
 extern int m_join(struct Client*, struct Client*, int, char*[]);
 extern int m_jupe(struct Client*, struct Client*, int, char*[]);
 extern int m_kick(struct Client*, struct Client*, int, char*[]);

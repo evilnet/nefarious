@@ -1254,6 +1254,10 @@ static Numeric replyTable[] = {
   { RPL_ENDOFHELP, "%s :End of /HELP", "611" },
 /* 612 */
   { RPL_LOAD2HI,  ":Server load is temporarily too heavy. Please wait a while and try again", "612" },
+/* 613 */
+  { RPL_SSLFP, "%s :SSL fingerprint: %s", "613" },
+/* 614 */
+  { ERR_NOSSLFP, "%s :No SSL fingerprint", "614" },
 };
 
 const struct Numeric* get_error_numeric(int n)

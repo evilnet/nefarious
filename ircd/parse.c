@@ -845,6 +845,16 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_ignore, m_watch, m_ignore, m_watch, m_ignore }
   },
+  /* Defines the new FINGERPRINT command used to get your own SSL
+   * fingerprint
+   */
+  {
+    MSG_FINGERPRINT,
+    TOK_FINGERPRINT,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_ignore, m_fingerprint, m_ignore, mo_fingerprint, m_ignore }
+  },
   /* Defines the new WEBIRC command used for faking real host/ip on
    * connection from a client authorised to do so
    */

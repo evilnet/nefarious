@@ -20,6 +20,7 @@ RULES           SET             SETTIME         SETHOST         SHUN            
 SQUIT           STATS           TIME            TOPIC           TRACE           UHELP
 USERHOST        USERIP          WALLCHOPS       WALLHOPS        WALLVOICES      WHO
 WHOIS           ZLINE           GLOBOPS         PRIVMSG         UPING           USER
+FINGERPRINT
 
 
 Other help which may be of use:

@@ -1,0 +1,4 @@
+/FINGERPRINT [<nick>]
+
+Displays your SSL fingerprint if available or the SSL fingerprint for the user
+with the specified nick.

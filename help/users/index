@@ -16,7 +16,7 @@ MOTD            NAMES           NICK            NOTICE          OPER            
 PASS            QUIT            RULES           SETHOST         SHUN            SILENCE
 STATS           TIME            TOPIC           USERHOST        USERIP          WALLCHOPS
 WALLHOPS        WALLVOICES      WHO             WHOIS           ZLINE           COMMANDS
-PRIVMSG         USER
+PRIVMSG         USER            FINGERPRINT
 
 Other help which may be of use:
 

@@ -147,6 +147,7 @@ IRCD_SRC = \
 	m_error.c \
 	m_exempt.c \
 	m_fakehost.c \
+	m_fingerprint.c \
 	m_get.c \
 	m_gline.c \
 	m_globops.c \
