@@ -107,9 +107,10 @@
 #include <string.h>
 
 static int wline_flags[] = {
-  WFLAG_MARK,    'm',
-  WFLAG_SIDENT,  's',
-  WFLAG_UIDENT,  'u'
+  WFLAG_MARK,       'm',
+  WFLAG_SIDENT,     's',
+  WFLAG_UIDENT,     'u',
+  WFLAG_STRIPSSLFP, 'f'
 };
 
 char wflagstr(const char* wflags)
@@ -260,6 +261,9 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   }
 
   SetWebIRC(cptr);
+
+  if (w_flag & WFLAG_STRIPSSLFP)
+    ircd_strncpy(cli_sslclifp(cptr), "", BUFSIZE + 1);
 
   if (w_flag & WFLAG_UIDENT)
     SetWebIRCUserIdent(cptr);

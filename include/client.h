@@ -1009,9 +1009,10 @@ struct Client {
 #define DFLAG_DENY	0x010
 
 /** Client webirc desc is sent */
-#define WFLAG_MARK	0x001
-#define WFLAG_SIDENT    0x002
-#define WFLAG_UIDENT    0x004
+#define WFLAG_MARK	 0x001
+#define WFLAG_SIDENT     0x002
+#define WFLAG_UIDENT     0x004
+#define WFLAG_STRIPSSLFP 0x008
 
 /** Exception for K:Lines */
 #define EFLAG_KLINE     0x001
