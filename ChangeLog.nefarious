@@ -3,6 +3,22 @@
 
 2009-12-04  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/m_webircextra.c: Added new WEBIRCEXTRA command.
+
+	* ircd/parse.c: Added new WEBIRCEXTRA command.
+
+	* ircd/Makefile.in: Added new WEBIRCEXTRA command.
+
+	* ircd/s_err.c: Added error reply numerics for WEBIRCEXTRA.
+
+	* include/numeric.h: Added error reply numerics for WEBIRCEXTRA.
+
+	* include/handlers.h: Added new WEBIRCEXTRA command.
+
+	* include/msg.h: Added new WEBIRCEXTRA command.
+
+2009-12-04  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/m_webirc.c: Added WebIRC block flag 'f'
 
 	* include/client.h: Added WebIRC block flag 'f'

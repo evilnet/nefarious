@@ -1258,6 +1258,8 @@ static Numeric replyTable[] = {
   { RPL_SSLFP, "%s :SSL fingerprint: %s", "613" },
 /* 614 */
   { ERR_NOSSLFP, "%s :No SSL fingerprint", "614" },
+/* 615 */
+  { ERR_NOTWEBIRC, ":%s is invalid for non WebIRC clients", "615"},
 };
 
 const struct Numeric* get_error_numeric(int n)

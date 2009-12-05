@@ -544,7 +544,9 @@ extern const struct Numeric* get_error_numeric(int err);
 #define RPL_SSLFP            613
 #define ERR_NOSSLFP          614
 
-#define ERR_LASTERROR        615
+#define ERR_NOTWEBIRC        615
+
+#define ERR_LASTERROR        616
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal

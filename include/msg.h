@@ -481,6 +481,10 @@ struct Client;
 #define TOK_WEBIRC              "WEBIRC"
 #define CMD_WEBIRC              MSG_WEBIRC, TOK_WEBIRC
 
+#define MSG_WEBIRCEXTRA         "WEBIRCEXTRA"         /* WEBIRCEXTRA */
+#define TOK_WEBIRCEXTRA         "WEBIRCEXTRA"
+#define CMD_WEBIRCEXTRA         MSG_WEBIRCEXTRA, TOK_WEBIRCEXTRA
+
 #define MSG_PROTOCTL            "PROTOCTL"      /* PROTOCTL */
 #define TOK_PROTOCTL            "PROTOCTL"
 #define CMD_PROTOCTL            MSG_PROTOCTL, CMD_PROTOCTL

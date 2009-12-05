@@ -865,6 +865,16 @@ struct Message msgtab[] = {
     /* UNREG, CLIENT, SERVER, OPER, SERVICE */
     { m_webirc, m_registered, m_ignore, m_registered, m_ignore }
   },
+  /* Defines the new WEBIRCEXTRA command used for sending additional WEBIRC
+   * data such as SSL fingerprint
+   */
+  {
+    MSG_WEBIRCEXTRA,
+    TOK_WEBIRCEXTRA,
+    0, MAXPARA, MFLG_SLOW, 0,
+    /* UNREG, CLIENT, SERVER, OPER, SERVICE */
+    { m_webircextra, m_registered, m_ignore, m_registered, m_ignore }
+  },
   /* Defines PROTOCTL command used by clients to announce features
    * listed by numeric 005 which they support
    */
@@ -1056,6 +1066,7 @@ parse_client(struct Client *cptr, char *buffer, char *bufend)
   expire_shuns();
   if ((strcasecmp(ch, "NICK"))    &&  /* rejection handled in m_nick.c */
       (strcasecmp(ch, "WEBIRC"))  &&  /* allow WEBIRC to still work */
+      (strcasecmp(ch, "WEBIRCEXTRA"))  &&  /* allow WEBIRCEXTRA to still work */
       (strcasecmp(ch, "SERVER"))  &&  /* expiring shuns with this or matching
                                        * just causes major issues, we dont need
                                        * to check shuns with SERVER.
