@@ -176,16 +176,10 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     password = parv[1];
   }
 
-  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(sptr), ircd_ntoa((const char*) &(cli_ip(sptr))));
+  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(sptr), cli_sock_ip(sptr));
   ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(sptr), cli_sockhost(sptr));
 
   for (wline = GlobalWList; wline; wline = wline->next) {
-    w_flag = wflagstr(wline->flags);
-    if (w_flag & WFLAG_MARK)
-      mark = 1;
-    else
-      mark = 0;
-
     if ((match(wline->mask, s_host) == 0) || (match(wline->mask, i_host) == 0)) {
       invalidauth = 0;
       if (!oper_password_match(password, wline->passwd))
@@ -205,6 +199,15 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     return exit_client(cptr, cptr, &me, "WEBIRC Password invalid for your host");
 
   /* assume success and continue */
+
+  w_flag = wflagstr(wline->flags);
+  if (w_flag & WFLAG_MARK)
+    mark = 1;
+  else
+    mark = 0;
+
+  ircd_strncpy(cli_webircpass(cptr), wline->passwd, BUFSIZE);
+  cli_webircflags(cptr) = w_flag;
 
   if (mark && !EmptyString(wline->desc))
     ircd_strncpy(cli_webirc(cptr), wline->desc, BUFSIZE);

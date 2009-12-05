@@ -63,13 +63,7 @@ int m_webircextra(struct Client *cptr, struct Client *sptr, int parc, char *parv
   char*         password = NULL;
   char*         key = NULL;
   char*         data = NULL;
-  char          i_host[SOCKIPLEN + USERLEN + 2];
-  char          s_host[HOSTLEN + USERLEN + 2];
-  int           invalidauth = 1, invalidpass = 0;
-  time_t        next_target = 0;
 
-  struct wline *wline;
- 
   assert(0 != cptr);
   assert(cptr == sptr);
 
@@ -77,7 +71,7 @@ int m_webircextra(struct Client *cptr, struct Client *sptr, int parc, char *parv
     return exit_client(cptr, cptr, &me, "Use a different port");
 
   if (parc < 4)
-    return need_more_params(sptr, "WEBIRC");
+    return need_more_params(sptr, "WEBIRCEXTRA");
 
   if (!IsWebIRC(cptr))
     return send_reply(cptr, ERR_NOTWEBIRC, "WEBIRCEXTRA");
@@ -86,26 +80,7 @@ int m_webircextra(struct Client *cptr, struct Client *sptr, int parc, char *parv
     password = parv[1];
   }
 
-  ircd_snprintf(0, i_host, USERLEN+SOCKIPLEN+2, "%s@%s", cli_username(sptr), ircd_ntoa((const char*) &(cli_ip(sptr))));
-  ircd_snprintf(0, s_host, USERLEN+HOSTLEN+2, "%s@%s", cli_username(sptr), cli_sockhost(sptr));
-
-  for (wline = GlobalWList; wline; wline = wline->next) {
-    if ((match(wline->mask, s_host) == 0) || (match(wline->mask, i_host) == 0)) {
-      invalidauth = 0;
-      if (!oper_password_match(password, wline->passwd))
-        invalidpass = 1;
-      else
-        invalidpass = 0;
-    }
-
-    if (!invalidauth && !invalidpass)
-      break;
-  }
-
-  if (invalidauth)
-    return exit_client(cptr, cptr, &me, "WEBIRCEXTRA Not authorized from your host");
-
-  if (invalidpass)
+  if (!oper_password_match(password, cli_webircpass(sptr)))
     return exit_client(cptr, cptr, &me, "WEBIRCEXTRA Password invalid for your host");
 
   /* assume success and continue */
@@ -121,7 +96,7 @@ int m_webircextra(struct Client *cptr, struct Client *sptr, int parc, char *parv
 
   if (ircd_strcmp(key, "SSLFP") == 0) {
     if (!EmptyString(data))
-      ircd_strncpy(cli_sslclifp(cptr), data, BUFSIZE+1);
+      ircd_strncpy(cli_sslclifp(cptr), data, BUFSIZE);
   } else if (ircd_strcmp(key, "IDENT") == 0) {
     if (EmptyString(data))
       ClrFlag(cptr, FLAG_GOTID);
