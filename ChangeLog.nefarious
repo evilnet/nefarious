@@ -1,7 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2009-12-04  Matthew Beeching  <jobe@mdbnet.co.uk>
+2009-12-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/readme.webircextra: Added documentation for the
+	WEBIRCEXTRA command.
+
+2009-12-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_webircextra.c: Added new WEBIRCEXTRA command.
 

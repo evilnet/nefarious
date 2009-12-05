@@ -1,0 +1,31 @@
+WEBIRCEXTRA documentation, last updated on 05 December 2009
+
+For a WEBIRC client, the syntax is:
+
+  WEBIRCEXTRA <password> <key> :<data>
+
+The WEBIRCEXTRA command should only be available pre-registration
+and then only available to clients that have already successfully
+issued a WEBIRC command with no errors. <password> is the WEBIRC
+password the WEBIRC client uses for the WEBIRC command. <key> is
+the type of data being sent. <data> is the data being sent if
+provided.
+
+Currently the only types of data available in Nefarious are:
+
+ident = Blank to set the client as a negative ident reply or
+        or the actual ident response as received by the WEBIRC
+        client itself.
+sslfp = SSL client certificate fingerprint, cannot be blank.
+
+Examples:
+
+Set an SSL fingerprint for the client:
+WEBIRCEXTRA password sslfp :D485B88AB8C37FD3E81357FF043157C83A0B382E0030AFC010542CA01FD0F9B0
+
+Set a client as having no ident response:
+WEBIRCEXTRA password ident :
+
+Set a clients actual ident response:
+WEBIRCEXTRA password ident :user
+
