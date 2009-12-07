@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/example.conf: Removed include comments from DNSBL Block.
+
 2009-12-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_webircextra.c: Fix fo WEBIRCEXTRA auth issue.
