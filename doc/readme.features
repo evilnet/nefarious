@@ -1549,6 +1549,97 @@ CHMODE_e_CHMODEEXCEPTION
 If enabled anyone on the +e exemption list will be able to bypass
 modes +i/+k/+l.
 
+EXTBAN_a
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban a (account) to be used.
+
+EXTBAN_c
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban c (channel) to be used.
+
+EXTBAN_j
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban j (shared bans) to be used.
+
+EXTBAN_n
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban n (nick change) to be used.
+
+EXTBAN_q
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban q (quiet) to be used.
+
+EXTBAN_r
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban r (realname) to be used.
+
+
+EXTBAN_R
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban R (text replace) to be used.
+
+EXTBAN_t
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended ban t (text ban) to be used.
+
+EXTEXCEPT_a
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except a (account) to be used.
+
+EXTEXCEPT_c
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except c (channel) to be used.
+
+EXTEXCEPT_j
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except j (shared excepts) to be used.
+
+EXTEXCEPT_n
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except n (nick changes) to be used.
+
+EXTEXCEPT_q
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except q (quiet) to be used.
+
+EXTEXCEPT_r
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except r (relname) to be used.
+
+EXTEXCEPT_t
+ * Type: boolean
+ * Default: TRUE
+
+Allows extended except t (text except) to be used.
+
 SWHOIS
  * Type: boolean
  * Default: TRUE

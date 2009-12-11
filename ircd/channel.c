@@ -3530,6 +3530,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
     excepted = substr(t_str, startarg, strlen(t_str)-1);
     switch (t_str[typepos]) {
       case 'q':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_q))
+          return;
         if (flags)
           flags |= EXTEXCEPT_QUIET;
         else
@@ -3540,6 +3542,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 'n':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_n))
+          return;
         if (flags)
           flags |= EXTEXCEPT_NICK;
         else
@@ -3550,6 +3554,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 'j':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_j))
+          return;
         if (flags)
           flags |= EXTEXCEPT_SHARE;
         else
@@ -3561,6 +3567,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 't':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_t))
+          return;
         if (flags)
           flags |= EXTEXCEPT_TEXT;
         else
@@ -3580,6 +3588,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 'a':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_a))
+          return;
         if (flags)
           flags |= EXTEXCEPT_ACCOUNT;
         else
@@ -3587,6 +3597,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 'c':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_c))
+          return;
         if (flags)
           flags |= EXTEXCEPT_CHAN;
         else
@@ -3601,6 +3613,8 @@ mode_parse_except(struct ParseState *state, int *flag_p)
         break;
 
       case 'r':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTEXCEPT_r))
+          return;
         if (flags)
           flags |= EXTEXCEPT_REAL;
         else
@@ -3773,6 +3787,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
     banned = substr(t_str, startarg, strlen(t_str)-1);
     switch (t_str[typepos]) {
       case 'q':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_q))
+          return;
         if (flags)
           flags |= EXTBAN_QUIET;
         else
@@ -3783,6 +3799,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'j':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_j))
+          return;
         if (flags)
           flags |= EXTBAN_SHARE;
         else
@@ -3794,6 +3812,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'a':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_a))
+          return;
         if (flags)
           flags |= EXTBAN_ACCOUNT;
         else
@@ -3801,6 +3821,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 't':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_t))
+          return;
         if (flags)
           flags |= EXTBAN_TEXT;
         else
@@ -3820,6 +3842,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'R':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_R))
+          return;
         if (flags)
            flags |= EXTBAN_REPLACE;
          else
@@ -3848,6 +3872,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'n':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_n))
+          return;
         if (flags)
           flags |= EXTBAN_NICK;
         else
@@ -3858,6 +3884,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'c':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_c))
+          return;
         if (flags)
           flags |= EXTBAN_CHAN;
         else
@@ -3872,6 +3900,8 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
         break;
 
       case 'r':
+        if (!IsOper(state->sptr) && !feature_bool(FEAT_EXTBAN_r))
+          return;
         if (flags)
           flags |= EXTBAN_REAL;
         else

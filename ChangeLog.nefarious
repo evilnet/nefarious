@@ -1,6 +1,21 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* doc/readme.features: Added Extended ban and except types.
+
+	* include/ircd_features.h: Added individual Features for extended
+	bans and excepts.
+
+	* ircd/channel.c: Individual extended ban and except types can now
+	be configured via the Feature block. They still require the EXTBANS 
+	Feature to be enabled. Opers and servers are not subject to this.
+
+	* ircd/ircd_features.c: Added individual Features for extended bans
+	and excepts. The EXTBAN isupport line is now generated based on what
+	is set and not set.
+
 2009-12-08  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Removed include comments from DNSBL Block.

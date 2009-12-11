@@ -268,8 +268,30 @@ set_isupport_excepts(void)
 static void
 set_isupport_extbans(void)
 {
-  if (feature_bool(FEAT_EXTBANS))
-    add_isupport_s("EXTBANS", "~,acjnqtrR");
+  char imaxlist[BUFSIZE] = "";
+
+  if (feature_bool(FEAT_EXTBANS)) {
+    strcat(imaxlist, "~,");
+
+    if (feature_bool(FEAT_EXTBAN_a))
+      strcat(imaxlist, "a");
+    if (feature_bool(FEAT_EXTBAN_c))
+      strcat(imaxlist, "c");
+    if (feature_bool(FEAT_EXTBAN_j))
+      strcat(imaxlist, "j");
+    if (feature_bool(FEAT_EXTBAN_n))
+      strcat(imaxlist, "n");
+    if (feature_bool(FEAT_EXTBAN_q))
+      strcat(imaxlist, "q");
+    if (feature_bool(FEAT_EXTBAN_r))
+      strcat(imaxlist, "r");
+    if (feature_bool(FEAT_EXTBAN_R))
+      strcat(imaxlist, "R");
+    if (feature_bool(FEAT_EXTBAN_t))
+      strcat(imaxlist, "t");
+
+    add_isupport_s("EXTBANS", imaxlist);
+  }
 }
 
 /** Set WATCH if they are enabled. */
@@ -709,6 +731,21 @@ static struct FeatureDesc {
   F_B(CHMODE_S, 0, 1, 0),
   F_B(CHMODE_T, 0, 1, 0),
   F_B(CHMODE_Z, 0, 1, 0),
+  F_B(EXTBAN_a, 0, 1, 0),
+  F_B(EXTBAN_c, 0, 1, 0),
+  F_B(EXTBAN_j, 0, 1, 0),
+  F_B(EXTBAN_n, 0, 1, 0),
+  F_B(EXTBAN_q, 0, 1, 0),
+  F_B(EXTBAN_r, 0, 1, 0),
+  F_B(EXTBAN_R, 0, 1, 0),
+  F_B(EXTBAN_t, 0, 1, 0),
+  F_B(EXTEXCEPT_a, 0, 1, 0),
+  F_B(EXTEXCEPT_c, 0, 1, 0),
+  F_B(EXTEXCEPT_j, 0, 1, 0),
+  F_B(EXTEXCEPT_n, 0, 1, 0),
+  F_B(EXTEXCEPT_q, 0, 1, 0),
+  F_B(EXTEXCEPT_r, 0, 1, 0),
+  F_B(EXTEXCEPT_t, 0, 1, 0),
   F_B(LUSERS_AUTHED, 0, 0, 0),
   F_B(OPER_WHOIS_PARANOIA, 0, 0, 0),
   F_I(SHUNMAXUSERCOUNT, 0, 20, 0),
