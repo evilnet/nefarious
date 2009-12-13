@@ -485,6 +485,7 @@ static int completed_connection(struct Client* cptr)
   }
 
   if (aconf->flags & CONF_SSL) {
+#ifdef USE_SSL
     r = ssl_connect(&(cli_socket(cptr)));
     if (r == -1) {
       sendto_opmask_butone(0, SNO_OLDSNO, "Connection failed to %s: SSL error",
@@ -495,6 +496,7 @@ static int completed_connection(struct Client* cptr)
     sslfp = ssl_get_fingerprint(cli_socket(cptr).ssl);
     if (sslfp)
       ircd_strncpy(cli_sslclifp(cptr), sslfp, BUFSIZE+1);
+#endif
     SetSSL(cptr);
   }
 
