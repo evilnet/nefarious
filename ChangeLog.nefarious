@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_burst.c: Removed tochan and toserv debugging from the
+	Net Rider kick messages.
+
 2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* README: Misc updates.

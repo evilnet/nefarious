@@ -228,8 +228,8 @@ int ms_burst(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
               && (!(check_modes & MODE_OPERONLY) || IsAnOper(member->user))
               && (!(check_modes & MODE_ADMINONLY) || IsAdmin(member->user)))
             continue;
-          sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Net Rider toserv", chptr, member->user);
-          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_KICK, chptr, NULL, 0, "%H %C :Net Rider tochan", chptr, member->user);
+          sendcmdto_serv_butone(&me, CMD_KICK, NULL, "%H %C :Net Rider", chptr, member->user);
+          sendcmdto_channel_butserv_butone(feature_bool(FEAT_HIS_HIDEWHO) ? &his : &me, CMD_KICK, chptr, NULL, 0, "%H %C :Net Rider", chptr, member->user);
           make_zombie(member, member->user, &me, &me, chptr);
         }
       }
