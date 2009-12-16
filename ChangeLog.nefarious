@@ -3,6 +3,10 @@
 
 2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* README: Misc updates.
+
+2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* config.h.in: Regenerated.
 
 	* configure: Regenerated.

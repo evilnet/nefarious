@@ -46,9 +46,10 @@ Jobe   - jobe@mdbnet.co.uk - Well without you Vadtec may not have figured
 
 - Nefarious coders --------------------------------------------------
 
-reed      - Reed Loden     - <reed@reedloden.com>
-SiRVulcaN - Neil Spierling - <sirvulcan@sirvulcan.co.nz>
-Rubin     - Alex Schumann  - <rubin@afternet.org>
+reed      - Reed Loden       - <reed@reedloden.com>
+SiRVulcaN - Neil Spierling   - <sirvulcan@sirvulcan.co.nz>
+Rubin     - Alex Schumann    - <rubin@afternet.org>
+Jobe      - Matthew Beeching - <jobe@mdbnet.co.uk>
 
 - documentation -------------------------------------------------------
 
@@ -56,10 +57,10 @@ README (this file)	- Credits, some feature lists, ssl notes
 READNE.Cygwin		- Cygwin installation instructions (Unsupported)
 doc/readme.features	- Full list of ircd.conf F:lines with explanations
 doc/example.conf	- Example ircd.conf
-doc/ircd.conf.sample	- Example ircd.conf
 doc/p10.txt		- Documentation on the P10 protocol
 doc/readme.asll		- Documentation on AsLL
 doc/readme.chroot	- Information on using chroot with Nefarious IRCu
+doc/readme.jupe		- Documentation on jupes
 doc/readme.gline	- Documentation on glines
 doc/readme.shun		- Documentation on shuns
 
@@ -125,17 +126,18 @@ cd /home/ircduser/lib
 nano example.conf (or vi, pico, ee, etc. :)
 mv example.conf ircd.conf
 
-Note: to compile mkpasswd do this:
-cd tools
-make -f Makefile.crypt
+To encrypt passwords use umkpasswd. This is compiled and install to the
+same directory as your ircd binary.
 
 - running --------------------------------------------------------------
 
 cd /home/ircduser/bin
 ./ircd
 
-If all goes well the ircd should run. If not, check your ircd.conf
-CAREFULLY for errors.
+If all goes well the ircd should run. If not, you can check your ircd.conf
+by running
+
+./ircd -k
 
 - crashes --------------------------------------------------------------
 
@@ -188,4 +190,4 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-- evilnet development - 04.04.2005 -----------------------------------------
+- evilnet development - 16.12.2009 -----------------------------------------
