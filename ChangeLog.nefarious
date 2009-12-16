@@ -5,6 +5,12 @@
 
 	* configure: Regenerated.
 
+	* configure.in: --disable-ssl and --enable-ssl now work correctly.
+
+2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* configure: Regenerated.
+
 	* configure.in: Check for EVP_sha256. Also properly check non
 	standard directories if they are given.
 

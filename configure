@@ -11363,26 +11363,24 @@ echo "${ECHO_T}no - using devnull.log" >&6; }
 fi
 
 
-{ echo "$as_me:$LINENO: checking whether to disable OpenSSL support" >&5
-echo $ECHO_N "checking whether to disable OpenSSL support... $ECHO_C" >&6; }
+{ echo "$as_me:$LINENO: checking whether to enable OpenSSL support" >&5
+echo $ECHO_N "checking whether to enable OpenSSL support... $ECHO_C" >&6; }
 # Check whether --enable-ssl was given.
 if test "${enable_ssl+set}" = set; then
-  enableval=$enable_ssl; unet_cv_disable_ssl=$enable_ssl
+  enableval=$enable_ssl; unet_cv_enable_ssl=$enable_ssl
 else
-  if test "${unet_cv_disable_ssl+set}" = set; then
+  if test "${unet_cv_enable_ssl+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  unet_cv_disable_ssl=no
+  unet_cv_enable_ssl=yes
 fi
 
 fi
 
+{ echo "$as_me:$LINENO: result: $unet_cv_enable_ssl" >&5
+echo "${ECHO_T}$unet_cv_enable_ssl" >&6; }
 
-{ echo "$as_me:$LINENO: result: $unet_cv_disable_ssl" >&5
-echo "${ECHO_T}$unet_cv_disable_ssl" >&6; }
-
-
-if test x"$unet_cv_disable_ssl" = xno; then
+if test x"$unet_cv_enable_ssl" = xyes; then
   { echo "$as_me:$LINENO: checking for OpenSSL includes" >&5
 echo $ECHO_N "checking for OpenSSL includes... $ECHO_C" >&6; }
 
@@ -11441,7 +11439,7 @@ echo "${ECHO_T}$unet_cv_with_kerberos_prefix" >&6; }
   CFLAGS="-I$unet_cv_with_openssl_inc_prefix -lcrypto"
   LIBS="-L$unet_cv_with_openssl_prefix -lssl -lcrypto"
 
-  unet_cv_disable_ssl="yes";
+  unet_cv_enable_ssl="no";
   OPENSSL_LDFLAGS="";
   { echo "$as_me:$LINENO: checking for SSL_read in -lssl" >&5
 echo $ECHO_N "checking for SSL_read in -lssl... $ECHO_C" >&6; }
@@ -11711,7 +11709,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
 
-        unet_cv_disable_ssl="no";
+        unet_cv_enable_ssl="yes";
         OPENSSL_LDFLAGS="-lssl -lcrypto"
         SSL_C=ssl.c
 
@@ -11730,7 +11728,7 @@ fi
   LIBS=$save_LIBS
   CFLAGS=$save_CFLAGS
 
-  if test "x$unet_cv_disable_ssl" = xno; then
+  if test "x$unet_cv_enable_ssl" = xyes; then
 
 cat >>confdefs.h <<\_ACEOF
 #define USE_SSL
@@ -12316,7 +12314,7 @@ if test x"$ac_cv_header_sys_event_h" = xno -o x"$ac_cv_func_kqueue" = xno; then
     unet_cv_enable_kqueue=no
 fi
 
-if test x"$unet_cv_disable_ssl" = xno -a x"$OSDEP_C" = xos_bsd.c; then
+if test x"$unet_cv_enable_ssl" = xyes -a x"$OSDEP_C" = xos_bsd.c; then
     unet_cv_enable_kqueue=no
 fi
 
