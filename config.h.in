@@ -6,6 +6,14 @@
 /* Configuration file name */
 #undef CPATH
 
+/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
+   systems. This function is required for `alloca.c' support on those systems.
+   */
+#undef CRAY_STACKSEG_END
+
+/* Define to 1 if using `alloca.c'. */
+#undef C_ALLOCA
+
 /* Enable debugging code */
 #undef DEBUGMODE
 
@@ -24,8 +32,18 @@
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
+/* Define to 1 if you have `alloca', as a function or macro. */
+#undef HAVE_ALLOCA
+
+/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
+   */
+#undef HAVE_ALLOCA_H
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the <arpa/nameser.h> header file. */
+#undef HAVE_ARPA_NAMESER_H
 
 /* Define to 1 if you have the <crypt.h> header file. */
 #undef HAVE_CRYPT_H
@@ -45,6 +63,9 @@
 /* Define to 1 if you have the <getopt.h> header file. */
 #undef HAVE_GETOPT_H
 
+/* Define to 1 if you have the `getpass' function. */
+#undef HAVE_GETPASS
+
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE
 
@@ -62,6 +83,9 @@
 
 /* Define to 1 if you have the `Fridge' library (-lFridge). */
 #undef HAVE_LIBFRIDGE
+
+/* Define to 1 if you have the <libintl.h> header file. */
+#undef HAVE_LIBINTL_H
 
 /* Define to 1 if you have the `Kenny' library (-lKenny). */
 #undef HAVE_LIBKENNY
@@ -81,6 +105,9 @@
 /* Define to 1 if your system has a GNU libc compatible `malloc' function, and
    to 0 otherwise. */
 #undef HAVE_MALLOC
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
 
 /* Define to 1 if you have the `memmove' function. */
 #undef HAVE_MEMMOVE
@@ -110,6 +137,12 @@
    and to 0 otherwise. */
 #undef HAVE_REALLOC
 
+/* Define to 1 if you have the `regcomp' function. */
+#undef HAVE_REGCOMP
+
+/* Define to 1 if you have the <resolv.h> header file. */
+#undef HAVE_RESOLV_H
+
 /* Define to 1 if system calls automatically restart after interruption by a
    signal. */
 #undef HAVE_RESTARTABLE_SYSCALLS
@@ -123,6 +156,10 @@
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
 
+/* Define to 1 if `stat' has the bug that it succeeds when given the
+   zero-length file name argument. */
+#undef HAVE_STAT_EMPTY_STRING_BUG
+
 /* Define to 1 if you have the <stddef.h> header file. */
 #undef HAVE_STDDEF_H
 
@@ -131,6 +168,9 @@
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
 
 /* Define to 1 if you have the `strchr' function. */
 #undef HAVE_STRCHR
@@ -146,6 +186,12 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strncasecmp' function. */
+#undef HAVE_STRNCASECMP
+
+/* Define to 1 if you have the `strpbrk' function. */
+#undef HAVE_STRPBRK
 
 /* Define to 1 if you have the `strrchr' function. */
 #undef HAVE_STRRCHR
@@ -222,11 +268,19 @@
 /* Define to 1 if `vfork' works. */
 #undef HAVE_WORKING_VFORK
 
+/* Define to 1 if you have the </usr/local/include/pcreposix.h> header file.
+   */
+#undef HAVE__USR_LOCAL_INCLUDE_PCREPOSIX_H
+
 /* Define if we have __va_copy */
 #undef HAVE___VA_COPY
 
 /* Path to debugging log file */
 #undef LPATH
+
+/* Define to 1 if `lstat' dereferences a symlink specified with a trailing
+   slash. */
+#undef LSTAT_FOLLOWS_SLASHED_SYMLINK
 
 /* Maximum number of network connections */
 #undef MAXCONNECTIONS
@@ -279,16 +333,16 @@
 /* Define to the type of arg 5 for `select'. */
 #undef SELECT_TYPE_ARG5
 
-/* The size of a `int', as computed by sizeof. */
+/* The size of `int', as computed by sizeof. */
 #undef SIZEOF_INT
 
-/* The size of a `long', as computed by sizeof. */
+/* The size of `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
-/* The size of a `short', as computed by sizeof. */
+/* The size of `short', as computed by sizeof. */
 #undef SIZEOF_SHORT
 
-/* The size of a `void *', as computed by sizeof. */
+/* The size of `void *', as computed by sizeof. */
 #undef SIZEOF_VOID_P
 
 /* Path to executable for restarts */
@@ -299,6 +353,14 @@
 
 /* Path name used as a base for the ssl lib files. */
 #undef SSL_LIBS_PATH
+
+/* If using the C implementation of alloca, define if you know the
+   direction of stack growth for your system; otherwise it will be
+   automatically deduced at runtime.
+	STACK_DIRECTION > 0 => grows toward higher addresses
+	STACK_DIRECTION < 0 => grows toward lower addresses
+	STACK_DIRECTION = 0 => direction of growth unknown */
+#undef STACK_DIRECTION
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
@@ -335,6 +397,21 @@
    `char[]'. */
 #undef YYTEXT_POINTER
 
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define for Solaris 2.5.1 so the uint64_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT64_T
+
+/* Define for Solaris 2.5.1 so the uint8_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef was allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT8_T
+
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
@@ -353,6 +430,14 @@
 /* Define to `long' if <sys/types.h> does not define. */
 #undef int32_t
 
+/* Define to the type of a signed integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef int64_t
+
+/* Define to the type of a signed integer type of width exactly 8 bits if such
+   a type exists and the standard includes do not define it. */
+#undef int8_t
+
 /* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc
 
@@ -362,7 +447,7 @@
 /* Define to rpl_realloc if the replacement function should be used. */
 #undef realloc
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
 
 /* Define to `int' if <sys/types.h> doesn't define. */
@@ -373,6 +458,14 @@
 
 /* Define to `unsigned long' if <sys/types.h> does not define. */
 #undef uint32_t
+
+/* Define to the type of an unsigned integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint64_t
+
+/* Define to the type of an unsigned integer type of width exactly 8 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint8_t
 
 /* Define as `fork' if `vfork' does not work. */
 #undef vfork

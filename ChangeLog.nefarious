@@ -3,6 +3,18 @@
 
 2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* config.h.in: Regenerated.
+
+	* configure: Regenerated.
+
+	* configure.in: Added some extra checks from an autoscan check.
+	Also if --disable-subversion is given then the svncheck.sh script
+	is skipped.
+
+	* ircd/svncheck.sh: Only attempt to check if svn exists.
+
+2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* configure: Regenerated.
 
 	* configure.in: --disable-ssl and --enable-ssl now work correctly.
