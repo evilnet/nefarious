@@ -435,6 +435,7 @@ if test x"$unet_cv_disable_ssl" = xno; then
   AC_DEFINE_UNQUOTED(SSL_LIBS_PATH, "$unet_cv_with_openssl_prefix",
   [Path name used as a base for the ssl lib files.])
 
+
   AC_MSG_CHECKING([for Kerberos includes])
   AC_ARG_WITH([kerberos-includes],
   AS_HELP_STRING([--with-kerb-includes=dir], [Specify location of Kerberos includes (default: /usr/kerberos/include)]),
@@ -442,13 +443,17 @@ if test x"$unet_cv_disable_ssl" = xno; then
   [unet_cv_with_kerberos_prefix=/usr/kerberos/include])
   AC_MSG_RESULT([$unet_cv_with_kerberos_prefix])
 
-  save_CFLAGS=$CFLAGS;
-  CFLAGS="-lcrypto";
+  save_CFLAGS=$CFLAGS
+  save_LIBS=$LIBS
+
+
+  CFLAGS="-I$unet_cv_with_openssl_inc_prefix -lcrypto"
+  LIBS="-L$unet_cv_with_openssl_prefix -lssl -lcrypto"
 
   unet_cv_disable_ssl="yes";
   OPENSSL_LDFLAGS="";
   AC_CHECK_LIB(ssl, SSL_read, [
-    AC_CHECK_LIB(crypto, X509_new, [
+    AC_CHECK_LIB(crypto, EVP_sha256, [
       AC_CHECK_HEADERS($base_ssl_inc/openssl/ssl.h $base_ssl_inc/openssl/err.h, [
         unet_cv_disable_ssl="no";
         OPENSSL_LDFLAGS="-lssl -lcrypto"
@@ -457,6 +462,8 @@ if test x"$unet_cv_disable_ssl" = xno; then
       ])
     ])
   ])
+
+  LIBS=$save_LIBS
   CFLAGS=$save_CFLAGS
 
   if test "x$unet_cv_disable_ssl" = xno; then
@@ -465,7 +472,7 @@ if test x"$unet_cv_disable_ssl" = xno; then
     LIBS="$LIBS -L$unet_cv_with_openssl_prefix $OPENSSL_LDFLAGS"
     CFLAGS="$CFLAGS -I$unet_cv_with_openssl_inc_prefix -I$unet_cv_with_kerberos_prefix"
   else
-    AC_MSG_ERROR([Unable to find OpenSSL, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location])
+    AC_MSG_ERROR([Unable to find OpenSSL with sha256 support, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location])
   fi
 fi
 

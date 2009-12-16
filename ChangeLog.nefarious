@@ -1,9 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-16  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* configure: Regenerated.
+
+	* configure.in: Check for EVP_sha256. Also properly check non
+	standard directories if they are given.
+
 2009-12-13  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_bsd.c: Fix for compile error with SSL disabled.
+
 
 2009-12-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 

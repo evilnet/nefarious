@@ -11420,6 +11420,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+
   { echo "$as_me:$LINENO: checking for Kerberos includes" >&5
 echo $ECHO_N "checking for Kerberos includes... $ECHO_C" >&6; }
 
@@ -11433,8 +11434,12 @@ fi
   { echo "$as_me:$LINENO: result: $unet_cv_with_kerberos_prefix" >&5
 echo "${ECHO_T}$unet_cv_with_kerberos_prefix" >&6; }
 
-  save_CFLAGS=$CFLAGS;
-  CFLAGS="-lcrypto";
+  save_CFLAGS=$CFLAGS
+  save_LIBS=$LIBS
+
+
+  CFLAGS="-I$unet_cv_with_openssl_inc_prefix -lcrypto"
+  LIBS="-L$unet_cv_with_openssl_prefix -lssl -lcrypto"
 
   unet_cv_disable_ssl="yes";
   OPENSSL_LDFLAGS="";
@@ -11501,9 +11506,9 @@ fi
 echo "${ECHO_T}$ac_cv_lib_ssl_SSL_read" >&6; }
 if test $ac_cv_lib_ssl_SSL_read = yes; then
 
-    { echo "$as_me:$LINENO: checking for X509_new in -lcrypto" >&5
-echo $ECHO_N "checking for X509_new in -lcrypto... $ECHO_C" >&6; }
-if test "${ac_cv_lib_crypto_X509_new+set}" = set; then
+    { echo "$as_me:$LINENO: checking for EVP_sha256 in -lcrypto" >&5
+echo $ECHO_N "checking for EVP_sha256 in -lcrypto... $ECHO_C" >&6; }
+if test "${ac_cv_lib_crypto_EVP_sha256+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
@@ -11521,11 +11526,11 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef __cplusplus
 extern "C"
 #endif
-char X509_new ();
+char EVP_sha256 ();
 int
 main ()
 {
-return X509_new ();
+return EVP_sha256 ();
   ;
   return 0;
 }
@@ -11548,21 +11553,21 @@ eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
 	 test ! -s conftest.err
        } && test -s conftest$ac_exeext &&
        $as_test_x conftest$ac_exeext; then
-  ac_cv_lib_crypto_X509_new=yes
+  ac_cv_lib_crypto_EVP_sha256=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-	ac_cv_lib_crypto_X509_new=no
+	ac_cv_lib_crypto_EVP_sha256=no
 fi
 
 rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_X509_new" >&5
-echo "${ECHO_T}$ac_cv_lib_crypto_X509_new" >&6; }
-if test $ac_cv_lib_crypto_X509_new = yes; then
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_sha256" >&5
+echo "${ECHO_T}$ac_cv_lib_crypto_EVP_sha256" >&6; }
+if test $ac_cv_lib_crypto_EVP_sha256 = yes; then
 
 
 
@@ -11721,6 +11726,8 @@ fi
 
 fi
 
+
+  LIBS=$save_LIBS
   CFLAGS=$save_CFLAGS
 
   if test "x$unet_cv_disable_ssl" = xno; then
@@ -11733,8 +11740,8 @@ _ACEOF
     LIBS="$LIBS -L$unet_cv_with_openssl_prefix $OPENSSL_LDFLAGS"
     CFLAGS="$CFLAGS -I$unet_cv_with_openssl_inc_prefix -I$unet_cv_with_kerberos_prefix"
   else
-    { { echo "$as_me:$LINENO: error: Unable to find OpenSSL, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location" >&5
-echo "$as_me: error: Unable to find OpenSSL, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location" >&2;}
+    { { echo "$as_me:$LINENO: error: Unable to find OpenSSL with sha256 support, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location" >&5
+echo "$as_me: error: Unable to find OpenSSL with sha256 support, Maybe you need to install the openssl and libssl-dev package, or use --with-openssl-includes and --with-openssl-libs if you have openssl installed in an odd location" >&2;}
    { (exit 1); exit 1; }; }
   fi
 fi
