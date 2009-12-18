@@ -3,6 +3,11 @@
 
 2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/ircd_features.c: Allow EXTBANS to be set without needing
+	to restart for now. In 1.4 this will be set back to read only.
+
+2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Default OPEFLAGS to TRUE.
 
 	* doc/readme.features: Default OPEFLAGS to TRUE.
