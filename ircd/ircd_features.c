@@ -653,6 +653,7 @@ static struct FeatureDesc {
   F_B(FAKEHOST, 0, 1, 0),
   F_S(DEFAULT_FAKEHOST, FEAT_NULL | FEAT_CASE, 0, 0),
   F_B(HIS_GLINE, 0, 1, 0),
+  F_B(HIS_GLINE_REASON, 0, 0, 0),
   F_B(HIS_USERGLINE, 0, 1, 0),
   F_B(HIS_USERIP, 0, 0, 0),
   F_B(AUTOJOIN_USER, 0, 0, 0),

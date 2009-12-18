@@ -1364,6 +1364,13 @@ HIS_GLINE
 
 This will hide the user who done the gline in the gline message when enabled.
 
+HIS_GLINE_REASON
+ * Type: boolean
+ * Default: TRUE
+
+This will hide the gline reason from quit messages. The affected user(s) will
+still see the reason via the YOURBANNEDCREEP numeric.
+
 HIS_USERGLINE
  * Type: boolean
  * Default: TRUE

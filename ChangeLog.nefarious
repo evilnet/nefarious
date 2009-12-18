@@ -3,6 +3,20 @@
 
 2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Added HIS_GLINE_REASON (default FALSE).
+
+	* doc/readme.features: Added HIS_GLINE_REASON (default FALSE).
+
+	* include/ircd_features.h: Added HIS_GLINE_REASON (default FALSE).
+
+	* ircd/gline.c: Added HIS_GLINE_REASON (default FALSE). When TRUE
+	the gline reason will be hidden from the quit message. The affected
+	user(s) will still get the reason via ERR_YOURBANNEDCREEP.
+
+	* ircd/ircd_features.c: Added HIS_GLINE_REASON (default FALSE).
+
+2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* config.h.in: Regenerated.
 
 	* configure: Rengerated.
