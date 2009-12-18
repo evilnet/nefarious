@@ -1,0 +1,17 @@
+/JUPE [+|-]<server> [[<target>] <expiration> :<reason>]]
+
+Sets (+), removes (-) or lists jupes (server bans). The target can either be
+specified as * for a global jupe (all servers) or a specific server can be
+specified for a local jupe confined to the specified server. The expiration
+can be specified either in seconds or as a formatted time, eg 2d5m3s
+(2 days 5 minutes 3 seconds.
+
+If the jupe does not already exist, it is created. The <target> parameter is
+used to select whether the jupe is only to apply to a single server (which
+need not be the local server) or to the whole network; if <target> is not given,
+it is assumed to be the local server.  This could be useful if a single
+particular link is having problems, for instance.  The <expiration> parameter
+is a number of seconds, not to exceed 7 days, for the jupe to exist.  The <reason>
+argument is mandatory and should describe why this particular jupe was placed.
+
+
