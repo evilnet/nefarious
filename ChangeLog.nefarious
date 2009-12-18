@@ -3,6 +3,12 @@
 
 2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/ircd_parser.y: Fixed a bug where if you specified
+	propagate = yes in a class block you would only get local oper
+	status.
+
+2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Added HIS_GLINE_REASON (default FALSE).
 
 	* doc/readme.features: Added HIS_GLINE_REASON (default FALSE).

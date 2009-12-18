@@ -738,7 +738,7 @@ operblock: OPER '{' operitems '}' ';'
     parse_error("Operator block for %s and class %s have no LOCAL setting", name, c_class->cc_name);
   else for (link = hosts; link != NULL; link = link->next) {
 
-    if (FlagHas(&privs, PRIV_PROPAGATE)) {
+    if (FlagHas(&privs, PRIV_PROPAGATE) || FlagHas(&c_class->privs, PRIV_PROPAGATE)) {
       m = "O";
       aconf = make_conf(CONF_OPERATOR);
     } else {
