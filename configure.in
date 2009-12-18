@@ -165,7 +165,7 @@ AC_FUNC_REALLOC
 AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STAT
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm dup2 getpass gettimeofday memmove memset regcomp select socket strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol strtoul kqueue setrlimit getrusage times])
+AC_CHECK_FUNCS([alarm dup2 getpass gettimeofday memmove memset regcomp select socket strcasecmp strchr strdup strerror strncasecmp strpbrk strrchr strstr strtol strtoul strspn kqueue setrlimit getrusage times])
 
 dnl Do we have restarting syscalls ?
 AC_SYS_RESTARTABLE_SYSCALLS
@@ -182,6 +182,24 @@ AC_PROG_LN_S
 AC_PATH_PROGS(RMPROG, rm, /bin/rm)
 AC_PATH_PROGS(SHPROG, sh, /bin/sh)
 AC_PATH_PROGS(BASH, bash, /bin/bash, [/bin/bash:/usr/bin/bash:/usr/local/bin/bash:$PATH])
+
+AC_CACHE_CHECK(if we can set the core size to unlimited, ac_cv_force_core,[
+AC_TRY_RUN([
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
+int main() {
+struct rlimit corelim;
+corelim.rlim_cur = corelim.rlim_max = RLIM_INFINITY;
+if (setrlimit(RLIMIT_CORE, &corelim))
+exit(1);
+exit(0);
+}
+],ac_cv_force_core=yes,ac_cv_force_core=no)
+])
+if test "$ac_cv_force_core" = "yes"; then
+  AC_DEFINE([FORCE_CORE], [], [Specify whether we can enable core files or not])
+fi
 
 dnl (F)LEX - needed for the new conf file parser
 AC_PROG_LEX

@@ -29,6 +29,9 @@
 /* Force inlining for a few critical functions */
 #undef FORCEINLINE
 
+/* Specify whether we can enable core files or not */
+#undef FORCE_CORE
+
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
@@ -195,6 +198,9 @@
 
 /* Define to 1 if you have the `strrchr' function. */
 #undef HAVE_STRRCHR
+
+/* Define to 1 if you have the `strspn' function. */
+#undef HAVE_STRSPN
 
 /* Define to 1 if you have the `strstr' function. */
 #undef HAVE_STRSTR

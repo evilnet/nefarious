@@ -72,6 +72,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -809,7 +810,7 @@ static char check_file_access(const char *path, char which, int mode) {
 /*----------------------------------------------------------------------------
  * set_core_limit
  *--------------------------------------------------------------------------*/
-#if defined(HAVE_SETRLIMIT) && defined(RLIMIT_CORE)
+#if defined(HAVE_SETRLIMIT) && defined(FORCE_CORE)
 static void set_core_limit(void) {
   struct rlimit corelim;
 
@@ -818,7 +819,7 @@ static void set_core_limit(void) {
     corelim.rlim_max = RLIM_INFINITY;   /* Try to recover */
   }
 
-  corelim.rlim_cur = corelim.rlim_max;
+  corelim.rlim_cur = corelim.rlim_max = RLIM_INFINITY;
   if (setrlimit(RLIMIT_CORE, &corelim))
     fprintf(stderr, "Setting rlimit core size failed: %s\n", strerror(errno));
 }
@@ -855,7 +856,7 @@ int main(int argc, char **argv) {
   thisServer.uid  = getuid();
   thisServer.euid = geteuid();
 
-#if defined(HAVE_SETRLIMIT) && defined(RLIMIT_CORE)
+#if defined(HAVE_SETRLIMIT) && defined(FORCE_CORE)
   set_core_limit();
 #endif
 

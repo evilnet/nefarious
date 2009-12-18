@@ -3,6 +3,17 @@
 
 2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* config.h.in: Regenerated.
+
+	* configure: Rengerated.
+
+	* configure.in: Determine if its possible to change the core file
+	size limit.
+
+	* ircd/ircd.c: If its possible to change the limit then do so.
+
+2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* help/opers/jupe: Added JUPE command help.
 
 2009-12-17  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
