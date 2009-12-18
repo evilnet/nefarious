@@ -3,6 +3,14 @@
 
 2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
+	* doc/example.conf: Default OPEFLAGS to TRUE.
+
+	* doc/readme.features: Default OPEFLAGS to TRUE.
+
+	* ircd/ircd_features.c: Default OPERFLAGS to TRUE.
+
+2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
 	* ircd/ircd_parser.y: Fixed a bug where if you specified
 	propagate = yes in a class block you would only get local oper
 	status.

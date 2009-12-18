@@ -717,11 +717,10 @@ it has been bad channel glined.
 
 OPERFLAGS
  * Type: boolean
- * Default: FALSE
+ * Default: TRUE
 
-Extended oper levels can be enabled. Currently this just adds support for
-an IRC Administrator oper level. See example.conf for enabling it on your
-O:Line if using this feature.
+Extended oper levels can be enabled. See example.conf for the available
+flags and how to enable it on your O:Line if using this feature.
 
 WHOIS_OPER
  * Type: string
