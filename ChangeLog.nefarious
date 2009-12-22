@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-22  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/s_err.c: Typo fix.
+
 2009-12-18  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_features.c: Allow EXTBANS to be set without needing
