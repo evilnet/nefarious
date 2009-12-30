@@ -540,13 +540,21 @@ else
 	 	AC_DEFINE([PCRE_SYSTEM], , [Define if PCRE is installed in /usr])
 	else
 		ac_cv_header_pcreposix_h=no
-		AC_CHECK_HEADERS($HOME/include/pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
+		AC_CHECK_HEADERS(/usr/include/pcre/pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
 		if test x"$ac_cv_header_pcreposix_h" = xyes; then
-			CPPFLAGS="$CPPFLAGS -I$HOME/include"
-			TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
+			CPPFLAGS="$CPPFLAGS -I/usr/include/pcre"
+			TRELIBS="-L/usr/lib/pcre -lpcreposix -lpcre"
 			AC_SUBST(TRELIBS)
-		else	
-			AC_MSG_ERROR([PCRE regex library not found. To install PCRE just type 'tools/pcre_install.sh' now, to install PCRE in your home directory.])
+		else
+			ac_cv_header_pcreposix_h=no
+			AC_CHECK_HEADERS($HOME/include/pcreposix.h, [ ac_cv_header_pcreposix_h="yes" ] , [ ac_cv_header_pcreposix_h="no" ])
+			if test x"$ac_cv_header_pcreposix_h" = xyes; then
+				CPPFLAGS="$CPPFLAGS -I$HOME/include"
+				TRELIBS="-L$HOME/lib -lpcreposix -lpcre"
+				AC_SUBST(TRELIBS)
+			else
+				AC_MSG_ERROR([PCRE regex library not found. To install PCRE just type 'tools/pcre_install.sh' now, to install PCRE in your home directory.])
+			fi
 		fi
         fi
 fi

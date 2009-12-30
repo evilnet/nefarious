@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2009-12-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* configure: Regenerated.
+
+	* configure.in: Added a check for /usr/include/pcre as centos is
+	weird. I will simplify this section sometime into a for loop.
+
 2009-12-29  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_server.c: Show IP in authorised connection notices.
