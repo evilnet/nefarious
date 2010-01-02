@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-01-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/m_check.c: Show timestamp in /check <server> output.
+
 2009-12-31  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* configure: Regenerated.

@@ -545,7 +545,7 @@ void checkServer(struct Client *sptr, struct Client *acptr)
    send_reply(sptr, RPL_CHKHEAD, "server", acptr->cli_name);
    send_reply(sptr, RPL_DATASTR, " ");
 
-   ircd_snprintf(0, outbuf, sizeof(outbuf),  "   Connected at:: %s", myctime(acptr->cli_serv->timestamp));
+   ircd_snprintf(0, outbuf, sizeof(outbuf),  "   Connected at:: %s (%Tu)", myctime(acptr->cli_serv->timestamp), acptr->cli_serv->timestamp);
    send_reply(sptr, RPL_DATASTR, outbuf);
 
    ircd_snprintf(0, outbuf, sizeof(outbuf), "    Server name:: %s", acptr->cli_name);
