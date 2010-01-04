@@ -1156,6 +1156,11 @@ static void client_sock_callback(struct Event* ev)
   case ET_ERROR: /* an error occurred */
     fallback = cli_info(cptr);
     cli_error(cptr) = ev_data(ev);
+    /* If the OS told us we have a bad file descriptor, we should
+     * record that for future reference.
+     */
+    if (cli_error(cptr) == EBADF)
+      cli_fd(cptr) = -1;
     if (s_state(&(con_socket(con))) == SS_CONNECTING) {
       completed_connection(cptr);
       /* From .12 patch:

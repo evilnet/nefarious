@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-01-05  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Some Undernet IRCu updates, see Changelog for more information.
+
 2010-01-03  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/m_check.c: Show timestamp in /check <server> output.

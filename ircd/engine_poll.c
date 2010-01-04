@@ -278,7 +278,7 @@ engine_loop(struct Generators* gen)
   int nfds;
   int i;
   int errcode;
-  size_t codesize;
+  socklen_t codesize
   struct Socket *sock;
 
   while (running) {

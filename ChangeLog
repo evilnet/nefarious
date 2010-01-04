@@ -1,3 +1,35 @@
+2010-01-03  Michael Poole <mdpoole@troilus.org>
+
+        * ircd/engine_devpoll.c: Make some variables that were local to
+        engine_loop() file-scoped so engine_delete() can see them.
+        (engine_delete): Discard unprocessed events for the deleted
+        socket.
+        (engine_loop): Update to use the new variable names.  Change a
+        frequent debug statement to DEBUG_ENGINE.  Fix the type of the
+        codesize variable.
+
+        * ircd/engine_epoll.c: Same as ircd/engine_devpoll.c, but the
+        debug statement and codesize variable were already fixed.
+
+        * ircd/engine_kqueue.c: Same as ircd/engine_devpoll.c, but also
+        fix a typo in an engine_signal() assertion, and get rid of dead
+        variables in engine_delete().
+
+        * ircd/engine_select.c (engine_loop): Remove a bogus assert() that
+        the structure's FD is correct after the event-handling callback
+        returns.  Also fix a warning about the type of the last parameter
+        passed to getsockopt().
+
+        * ircd/m_names.c (m_names): Terminate the buffer used for listing
+        clients who are not in any channel.
+ 
+	* ircd/m_server.c (check_loop_and_lh): Never return 1 when we kill
+	another server.  Update the squit message text for maxhops and hub
+	violations.
+
+        * ircd/s_bsd.c (client_sock_callback): Invalidate cli_fd() when we
+        receive an EBADF error.
+
 2008-03-15  Kevin L. Mitchell  <klmitch@mit.edu>
 
 	* doc/example.conf: document 'exempt' port flag

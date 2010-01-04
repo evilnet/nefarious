@@ -475,14 +475,17 @@ int ms_names(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 
       if (mlen + idx + NICKLEN + 3 > BUFSIZE)     /* space, \r\n\0 */
       {
+        buf[idx-1] = '\0';
         send_reply(sptr, RPL_NAMREPLY, buf);
         strcpy(buf, "* * :");
         idx = 5;
         flag = 0;
       }
     }
-    if (flag)
+    if (flag) {
+      buf[idx-1] = '\0';
       send_reply(sptr, RPL_NAMREPLY, buf);
+    }
     send_reply(sptr, RPL_ENDOFNAMES, "*");
     return 1; 
   } 

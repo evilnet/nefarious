@@ -264,7 +264,7 @@ engine_loop(struct Generators* gen)
   int nfds;
   int i;
   int errcode;
-  size_t codesize;
+  socklen_t codesize;
   struct Socket *sock;
 
   while (running) {
@@ -401,8 +401,6 @@ engine_loop(struct Generators* gen)
 	  nfds--;
 	break;
       }
-
-      assert(s_fd(sock) == i);
 
       gen_ref_dec(sock); /* we're done with it */
     }

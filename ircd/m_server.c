@@ -407,24 +407,24 @@ check_loop_and_lh(struct Client* cptr, struct Client *sptr, time_t *ghost, const
       sendto_opmask_butone(&me, SNO_OLDSNO,
                            "%s SQUIT by %s [Too many hops at %s <- %s, check MaxLinks and Leaf]",
                            host, cli_name(&me), cli_name(cptr), host);
-      return exit_new_server(cptr, sptr, host, timestamp,
-                             "Too many hops at %s <- %s, check MaxLinks and Leaf",
-                             cli_name(cptr), host);
+      if (exit_client_msg(cptr, LHcptr, &me,
+                          "Too many hops at %s <- %s, check MaxLinks and Leaf",
+                          cli_name(cptr), host) == CPTR_KILLED)
+        return CPTR_KILLED;
     }
     else if (active_lh_line == 2)
     {
       sendto_opmask_butone(&me, SNO_OLDSNO,
                            "%s SQUIT by %s [Non-Hub link %s <- %s, check Hub mask]",
                            host, cli_name(&me), cli_name(cptr), host);      
-      return exit_new_server(cptr, sptr, host, timestamp,
-                             "Non-Hub link %s <- %s, check Hub mask",
-                             cli_name(cptr), host);
+      if (exit_client_msg(cptr, LHcptr, &me,
+                          "Non-Hub link %s <- %s, check Hub mask",
+                          cli_name(cptr), host) == CPTR_KILLED)
+        return CPTR_KILLED;
     }
-    /*
-     * Did we kill the incoming server off already ?
-     */
-    if (killed)
-      return 0;
+
+    /* We just squit somebody, and it wasn't cptr. */
+    return 0;
   }
 
   return 1;
