@@ -127,10 +127,12 @@ int m_silence(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   acptr = sptr;
 
   if (parc < 2 || EmptyString(parv[1]) || (acptr = FindUser(parv[1]))) {
-    if (!(cli_user(acptr)))
-      return 0;
-    for (lp = cli_user(acptr)->silence; lp; lp = lp->next)
-      send_reply(sptr, RPL_SILELIST, cli_name(acptr), (lp->flags & SILENCE_EXEMPT) ? "~" : "", lp->value.cp);
+    if (cli_user(acptr) && ((acptr == sptr) || IsChannelService(acptr))) {
+      for (lp = cli_user(acptr)->silence; lp; lp = lp->next) {
+        send_reply(sptr, RPL_SILELIST, cli_name(acptr),
+                   (lp->flags & SILENCE_EXEMPT) ? "~" : "", lp->value.cp);
+      }
+    }
     send_reply(sptr, RPL_ENDOFSILELIST, cli_name(acptr));
     return 0;
   }

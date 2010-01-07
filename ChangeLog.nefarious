@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-01-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
+
+	* Some Undernet IRCu updates, see Changelog for more information.
+
 2010-01-06  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/engine_poll.c: Added missing ';'.
