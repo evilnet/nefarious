@@ -1009,7 +1009,7 @@ static Numeric replyTable[] = {
 /* 489 */
   { ERR_VOICENEEDED, "%s :You're neither voiced nor channel operator", "489" },
 /* 490 */
-  { ERR_LINKSET, "%s :[Redirect] %s has has a channel redirection (+L) enabled, so you are automatically being transferred to the channel %s", "490" },
+  { ERR_LINKSET, "%s :[Redirect] %s has channel redirection (+L) enabled, so you are automatically being transferred to the channel %s", "490" },
 /* 491 */
   { ERR_NOOPERHOST, ":No O-lines for your host", "491" },
 /* 492 */

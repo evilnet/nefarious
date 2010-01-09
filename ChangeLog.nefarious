@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-01-09  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_err.c: Minor typo fix.
+
 2010-01-07  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* Some Undernet IRCu updates, see Changelog for more information.
