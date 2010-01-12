@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-01-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+
+	* include/ircd.h: Declared get_pe_message.
+
+	* ircd/ircd.c: Added get_pe_message, this will get the reason for
+	a current pending quit.
+
+	* ircd/listener.c: If get_pe_message returns a reason then show
+	this when rejecting client connections on non exempt ports.
+
 2010-01-09  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_err.c: Minor typo fix.

@@ -59,6 +59,7 @@ struct PendingExit
 extern void server_panic(const char* message);
 
 
+extern char *get_pe_message();
 extern void exit_cancel(struct Client *who);
 extern void exit_schedule(int restart, time_t when, struct Client *who,
 			  const char *message);

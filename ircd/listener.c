@@ -492,6 +492,8 @@ static void accept_connection(struct Event* ev)
   struct sockaddr_in addr = { 0 };
   unsigned int       addrlen = sizeof(struct sockaddr_in);
   int                fd;
+  char               strpe[BUFSIZE] = "";
+  char               *pemsg;
 
   assert(0 != ev_socket(ev));
   assert(0 != s_data(ev_socket(ev)));
@@ -582,9 +584,19 @@ static void accept_connection(struct Event* ev)
       if (refuse && !listener->exempt)
       {
         ++ServerStats->is_ref;
-        /*                 111111111122222222223 3 3 */
-        /*        123456789012345678901234567890 1 2 */
-        send(fd, "ERROR :Server is shutting down\r\n", 32, 0);
+
+        pemsg = get_pe_message();
+        if (pemsg && *pemsg) {
+          /*                                                    11111111112222222222333333333344 44 4 4 */
+          /*                                           12345678901234567890123456789012345678901 23 4 5 */
+          ircd_snprintf(0, strpe, strlen(pemsg) + 45, "ERROR :Server is shutting down. (Reason: %s)\r\n",
+                        pemsg);
+          send(fd, strpe, strlen(strpe), 0);
+        } else {
+          /*                 111111111122222222223 3 3 */
+          /*        123456789012345678901234567890 1 2 */
+          send(fd, "ERROR :Server is shutting down\r\n", 32, 0);
+        }
         close(fd);
         continue;
       }

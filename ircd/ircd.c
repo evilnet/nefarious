@@ -391,6 +391,20 @@ void exit_schedule(int restart, time_t when, struct Client *who,
   _exit_countdown(pe, 0);
 }
 
+char *get_pe_message()
+{
+  struct PendingExit *pe;
+
+  if (!t_onqueue(&countdown_timer))
+    return NULL; /* it's not running... */
+
+  pe = t_data(&countdown_timer); /* get the pending exit data */
+  if (pe && pe->message)
+    return pe->message;
+  else
+    return NULL;
+}
+
 /*----------------------------------------------------------------------------
  * API: server_panic
  *--------------------------------------------------------------------------*/
