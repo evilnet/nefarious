@@ -3488,7 +3488,7 @@ mode_parse_except(struct ParseState *state, int *flag_p)
   if (MyUser(state->sptr) && state->max_args <= 0) /* drop if too many args */
     return;
 
-  t_str = state->parv[state->args_used++]; /* grab arg */
+  t_str = strdup(state->parv[state->args_used++]); /* grab arg */
   state->parc--;
   state->max_args--;
 
@@ -3744,7 +3744,7 @@ mode_parse_ban(struct ParseState *state, int *flag_p)
   if (MyUser(state->sptr) && state->max_args <= 0) /* drop if too many args */
     return;
 
-  t_str = state->parv[state->args_used++]; /* grab arg */
+  t_str = strdup(state->parv[state->args_used++]); /* grab arg */
   state->parc--;
   state->max_args--;
 

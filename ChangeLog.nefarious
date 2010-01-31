@@ -3,6 +3,10 @@
 
 2010-01-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/channel.c: Fix for adding multiple extended bans at a time.
+
+2010-01-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+
 	* include/ircd.h: Declared get_pe_message.
 
 	* ircd/ircd.c: Added get_pe_message, this will get the reason for
