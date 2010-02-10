@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-02-11 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+
+	* ircd/ircd_relay.c: Bug fix, exempts are now checked before R/t
+	extended bans.
+
 2010-01-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Fix for adding multiple extended bans at a time.
