@@ -283,7 +283,7 @@ static struct remapped_feature {
     { "OPER_DIE", "die", 2, 0 },
     { "OPER_GLINE", "gline", 2, 0 },
     { "OPER_LGLINE", "local_gline", 2, 0 },
-    { "OPER_JUPE", "jupe", 2, 0 },
+    { "OPER_JUPE", "global_jupe", 2, 0 },
     { "OPER_LJUPE", "local_jupe", 2, 0 },
     { "OPER_OPMODE", "opmode", 2, 0 },
     { "OPER_LOPMODE", "local_opmode", 2, 0 },

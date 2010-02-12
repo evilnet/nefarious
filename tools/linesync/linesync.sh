@@ -235,19 +235,32 @@ fi
 CKSUM=`$md5_cmd $TMPFILE|cut -d' ' -f1`
 
 check_file="$tmp_path/linesync.sum.$TS"
-for ck_server in $LINE_CHECK; do
-	sumfile="$ck_server""linesync.sum13"
-	wget --cache=off --quiet $CREDENTIALS --output-document=$check_file $sumfile > /dev/null 2>&1
-	if [ ! -s "$check_file" ]; then
-		echo "Unable to retrieve checksum from $sumfile"
-		exit 1	
-	fi
-	if [ "$CKSUM" != "`cat $check_file`" ]; then
-		echo "Checksum retrieved from $sumfile does not match!"
-		exit 1
+LINE_CHECK_SPLIT=$(echo $LINE_CHECK | tr " " "\n")
+success="0";
+for ck_server in $LINE_CHECK_SPLIT; do
+	if [ "$success" -eq "0" ]; then
+		echo "checking $ck_server"
+		sumfile="$ck_server""linesync.sum13"
+		wget --cache=off --quiet $CREDENTIALS --output-document=$check_file $sumfile > /dev/null 2>&1
+		if [ ! -s "$check_file" ]; then
+			echo "Unable to retrieve checksum from $ck_server"
+			fail="1";
+		fi
+		if [ "$CKSUM" != "`cat $check_file`" ]; then
+			echo "Checksum retrieved from $ck_server does not match!"
+			fail="1"
+		else
+			fail="0"
+			success="1"
+		fi
 	fi
 	rm -f $check_file
 done
+
+if [ "$fail" -eq "1" ]; then
+	exit 1
+fi
+
 # It all checks out, proceed...
 
 # Replace the marked block in ircd.conf with the new version

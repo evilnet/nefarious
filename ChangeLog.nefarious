@@ -3,6 +3,12 @@
 
 2010-02-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
 
+	* ircd/convert-conf.c: Change jupe -> global_jupe.
+
+	* tools/linesync/linesync.sh: Multiple checksum servers now work.
+
+2010-02-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+
 	* doc/example.conf: Moved Jupe priv setting to global_jupe as it was
 	conflicting with Jupe blocks.
 
