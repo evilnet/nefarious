@@ -177,6 +177,7 @@ static void free_slist(struct SLink **link) {
 %token FORWARD
 %token GBYTES
 %token GENERAL
+%token GLOBAL_JUPE
 %token HIDDEN
 %token HOST
 %token HOSTMASK
@@ -255,8 +256,8 @@ static void free_slist(struct SLink **link) {
 %token TPRIV_RESTART
 %token TPRIV_DIE
 %token TPRIV_GLINE
+%token TPRIV_GLOBAL_JUPE
 %token TPRIV_LOCAL_GLINE
-%token TPRIV_JUPE
 %token TPRIV_LOCAL_JUPE
 %token TPRIV_OPMODE
 %token TPRIV_LOCAL_OPMODE
@@ -864,7 +865,7 @@ privtype:  TPRIV_DISPLAY_MODE { $$ = PRIV_DISPLAY_MODE; } |
            TPRIV_DIE { $$ = PRIV_DIE; } |
            TPRIV_GLINE { $$ = PRIV_GLINE; } |
            TPRIV_LOCAL_GLINE { $$ = PRIV_LOCAL_GLINE; } |
-           TPRIV_JUPE { $$ = PRIV_JUPE; } |
+           TPRIV_GLOBAL_JUPE { $$ = PRIV_JUPE; } |
            TPRIV_LOCAL_JUPE { $$ = PRIV_LOCAL_JUPE; } |
            TPRIV_OPMODE { $$ = PRIV_OPMODE; } |
            TPRIV_LOCAL_OPMODE { $$ = PRIV_LOCAL_OPMODE; } |

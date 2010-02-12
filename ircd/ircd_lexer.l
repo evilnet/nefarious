@@ -154,7 +154,7 @@ static struct lexer_token {
   { "terabytes", TBYTES },
   { "kill", TPRIV_KILL },
   { "local_kill", TPRIV_LOCAL_KILL },
-  { "jupe", TPRIV_JUPE },
+  { "global_jupe", TPRIV_GLOBAL_JUPE },
   { "remoterehash", TPRIV_REMOTEREHASH },
   { "check", TPRIV_CHECK },
   { "see_secret_chan", TPRIV_SEE_SECRET_CHAN },
