@@ -270,7 +270,6 @@ extern const struct Numeric* get_error_numeric(int err);
 /*	RPL_LISTSYNTAX	     334	   unreal */
 #define RPL_WHOISACCOUNTONLY 335	/* Nefarious extension */
 #define RPL_WHOISBOT         336	/* Nefarious extension */
-#define RPL_WHOISSSL         337	/* Nefarious extension */
 /*      RPL_CHANPASSOK       338           IRCnet extension (?)*/
 #define	RPL_WHOISACTUALLY    338	/* Undernet extension, dalnet */
 /*      RPL_BADCHANPASS      339           IRCnet extension (?)*/
@@ -546,7 +545,9 @@ extern const struct Numeric* get_error_numeric(int err);
 
 #define ERR_NOTWEBIRC        615
 
-#define ERR_LASTERROR        616
+#define RPL_WHOISSSL         671        /* Nefarious extension */
+
+#define ERR_LASTERROR        672
 
 /*	RPL_LOGON	     600	dalnet,unreal
 	RPL_LOGOFF           601	dalnet,unreal
