@@ -2379,7 +2379,7 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
      * run into problems (interference with +s if user is +B). -reed
      */
     if (!(FlagHas(&setflags, FLAG_BOT)) &&
-        (0 == ircd_strcmp(feature_str(FEAT_BOT_CLASS), get_client_class(acptr))))
+        (0 != ircd_strcmp(feature_str(FEAT_BOT_CLASS), get_client_class(acptr))))
       ClearBot(acptr);
 
     /*

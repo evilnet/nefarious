@@ -1,13 +1,18 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2010-02-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+2010-02-16  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for bug where everyone except allowed users
+	could set user mode +B
+
+2010-02-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/convert-conf.c: Change jupe -> global_jupe.
 
 	* tools/linesync/linesync.sh: Multiple checksum servers now work.
 
-2010-02-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+2010-02-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* doc/example.conf: Moved Jupe priv setting to global_jupe as it was
 	conflicting with Jupe blocks.
@@ -16,16 +21,16 @@
 
 	* ircd/ircd_parser.y: See above.
 
-2010-02-11 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+2010-02-11  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/ircd_relay.c: Bug fix, exempts are now checked before R/t
 	extended bans.
 
-2010-01-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+2010-01-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* ircd/channel.c: Fix for adding multiple extended bans at a time.
 
-2010-01-12 Neil Spierling <sirvulcan@sirvulcan.co.nz>
+2010-01-12  Neil Spierling  <sirvulcan@sirvulcan.co.nz>
 
 	* include/ircd.h: Declared get_pe_message.
 
