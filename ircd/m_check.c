@@ -395,6 +395,9 @@ void checkClient(struct Client *sptr, struct Client *acptr)
      send_reply(sptr, RPL_DATASTR, "         Status:: Client");
    }
 
+   ircd_snprintf(0, outbuf, sizeof(outbuf), "          Class:: %s", get_client_class(acptr));
+   send_reply(sptr, RPL_DATASTR, outbuf);
+
    privs = client_print_privs(acptr);
    if (strlen(privs) > 1)
      client_check_privs(acptr, sptr);
@@ -571,6 +574,9 @@ void checkServer(struct Client *sptr, struct Client *acptr)
      send_reply(sptr, RPL_DATASTR, "         Status:: Network Service");
    else if (IsHub(acptr))
      send_reply(sptr, RPL_DATASTR, "         Status:: Network Hub");
+
+   ircd_snprintf(0, outbuf, sizeof(outbuf), "          Class:: %s", get_client_class(acptr));
+   send_reply(sptr, RPL_DATASTR, outbuf);
 
    if (feature_bool(FEAT_CHECK_EXTENDED)) {
      int dlinkc = 0;
