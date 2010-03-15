@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-03-14  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_account.c: Fix for unknown ACCOUTN subtype S error due
+	to missing support for LOC_SENDSSLFP.
+
 2010-03-08  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_svsinfo.c: Fix for bug where SVSINFO was forwaded as

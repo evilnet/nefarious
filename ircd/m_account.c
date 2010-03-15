@@ -318,6 +318,30 @@ int ms_account(struct Client* cptr, struct Client* sptr, int parc,
                                       parv[3], parv[4], parv[5]);
           break;
 
+       case 'S':
+          if (parc < 8)
+            return need_more_params(sptr, "ACCOUNT");
+
+          /* findNUser("AB") seems to return Sirvulcan, whois numnick is ABAAB..
+           * This is a bug with findNUser no?
+           * so you cant do this, because acptr is the user not the server.
+           * Hopefully reversing them will be ok.
+           *    if (!(acptr = findNUser(parv[1])) && !(acptr = FindNServer(parv[1])))
+           */
+          if (!(acptr = FindNServer(parv[1])) && !(acptr = findNUser(parv[1])))
+            return 0; /* target not online, ignore */
+
+          if (!IsMe(acptr)) {
+            /* in-transit message, forward it */
+            sendcmdto_one(sptr, CMD_ACCOUNT, acptr,
+                          type == 'S' ? "%s %s %s %s %s %s :%s" : "%s %s %s",
+                          parv[1], parv[2], parv[3], parv[4], parv[5], parv[6], parv[parc-1]);
+            return 0;
+          } else /* auth checks are for services, not servers */
+            return protocol_violation(cptr, "ACCOUNT check (%s %s %s)",
+                                      parv[3], parv[4], parv[5]);
+          break;
+
 	case 'A':
 	case 'D':
 	  if (parc < 4)
