@@ -1,6 +1,17 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-03-07  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_join.c: Fix for AUTOCHANMODES only being applied to last
+	new channel joined.
+
+	* ircd/m_svsjoin.c: Fix for AUTOCHANMODES only being applied to
+	last new channel joined.
+
+	* ircd/channel.c: Fix for AUTOCHANMODES only being applied to
+	last new channel joined.
+
 2010-03-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* help/users/usermodes: Added user mode +q to documentation.

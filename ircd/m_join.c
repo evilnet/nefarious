@@ -184,7 +184,7 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   struct JoinBuf create;
   struct Gline *gline;
   unsigned int flags = 0;
-  int i, flex = 0, automodes = 0, redir = 0;
+  int i, flex = 0, redir = 0;
   char* bjoin[2];
   char *p = 0;
   char *chanlist;
@@ -370,13 +370,6 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       continue;
     } else {
       joinbuf_join(&create, chptr, flags);
-      if (feature_bool(FEAT_AUTOCHANMODES) &&
-	  feature_str(FEAT_AUTOCHANMODES_LIST) &&
-          !IsLocalChannel(chptr->chname) &&
-	  strlen(feature_str(FEAT_AUTOCHANMODES_LIST)) > 0) {
-	SetAutoChanModes(chptr);
-        automodes = 1;
-      }
     }
 
     del_invite(sptr, chptr);
@@ -402,10 +395,6 @@ int do_join(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 
   joinbuf_flush(&join); /* must be first, if there's a JOIN 0 */
   joinbuf_flush(&create);
-
-  if (automodes && chptr)
-    sendcmdto_serv_butone(&me, CMD_MODE, sptr,
-                          "%H +%s", chptr, feature_str(FEAT_AUTOCHANMODES_LIST));
 
   RET(0);
 }
