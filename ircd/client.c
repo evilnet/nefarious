@@ -192,6 +192,12 @@ client_set_privs(struct Client *client, struct ConfItem *oper)
     FlagClr(&privs_global, PRIV_SET);
     FlagClr(&privs_global, PRIV_BADCHAN);
     FlagClr(&privs_global, PRIV_LOCAL_BADCHAN);
+    FlagClr(&privs_global, PRIV_WHOIS_NOTICE);
+    FlagClr(&privs_global, PRIV_HIDE_IDLE);
+    FlagClr(&privs_global, PRIV_XTRAOP);
+    FlagClr(&privs_global, PRIV_HIDE_CHANNELS);
+    FlagClr(&privs_global, PRIV_REMOVE);
+    FlagClr(&privs_global, PRIV_DISPLAY_MODE);
 
     FlagSet(&privs_local, PRIV_CHAN_LIMIT);
     FlagSet(&privs_local, PRIV_MODE_LCHAN);
