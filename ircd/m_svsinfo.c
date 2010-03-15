@@ -61,7 +61,7 @@ int ms_svsinfo(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
   ircd_strncpy(acptr->cli_info, parv[2], REALLEN);
 
 
-  sendcmdto_serv_butone(sptr, CMD_SVSIDENT, cptr, "%s%s :%s", acptr->cli_user->server->cli_yxx,
+  sendcmdto_serv_butone(sptr, CMD_SVSINFO, cptr, "%s%s :%s", acptr->cli_user->server->cli_yxx,
         acptr->cli_yxx, acptr->cli_info);
 
   return 0;
