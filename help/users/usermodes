@@ -2,6 +2,7 @@ B	Bot (Only a status line in /WHOIS output)
 d	Deaf (cannot see messages in channels)
 i	Invisible (Not shown in /WHO unless on the same channel)
 L	Receive an error instead of being redirected by channel mode +L
+q	PRIVMSG/NOTICE/INVITE same channel only
 R	Only registered users can PM you
 s	Server notices (see Server Notice Masks for more information on server notices)
 x	Hide you IP/Host

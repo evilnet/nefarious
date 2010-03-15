@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-03-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* help/users/usermodes: Added user mode +q to documentation.
+
+	* help/opers/usermodes: Added user mode +q to documentation.
+
 2010-02-16  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_err.c: Changed RPL_WHOISSSL from 337 to 671 to match
