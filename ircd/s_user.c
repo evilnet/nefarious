@@ -799,7 +799,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
   if (IsInvisible(sptr))
     ++UserStats.inv_clients;
-  if (IsOper(sptr))
+  if (IsOper(sptr) && !IsHideOper(sptr))
     ++UserStats.opers;
   if (IsAccount(sptr))
     ++UserStats.authed;
@@ -2300,14 +2300,8 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	break;
       case 'H':
         if (what == MODE_ADD) {
-          if (!IsHideOper(acptr)) {
-            --UserStats.opers;
-          }
           SetHideOper(acptr);
         } else {
-          if (IsHideOper(acptr)) {
-            ++UserStats.opers;
-          }
           ClearHideOper(acptr);
         }
         break;
@@ -2407,8 +2401,6 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
       ClearWhois(acptr);
 
     if (!FlagHas(&setflags, FLAG_DISPLAY_MODE) && !(HasPriv(acptr, PRIV_DISPLAY_MODE) && IsOper(acptr))) {
-      if (IsHideOper(acptr))
-        ++UserStats.opers; /* count is added when mode is set, decrement if they cant set +H */
       ClearHideOper(acptr);
     }
   }
@@ -2436,13 +2428,19 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
   if (HasPriv(acptr, PRIV_PROPAGATE)) /* remember propagate privilege setting */
     prop = 1;
   if (FlagHas(&setflags, FLAG_OPER) && !IsOper(acptr)) { /* user no longer oper */
-    if (!IsHideOper(acptr))
+    if (!FlagHas(&setflags, FLAG_DISPLAY_MODE))
       --UserStats.opers;
     ClearHideOper(acptr);
     client_set_privs(acptr, NULL); /* will clear propagate privilege */
     clear_privs(acptr);
     sendcmdto_serv_butone(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", acptr);
   }
+  if (!FlagHas(&setflags, FLAG_DISPLAY_MODE) && IsHideOper(acptr))
+    if (FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
+      --UserStats.opers;
+  if (FlagHas(&setflags, FLAG_DISPLAY_MODE) && !IsHideOper(acptr))
+    if (FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))
+      ++UserStats.opers;
   if (FlagHas(&setflags, FLAG_INVISIBLE) && !IsInvisible(acptr))
     --UserStats.inv_clients;
   if (!FlagHas(&setflags, FLAG_INVISIBLE) && IsInvisible(acptr))

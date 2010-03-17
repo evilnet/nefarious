@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-03-17  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for bug where oper count didnt go up and down
+	as expected during splits and merges.
+
 2010-03-15  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/client.c: Removed WHOIS_NOTICE HIDE_IDLE XTRAOP
