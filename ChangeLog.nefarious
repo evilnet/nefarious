@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-03-18  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/version.c.SH: Updated to get cvs version details from hg.
+
 2010-03-17  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fix for bug where oper count didnt go up and down
