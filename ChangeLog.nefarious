@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-03-29  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/example.conf: Added comment regarding the user of @ in
+	Client block host masks or the inclusion of the username param
+	in Client blocks.
+
 2010-03-18  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/version.c.SH: Updated to get cvs version details from hg.
