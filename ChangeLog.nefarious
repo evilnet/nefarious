@@ -1,7 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
-2010-03-29  Matthew Beeching  <jobe@mdbnet.co.uk>
+2010-05-04  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/client.c: Few tweaks to privs including fixing bug where
+	operator flags X W I and n didnt give the privs they were are
+	supposed to.
+
+2010-04-29  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* doc/example.conf: Added comment regarding the user of @ in
 	Client block host masks or the inclusion of the username param
