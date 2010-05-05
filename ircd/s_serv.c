@@ -295,8 +295,6 @@ int server_estab(struct Client *cptr, struct ConfItem *aconf)
       privs = client_print_privs(acptr);
       if (strlen(privs) > 1)
         sendcmdto_one(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C %s", acptr, privs);
-      else
-        sendcmdto_one(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", acptr);
     }
   }
 

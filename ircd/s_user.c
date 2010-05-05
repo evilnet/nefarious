@@ -1043,7 +1043,6 @@ int register_user(struct Client *cptr, struct Client *sptr,
       FlagClr(&flags, FLAG_ACCOUNT);
 
     client_set_privs(sptr, NULL);
-    sendcmdto_serv_butone(cli_user(sptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", sptr);
 
     /* Send server notice mask to client */
     if (MyUser(sptr) && (cli_snomask(sptr) != SNO_DEFAULT) && HasFlag(sptr, FLAG_SERVNOTICE))
@@ -2433,7 +2432,6 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
     ClearHideOper(acptr);
     client_set_privs(acptr, NULL); /* will clear propagate privilege */
     clear_privs(acptr);
-    sendcmdto_serv_butone(cli_user(acptr)->server, CMD_PRIVS, cptr, "%C PRIV_NONE", acptr);
   }
   if (!FlagHas(&setflags, FLAG_DISPLAY_MODE) && IsHideOper(acptr))
     if (FlagHas(&setflags, FLAG_OPER) && IsOper(acptr))

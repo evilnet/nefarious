@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-05-05  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_serv.c: Removed sending PRIV_NONE as it caused problems
+	with X3's auto_oper and doesnt appear to be needed.
+
+	* ircd/s_user.c: Removed sending PRIV_NONE as it caused problems
+	with X3's auto_oper and doesnt appear to be needed.
+
 2010-05-04  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/client.c: Few tweaks to privs including fixing bug where
