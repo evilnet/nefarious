@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-05-20  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Changed User connection server notice to display
+	real host instead of LOC host.
+
 2010-05-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_serv.c: Removed sending PRIV_NONE as it caused problems
