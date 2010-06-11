@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-06-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_check.c: Fix to stop class from showing in check when
+	a server is responding for a user on another server.
+
 2010-05-20  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Changed User connection server notice to display
