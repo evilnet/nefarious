@@ -741,22 +741,22 @@ int is_excepted(struct Client *cptr, struct Channel *chptr,
 
     if (tmpe->value.except.extflag & EXTEXCEPT_CHAN) {
       struct Membership *lp;
-      struct Channel *chptr;
+      struct Channel *chptr2;
       int cmatch = 0;
 
       for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
-        chptr = lp->channel;
+        chptr2 = lp->channel;
         cmatch = 0;
 
-        Debug((DEBUG_DEBUG, "ch: %s", chptr->chname));
+        Debug((DEBUG_DEBUG, "ch: %s", chptr2->chname));
 
         if (*tmpe->value.except.extstr == '#') {
-          if (!mmatch(tmpe->value.except.extstr, chptr->chname)) {
+          if (!mmatch(tmpe->value.except.extstr, chptr2->chname)) {
             cmatch = 1;
             break;
           }
         } else {
-          if (!mmatch(tmpe->value.except.extstr+1, chptr->chname)) {
+          if (!mmatch(tmpe->value.except.extstr+1, chptr2->chname)) {
             if ((*tmpe->value.except.extstr == '@') && IsChanOp(lp)) {
               cmatch = 1;
               break;
@@ -1337,22 +1337,22 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
     if (tmp->value.ban.extflag & EXTBAN_CHAN) {
       struct Membership *lp;
-      struct Channel *chptr;
+      struct Channel *chptr2;
       int cmatch = 0;
 
 
       if (!(tmp->value.ban.extflag & EXTBAN_REVERSE)) {
         for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
-          chptr = lp->channel;
+          chptr2 = lp->channel;
           cmatch = 0;
 
           if (*tmp->value.ban.extstr == '#') {
-            if (!mmatch(tmp->value.ban.extstr, chptr->chname)) {
+            if (!mmatch(tmp->value.ban.extstr, chptr2->chname)) {
               cmatch = 1;
               break;
             }
           } else {
-            if (!mmatch(tmp->value.ban.extstr+1, chptr->chname)) {
+            if (!mmatch(tmp->value.ban.extstr+1, chptr2->chname)) {
               if ((*tmp->value.ban.extstr == '@') && IsChanOp(lp)) {
                 cmatch = 1;
                 break;
@@ -1372,16 +1372,16 @@ static int is_banned(struct Client *cptr, struct Channel *chptr,
 
       if ((cmatch == 0) && (tmp->value.ban.extflag & EXTBAN_REVERSE)) {
         for (lp = cptr->cli_user->channel; lp; lp = lp->next_channel) {
-          chptr = lp->channel;
+          chptr2 = lp->channel;
           cmatch = 0;
 
           if (*tmp->value.ban.extstr == '#') {
-            if (!mmatch(tmp->value.ban.extstr, chptr->chname)) {
+            if (!mmatch(tmp->value.ban.extstr, chptr2->chname)) {
               cmatch = 1;
               break;
             }
           } else {
-            if (!mmatch(tmp->value.ban.extstr+1, chptr->chname)) {
+            if (!mmatch(tmp->value.ban.extstr+1, chptr2->chname)) {
               if ((*tmp->value.ban.extstr == '@') && IsChanOp(lp)) {
                 cmatch = 1;
                 break;

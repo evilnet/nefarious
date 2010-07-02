@@ -517,7 +517,7 @@ spamfilter_remove(struct Client* sptr, char *mask, char *reason)
  */
 int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv[])
 {
-  int add = 0, remove = 0, exp = 0, gotreact = 0, gotmulti = 0;
+  int add = 0, rem = 0, exp = 0, gotreact = 0, gotmulti = 0;
   char *wflags, *rflags, *reason, *regex, *ar, *tmprflags;
   char *multi_react = "aCSinmov", *tmpmulti = NULL;
   struct SpamFilter* spamfilter = NULL;
@@ -532,15 +532,15 @@ int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv
   if (*ar == '+')
     add = 1;
   else if (*ar == '-')
-    remove = 1;
+    rem = 1;
 
   if ((parc < 6) && (add))
     return need_more_params(sptr, "SPAMFILTER");
 
-  if ((parc < 4) && (remove))
+  if ((parc < 4) && (rem))
     return need_more_params(sptr, "SPAMFILTER");
 
-  if (!add && !remove)
+  if (!add && !rem)
     return need_more_params(sptr, "SPAMFILTER");
 
   wflags = parv[2];
@@ -589,7 +589,7 @@ int mo_spamfilter(struct Client* cptr, struct Client* sptr, int parc, char* parv
     reason = parv[5];
 
     spamfilter = spamfilter_add(sptr, regex, rflags, wflags, reason, expire);
-  } else if (remove)
+  } else if (rem)
     spamfilter = spamfilter_deactivate(sptr, regex, rflags, wflags);
 
   if (spamfilter)

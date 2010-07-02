@@ -1728,7 +1728,7 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
   struct SpamFilter *sspamfilter;
   long ms_past;
   int rf_flag = 0, wf_flag = 0, regmatch = 0;
-  int ret = 0, brk = 0, ovector[186];
+  int ret = 0, fbrk = 0, ovector[186];
   char temp1[BUFSIZE], temp2[BUFSIZE], temphost[HOSTLEN +3], reason[BUFSIZE];
   char* gline[6];
   char* zline[6];
@@ -1765,13 +1765,13 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           for (member=chptr->members;member;member=nmember) {
             nmember=member->next_member;
             if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
-              brk = 1;
+              fbrk = 1;
           }
         }
-        if (brk == 1)
+        if (fbrk == 1)
           break;
       }
-      brk = 0;
+      fbrk = 0;
 
       if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_VOICE)) {
         chptr = FindChannel(target);
@@ -1780,13 +1780,13 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           for (member=chptr->members;member;member=nmember) {
             nmember=member->next_member;
             if ((member->user == sptr) && (IsVoicedOrOpped(member)))
-              brk = 1;
+              fbrk = 1;
           }
         }
-        if (brk == 1)
+        if (fbrk == 1)
           break;
       }
-      brk = 0;
+      fbrk = 0;
     }
 
     if (wf_flag & flags) {
@@ -1954,13 +1954,13 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           for (member=chptr->members;member;member=nmember) {
             nmember=member->next_member;
             if ((member->user == sptr) && (IsChanOp(member) || IsHalfOp(member)))
-              brk = 1;
+              fbrk = 1;
           }
         }
-        if (brk == 1)
+        if (fbrk == 1)
           break;
       }
-      brk = 0;
+      fbrk = 0;
 
       if (IsChannelPrefix(*target) && (rf_flag & RFFLAG_VOICE)) {
         chptr = FindChannel(target);
@@ -1969,13 +1969,13 @@ int find_fline(struct Client *cptr, struct Client *sptr, char *string, unsigned 
           for (member=chptr->members;member;member=nmember) {
             nmember=member->next_member;
             if ((member->user == sptr) && (IsVoicedOrOpped(member)))
-              brk = 1;
+              fbrk = 1;
           }
         }
-        if (brk == 1)
+        if (fbrk == 1)
           break;
       }
-      brk = 0;
+      fbrk = 0;
     }
 
     if (wf_flag & flags) {

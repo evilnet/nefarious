@@ -1278,7 +1278,6 @@ int parse_server(struct Client *cptr, char *buffer, char *bufend)
   else
   {
     char numeric_prefix[6];
-    int  i;
     for (i = 0; i < 5; ++i)
     {
       if ('\0' == ch[i] || ' ' == (numeric_prefix[i] = ch[i]))

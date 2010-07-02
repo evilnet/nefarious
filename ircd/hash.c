@@ -66,27 +66,27 @@ static uint32_t crc32hash[256];
 /** Initialize the map used by the hash function. */
 void init_hash(void)
 {
-  unsigned int ii, jj, rand, poly;
+  unsigned int ii, jj, rnd, poly;
 
   /* First calculate a normal CRC-32 table. */
   for (ii = 0, poly = 0xedb88320; ii < 256; ii++)
   {
-    rand = ii;
+    rnd = ii;
     for (jj = 0; jj < 8; jj++)
-      rand = (rand & 1) ? poly ^ (rand >> 1) : rand >> 1;
-    crc32hash[ii] = rand;
+      rnd = (rnd & 1) ? poly ^ (rnd >> 1) : rnd >> 1;
+    crc32hash[ii] = rnd;
   }
 
   /* Now reorder the hash table. */
-  for (ii = 0, rand = 0; ii < 256; ii++)
+  for (ii = 0, rnd = 0; ii < 256; ii++)
   {
-    if (!rand)
-      rand = ircrandom();
-    poly = ii + rand % (256 - ii);
+    if (!rnd)
+      rnd = ircrandom();
+    poly = ii + rnd % (256 - ii);
     jj = crc32hash[ii];
     crc32hash[ii] = crc32hash[poly];
     crc32hash[poly] = jj;
-    rand >>= 8;
+    rnd >>= 8;
   }
 }
 

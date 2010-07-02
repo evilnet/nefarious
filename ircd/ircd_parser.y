@@ -553,14 +553,14 @@ clientblock: CLIENT
     aconf = make_conf(CONF_CLIENT);
 
     if (ip) {
-      int  c_class;
+      int  cls;
       char ipname[16];
       int  ad[4] = { 0 };
       int  bits2 = 0;
 
-      c_class = sscanf(ip, "%d.%d.%d.%d/%d", &ad[0], &ad[1], &ad[2], &ad[3], &bits2);
-      if (c_class != 5) {
-        bits = c_class * 8;
+      cls = sscanf(ip, "%d.%d.%d.%d/%d", &ad[0], &ad[1], &ad[2], &ad[3], &bits2);
+      if (cls != 5) {
+        bits = cls * 8;
       }
       else {
         bits = bits2;
@@ -669,7 +669,6 @@ classblock: CLASS {
 {
   if (name != NULL)
   {
-    struct ConnectionClass *c_class;
     add_class(name, tping, tconn, maxlinks, sendq);
     c_class = find_class(name);
     c_class->default_umode = pass;
@@ -981,7 +980,7 @@ killuhost: HOST '=' QSTRING ';'
   }
 
   if (check_if_ipmask(dconf->hostmask)) {
-    int  c_class;
+    int  cls;
     char ipname[16];
     int  ad[4] = { 0 };
     int  bits2 = 0;
@@ -991,10 +990,10 @@ killuhost: HOST '=' QSTRING ';'
      sendto_opmask_butone(0, SNO_OLDSNO, 
         "Mangled IP in IP Kill block: k:%s:%s", dconf->hostmask, dconf->usermask);
     } else {
-      c_class = sscanf(dconf->hostmask, "%d.%d.%d.%d/%d",
+      cls = sscanf(dconf->hostmask, "%d.%d.%d.%d/%d",
                        &ad[0], &ad[1], &ad[2], &ad[3], &bits2);
-      if (c_class != 5) {
-        dconf->bits = c_class * 8;
+      if (cls != 5) {
+        dconf->bits = cls * 8;
       }
       else {
         dconf->bits = bits2;
@@ -1235,14 +1234,14 @@ generaldesc: DESCRIPTION '=' QSTRING ';'
 
 generalvhost: VHOST '=' QSTRING ';'
 {
-  char *vhost = $3;
+  char *vhostc = $3;
 
-  if (string_is_address(vhost)) {
-    if (INADDR_NONE == (localConf.vhost_address.s_addr = inet_addr(vhost)))
+  if (string_is_address(vhostc)) {
+    if (INADDR_NONE == (localConf.vhost_address.s_addr = inet_addr(vhostc)))
       localConf.vhost_address.s_addr = INADDR_ANY;
   }
 
-  MyFree(vhost);
+  MyFree(vhostc);
 };
 
 

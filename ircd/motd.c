@@ -130,7 +130,7 @@ motd_create(const char *hostmask, const char *path, int maxcount)
  * @return Matching MotdCache entry.
  */
 static struct MotdCache *
-motd_cache(struct Motd *motd)
+motd_cache(struct Motd *motdin)
 {
   FBFILE*		file;
   struct MotdCache*	cache;
@@ -139,25 +139,25 @@ motd_cache(struct Motd *motd)
   char*			tmp;
   int			i;
 
-  assert(0 != motd);
-  assert(0 != motd->path);
+  assert(0 != motdin);
+  assert(0 != motdin->path);
 
-  if (motd->cache)
-    return motd->cache;
+  if (motdin->cache)
+    return motdin->cache;
 
   /* try to find it in the list of cached files... */
   for (cache = MotdList.cachelist; cache; cache = cache->next) {
-    if (!strcmp(cache->path, motd->path) &&
-	cache->maxcount == motd->maxcount) { /* found one... */
+    if (!strcmp(cache->path, motdin->path) &&
+	cache->maxcount == motdin->maxcount) { /* found one... */
       cache->ref++; /* increase reference count... */
-      motd->cache = cache; /* remember cache... */
-      return motd->cache; /* return it */
+      motdin->cache = cache; /* remember cache... */
+      return motdin->cache; /* return it */
     }
   }
 
   /* gotta read in the file, now */
-  if (!(file = fbopen(motd->path, "r"))) {
-    Debug((DEBUG_ERROR, "Couldn't open \"%s\": %s", motd->path,
+  if (!(file = fbopen(motdin->path, "r"))) {
+    Debug((DEBUG_ERROR, "Couldn't open \"%s\": %s", motdin->path,
 	   strerror(errno)));
     return 0;
   }
@@ -173,8 +173,8 @@ motd_cache(struct Motd *motd)
 				       (MOTD_LINESIZE * (MOTD_MAXLINES - 1)));
 
   cache->ref = 1;
-  DupString(cache->path, motd->path);
-  cache->maxcount = motd->maxcount;
+  DupString(cache->path, motdin->path);
+  cache->maxcount = motdin->maxcount;
 
   cache->modtime = *localtime((time_t *) &sb.st_mtime); /* store modtime */
 
@@ -193,20 +193,20 @@ motd_cache(struct Motd *motd)
   fbclose(file); /* close the file */
 
   /* trim memory usage a little */
-  motd->cache = (struct MotdCache*)MyMalloc(sizeof(struct MotdCache) +
+  motdin->cache = (struct MotdCache*)MyMalloc(sizeof(struct MotdCache) +
                                             (MOTD_LINESIZE * (cache->count - 1)));
-  memcpy(motd->cache, cache, sizeof(struct MotdCache) +
+  memcpy(motdin->cache, cache, sizeof(struct MotdCache) +
          (MOTD_LINESIZE * (cache->count - 1)));
   MyFree(cache);
 
   /* now link it in... */
-  motd->cache->next = MotdList.cachelist;
-  motd->cache->prev_p = &MotdList.cachelist;
+  motdin->cache->next = MotdList.cachelist;
+  motdin->cache->prev_p = &MotdList.cachelist;
   if (MotdList.cachelist)
-    MotdList.cachelist->prev_p = &motd->cache->next;
-  MotdList.cachelist = motd->cache;
+    MotdList.cachelist->prev_p = &motdin->cache->next;
+  MotdList.cachelist = motdin->cache;
 
-  return motd->cache;
+  return motdin->cache;
 }
 
 /** Clear and dereference the Motd::cache element of \a motd.
@@ -214,16 +214,16 @@ motd_cache(struct Motd *motd)
  * @param[in] motd MOTD to uncache.
  */
 static void
-motd_decache(struct Motd *motd)
+motd_decache(struct Motd *motdin)
 {
   struct MotdCache* cache;
 
-  assert(0 != motd);
+  assert(0 != motdin);
 
-  if (!(cache = motd->cache)) /* we can be called for records with no cache */
+  if (!(cache = motdin->cache)) /* we can be called for records with no cache */
     return;
 
-  motd->cache = 0; /* zero the cache */
+  motdin->cache = 0; /* zero the cache */
 
   if (!--cache->ref) { /* reduce reference count... */
     if (cache->next) /* ref is 0, delink from list and free */
@@ -241,17 +241,17 @@ motd_decache(struct Motd *motd)
  * @param[in] motd MOTD to destroy.
  */
 static void
-motd_destroy(struct Motd *motd)
+motd_destroy(struct Motd *motdin)
 {
-  assert(0 != motd);
+  assert(0 != motdin);
 
-  MyFree(motd->path); /* we always must have a path */
-  MyFree(motd->hostmask);
-  if (motd->cache) /* drop the cache */
-    motd_decache(motd);
+  MyFree(motdin->path); /* we always must have a path */
+  MyFree(motdin->hostmask);
+  if (motdin->cache) /* drop the cache */
+    motd_decache(motdin);
 
-  motd->next = MotdList.freelist;
-  MotdList.freelist = motd;
+  motdin->next = MotdList.freelist;
+  MotdList.freelist = motdin;
 }
 
 /** Find the first matching MOTD block for a user.

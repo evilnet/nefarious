@@ -3,6 +3,26 @@
 
 2010-07-02  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/channel.c: Fix for -Wshadow warnings.
+
+	* ircd/hash.c: Fix for -Wshadow warnings.
+
+	* ircd/ircd_events.c: Fix for -Wshadow warnings.
+
+	* ircd/ircd_parser.y: Fix for -Wshadow warnings.
+
+	* ircd/m_spamfilter.c: Fix for -Wshadow warnings.
+
+	* ircd/motd.c: Fix for -Wshadow warnings.
+
+	* ircd/numnicks.c: Fix for -Wshadow warnings.
+
+	* ircd/parse.c: Fix for -Wshadow warnings.
+
+	* ircd/s_conf.c: Fix for -Wshadow warnings.
+
+2010-07-02  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/opercmds.c: Fixed some -Wformat=2 warnings.
 
 	* ircd/os_bsd.c: Fixed some -Wformat=2 warnings.

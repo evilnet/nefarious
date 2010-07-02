@@ -579,23 +579,23 @@ timer_run(void)
  * @param[in] sig Signal number to hook.
  */
 void
-signal_add(struct Signal* signal, EventCallBack call, void* data, int sig)
+signal_add(struct Signal* sigin, EventCallBack call, void* data, int sig)
 {
   struct sigaction act;
 
-  assert(0 != signal);
+  assert(0 != sigin);
   assert(0 != call);
   assert(0 != evInfo.engine);
 
   /* set up struct */
-  gen_init(&signal->sig_header, call, data,
+  gen_init(&sigin->sig_header, call, data,
 	   evInfo.gens.g_signal,
 	   &evInfo.gens.g_signal);
 
-  signal->sig_signal = sig;
+  sigin->sig_signal = sig;
 
   if (evInfo.engine->eng_signal)
-    (*evInfo.engine->eng_signal)(signal); /* tell engine */
+    (*evInfo.engine->eng_signal)(sigin); /* tell engine */
   else {
     act.sa_handler = signal_handler; /* set up signal handler */
     act.sa_flags = 0;
