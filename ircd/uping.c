@@ -306,7 +306,7 @@ void uping_send(struct UPing* pptr)
   memset(buf, 0, sizeof(buf));
 
   gettimeofday(&tv, NULL);
-  sprintf(buf, " %10lu%c%6lu", tv.tv_sec, '\0', tv.tv_usec);
+  sprintf(buf, " %10lu%c%6lu", (long unsigned int)tv.tv_sec, '\0', tv.tv_usec);
 
   Debug((DEBUG_SEND, "send_ping: sending [%s %s] to %s.%d on %d",
 	  buf, &buf[12],

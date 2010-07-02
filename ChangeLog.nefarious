@@ -3,6 +3,14 @@
 
 2010-07-02  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/opercmds.c: Fixed some -Wformat=2 warnings.
+
+	* ircd/os_bsd.c: Fixed some -Wformat=2 warnings.
+
+	* ircd/uping.c: Fixed some -Wformat=2 warnings.
+
+2010-07-02  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/m_help.c: Fixed compiler warnings.
 
 	* ircd/s_misc.c: Fixed compiler warnings.

@@ -93,9 +93,9 @@ int os_get_rusage(struct Client *cptr, int uptime, EnumFn enumerator)
     secs = 1;
 
   sprintf(buf, "CPU Secs %ld:%ld User %ld:%ld System %ld:%ld",
-          secs / 60, secs % 60,
-          rus.ru_utime.tv_sec / 60, rus.ru_utime.tv_sec % 60,
-          rus.ru_stime.tv_sec / 60, rus.ru_stime.tv_sec % 60);
+          (long int)(secs / 60), (long int)(secs % 60),
+          (long int)(rus.ru_utime.tv_sec / 60), (long int)(rus.ru_utime.tv_sec % 60),
+          (long int)(rus.ru_stime.tv_sec / 60), (long int)(rus.ru_stime.tv_sec % 60));
   (*enumerator)(cptr, buf);
 
   sprintf(buf, "RSS %ld ShMem %ld Data %ld Stack %ld",
