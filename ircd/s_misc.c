@@ -676,7 +676,7 @@ char *checkregex(char *s, int check_broadness)
   static char errorbuf[512];
 
   for (tmp = s; *tmp; tmp++) {
-    if (!IsAlnum(*tmp) && !(*tmp >= 128)) {
+    if (!IsAlnum(*tmp) && !(*tmp < 0)) {
       if ((s == tmp) && (*tmp == '*'))
         continue;
       if ((*(tmp + 1) == '\0') && (*tmp == '*'))

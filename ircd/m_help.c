@@ -192,6 +192,7 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
   char line[HELPLEN];
   char started = 0;
   char format_reply[HELPLEN];
+  char *network, *ip;
   int type;
 
   if ((file = fbopen(path, "r")) == NULL)
@@ -213,6 +214,8 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
     started = 1;
   }
 
+  network = strdup(feature_str(FEAT_NETWORK));
+  ip = strdup(ircd_ntoa((const char*) &(cli_ip(sptr))));
   while (fbgets(line, sizeof(line), file))
   {
     line[strlen(line) - 1] = '\0';
@@ -228,15 +231,17 @@ sendhelpfile(struct Client *sptr, const char *path, const char *topic)
         type = RPL_HELPTXT;
 
       if (strlen(line) > 1) {
-        ircd_snprintf(0, format_reply, sizeof(format_reply), "%s", format_help_message((char*)feature_str(FEAT_NETWORK), cli_name(sptr),
-                         sptr->cli_user->username, cli_user(sptr)->host, (char*)ircd_ntoa((const char*) &(cli_ip(sptr))),
-                         cli_name(sptr->cli_user->server), line));
+        ircd_snprintf(0, format_reply, sizeof(format_reply), "%s", format_help_message((char*)network, cli_name(sptr),
+                         sptr->cli_user->username, cli_user(sptr)->host, (char*)ip, cli_name(sptr->cli_user->server),
+                         line));
         format_reply[strlen(format_reply) + 1] = '\0';
         send_reply(sptr, RPL_HELPTXT, topic, format_reply);
       } else
         send_reply(sptr, RPL_HELPTXT, topic, line);
     }
   }
+  free(network);
+  free(ip);
 
   fbclose(file);
   send_reply(sptr, RPL_HELPTXT, topic, "");
