@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-07-07  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* help/opers/usermodes: Added missing +D user mode documentation.
+
+	* help/users/usermodes: Added missing +D user mode documentation.
+
 2010-07-02  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/channel.c: Fix for -Wshadow warnings.

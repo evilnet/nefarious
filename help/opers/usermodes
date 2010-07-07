@@ -1,5 +1,6 @@
 B	Bot (Only a status line in /WHOIS output)
 d	Deaf (cannot see messages in channels)
+D	Private Deaf (cannot see private messages)
 i	Invisible (Not shown in /WHO unless on the same channel)
 L	Receive an error instead of being redirected by channel mode +L
 q	PRIVMSG/NOTICE/INVITE same channel only
