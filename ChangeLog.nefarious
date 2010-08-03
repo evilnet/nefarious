@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-08-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for crash when ulined server sets user mode
+	-x on a remote user.
+
 2010-07-07  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* help/opers/usermodes: Added missing +D user mode documentation.

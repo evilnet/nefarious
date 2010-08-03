@@ -2223,16 +2223,16 @@ int set_user_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv
 	    do_host_hiding = 1;
 	} else {
 	  if (feature_int(FEAT_HOST_HIDING_STYLE) == 2) {
-            unhide_hostmask(sptr);
-	    ClearHiddenHost(sptr);
+            unhide_hostmask(acptr);
+	    ClearHiddenHost(acptr);
 	  } else if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
             if (feature_bool(FEAT_ALLOWRMX)) {
-              if (!IsAccount(sptr)) {
-                ClearHiddenHost(sptr);
+              if (!IsAccount(acptr)) {
+                ClearHiddenHost(acptr);
               } else {
                 if (FlagHas(&setflags, FLAG_HIDDENHOST)) {
-                  unhide_hostmask(sptr);
-                  ClearHiddenHost(sptr);
+                  unhide_hostmask(acptr);
+                  ClearHiddenHost(acptr);
                 }
               }
             }
