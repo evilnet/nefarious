@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-08-10  Matthew Beeching  <jobe@mbdnet.co.uk>
+
+	* ircd/m_check.c: Added SWHOIS to CHECK output.
+
 2010-08-03  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fix for crash when ulined server sets user mode
