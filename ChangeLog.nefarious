@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-08-12  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/example.conf: Fix for a typo in example.conf.
+
 2010-08-10  Matthew Beeching  <jobe@mbdnet.co.uk>
 
 	* ircd/m_check.c: Added SWHOIS to CHECK output.
