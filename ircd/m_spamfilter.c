@@ -338,7 +338,7 @@ spamfilter_server_add(struct Client* sptr, char *regex, char *rflags, char *wfla
   const char *error;
   int erroffset;
   int a = 0, d = 0;
-  char *msg;
+  char *msg = NULL;
 
   if ((spamfilter = spamfilter_find(regex, rflags, wflags))) {
     if (!SpamFilterIsActive(spamfilter) && add) {
@@ -370,6 +370,9 @@ spamfilter_server_add(struct Client* sptr, char *regex, char *rflags, char *wfla
       else
         msg = "updating";
     }
+
+    if (msg == NULL)
+      msg = "updating";
   } else {
     spamfilter = (struct SpamFilter *)MyMalloc(sizeof(struct SpamFilter)); /* alloc memory */
     assert(0 != spamfilter);

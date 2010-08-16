@@ -1,6 +1,14 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-08-16  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_mode.c: Fix for crash bug when an oper with user mode +k
+	issues a MODE command for a channel he/she is not on.
+
+	* ircd/m_spamfilter.c: Fix for possible crash bug during
+	spamfilter propagation at burst.
+
 2010-08-12  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* doc/example.conf: Fix for a typo in example.conf.

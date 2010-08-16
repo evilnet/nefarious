@@ -138,7 +138,7 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   }
 
   if ((!member && !IsChannelService(sptr)) ||
-      (!IsChanOp(member) && !IsHalfOp(member))) {
+      (member && !IsChanOp(member) && !IsHalfOp(member))) {
     if (IsLocalChannel(chptr->chname) && HasPriv(sptr, PRIV_MODE_LCHAN)) {
       modebuf_init(&mbuf, sptr, cptr, chptr,
 		   (MODEBUF_DEST_CHANNEL | /* Send mode to channel */
@@ -157,9 +157,9 @@ m_mode(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
 	       (MODEBUF_DEST_CHANNEL | /* Send mode to channel */
 		MODEBUF_DEST_SERVER)); /* Send mode to servers */
 
-  if (IsChanOp(member))
+  if (member && IsChanOp(member))
     hoflags = MODE_PARSE_SET; /* set unconditionally */
-  else if (IsHalfOp(member))
+  else if (member && IsHalfOp(member))
     hoflags = MODE_PARSE_ISHALFOP|MODE_PARSE_SET|MODE_PARSE_NOTOPER; /* allowed to +v */
   else
     hoflags = MODE_PARSE_NOTOPER;
