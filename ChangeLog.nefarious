@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-08-17  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/channel.c: Fixed channel mode +Z to stop ALL users from
+	joining if they dont have user mode +z even if they have been
+	invited.
+
 2010-08-16  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/m_mode.c: Fix for crash bug when an oper with user mode +k

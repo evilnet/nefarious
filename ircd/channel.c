@@ -2142,6 +2142,17 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   int overrideJoin = 0;  
   int keyv = 0;
   int exception_join = 0;
+
+  /*
+   * ASUKA_X:
+   * Allow XtraOpers to join all channels.
+   * --Bigfoot
+   */
+  if (IsXtraOp(sptr))
+    return 0;
+
+  if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
+        return overrideJoin + ERR_SSLONLYCHAN;
   
   /*
    * Now a banned user CAN join if invited -- Nemesi
@@ -2159,14 +2170,6 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
       !BadPtr(key) && compall("OVERRIDE",key) == 0
       && compall("OVERRIDE",chptr->mode.key) != 0)
     overrideJoin = MAGIC_OPER_OVERRIDE;
-
-  /*
-   * ASUKA_X:
-   * Allow XtraOpers to join all channels.
-   * --Bigfoot
-   */
-  if (IsXtraOp(sptr))
-    return 0;
 
   /*
    * See if CHMODE_e_CHMODEEXCEPTION is enabled,
@@ -2207,9 +2210,6 @@ int can_join(struct Client *sptr, struct Channel *chptr, char *key)
   if ((chptr->mode.mode & MODE_ADMINONLY) && !IsAdmin(sptr) && ((keyv == 0) ||
      (!feature_bool(FEAT_FLEXABLEKEYS))))
         return overrideJoin + ERR_ADMINONLYCHAN;
-
-  if ((chptr->mode.mode & MODE_SSLONLY) && !IsSSL(sptr))
-	return overrideJoin + ERR_SSLONLYCHAN;
 
   if (is_banned(sptr, chptr, NULL, 0) && !is_excepted(sptr, chptr, NULL, 0))
   	return overrideJoin + ERR_BANNEDFROMCHAN;
