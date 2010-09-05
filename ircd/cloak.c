@@ -55,7 +55,7 @@
  */
 static inline unsigned int downsample(unsigned char *i)
 {
-char r[4];
+unsigned char r[4];
 
 	r[0] = i[0] ^ i[1] ^ i[2] ^ i[3];
 	r[1] = i[4] ^ i[5] ^ i[6] ^ i[7];
@@ -129,14 +129,13 @@ unsigned int alpha, beta, gamma;
 char *hidehost_normalhost(char *host)
 {
 char *p;
-static char buf[512], result[HOSTLEN+1];
-unsigned char res[512], res2[512];
+static char buf[512], res[512], res2[512], result[HOSTLEN+1];
 unsigned int alpha, n;
 
-	ircd_snprintf(0, buf, HOSTLEN, "%s:%s:%s", KEY1, host, KEY2);
-	DoMD5(res, (unsigned char*) buf, strlen(buf));
-        strcpy((char *) res+16, KEY3);
-	n = strlen((char *)res+16) + 16;
+	ircd_snprintf(0, buf, 512, "%s:%s:%s", KEY1, host, KEY2);
+	DoMD5(res, buf, strlen(buf));
+        strcpy(res+16, KEY3);
+	n = strlen(res+16) + 16;
 	DoMD5(res2, res, n);
 	alpha = downsample(res2);
 
