@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2010-09-30  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/channels.c: Removed IsOper() exemptions from FEAT_EXTBAN_*
+	and FEAT_EXTEXCEPT_* Features.
+
 2010-08-05  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/cloak.c: Fixed a coupld of trivial bugs in the cloaking
