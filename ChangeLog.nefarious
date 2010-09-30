@@ -3,6 +3,10 @@
 
 2010-09-30  Matthew Beeching  <jobe@mdbnet.co.uk>
 
+	* ircd/ircd_features.c: Fixed 2 memory leaks in itoa().
+
+2010-09-30  Matthew Beeching  <jobe@mdbnet.co.uk>
+
 	* ircd/channels.c: Removed IsOper() exemptions from FEAT_EXTBAN_*
 	and FEAT_EXTEXCEPT_* Features.
 

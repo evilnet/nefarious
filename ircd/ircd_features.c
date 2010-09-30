@@ -68,14 +68,11 @@ static struct LogTypes {
   { 0, 0, 0 }
 };
 
-char* itoa (int n){
+char* itoa(int n) {
   int i=0,j;
-  char* s;
-  char* u;
+  static char s[17];
+  static char u[17];
 
-  s= (char*) malloc(17);
-  u= (char*) malloc(17);
-  
   do{
     s[i++]=(char)( n%10+48 );
     n-=n%10;
@@ -85,7 +82,7 @@ char* itoa (int n){
   u[i-1-j]=s[j];
 
   u[j]='\0';
-  return u;
+  return (char *)&u;
 }
 
 /** Handle an update to FEAT_HIS_SERVERNAME. */
