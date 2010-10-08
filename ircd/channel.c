@@ -831,8 +831,8 @@ int ext_text_ban(struct Client* sptr, struct Channel* chptr, const char* text) {
   for (tmp = chptr->banlist; tmp; tmp = tmp->next) {
     if (tmp->value.ban.extflag) {
       if (tmp->value.ban.extflag & EXTBAN_TEXT) {
-        ban = strdup(tmp->value.ban.banstr);
-        extstr = strdup(tmp->value.ban.extstr);
+        ban = tmp->value.ban.banstr;
+        extstr = tmp->value.ban.extstr;
         flags = tmp->flags;
 
         argc = explode_line(decodespace(ban), 1, ArrayLength(argv), argv);
