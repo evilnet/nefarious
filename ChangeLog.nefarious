@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2011-04-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/m_server.c: Fix for bug 3283924
+
 2010-09-30  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ircd_features.c: Fixed 2 memory leaks in itoa().

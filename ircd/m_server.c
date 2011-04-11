@@ -422,6 +422,16 @@ check_loop_and_lh(struct Client* cptr, struct Client *sptr, time_t *ghost, const
                           cli_name(cptr), host) == CPTR_KILLED)
         return CPTR_KILLED;
     }
+    else if (active_lh_line == 3)
+    {
+      sendto_opmask_butone(&me, SNO_OLDSNO,
+                           "%s SQUIT by %s [Non-Hub link %s <- %s, I'm a leaf, define HUB]",
+                           host, cli_name(&me), cli_name(cptr), host);
+      if (exit_client_msg(cptr, LHcptr, &me,
+                          "Non-Hub link %s <- %s, I'm a leaf, define HUB",
+                          cli_name(cptr), host) == CPTR_KILLED)
+        return CPTR_KILLED;
+    }
 
     /* We just squit somebody, and it wasn't cptr. */
     return 0;
