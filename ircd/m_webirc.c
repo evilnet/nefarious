@@ -254,7 +254,7 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   if (find_eline(cptr, EFLAG_IPCHECK))
     SetIPCheckExempted(cptr);
 
-  ircd_strncpy(cli_sock_ip(cptr), ipaddr, SOCKIPLEN);
+  ircd_strncpy(cli_sock_ip(cptr), ircd_ntoa((const char*) &(cli_ip(cptr))), SOCKIPLEN);
   ircd_strncpy(cli_sockhost(cptr), hostname, HOSTLEN);
 
   if (cli_user(sptr)) {
