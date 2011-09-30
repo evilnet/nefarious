@@ -1,5 +1,5 @@
 o <nick>	Channel operator (@ prefix)
-h <nick>	Channel half operator (% prefix)
+h <nick>	Channel half operator (%% prefix)
 v <nick>	Voiced user (+ prefix)
 
 b <mask>	Channel ban (users matching <mask> cannot /JOIN)

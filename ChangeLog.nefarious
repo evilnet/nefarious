@@ -1,6 +1,16 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2011-09-30  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* help/opers/channelmodes: Fixed +h prefix not showing.
+
+	* help/opers/usermodes: Fixed definition of +x.
+
+	* help/users/channelmodes: Fixed +h prefix not showing.
+
+	* help/users/usermodes: Fixed definition of +x.
+
 2011-08-02  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_user.c: Fixed client connection server notice to display
