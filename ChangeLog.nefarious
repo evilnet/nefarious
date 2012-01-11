@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2012-01-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/ircd_features.c: Fixed the default messages for
+	F:DNSBL_LOC_EXEMPT_N_TWO and F:KLINE_PROMPT_TWO to indicate the
+	correct login on connect PASS syntax.
+
 2011-09-30  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* help/opers/channelmodes: Fixed +h prefix not showing.
