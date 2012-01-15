@@ -1,6 +1,10 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2012-01-15  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_err.c: Corrected RPL_STATSSHUN definition.
+
 2012-01-11  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/ircd_features.c: Fixed the default messages for

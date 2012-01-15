@@ -1113,7 +1113,7 @@ static Numeric replyTable[] = {
 /* 541 */
   { RPL_ENDOFEXEMPTLIST, "%s :End of DNSBL Exempt List", "541" },
 /* 542 */
-  { RPL_STATSSLINE, "%c %s%s%s %Tu %Tu %c :%s", "542" },
+  { RPL_STATSSHUN, "%c %s%s%s %Tu %Tu %c :%s", "542" },
 /* 543 */
   { ERR_NOSUCHSHUN, "%s :No such shun", "543" },
 /* 544 */
