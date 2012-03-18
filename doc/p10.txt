@@ -1,7 +1,7 @@
 {0}
 
-the most recent version of this document can be found at www.bircd.org/bewarep10.txt. email me if you have comments/feedback.
-- beware (bewareircd at xs4all dot nl)
+the most recent version of this document can be found at http://ircd.bircd.org/bewarep10.txt. email me if you have comments/feedback.
+- beware (beware at bircd dot org)
 
 the text should be viewed in an ascii text viewer with line wrapping.
 
@@ -91,7 +91,7 @@ AA (0), AB (1), ... ]] (4095).
 
 - a client numeric is a server numeric + the number of the client on that server. a total of 5 base64 chars. for example ABAAC is client #2 (AAC) on server #1 (AB). one server can have a maximum of 262144 clients.
 
-{32} a server has a "max client numeric", this is sent in SERVER messages. a client numeric on a server, ANDed with the max server numeric, must be unique. for example if server YY's max client numeric is YYA]] (4095), clients YYBXX and YCXX can't exist at the same time, doing this would cause a "numeric collision", which is in this a protocol violation. but such numerics which occupy the same "slot" are not identical - a message sent to user YYBXX in this example must not reach user YYCXX.
+{32} a server has a "max client numeric", this is sent in SERVER messages. a client numeric on a server, ANDed with the max server numeric, must be unique. for example if server YY's max client numeric is YYA]] (4095), clients YYBXX and YCXX can't exist at the same time, doing this would cause a "numeric collision", which is in this a protocol violation. but such numerics which occupy the same "slot" are not identical - a message sent to user YYBXX in this example must not reach user YYCXX. the max client numeric has to be 2^n-1.
 
 {33} described above are "extended numerics", as used on undernet.
 
@@ -229,6 +229,7 @@ W	WHOIS
 X	WHOWAS
 SN	SVSNICK
 SJ	SVSJOIN
+SH	SETHOST
 
 ======================================
 {6} MISC
@@ -248,7 +249,7 @@ both ends of a link have the same link timestamp for that link: it is the link t
 if a server receives a SERVER or S message and the name or numeric of the new server already exists, there is a server name/numeric collision, this needs to be solved by breaking a link.
 An implementation which will not be hub (such as services) doen not need to support this at all.
 
-what do so when a server collision happens:
+what to do when a server collision happens:
 
 - if there is a name or numeric collision with the local server (myself) or with any U:lined (services) server, close the direct connection to the newly introduced server.
 
@@ -260,7 +261,7 @@ what do so when a server collision happens:
 
 - if the direct connection of the newly introduced server is marked as "caused ghost", remove the existing server (ghost loop)
 
-??? the ghost/ghost loop is not entirely clear to me; when testing, a ghost loop (w/o a *real* ghost) could break every server link in the loop, ircu prevents this with another check which is not documented and which is impossible to understand in the source, and which is not documented in carlo's specification.
+??? the ghost/ghost loop is not entirely clear to me; when testing, a ghost loop (without a *real* ghost) could break every server link in the loop, ircu prevents this with another check which is not documented and which is impossible to understand in the source, and which is not documented in carlo's specification.
 
 if none of the above criteria matched, break the second youngest link.
 
@@ -334,13 +335,13 @@ undernet and quakenet use account host hiding, an ircu2.10.11+ feature: if a use
 
 - note: if the last param of a command may have spaces - it is a fullname, reason, or "text" of any kind - the parser *must* use the last parameter of the received message, not a fixed param number. this allows room for inserting new parameters in the future. a fully compliant parser parses both "SSCCC P #channel :text" and "SSCCC P #channel 0 :text" correctly. the extra inserted parameters which are not described by the protocol, if any, may be ignored.
 
-with parameter number -1 i mean the last param, -2 is the param before the last param, etc. room for inserting future parameters w/o breaking a compliant parser is between the last parameter with positive number (counted from start) and first parameter with negative number (counted from end).
+with parameter number -1 i mean the last param, -2 is the param before the last param, etc. room for inserting future parameters without breaking a compliant parser is between the last parameter with positive number (counted from start) and first parameter with negative number (counted from end).
 
 - if parameter 0 is mentioned, it is the source of the message. if it is not mentioned, the source is obvious.
 
 - "remote request" means servers relay the message to the "target server", when the message reaches the target server it will take appropriate action (sending a reply to the source user)
 
-(mention beware topicburst syntax, which one *may* implement, safely w/o breaking ircu or asuka - asuka has it implemented)
+(mention beware topicburst syntax, which one *may* implement, safely without breaking ircu or asuka - asuka has it implemented)
 
 --------------------------
 {7AC} *** ACCOUNT (ircu2.10.11)
@@ -395,7 +396,7 @@ if incoming TS is older than the existing TS, all modes/ops/voices/bans on the e
 
 if the existing TS is older than the incoming TS, all modes/ops/voices/bans from the B message are ignored and are not propagared, only the users.
 
-if the timestamps are equal, the modes/bans/etc of the B are merged with the existing modes. if the incoming modes has a limit/ key and the existing modes has a limit/key, the greater one overrules ("a < b")
+if the timestamps are equal, the modes/bans/etc of the B are merged with the existing modes. a mode that's set wins from a mode that's not set. if both the incoming modes and existing modes have a limit/key, a lower limit wins. an a key that's first alphabetically wins.
 
 - <modes> is a parameter of which the first character is a +, it is parsed as a channel mode change; there can be extra parameters after the mode parameter for key and limit
 
@@ -405,7 +406,7 @@ if the timestamps are equal, the modes/bans/etc of the B are merged with the exi
 
 note that ircu2.10.12 will have "op levels", which are a number at the end of the membership modes string (???)
 
-in a generated burst message, the users must be sorted by the modes: first users w/o modes, then users with voice, then with op, then with op+voice: num,num:v,num:o,num:ov
+in a generated burst message, the users must be sorted by the modes: first users without modes, then users with voice, then with op, then with op+voice: num,num:v,num:o,num:ov
 
 example B message:
 A0 B #channel 1056560707 +ntslk 10 key A0AAB,A0AAC,ABAAA:v,ABAAB:o :%*!*@banned.host *!another@ban
@@ -538,7 +539,7 @@ remote "info" request
 
 - the creationtime parameter must be present if the channel parameter is not 0.
 
-- if the channel is created because of a JOIN, the channel's TS is set to the creationtime parameter. if the TS parameter is 0 or absent, ircu sets the channel TS to MAGIC_REMOTE_JOIN_TS, defined as 1270080000. JOIN messages w/o TS may be sent by ircu2.10.10 and earlier. JOIN messages for not existing channels can exist because of a JOIN crossing a PART which destroyed the channel.
+- if the channel is created because of a JOIN, the channel's TS is set to the creationtime parameter. if the TS parameter is 0 or absent, ircu sets the channel TS to MAGIC_REMOTE_JOIN_TS, defined as 1270080000. JOIN messages without TS may be sent by ircu2.10.10 and earlier. JOIN messages for not existing channels can exist because of a JOIN crossing a PART which destroyed the channel.
 
 --------------------------
 {7JU} *** JUPE
@@ -668,9 +669,10 @@ known modes with parameters are:
 
 the modes with parameters must only be used in the above mentioned sequence, for compatibility with implementations which support +r but dont support +h (or use +h for something different)
 
-- the IP is the binary 32 bits network order IP of the user, represented using 6 base64 characters. for example 192.168.0.1 -> $c0a80001 -> DAqAAB.
+- if the IP is IPv4, it is encoded as the binary 32 bits network order IP of the user, as 6 base64 characters. for example 192.168.0.1 -> $c0a80001 -> DAqAAB.
 
-in the future one can encounter an IP parameter in a different format, it will then have a different length. for example for IPv6. the format is unknown(???). a parser should deal with them somehow, such truncating them to 6 chars, and not crash.
+an IPv6 IP is encoded with up to 8 words of 3 chars, the longest run of zero (AAA) words should be substituted by a single _ (underscore character). for example, 1:2::3 -> AABAAC_AAD. an ircd that supports the IPv6 IPs must indicate doing so by including a 6 in its server flags in the SERVER message. an ircd must substitute AAAAAA (v4 IP 0.0.0.0) for a v6 IP when sending to links that don't support ipv6.
+
 
 - the numeric is the numeric of the new client, SSCCC format, the "SS" Part of the numeric must be the same as the source numeric.
 
@@ -682,6 +684,8 @@ in the future one can encounter an IP parameter in a different format, it will t
 - the source is the user who changes nick.
 
 - the TS is when the client last changed nick (also counting when the client connected)
+
+- the user's nickchange TS does not change if the nick changes only in case (is the same if compared case tolerant), then the existing/old TS is sent in the N message, not "now".
 
 if there is already a user with the new nick and it is not the source of the N message, there is a nick collision.
 
@@ -701,7 +705,7 @@ the source should be an IRC operator.
 -1 <reason>
 
 - the <channels> parameter may be a comma separated list
-- note about blocking a part if the user isn't in the channel: it must be propagated anyway if the user is in the channel as "zombie". a compatible implementation w/o zombies can be done by propagating them always.
+- note about blocking a part if the user isn't in the channel: it must be propagated anyway if the user is in the channel as "zombie". a compatible implementation without zombies can be done by propagating them always.
 
 --------------------------
 {7G} *** PING
@@ -823,17 +827,30 @@ in case of an existing server introducing another server (also during burst), th
 
 - <max clients numerics>: see [32]
 
-- the <flags> parameter is + (normal server), +h (hub hidden in /map) or +s (services). it may also be "0" for implementations which dont support the "flags" parameter.
+- the <flags> parameter, if present, is a + followed by one or more characters. characters include: h (hub hidden in /map), s (services), 6 (IPv6 support). the parameter may also be "0" for implementations which dont support the "flags" parameter.
+
+--------------------------
+{7SH} *** SETHOST
+
+1 <numeric of target user}
+2 <new userid>
+3 <new host>
+
+change the userid and host of another user.
+
+origin: snircd (quakenet).
+can be sent only by U:lined server. the message is propagated to the target user's server, which then changes the user's userid and host,
+and sends a +h user@host mode change to inform other servers of it.
 
 --------------------------
 {7SE} *** SETTIME
 
 1 <timestamp>
-1 [<target server numeric>]
+2 [<target server numeric>]
 
 settime sets the "clock" of one or all servers.
 
-the target server numeric is present if an oper issued "/settime timestamp server". a settime w/o target server numeric is broadcast to all servers. a server with RELIABLE_CLOCK will change the timestamp parameter of any settime message to it's own idea about the TS.
+the target server numeric is present if an oper issued "/settime timestamp server". a settime without target server numeric is broadcast to all servers. a server with RELIABLE_CLOCK will change the timestamp parameter of any settime message to it's own idea about the TS.
 
 --------------------------
 {7U} *** SILENCE
@@ -1009,3 +1026,11 @@ changes
 20031101: transactional kick/zombie part
 20031119: tell about GL/JU burst, mention they're before nicks (since .06). tell about "max client numeric". added search tags.
 20031122: about registering the connection
+20031213: max client numeric
+20031224: v6 IP in N token
+20040315: TS for nickchange only case
+20050102: settime param number typo fix
+20051029: server collision typo
+20100902: changed IPv6 IP encoding to be compatible with ircu2.10.12
+20111002: sethost SH
+20111002: limit/key in burst behavior to match ircu

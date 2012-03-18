@@ -1,6 +1,11 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2012-03-18  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/p10.txt: Updated P10 documentation from
+	http://ircd.bircd.org/bewarep10.txt
+
 2012-01-15  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* ircd/s_err.c: Corrected RPL_STATSSHUN definition.
