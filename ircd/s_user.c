@@ -830,7 +830,7 @@ int register_user(struct Client *cptr, struct Client *sptr,
         ircd_snprintf(0, cli_user(sptr)->virtip, HOSTLEN, "%s", hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
       } else {
         ircd_snprintf(0, cli_user(sptr)->virtip, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(sptr)))));
-        ircd_snprintf(0, cli_user(sptr)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(sptr)->host));
+        ircd_snprintf(0, cli_user(sptr)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(sptr)->realhost));
       }
 
       SetFlag(sptr, FLAG_CLOAKHOST);
@@ -1205,7 +1205,7 @@ int set_nick_name(struct Client* cptr, struct Client* sptr,
           ircd_snprintf(0, cli_user(new_client)->virtip, HOSTLEN, "%s", hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(new_client)))));
         } else {
           ircd_snprintf(0, cli_user(new_client)->virtip, HOSTLEN, hidehost_ipv4((char*)ircd_ntoa((const char*) &(cli_ip(new_client)))));
-          ircd_snprintf(0, cli_user(new_client)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(new_client)->host));
+          ircd_snprintf(0, cli_user(new_client)->virthost, HOSTLEN, "%s", hidehost_normalhost(cli_user(new_client)->realhost));
         }
       }
       SetFlag(new_client, FLAG_CLOAKHOST);

@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2012-03-29  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* ircd/s_user.c: Fix for style 2 cloaking not cloaking the correct
+	host name when the user gets an automatic spoofhost via a spoofhost
+	block.
+
 2012-03-18  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* doc/p10.txt: Updated P10 documentation from
