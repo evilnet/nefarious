@@ -20,7 +20,7 @@ When matching IP numbers the <mask> can be in 3 forms:
 
 The "options2" part can be as follows:
 
- [<flags>][%[<fields>[,<querytype>]]]
+ [<flags>][%%[<fields>[,<querytype>]]]
 
 in which:
 
@@ -47,7 +47,7 @@ User mode matching flags (specifying one of these means that only clients
        [In the future more flags will be supported, basically all
         usermodes plus the +/- specificators to revert the filtering]
 
-   The rest, what follows the %, that is [%[fields[,<querytype>]]], is as it
+   The rest, what follows the %%, that is [%[fields[,<querytype>]]], is as it
    has always been since the first who.patch, the <fields> part specifies
    wich fields to include in the output as:
 
