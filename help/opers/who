@@ -59,7 +59,7 @@ User mode matching flags (specifying one of these means that only clients
        means that the query is almost certainly logged and the admin might
        (rightfully) ask you an explanation on why you did.
 
-   The rest, what follows the %%, that is [%[fields[,<querytype>]]], is as it
+   The rest, what follows the %%, that is [%%[fields[,<querytype>]]], is as it
    has always been since the first who.patch, the <fields> part specifies
    wich fields to include in the output as:
 

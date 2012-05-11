@@ -1,6 +1,12 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2012-05-11  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* help/opers/who: Fix for unescaped % not showing in HELP WHO output.
+
+	* help/users/who: Fix for unescaped % not showing in HELP WHO output.
+
 2012-05-09  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* help/opers/who: Fix for unescaped % not showing in HELP WHO output.
