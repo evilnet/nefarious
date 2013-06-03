@@ -110,7 +110,8 @@ static int wline_flags[] = {
   WFLAG_MARK,       'm',
   WFLAG_SIDENT,     's',
   WFLAG_UIDENT,     'u',
-  WFLAG_STRIPSSLFP, 'f'
+  WFLAG_STRIPSSLFP, 'f',
+  WFLAG_ACCOUNT,    'a'
 };
 
 char wflagstr(const char* wflags)
@@ -154,6 +155,7 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
   char*         hostname = NULL;
   char*         ipaddr = NULL;
   char*         password = NULL;
+  char*         username = NULL;
   char          i_host[SOCKIPLEN + USERLEN + 2];
   char          s_host[HOSTLEN + USERLEN + 2];
   int           invalidauth = 1, invalidpass = 0, mark = 0;
@@ -225,6 +227,9 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
     ipaddr = parv[4];
   }
 
+  if (!EmptyString(parv[2]))
+    username = parv[2];
+
   inet_aton(ipaddr, &webirc_addr);
 
   if (feature_bool(FEAT_IPCHECK) && !find_eline(cptr, EFLAG_IPCHECK)) {
@@ -276,6 +281,11 @@ int m_webirc(struct Client *cptr, struct Client *sptr, int parc, char *parv[])
       ircd_strncpy(cli_username(cptr), wline->ident, USERLEN);
       SetGotId(cptr);
     }
+  }
+
+  if (w_flag & WFLAG_ACCOUNT) {
+    SetWebIRCAccount(cptr);
+    ircd_strncpy(cli_webircaccount(cptr), username, ACCOUNTLEN);
   }
 
   return 0;

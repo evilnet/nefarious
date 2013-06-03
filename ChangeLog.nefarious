@@ -1,6 +1,13 @@
 /***********************************************************************
  Nefarious IRCu ChangeLog
 
+2013-06-03  Matthew Beeching  <jobe@mdbnet.co.uk>
+
+	* doc/example.conf: Added WebIRC block flag 'a'.
+	* include/client.h: Added WebIRC block flag 'a'.
+	* ircd/m_webirc.c: Added WebIRC block flag 'a'.
+	* ircd/s_user.c: Added WebIRC block flag 'a'.
+
 2012-05-11  Matthew Beeching  <jobe@mdbnet.co.uk>
 
 	* help/opers/who: Fix for unescaped % not showing in HELP WHO output.

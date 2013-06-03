@@ -648,6 +648,15 @@ int register_user(struct Client *cptr, struct Client *sptr,
 
   }
 
+  if (MyConnect(sptr) && IsWebIRCAccount(sptr) && !IsAccount(sptr)) {
+    ircd_strncpy(cli_user(sptr)->account, cli_webircaccount(sptr), ACCOUNTLEN);
+    SetAccount(sptr);
+    if (feature_int(FEAT_HOST_HIDING_STYLE) == 1) {
+      SetHiddenHost(sptr);
+      hide_hostmask(sptr);
+    }
+  }
+
   if ((deny=find_prompt(sptr)) && !IsAccount(sptr) && MyConnect(sptr)) {
     log_write(LS_DNSBL, L_INFO, 0, "Offering kline loc exemption to %s", cli_name(sptr));
     if (!EmptyString(deny->mark)) {

@@ -186,6 +186,7 @@ enum Flag {
 
     FLAG_WEBIRC,                    /**< User registered with WEBIRC command */
     FLAG_WEBIRC_UIDENT,             /**< Use USER method for getting IDENT */
+    FLAG_WEBIRC_ACCOUNT,            /**< WEBIRC has set an account name */
 
     FLAG_NAMESX,                    /**< Client supports extended NAMES replies */
     FLAG_UHNAMES,                   /**< Client supports extended NAMES replies */
@@ -305,6 +306,7 @@ struct Client {
   char cli_dnsbls[BUFSIZE + 1];      /**< all dnsbls matched identifier */
   char cli_sslclifp[BUFSIZE + 1];    /**< SSL client certificate fingerprint if available */
   char cli_webircpass[BUFSIZE + 1];  /**< W:Line password */
+  char cli_webircaccount[ACCOUNTLEN + 1]; /**< Account name set by WEBIRC */
   unsigned int cli_webircflags;      /**< W:Line flags */
   struct SLink*   cli_sdnsbls;       /**< chain of dnsbl pointer blocks */
   char cli_dnsblformat[BUFSIZE + 1]; /**< dnsbl rejection message */
@@ -465,6 +467,8 @@ struct Client {
 #define cli_sslclifp(cli)       ((cli)->cli_sslclifp)
 /** Get WebIRC password used for successful WEBIRC */
 #define cli_webircpass(cli)     ((cli)->cli_webircpass)
+/** Get WebIRC account name for the client */
+#define cli_webircaccount(cli)  ((cli)->cli_webircaccount)
 /** Get WebIRC flags from successful WEBIRC */
 #define cli_webircflags(cli)    ((cli)->cli_webircflags)
 
@@ -724,6 +728,8 @@ struct Client {
 #define IsWebIRC(x)             HasFlag(x, FLAG_WEBIRC)
 /** Return non-zero if the client is WEBIRC line uses USER method */
 #define IsWebIRCUserIdent(x)    HasFlag(x, FLAG_WEBIRC_UIDENT)
+/** Return non-zero if the client has an account name from WEBIRC */
+#define IsWebIRCAccount(x)      HasFlag(x, FLAG_WEBIRC_ACCOUNT)
 /** Return non-zero if the client supports extended NAMES */
 #define IsNamesX(x)             HasFlag(x, FLAG_NAMESX)
 /** Return non-zero if the client supports extended NAMES */
@@ -821,6 +827,8 @@ struct Client {
 #define SetWebIRC(x)            SetFlag(x, FLAG_WEBIRC)
 /** Mark a WEBIRC client as using USER to send ident .*/
 #define SetWebIRCUserIdent(x)   SetFlag(x, FLAG_WEBIRC_UIDENT)
+/** Mark a WEBIRC client as having an account name. */
+#define SetWebIRCAccount(x)     SetFlag(x, FLAG_WEBIRC_ACCOUNT)
 /** Mark a client as supporting extended NAMES. */
 #define SetNamesX(x)            SetFlag(x, FLAG_NAMESX)
 /** Mark a client as supporting extended NAMES. */
@@ -1019,6 +1027,7 @@ struct Client {
 #define WFLAG_SIDENT     0x002
 #define WFLAG_UIDENT     0x004
 #define WFLAG_STRIPSSLFP 0x008
+#define WFLAG_ACCOUNT    0x010
 
 /** Exception for K:Lines */
 #define EFLAG_KLINE     0x001
