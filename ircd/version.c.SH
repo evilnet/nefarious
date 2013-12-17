@@ -24,7 +24,8 @@ if test -f ../.release
 then
         cvs_version=`cat ../.release`
 else
-        cvs_version=`hg tip --template '{rev}:{node|short} {date|shortdate}'`
+        #cvs_version=`hg tip --template '{rev}:{node|short} {date|shortdate}'`
+        cvs_version=`git describe --dirty --long --always`
 fi
 
 /bin/cat >version.c <<!SUB!THIS!
